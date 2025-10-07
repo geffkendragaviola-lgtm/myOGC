@@ -165,6 +165,9 @@ Route::middleware(['auth'])->group(function () {
     Route::post('counselor/events/{event}/registrations/{registration}/status', [EventController::class, 'updateRegistrationStatus'])->name('counselor.events.update-registration-status');
 });
 
+
+
+
 // Student event routes
 Route::middleware(['auth'])->group(function () {
     Route::get('/events/available', [EventRegistrationController::class, 'availableEvents'])->name('student.events.available');

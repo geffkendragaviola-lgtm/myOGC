@@ -1,13 +1,8 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Book Appointment - OGC</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-</head>
-<body class="bg-gray-50">
+@extends('layouts.student')
+
+@section('title', 'Student Dashboard - OGC')
+
+@section('content')
 
 
     <div class="container mx-auto px-6 py-8">
@@ -169,5 +164,4 @@
         dateSelect.addEventListener('change', loadAvailableSlots);
     });
 </script>
-</body>
-</html>
+@endsection

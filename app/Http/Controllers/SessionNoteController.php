@@ -415,57 +415,57 @@ class SessionNoteController extends Controller
     /**
      * Update session notes
      */
-    public function update(Request $request, SessionNote $sessionNote)
-    {
-        // Verify the counselor owns this session note (from any assigned college)
-        $counselorIds = $this->getCounselorIds();
-        if (!$counselorIds->contains($sessionNote->counselor_id)) {
-            abort(403);
-        }
-
-        $validated = $request->validate([
-            'notes' => 'required|string|min:10',
-            'follow_up_actions' => 'nullable|string',
-            'session_date' => 'required|date',
-            'session_type' => 'required|in:initial,follow_up,crisis,regular',
-            'mood_level' => 'nullable|in:very_low,low,neutral,good,very_good',
-            'requires_follow_up' => 'boolean',
-            'next_session_date' => 'nullable|date|after:session_date',
-            // Follow-up appointment fields
-            'followup_appointment_date' => 'nullable|date|after:session_date',
-            'followup_start_time' => 'nullable|date_format:H:i',
-            'followup_concern' => 'nullable|string|max:500',
-            'auto_approve_followup' => 'boolean'
-        ]);
-
-        $validated['requires_follow_up'] = $request->has('requires_follow_up');
-
-        // Update session note
-        $sessionNote->update($validated);
-
-        // Handle follow-up appointment
-        if ($request->has('requires_follow_up') &&
-            $request->filled('followup_appointment_date') &&
-            $request->filled('followup_start_time') &&
-            $request->filled('followup_concern')) {
-
-            $this->updateOrCreateFollowupAppointment($request, $sessionNote);
-        } else {
-            // Delete existing follow-up appointment if exists and follow-up is no longer required
-            if ($sessionNote->appointment) {
-                $sessionNote->appointment->delete();
-                $sessionNote->update(['appointment_id' => null]);
-            }
-        }
-
-        $successMessage = 'Session notes updated successfully!';
-        if ($request->has('requires_follow_up') && $request->filled('followup_appointment_date')) {
-            $successMessage .= ' Follow-up appointment updated.';
-        }
-
-        return redirect()->route('counselor.session-notes.index', $sessionNote->student)
-            ->with('success', $successMessage);
+public function update(Request $request, SessionNote $sessionNote)
+{
+    // Verify the counselor owns this session note (from any assigned college)
+    $counselorIds = $this->getCounselorIds();
+    if (!$counselorIds->contains($sessionNote->counselor_id)) {
+        abort(403);
     }
+
+    $validated = $request->validate([
+        'notes' => 'required|string|min:10',
+        'follow_up_actions' => 'nullable|string',
+        'session_date' => 'required|date',
+        'session_type' => 'required|in:initial,follow_up,crisis,regular',
+        'mood_level' => 'nullable|in:very_low,low,neutral,good,very_good',
+        'requires_follow_up' => 'boolean',
+        'next_session_date' => 'nullable|date|after:session_date',
+        // Follow-up appointment fields
+        'followup_appointment_date' => 'nullable|date|after:session_date',
+        'followup_start_time' => 'nullable|date_format:H:i',
+        'followup_concern' => 'nullable|string|max:500',
+        'auto_approve_followup' => 'boolean'
+    ]);
+
+    $validated['requires_follow_up'] = $request->has('requires_follow_up');
+
+    // Update session note
+    $sessionNote->update($validated);
+
+    // Handle follow-up appointment - FIXED LOGIC
+// Handle follow-up appointment - PRESERVE EXISTING APPOINTMENTS
+$hasFollowUpData = $request->filled('followup_appointment_date') &&
+                  $request->filled('followup_start_time') &&
+                  $request->filled('followup_concern');
+
+if ($request->has('requires_follow_up') && $hasFollowUpData) {
+    // Create or update follow-up appointment
+    $this->updateOrCreateFollowupAppointment($request, $sessionNote);
+}
+// Never delete appointments automatically - only update or create
+    // If requires_follow_up is checked but data is incomplete, do nothing (preserve existing appointment)
+
+    $successMessage = 'Session notes updated successfully!';
+    if ($request->has('requires_follow_up') && $hasFollowUpData) {
+        $successMessage .= ' Follow-up appointment updated.';
+    } elseif (!$request->has('requires_follow_up') && $sessionNote->appointment) {
+        $successMessage .= ' Follow-up appointment removed.';
+    }
+
+    return redirect()->route('counselor.session-notes.index', $sessionNote->student)
+        ->with('success', $successMessage);
+}
 
     /**
      * Update or create follow-up appointment
