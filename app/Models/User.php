@@ -176,4 +176,8 @@ class User extends Authenticatable
             'birthdate' => 'date',
         ];
     }
+
+
+
 }
+

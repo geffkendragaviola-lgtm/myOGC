@@ -12,6 +12,8 @@ use App\Http\Controllers\EventRegistrationController;
 use App\Http\Controllers\ResourceController;
 use App\Http\Controllers\SessionNoteController;
 use App\Http\Controllers\CounselorAnnouncementController;
+use Illuminate\Support\Facades\Auth;
+use App\Http\Controllers\AdminController;
 
 Route::get('/', function () {
     return redirect()->route('login');
@@ -177,4 +179,30 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/events/{event}/cancel', [EventRegistrationController::class, 'cancelRegistration'])->name('student.events.cancel');
 });
 
+// Admin routes - using same logic as counselor (no middleware)
+Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () {
+    Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('dashboard');
+    Route::get('/users', [AdminController::class, 'users'])->name('users');
+    Route::get('/users/create', [AdminController::class, 'createUser'])->name('users.create');
+    Route::post('/users', [AdminController::class, 'storeUser'])->name('users.store');
+    Route::get('/users/{user}/edit', [AdminController::class, 'editUser'])->name('users.edit');
+    Route::put('/users/{user}', [AdminController::class, 'updateUser'])->name('users.update');
+    Route::delete('/users/{user}', [AdminController::class, 'deleteUser'])->name('users.delete');
+
+    Route::get('/students', [AdminController::class, 'students'])->name('students');
+    Route::get('/counselors', [AdminController::class, 'counselors'])->name('counselors');
+});
+// Add this to your web.php temporarily
+Route::get('/check-admin-status', function() {
+    $user = Auth::user();
+    $admin = \App\Models\Admin::where('user_id', $user->id)->first();
+
+    return response()->json([
+        'user_id' => $user->id,
+        'user_email' => $user->email,
+        'user_role' => $user->role,
+        'has_admin_profile' => $admin ? 'Yes' : 'No',
+        'admin_profile' => $admin
+    ]);
+});
 require __DIR__.'/auth.php';

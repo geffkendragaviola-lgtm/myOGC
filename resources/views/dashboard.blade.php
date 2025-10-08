@@ -175,7 +175,48 @@
 </div>
 
                         @endif
+<!-- Admin Dropdown (if user role is admin) -->
+@if(Auth::user()->role === 'admin')
+<div class="relative" id="admin-dropdown">
+    <button
+        class="text-white font-semibold hover:text-yellow-300 transition flex items-center"
+        id="admin-dropdown-btn"
+    >
+        Admin
+        <i class="fas fa-chevron-down ml-1 text-sm"></i>
+    </button>
 
+    <div
+        class="absolute hidden bg-white rounded-md shadow-lg mt-1 w-48 z-50"
+        id="admin-dropdown-menu"
+    >
+        <a href="{{ route('admin.dashboard') }}" class="block px-4 py-2 text-gray-800 hover:bg-blue-100">
+            <i class="fas fa-tachometer-alt mr-2"></i> Dashboard
+        </a>
+
+        <a href="{{ route('admin.users') }}" class="block px-4 py-2 text-gray-800 hover:bg-blue-100">
+            <i class="fas fa-users mr-2"></i> Manage Users
+        </a>
+
+        <a href="{{ route('admin.users.create') }}" class="block px-4 py-2 text-gray-800 hover:bg-blue-100">
+            <i class="fas fa-user-plus mr-2"></i> Create User
+        </a>
+
+        <a href="{{ route('admin.students') }}" class="block px-4 py-2 text-gray-800 hover:bg-blue-100">
+            <i class="fas fa-user-graduate mr-2"></i> Students
+        </a>
+
+        <a href="{{ route('admin.counselors') }}" class="block px-4 py-2 text-gray-800 hover:bg-blue-100">
+            <i class="fas fa-user-md mr-2"></i> Counselors
+        </a>
+
+        <!-- Remove or update the feedback route since it wasn't defined -->
+        <!-- <a href="{{ route('admin.feedback.index') }}" class="block px-4 py-2 text-gray-800 hover:bg-blue-100">
+            <i class="fas fa-comments mr-2"></i> Feedback
+        </a> -->
+    </div>
+</div>
+        @endif
                         <!-- Student Dropdown (if user role is student) -->
                         @if(Auth::user()->role === 'student')
                         <div class="relative" id="student-dropdown">
@@ -565,6 +606,27 @@
                 });
             }
         });
+
+        // Admin Dropdown functionality
+const adminDropdownBtn = document.getElementById('admin-dropdown-btn');
+const adminDropdownMenu = document.getElementById('admin-dropdown-menu');
+
+if (adminDropdownBtn && adminDropdownMenu) {
+    adminDropdownBtn.addEventListener('click', function(e) {
+        e.stopPropagation();
+        adminDropdownMenu.classList.toggle('hidden');
+    });
+
+    // Close dropdown when clicking outside
+    document.addEventListener('click', function() {
+        adminDropdownMenu.classList.add('hidden');
+    });
+
+    // Prevent dropdown from closing when clicking inside
+    adminDropdownMenu.addEventListener('click', function(e) {
+        e.stopPropagation();
+    });
+}
     </script>
 </body>
 </html>

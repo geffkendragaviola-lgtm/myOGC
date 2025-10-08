@@ -34,6 +34,22 @@
         .sidebar a:hover {
             background-color: rgba(255, 255, 255, 0.2);
         }
+ .dashboard-profile-dropdown {
+            position: relative;
+        }
+
+        .dashboard-profile-dropdown-content {
+            position: absolute;
+            right: 0;
+            top: 100%;
+            background: white;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            border-radius: 8px;
+            padding: 1rem;
+            min-width: 200px;
+            z-index: 1000;
+            margin-top: 0.5rem;
+        }
 
         body {
             overflow-x: hidden;
@@ -64,19 +80,6 @@
                 </div>
 
                 <!-- Student Dropdown -->
-                <div class="relative" id="student-dropdown">
-                    <button class="text-white font-semibold hover:text-yellow-300 transition flex items-center" id="student-dropdown-btn">
-                        Student <i class="fas fa-chevron-down ml-1 text-sm"></i>
-                    </button>
-                    <div class="absolute hidden bg-white rounded-md shadow-lg py-2 mt-1 w-48 z-50" id="student-dropdown-menu">
-                        <a href="{{ route('appointments.index') }}" class="block px-4 py-2 text-gray-800 hover:bg-blue-100">
-                            <i class="fas fa-calendar-plus mr-2"></i>My Appointments
-                        </a>
-                        <a href="{{ route('student.events.my-registrations') }}" class="block px-4 py-2 text-gray-800 hover:bg-blue-100">
-                            <i class="fas fa-list-check mr-2"></i>My Registrations
-                        </a>
-                    </div>
-                </div>
 
                 <a href="{{ route('feedback') }}" class="text-white font-semibold hover:text-yellow-300 transition">Feedback</a>
             </div>
@@ -86,7 +89,7 @@
                     <i class="fas fa-bell"></i>
                 </button>
 
-                <!-- Profile Dropdown -->
+                    <!-- Profile Dropdown -->
                 <div class="dashboard-profile-dropdown">
                     <button class="text-white p-2 rounded-full hover:bg-blue-700 transition" id="profile-dropdown-btn">
                         <i class="fas fa-user"></i>
@@ -110,7 +113,6 @@
                 </div>
             </div>
         </nav>
-
         <!-- Sidebar for Students -->
         <nav class="sidebar fixed top-16 left-0 h-[calc(100vh-4rem)] w-64 text-white flex flex-col justify-between z-30">
             <div>
@@ -128,7 +130,7 @@
 
                     <a href="{{ route('appointments.index') }}"><i class="fas fa-calendar-plus mr-3"></i> My Appointments</a>
                     <a href="{{ route('student.events.my-registrations') }}"><i class="fas fa-list-check mr-3"></i> My Registrations</a>
-                 
+
                     <a href="{{ route('bap') }}"><i class="fas fa-calendar-check mr-3"></i> Book Appointment</a>
                 </div>
             </div>
