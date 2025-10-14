@@ -11,67 +11,42 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules;
+use Illuminate\Support\Facades\DB;
+use Carbon\Carbon;
 
 class AdminController extends Controller
 {
-   public function dashboard()
-{
-    $user = Auth::user();
+    public function dashboard()
+    {
+        $user = Auth::user();
 
-    // Debug: Check if user is authenticated and has admin role
-    if (!$user) {
-        return redirect()->route('login');
-    }
+        if (!$user || $user->role !== 'admin') {
+            return redirect()->route('login');
+        }
 
-    // Check if user has admin role
-    if ($user->role !== 'admin') {
-        return redirect()->route('dashboard')->with('error', 'Access denied. Your account does not have admin privileges.');
-    }
-
-    // Get or create admin profile
-    $admin = Admin::with('user')->where('user_id', $user->id)->first();
-
-    if (!$admin) {
-        try {
+        // Force create admin profile if missing
+        $admin = Admin::with('user')->where('user_id', $user->id)->first();
+        if (!$admin) {
             $admin = Admin::create([
                 'user_id' => $user->id,
                 'credentials' => 'System Administrator'
             ]);
-            $admin->load('user');
-        } catch (\Exception $e) {
-            return redirect()->route('dashboard')->with('error', 'Failed to create admin profile: ' . $e->getMessage());
         }
-    }
 
-    // Get statistics with error handling
-    try {
+        // Simple stats without relationships
         $stats = [
             'total_users' => User::count(),
             'total_students' => Student::count(),
             'total_counselors' => Counselor::count(),
             'total_admins' => Admin::count(),
-            'pending_users' => User::where('status', 'pending')->count() ?? 0,
+            'pending_users' => 0, // Temporary
         ];
 
-        // Recent users
-        $recentUsers = User::with(['student', 'counselor', 'admin'])
-            ->latest()
-            ->limit(10)
-            ->get();
-    } catch (\Exception $e) {
-        // If there's an error with stats, set defaults
-        $stats = [
-            'total_users' => 0,
-            'total_students' => 0,
-            'total_counselors' => 0,
-            'total_admins' => 0,
-            'pending_users' => 0,
-        ];
-        $recentUsers = collect();
+        // Simple recent users without relationships
+        $recentUsers = User::latest()->limit(10)->get();
+
+        return view('admin.dashboard', compact('admin', 'stats', 'recentUsers'));
     }
-
-    return view('admin.dashboard', compact('admin', 'stats', 'recentUsers'));
-}
 
     public function users(Request $request)
     {
@@ -119,7 +94,8 @@ class AdminController extends Controller
 
     public function storeUser(Request $request)
     {
-        $request->validate([
+        // Base validation rules
+        $rules = [
             'first_name' => 'required|string|max:255',
             'last_name' => 'required|string|max:255',
             'middle_name' => 'nullable|string|max:255',
@@ -128,67 +104,99 @@ class AdminController extends Controller
             'role' => 'required|in:student,counselor,admin',
             'phone_number' => 'nullable|string|max:20',
             'address' => 'nullable|string|max:500',
-        ]);
+            'birthdate' => 'nullable|date',
+            'sex' => 'nullable|in:male,female,other',
+            'birthplace' => 'nullable|string|max:255',
+            'religion' => 'nullable|string|max:100',
+            'affiliation' => 'nullable|string|max:100',
+            'civil_status' => 'nullable|in:single,married,divorced,widowed',
+            'citizenship' => 'nullable|string|max:50',
+        ];
 
-        // Create user
-        $user = User::create([
-            'first_name' => $request->first_name,
-            'last_name' => $request->last_name,
-            'middle_name' => $request->middle_name,
-            'email' => $request->email,
-            'password' => Hash::make($request->password),
-            'role' => $request->role,
-            'phone_number' => $request->phone_number,
-            'address' => $request->address,
-            'email_verified_at' => now(), // Auto-verify for admin-created users
-        ]);
-
-        // Create role-specific profile
+        // Add role-specific rules
         if ($request->role === 'student') {
-            $request->validate([
-                'student_id' => 'required|string|max:50|unique:students',
-                'year_level' => 'required|in:1st Year,2nd Year,3rd Year,4th Year,5th Year,Graduate',
-                'course' => 'required|string|max:255',
-                'college_id' => 'required|exists:colleges,id',
-            ]);
-
-            Student::create([
-                'user_id' => $user->id,
-                'student_id' => $request->student_id,
-                'year_level' => $request->year_level,
-                'course' => $request->course,
-                'college_id' => $request->college_id,
-            ]);
-
+            $rules['student_id'] = 'required|string|max:50|unique:students';
+            $rules['year_level'] = 'required|in:1st Year,2nd Year,3rd Year,4th Year,5th Year,Graduate';
+            $rules['course'] = 'required|string|max:255';
+            $rules['college_id'] = 'required|exists:colleges,id';
         } elseif ($request->role === 'counselor') {
-            $request->validate([
-                'position' => 'required|string|max:255',
-                'credentials' => 'required|string|max:255',
-                'college_id' => 'required|exists:colleges,id',
-                'specialization' => 'nullable|string|max:500',
-            ]);
-
-            Counselor::create([
-                'user_id' => $user->id,
-                'position' => $request->position,
-                'credentials' => $request->credentials,
-                'college_id' => $request->college_id,
-                'specialization' => $request->specialization,
-                'is_head' => $request->has('is_head'),
-            ]);
-
+            $rules['position'] = 'required|string|max:255';
+            $rules['credentials'] = 'required|string|max:255';
+            $rules['counselor_college_id'] = 'required|exists:colleges,id';
+            $rules['specialization'] = 'nullable|string|max:500';
         } elseif ($request->role === 'admin') {
-            $request->validate([
-                'credentials' => 'required|string|max:100',
-            ]);
-
-            Admin::create([
-                'user_id' => $user->id,
-                'credentials' => $request->credentials,
-            ]);
+            $rules['admin_credentials'] = 'required|string|max:255';
         }
 
-        return redirect()->route('admin.users')->with('success', 'User created successfully.');
+        $request->validate($rules);
+
+        DB::beginTransaction();
+
+        try {
+            // Calculate age from birthdate
+            $age = null;
+            if ($request->birthdate) {
+                $age = Carbon::parse($request->birthdate)->age;
+            }
+
+            // Create user
+            $user = User::create([
+                'first_name' => strip_tags($request->first_name),
+                'last_name' => strip_tags($request->last_name),
+                'middle_name' => $request->middle_name ? strip_tags($request->middle_name) : null,
+                'email' => $request->email,
+                'password' => Hash::make($request->password),
+                'role' => $request->role,
+                'phone_number' => $request->phone_number,
+                'address' => $request->address ? strip_tags($request->address) : null,
+                'birthdate' => $request->birthdate,
+                'age' => $age,
+                'sex' => $request->sex,
+                'birthplace' => $request->birthplace ? strip_tags($request->birthplace) : null,
+                'religion' => $request->religion ? strip_tags($request->religion) : null,
+                'affiliation' => $request->affiliation ? strip_tags($request->affiliation) : null,
+                'civil_status' => $request->civil_status,
+                'citizenship' => $request->citizenship ? strip_tags($request->citizenship) : null,
+                'email_verified_at' => now(), // Auto-verify for admin-created users
+            ]);
+
+            // Create role-specific profile
+            if ($request->role === 'student') {
+                Student::create([
+                    'user_id' => $user->id,
+                    'student_id' => $request->student_id,
+                    'year_level' => $request->year_level,
+                    'course' => strip_tags($request->course),
+                    'college_id' => $request->college_id,
+                ]);
+
+            } elseif ($request->role === 'counselor') {
+                Counselor::create([
+                    'user_id' => $user->id,
+                    'position' => strip_tags($request->position),
+                    'credentials' => strip_tags($request->credentials),
+                    'college_id' => $request->counselor_college_id,
+                    'specialization' => $request->specialization ? strip_tags($request->specialization) : null,
+                    'is_head' => $request->has('is_head'),
+                ]);
+
+            } elseif ($request->role === 'admin') {
+                Admin::create([
+                    'user_id' => $user->id,
+                    'credentials' => strip_tags($request->admin_credentials),
+                ]);
+            }
+
+            DB::commit();
+
+            return redirect()->route('admin.users')->with('success', 'User created successfully.');
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return redirect()->back()
+                ->withInput()
+                ->withErrors(['error' => 'Failed to create user: ' . $e->getMessage()]);
+        }
     }
 
     public function editUser(User $user)
@@ -202,68 +210,129 @@ class AdminController extends Controller
 
     public function updateUser(Request $request, User $user)
     {
-        $request->validate([
+        // Base validation rules
+        $rules = [
             'first_name' => 'required|string|max:255',
             'last_name' => 'required|string|max:255',
             'middle_name' => 'nullable|string|max:255',
             'email' => 'required|string|email|max:255|unique:users,email,' . $user->id,
             'phone_number' => 'nullable|string|max:20',
             'address' => 'nullable|string|max:500',
-        ]);
+            'birthdate' => 'nullable|date',
+            'sex' => 'nullable|in:male,female,other',
+            'birthplace' => 'nullable|string|max:255',
+            'religion' => 'nullable|string|max:100',
+            'affiliation' => 'nullable|string|max:100',
+            'civil_status' => 'nullable|in:single,married,divorced,widowed',
+            'citizenship' => 'nullable|string|max:50',
+        ];
 
-        // Update user
-        $user->update([
-            'first_name' => $request->first_name,
-            'last_name' => $request->last_name,
-            'middle_name' => $request->middle_name,
-            'email' => $request->email,
-            'phone_number' => $request->phone_number,
-            'address' => $request->address,
-        ]);
-
-        // Update role-specific profile
-        if ($user->role === 'student' && $user->student) {
-            $request->validate([
-                'student_id' => 'required|string|max:50|unique:students,student_id,' . $user->student->id,
-                'year_level' => 'required|in:1st Year,2nd Year,3rd Year,4th Year,5th Year,Graduate',
-                'course' => 'required|string|max:255',
-                'college_id' => 'required|exists:colleges,id',
-            ]);
-
-            $user->student->update([
-                'student_id' => $request->student_id,
-                'year_level' => $request->year_level,
-                'course' => $request->course,
-                'college_id' => $request->college_id,
-            ]);
-
-        } elseif ($user->role === 'counselor' && $user->counselor) {
-            $request->validate([
-                'position' => 'required|string|max:255',
-                'credentials' => 'required|string|max:255',
-                'college_id' => 'required|exists:colleges,id',
-                'specialization' => 'nullable|string|max:500',
-            ]);
-
-            $user->counselor->update([
-                'position' => $request->position,
-                'credentials' => $request->credentials,
-                'college_id' => $request->college_id,
-                'specialization' => $request->specialization,
-                'is_head' => $request->has('is_head'),
-            ]);
-
-        } elseif ($user->role === 'admin' && $user->admin) {
-            $request->validate([
-                'credentials' => 'required|string|max:100',
-            ]);
-
-            $user->admin->update([
-                'credentials' => $request->credentials,
-            ]);
+        // Add role-specific rules
+        if ($user->role === 'student') {
+            $rules['student_id'] = 'required|string|max:50|unique:students,student_id,' . ($user->student ? $user->student->id : 'NULL');
+            $rules['year_level'] = 'required|in:1st Year,2nd Year,3rd Year,4th Year,5th Year,Graduate';
+            $rules['course'] = 'required|string|max:255';
+            $rules['college_id'] = 'required|exists:colleges,id';
+        } elseif ($user->role === 'counselor') {
+            $rules['position'] = 'required|string|max:255';
+            $rules['credentials'] = 'required|string|max:255';
+            $rules['counselor_college_id'] = 'required|exists:colleges,id';
+            $rules['specialization'] = 'nullable|string|max:500';
+        } elseif ($user->role === 'admin') {
+            $rules['admin_credentials'] = 'required|string|max:255';
         }
 
-        return redirect()->route('admin.users')->with('success', 'User updated successfully.');
+        $request->validate($rules);
+
+        DB::beginTransaction();
+
+        try {
+            // Calculate age from birthdate
+            $age = null;
+            if ($request->birthdate) {
+                $age = Carbon::parse($request->birthdate)->age;
+            }
+
+            // Update user
+            $user->update([
+                'first_name' => strip_tags($request->first_name),
+                'last_name' => strip_tags($request->last_name),
+                'middle_name' => $request->middle_name ? strip_tags($request->middle_name) : null,
+                'email' => $request->email,
+                'phone_number' => $request->phone_number,
+                'address' => $request->address ? strip_tags($request->address) : null,
+                'birthdate' => $request->birthdate,
+                'age' => $age,
+                'sex' => $request->sex,
+                'birthplace' => $request->birthplace ? strip_tags($request->birthplace) : null,
+                'religion' => $request->religion ? strip_tags($request->religion) : null,
+                'affiliation' => $request->affiliation ? strip_tags($request->affiliation) : null,
+                'civil_status' => $request->civil_status,
+                'citizenship' => $request->citizenship ? strip_tags($request->citizenship) : null,
+            ]);
+
+            // Update role-specific profile
+            if ($user->role === 'student') {
+                if ($user->student) {
+                    $user->student->update([
+                        'student_id' => $request->student_id,
+                        'year_level' => $request->year_level,
+                        'course' => strip_tags($request->course),
+                        'college_id' => $request->college_id,
+                    ]);
+                } else {
+                    Student::create([
+                        'user_id' => $user->id,
+                        'student_id' => $request->student_id,
+                        'year_level' => $request->year_level,
+                        'course' => strip_tags($request->course),
+                        'college_id' => $request->college_id,
+                    ]);
+                }
+
+            } elseif ($user->role === 'counselor') {
+                if ($user->counselor) {
+                    $user->counselor->update([
+                        'position' => strip_tags($request->position),
+                        'credentials' => strip_tags($request->credentials),
+                        'college_id' => $request->counselor_college_id,
+                        'specialization' => $request->specialization ? strip_tags($request->specialization) : null,
+                        'is_head' => $request->has('is_head'),
+                    ]);
+                } else {
+                    Counselor::create([
+                        'user_id' => $user->id,
+                        'position' => strip_tags($request->position),
+                        'credentials' => strip_tags($request->credentials),
+                        'college_id' => $request->counselor_college_id,
+                        'specialization' => $request->specialization ? strip_tags($request->specialization) : null,
+                        'is_head' => $request->has('is_head'),
+                    ]);
+                }
+
+            } elseif ($user->role === 'admin') {
+                if ($user->admin) {
+                    $user->admin->update([
+                        'credentials' => strip_tags($request->admin_credentials),
+                    ]);
+                } else {
+                    Admin::create([
+                        'user_id' => $user->id,
+                        'credentials' => strip_tags($request->admin_credentials),
+                    ]);
+                }
+            }
+
+            DB::commit();
+
+            return redirect()->route('admin.users')->with('success', 'User updated successfully.');
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return redirect()->back()
+                ->withInput()
+                ->withErrors(['error' => 'Failed to update user: ' . $e->getMessage()]);
+        }
     }
 
     public function deleteUser(User $user)
@@ -273,9 +342,39 @@ class AdminController extends Controller
             return redirect()->back()->with('error', 'You cannot delete your own account.');
         }
 
-        $user->delete();
+        DB::beginTransaction();
 
-        return redirect()->route('admin.users')->with('success', 'User deleted successfully.');
+        try {
+            // Delete role-specific profile first
+            switch ($user->role) {
+                case 'student':
+                    if ($user->student) {
+                        $user->student->delete();
+                    }
+                    break;
+                case 'counselor':
+                    if ($user->counselor) {
+                        $user->counselor->delete();
+                    }
+                    break;
+                case 'admin':
+                    if ($user->admin) {
+                        $user->admin->delete();
+                    }
+                    break;
+            }
+
+            // Delete user
+            $user->delete();
+
+            DB::commit();
+
+            return redirect()->route('admin.users')->with('success', 'User deleted successfully.');
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return redirect()->back()->with('error', 'Failed to delete user: ' . $e->getMessage());
+        }
     }
 
     public function students(Request $request)

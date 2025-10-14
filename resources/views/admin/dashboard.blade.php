@@ -97,38 +97,38 @@
                 </div>
             </div>
 
-         <!-- Quick Actions -->
-<div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-    <a href="{{ route('admin.users.create') }}" class="bg-white rounded-lg shadow p-6 hover:shadow-md transition">
-        <div class="flex items-center">
-            <i class="fas fa-user-plus text-blue-600 text-2xl"></i>
-            <div class="ml-4">
-                <h3 class="font-semibold text-gray-900">Create User</h3>
-                <p class="text-sm text-gray-600">Add new user account</p>
-            </div>
-        </div>
-    </a>
+            <!-- Quick Actions -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                <a href="{{ route('admin.users.create') }}" class="bg-white rounded-lg shadow p-6 hover:shadow-md transition">
+                    <div class="flex items-center">
+                        <i class="fas fa-user-plus text-blue-600 text-2xl"></i>
+                        <div class="ml-4">
+                            <h3 class="font-semibold text-gray-900">Create User</h3>
+                            <p class="text-sm text-gray-600">Add new user account</p>
+                        </div>
+                    </div>
+                </a>
 
-    <a href="{{ route('admin.users') }}" class="bg-white rounded-lg shadow p-6 hover:shadow-md transition">
-        <div class="flex items-center">
-            <i class="fas fa-users-cog text-green-600 text-2xl"></i>
-            <div class="ml-4">
-                <h3 class="font-semibold text-gray-900">Manage Users</h3>
-                <p class="text-sm text-gray-600">View all users</p>
-            </div>
-        </div>
-    </a>
+                <a href="{{ route('admin.users') }}" class="bg-white rounded-lg shadow p-6 hover:shadow-md transition">
+                    <div class="flex items-center">
+                        <i class="fas fa-users-cog text-green-600 text-2xl"></i>
+                        <div class="ml-4">
+                            <h3 class="font-semibold text-gray-900">Manage Users</h3>
+                            <p class="text-sm text-gray-600">View all users</p>
+                        </div>
+                    </div>
+                </a>
 
-    <a href="{{ route('admin.students') }}" class="bg-white rounded-lg shadow p-6 hover:shadow-md transition">
-        <div class="flex items-center">
-            <i class="fas fa-graduation-cap text-purple-600 text-2xl"></i>
-            <div class="ml-4">
-                <h3 class="font-semibold text-gray-900">Student Records</h3>
-                <p class="text-sm text-gray-600">Manage student data</p>
+                <a href="{{ route('admin.students') }}" class="bg-white rounded-lg shadow p-6 hover:shadow-md transition">
+                    <div class="flex items-center">
+                        <i class="fas fa-graduation-cap text-purple-600 text-2xl"></i>
+                        <div class="ml-4">
+                            <h3 class="font-semibold text-gray-900">Student Records</h3>
+                            <p class="text-sm text-gray-600">Manage student data</p>
+                        </div>
+                    </div>
+                </a>
             </div>
-        </div>
-    </a>
-</div>
 
             <!-- Recent Users -->
             <div class="bg-white rounded-lg shadow">
@@ -146,7 +146,7 @@
                             </tr>
                         </thead>
                         <tbody class="bg-white divide-y divide-gray-200">
-                            @foreach($recentUsers as $user)
+                            @forelse($recentUsers as $user)
                             <tr>
                                 <td class="px-6 py-4 whitespace-nowrap">
                                     <div class="flex items-center">
@@ -170,7 +170,13 @@
                                     {{ $user->created_at->format('M j, Y') }}
                                 </td>
                             </tr>
-                            @endforeach
+                            @empty
+                            <tr>
+                                <td colspan="4" class="px-6 py-4 text-center text-sm text-gray-500">
+                                    No users found.
+                                </td>
+                            </tr>
+                            @endforelse
                         </tbody>
                     </table>
                 </div>

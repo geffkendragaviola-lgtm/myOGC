@@ -1,4 +1,9 @@
 <x-guest-layout>
+    <div class="mb-6">
+        <h2 class="text-2xl font-bold text-gray-900 text-center">Create New Admin Account</h2>
+        <p class="text-gray-600 text-center mt-2">Register a new administrator for the system</p>
+    </div>
+
     <form method="POST" action="{{ route('register') }}">
         @csrf
 
@@ -12,6 +17,9 @@
                 </ul>
             </div>
         @endif
+
+        <!-- Role (hidden, set to admin) -->
+        <input type="hidden" name="role" value="admin">
 
         <!-- First Name -->
         <div>
@@ -34,12 +42,12 @@
             <x-input-error :messages="$errors->get('last_name')" class="mt-2" />
         </div>
 
-<!-- Birthdate -->
-<div class="mt-4">
-    <x-input-label for="birthdate" :value="__('Birthdate')" />
-    <x-text-input id="birthdate" class="block mt-1 w-full" type="date" name="birthdate" :value="old('birthdate')" autocomplete="bday-year" />
-    <x-input-error :messages="$errors->get('birthdate')" class="mt-2" />
-</div>
+        <!-- Birthdate -->
+        <div class="mt-4">
+            <x-input-label for="birthdate" :value="__('Birthdate')" />
+            <x-text-input id="birthdate" class="block mt-1 w-full" type="date" name="birthdate" :value="old('birthdate')" autocomplete="bday-year" />
+            <x-input-error :messages="$errors->get('birthdate')" class="mt-2" />
+        </div>
 
         <!-- Age (auto-calculated, read-only) -->
         <div class="mt-4">
@@ -130,8 +138,50 @@
             <x-input-error :messages="$errors->get('email')" class="mt-2" />
         </div>
 
+        <!-- Admin-specific fields -->
+        <div class="mt-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
+            <h3 class="text-lg font-semibold text-blue-800 mb-4">Administrator Information</h3>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <!-- Position -->
+                <div>
+                    <x-input-label for="position" :value="__('Position')" />
+                    <x-text-input id="position" class="block mt-1 w-full" type="text" name="position" :value="old('position')" required autocomplete="organization-title" placeholder="e.g., System Administrator" />
+                    <x-input-error :messages="$errors->get('position')" class="mt-2" />
+                </div>
+
+                <!-- Department -->
+                <div>
+                    <x-input-label for="department" :value="__('Department')" />
+                    <x-text-input id="department" class="block mt-1 w-full" type="text" name="department" :value="old('department')" required autocomplete="organization" placeholder="e.g., IT Department" />
+                    <x-input-error :messages="$errors->get('department')" class="mt-2" />
+                </div>
+
+                <!-- Employee ID -->
+                <div>
+                    <x-input-label for="employee_id" :value="__('Employee ID')" />
+                    <x-text-input id="employee_id" class="block mt-1 w-full" type="text" name="employee_id" :value="old('employee_id')" required autocomplete="off" placeholder="e.g., EMP-2024-001" />
+                    <x-input-error :messages="$errors->get('employee_id')" class="mt-2" />
+                </div>
+
+                <!-- Office Location -->
+                <div>
+                    <x-input-label for="office_location" :value="__('Office Location')" />
+                    <x-text-input id="office_location" class="block mt-1 w-full" type="text" name="office_location" :value="old('office_location')" autocomplete="off" placeholder="e.g., Main Building, Room 101" />
+                    <x-input-error :messages="$errors->get('office_location')" class="mt-2" />
+                </div>
+
+                <!-- Extension -->
+                <div class="md:col-span-2">
+                    <x-input-label for="extension" :value="__('Extension')" />
+                    <x-text-input id="extension" class="block mt-1 w-full" type="text" name="extension" :value="old('extension')" autocomplete="off" placeholder="e.g., 1234" />
+                    <x-input-error :messages="$errors->get('extension')" class="mt-2" />
+                </div>
+            </div>
+        </div>
+
         <!-- Password -->
-        <div class="mt-4">
+        <div class="mt-6">
             <x-input-label for="password" :value="__('Password')" />
             <x-text-input id="password" class="block mt-1 w-full" type="password" name="password" required autocomplete="new-password" />
             <x-input-error :messages="$errors->get('password')" class="mt-2" />
@@ -144,121 +194,20 @@
             <x-input-error :messages="$errors->get('password_confirmation')" class="mt-2" />
         </div>
 
-        <!-- Role -->
-        <div class="mt-4">
-            <x-input-label for="role" :value="__('Role')" />
-            <select id="role" name="role" class="block mt-1 w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" required autocomplete="off">
-                <option value="">Select Role</option>
-                <option value="student" {{ old('role') == 'student' ? 'selected' : '' }}>Student</option>
-                <option value="counselor" {{ old('role') == 'counselor' ? 'selected' : '' }}>Counselor</option>
-                <option value="admin" {{ old('role') == 'admin' ? 'selected' : '' }}>Admin</option>
-            </select>
-            <x-input-error :messages="$errors->get('role')" class="mt-2" />
-        </div>
-
-        <!-- Student-specific fields -->
-        <div id="student-fields" class="mt-4 hidden">
-            <div class="mt-4">
-                <x-input-label for="student_id" :value="__('Student ID')" />
-                <x-text-input id="student_id" class="block mt-1 w-full" type="text" name="student_id" :value="old('student_id')" autocomplete="off" />
-                <x-input-error :messages="$errors->get('student_id')" class="mt-2" />
-            </div>
-
-            <div class="mt-4">
-                <x-input-label for="year_level" :value="__('Year Level')" />
-                <select id="year_level" name="year_level" class="block mt-1 w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" autocomplete="off">
-                    <option value="">Select Year Level</option>
-                    <option value="1st Year" {{ old('year_level') == '1st Year' ? 'selected' : '' }}>1st Year</option>
-                    <option value="2nd Year" {{ old('year_level') == '2nd Year' ? 'selected' : '' }}>2nd Year</option>
-                    <option value="3rd Year" {{ old('year_level') == '3rd Year' ? 'selected' : '' }}>3rd Year</option>
-                    <option value="4th Year" {{ old('year_level') == '4th Year' ? 'selected' : '' }}>4th Year</option>
-                    <option value="5th Year" {{ old('year_level') == '5th Year' ? 'selected' : '' }}>5th Year</option>
-                </select>
-                <x-input-error :messages="$errors->get('year_level')" class="mt-2" />
-            </div>
-
-            <div class="mt-4">
-                <x-input-label for="course" :value="__('Course')" />
-                <x-text-input id="course" class="block mt-1 w-full" type="text" name="course" :value="old('course')" autocomplete="off" />
-                <x-input-error :messages="$errors->get('course')" class="mt-2" />
-            </div>
-
-            <div class="mt-4">
-                <x-input-label for="college_id" :value="__('College')" />
-                <select id="college_id" name="college_id" class="block mt-1 w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" autocomplete="off">
-                    <option value="">Select College</option>
-                    @foreach($colleges as $college)
-                        <option value="{{ $college->id }}" {{ old('college_id') == $college->id ? 'selected' : '' }}>
-                            {{ $college->name }}
-                        </option>
-                    @endforeach
-                </select>
-                <x-input-error :messages="$errors->get('college_id')" class="mt-2" />
-            </div>
-        </div>
-
-        <!-- Counselor-specific fields -->
-        <div id="counselor-fields" class="mt-4 hidden">
-            <div class="mt-4">
-                <x-input-label for="position" :value="__('Position')" />
-                <x-text-input id="position" class="block mt-1 w-full" type="text" name="position" :value="old('position')" autocomplete="organization-title" />
-                <x-input-error :messages="$errors->get('position')" class="mt-2" />
-            </div>
-
-            <div class="mt-4">
-                <x-input-label for="credentials" :value="__('Credentials')" />
-                <x-text-input id="credentials" class="block mt-1 w-full" type="text" name="credentials" :value="old('credentials')" autocomplete="off" />
-                <x-input-error :messages="$errors->get('credentials')" class="mt-2" />
-            </div>
-
-            <div class="mt-4">
-                <x-input-label for="counselor_college_id" :value="__('College')" />
-                <select id="counselor_college_id" name="counselor_college_id" class="block mt-1 w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" autocomplete="off">
-                    <option value="">Select College</option>
-                    @foreach($colleges as $college)
-                        <option value="{{ $college->id }}" {{ old('counselor_college_id') == $college->id ? 'selected' : '' }}>
-                            {{ $college->name }}
-                        </option>
-                    @endforeach
-                </select>
-                <x-input-error :messages="$errors->get('counselor_college_id')" class="mt-2" />
-            </div>
-
-            <div class="mt-4">
-                <label class="flex items-center">
-                    <input type="checkbox" name="is_head" value="1" {{ old('is_head') ? 'checked' : '' }} class="rounded border-gray-300 text-indigo-600 shadow-sm focus:ring-indigo-500" autocomplete="off">
-                    <span class="ms-2 text-sm text-gray-600">Head Counselor</span>
-                </label>
-                <x-input-error :messages="$errors->get('is_head')" class="mt-2" />
-            </div>
-        </div>
-
-        <!-- Admin-specific fields -->
-        <div id="admin-fields" class="mt-4 hidden">
-            <div class="mt-4">
-                <x-input-label for="admin_credentials" :value="__('Admin Credentials')" />
-                <x-text-input id="admin_credentials" class="block mt-1 w-full" type="text" name="admin_credentials" :value="old('admin_credentials')" autocomplete="off" />
-                <x-input-error :messages="$errors->get('admin_credentials')" class="mt-2" />
-            </div>
-        </div>
-
-        <div class="flex items-center justify-end mt-4">
+        <div class="flex items-center justify-between mt-6">
             <a class="underline text-sm text-gray-600 hover:text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" href="{{ route('login') }}">
-                {{ __('Already registered?') }}
+                {{ __('Back to Login') }}
             </a>
 
-            <x-primary-button class="ms-4">
-                {{ __('Register') }}
+            <x-primary-button class="ms-4 bg-blue-600 hover:bg-blue-700">
+                <i class="fas fa-user-plus mr-2"></i>
+                {{ __('Create Admin Account') }}
             </x-primary-button>
         </div>
     </form>
 
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-            const roleSelect = document.getElementById('role');
-            const studentFields = document.getElementById('student-fields');
-            const counselorFields = document.getElementById('counselor-fields');
-            const adminFields = document.getElementById('admin-fields');
             const birthdateInput = document.getElementById('birthdate');
             const ageInput = document.getElementById('age');
 
@@ -282,43 +231,10 @@
 
             birthdateInput.addEventListener('change', calculateAge);
 
-            function toggleRoleFields() {
-                // Hide all fields first
-                studentFields.classList.add('hidden');
-                counselorFields.classList.add('hidden');
-                adminFields.classList.add('hidden');
-
-                // Reset all role-specific fields to empty when hidden
-                if (roleSelect.value !== 'student') {
-                    document.getElementById('student_id').value = '';
-                    document.getElementById('year_level').value = '';
-                    document.getElementById('course').value = '';
-                    document.getElementById('college_id').value = '';
-                }
-
-                if (roleSelect.value !== 'counselor') {
-                    document.getElementById('position').value = '';
-                    document.getElementById('credentials').value = '';
-                    document.getElementById('counselor_college_id').value = '';
-                    document.querySelector('input[name="is_head"]').checked = false;
-                }
-
-                if (roleSelect.value !== 'admin') {
-                    document.getElementById('admin_credentials').value = '';
-                }
-
-                // Show fields based on selected role
-                if (roleSelect.value === 'student') {
-                    studentFields.classList.remove('hidden');
-                } else if (roleSelect.value === 'counselor') {
-                    counselorFields.classList.remove('hidden');
-                } else if (roleSelect.value === 'admin') {
-                    adminFields.classList.remove('hidden');
-                }
+            // Auto-calculate age if birthdate is already filled (on page load)
+            if (birthdateInput.value) {
+                calculateAge();
             }
-
-            roleSelect.addEventListener('change', toggleRoleFields);
-            toggleRoleFields(); // run on page load
         });
     </script>
 

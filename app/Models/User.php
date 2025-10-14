@@ -84,11 +84,10 @@ class User extends Authenticatable
     /**
      * Get the admin record associated with the user.
      */
-    public function admin(): HasOne
-    {
-        return $this->hasOne(Admin::class);
-    }
-
+public function admin()
+{
+    return $this->hasOne(Admin::class);
+}
     /**
      * Get the role-specific profile based on user role.
      */

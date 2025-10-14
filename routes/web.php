@@ -158,7 +158,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::patch('/profile/password', [ProfileController::class, 'updatePassword'])->name('profile.password.update');
-
+Route::patch('/profile/admin', [ProfileController::class, 'updateAdmin'])->name('profile.admin.update');
     // Student-specific profile routes
     Route::patch('/profile/student', [ProfileController::class, 'updateStudent'])->name('profile.student.update');
 
@@ -179,22 +179,28 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/events/{event}/cancel', [EventRegistrationController::class, 'cancelRegistration'])->name('student.events.cancel');
 });
 
-// Admin routes - using same logic as counselor (no middleware)
+// Admin routes
+// Admin routes
 Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () {
-    Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('dashboard');
-    Route::get('/users', [AdminController::class, 'users'])->name('users');
-    Route::get('/users/create', [AdminController::class, 'createUser'])->name('users.create');
-    Route::post('/users', [AdminController::class, 'storeUser'])->name('users.store');
-    Route::get('/users/{user}/edit', [AdminController::class, 'editUser'])->name('users.edit');
-    Route::put('/users/{user}', [AdminController::class, 'updateUser'])->name('users.update');
-    Route::delete('/users/{user}', [AdminController::class, 'deleteUser'])->name('users.delete');
+    Route::get('/dashboard', [App\Http\Controllers\AdminController::class, 'dashboard'])->name('dashboard');
+    Route::get('/users', [App\Http\Controllers\AdminController::class, 'users'])->name('users');
+    Route::get('/users/create', [App\Http\Controllers\AdminController::class, 'createUser'])->name('users.create');
+    Route::post('/users', [App\Http\Controllers\AdminController::class, 'storeUser'])->name('users.store');
+    Route::get('/users/{user}/edit', [App\Http\Controllers\AdminController::class, 'editUser'])->name('users.edit');
+    Route::put('/users/{user}', [App\Http\Controllers\AdminController::class, 'updateUser'])->name('users.update');
+    Route::delete('/users/{user}', [App\Http\Controllers\AdminController::class, 'deleteUser'])->name('users.delete');
 
-    Route::get('/students', [AdminController::class, 'students'])->name('students');
-    Route::get('/counselors', [AdminController::class, 'counselors'])->name('counselors');
+    Route::get('/students', [App\Http\Controllers\AdminController::class, 'students'])->name('students');
+    Route::get('/counselors', [App\Http\Controllers\AdminController::class, 'counselors'])->name('counselors');
 });
-// Add this to your web.php temporarily
+
+// Debug route
 Route::get('/check-admin-status', function() {
     $user = Auth::user();
+    if (!$user) {
+        return response()->json(['error' => 'Not authenticated']);
+    }
+
     $admin = \App\Models\Admin::where('user_id', $user->id)->first();
 
     return response()->json([

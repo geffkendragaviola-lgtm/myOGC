@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Redirect;
 use Illuminate\View\View;
 use App\Models\Student;
 use App\Models\Counselor;
+use App\Models\Admin;
 use Illuminate\Support\Facades\Log;
 use App\Models\College;
 
@@ -23,17 +24,20 @@ class ProfileController extends Controller
             $user = $request->user();
             $studentProfile = null;
             $counselorProfile = null;
+            $adminProfile = null;
 
             if ($user->role === 'student') {
                 $studentProfile = Student::where('user_id', $user->id)->first();
             } elseif ($user->role === 'counselor') {
                 $counselorProfile = Counselor::where('user_id', $user->id)->first();
+            } elseif ($user->role === 'admin') {
+                $adminProfile = Admin::where('user_id', $user->id)->first();
             }
 
             // Get colleges for dropdown
             $colleges = College::all();
 
-            return view('profile.edit', compact('user', 'studentProfile', 'counselorProfile', 'colleges'));
+            return view('profile.edit', compact('user', 'studentProfile', 'counselorProfile', 'adminProfile', 'colleges'));
         } catch (\Exception $e) {
             // Log the error and return a simple view
             Log::error('Profile edit error: ' . $e->getMessage());
@@ -167,6 +171,44 @@ class ProfileController extends Controller
         } catch (\Exception $e) {
             Log::error('Counselor profile update error: ' . $e->getMessage());
             return back()->withErrors(['error' => 'Failed to update counselor profile.']);
+        }
+    }
+
+    /**
+     * Update admin-specific profile information.
+     */
+    public function updateAdmin(Request $request)
+    {
+        try {
+            $request->validate([
+                'position' => ['required', 'string', 'max:255'],
+                'department' => ['required', 'string', 'max:255'],
+                'employee_id' => ['required', 'string', 'max:50'],
+                'office_location' => ['nullable', 'string', 'max:255'],
+                'extension' => ['nullable', 'string', 'max:20'],
+            ]);
+
+            $user = $request->user();
+
+            if ($user->role !== 'admin') {
+                return back()->withErrors(['error' => 'Unauthorized action.']);
+            }
+
+            $adminProfile = Admin::where('user_id', $user->id)->first();
+
+            if ($adminProfile) {
+                $adminProfile->update($request->all());
+            } else {
+                Admin::create(array_merge(
+                    ['user_id' => $user->id],
+                    $request->all()
+                ));
+            }
+
+            return Redirect::route('profile.edit')->with('status', 'admin-profile-updated');
+        } catch (\Exception $e) {
+            Log::error('Admin profile update error: ' . $e->getMessage());
+            return back()->withErrors(['error' => 'Failed to update admin profile.']);
         }
     }
 
