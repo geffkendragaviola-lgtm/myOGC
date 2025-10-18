@@ -75,7 +75,12 @@ Route::middleware('auth')->group(function () {
         Route::get('/appointments/{appointment}/details', [CounselorController::class, 'getAppointmentDetails'])->name('counselor.appointments.details');
         Route::patch('/appointments/{appointment}/update-status', [AppointmentController::class, 'updateStatus'])
             ->name('counselor.appointments.update-status');
- // Feedback management routes
+
+        // FIXED: Moved transfer routes INSIDE the counselor middleware group
+        Route::patch('/appointments/{appointment}/transfer', [AppointmentController::class, 'transfer'])->name('counselor.appointments.transfer');
+        Route::get('/appointments/{appointment}/available-counselors', [AppointmentController::class, 'getAvailableCounselorsForTransfer'])->name('counselor.appointments.available-counselors');
+
+        // Feedback management routes
         Route::get('/feedback', [FeedbackController::class, 'index'])->name('counselor.feedback.index');
         Route::get('/feedback/{feedback}', [FeedbackController::class, 'show'])->name('counselor.feedback.show');
         Route::get('/feedback/export', [FeedbackController::class, 'export'])->name('counselor.feedback.export');
@@ -129,6 +134,13 @@ Route::middleware('auth')->group(function () {
         // Export appointments
         Route::get('/appointments/export', [CounselorController::class, 'exportAppointments'])
             ->name('counselor.appointments.export');
+
+        // Referral routes
+        Route::get('/appointments/{appointment}/refer-form', [CounselorController::class, 'showReferralForm'])->name('counselor.appointments.refer-form');
+        Route::post('/appointments/{appointment}/refer', [CounselorController::class, 'processReferral'])->name('counselor.appointments.refer');
+
+        // API route for getting available counselors (for referrals)
+        Route::get('/appointments/available-counselors', [AppointmentController::class, 'getAvailableCounselors'])->name('counselor.appointments.available-counselors');
     });
 });
 
@@ -190,7 +202,8 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
     Route::get('/events/{event}/registrations', [AdminController::class, 'showEventRegistrations'])->name('events.registrations');
     Route::patch('/events/{event}/registrations/{registration}/status', [AdminController::class, 'updateEventRegistrationStatus'])->name('events.update-registration-status');
     Route::get('/events/{event}/export-registrations', [AdminController::class, 'exportEventRegistrations'])->name('events.export-registrations');
-  Route::get('/feedback', [FeedbackController::class, 'index'])->name('feedback.index');
+
+    Route::get('/feedback', [FeedbackController::class, 'index'])->name('feedback.index');
     Route::get('/feedback/{feedback}', [FeedbackController::class, 'show'])->name('feedback.show');
     Route::get('/feedback/export', [FeedbackController::class, 'export'])->name('feedback.export');
 });

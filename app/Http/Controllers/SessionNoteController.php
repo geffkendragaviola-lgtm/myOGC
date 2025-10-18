@@ -5,11 +5,13 @@ namespace App\Http\Controllers;
 use App\Models\Appointment;
 use App\Models\SessionNote;
 use App\Models\Student;
+use App\Models\Counselor;
 use App\Models\College;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class SessionNoteController extends Controller
 {
@@ -18,187 +20,37 @@ class SessionNoteController extends Controller
      */
     private function getCounselorIds()
     {
-        return \App\Models\Counselor::where('user_id', Auth::id())->pluck('id');
+        return Counselor::where('user_id', Auth::id())->pluck('id');
     }
 
-    /**
-     * Get all colleges assigned to the counselor
-     */
     private function getAssignedColleges()
     {
-        return \App\Models\Counselor::with('college')
-            ->where('user_id', Auth::id())
-            ->get()
-            ->pluck('college')
-            ->filter();
+        return College::whereHas('counselors', function($query) {
+            $query->where('user_id', Auth::id());
+        })->get();
     }
 
     /**
-     * Show comprehensive session notes dashboard with session numbers
+     * Check if counselor can manage student (including cross-college referrals)
      */
-    public function dashboard(Request $request)
+    private function canManageStudent($student, $counselorIds, $allColleges)
     {
-        $counselorIds = $this->getCounselorIds();
-        $allColleges = $this->getAssignedColleges();
-
-        // Get student session counts first
-        $studentSessionCounts = SessionNote::whereIn('counselor_id', $counselorIds)
-            ->select('student_id', DB::raw('COUNT(*) as session_count'))
-            ->groupBy('student_id')
-            ->get()
-            ->keyBy('student_id');
-
-        // Base query for session notes with session numbers
-        $query = SessionNote::with([
-                'student.user',
-                'student.college',
-                'appointment',
-                'counselor.user'
-            ])
-            ->whereIn('counselor_id', $counselorIds)
-            ->orderBy('session_date', 'desc')
-            ->orderBy('created_at', 'desc');
-
-        // Search functionality
-        if ($request->has('search') && $request->search) {
-            $search = strtolower($request->search);
-            $query->where(function($q) use ($search) {
-                $q->whereHas('student.user', function($q) use ($search) {
-                    $q->whereRaw('LOWER(first_name) LIKE ?', ["%{$search}%"])
-                      ->orWhereRaw('LOWER(last_name) LIKE ?', ["%{$search}%"]);
-                })
-                ->orWhereHas('student', function($q) use ($search) {
-                    $q->whereRaw('LOWER(student_id) LIKE ?', ["%{$search}%"]);
-                })
-                ->orWhereHas('student.college', function($q) use ($search) {
-                    $q->whereRaw('LOWER(name) LIKE ?', ["%{$search}%"]);
-                })
-                ->orWhereRaw('LOWER(notes) LIKE ?', ["%{$search}%"])
-                ->orWhereRaw('LOWER(follow_up_actions) LIKE ?', ["%{$search}%"]);
-            });
+        // If student belongs to one of counselor's assigned colleges
+        $assignedCollegeIds = $allColleges->pluck('id');
+        if ($assignedCollegeIds->contains($student->college_id)) {
+            return true;
         }
 
-        // Session type filter
-        if ($request->has('session_type') && $request->session_type) {
-            $query->where('session_type', $request->session_type);
-        }
+        // Check if counselor has any referred appointments with this student
+        $hasReferredAppointment = Appointment::where('student_id', $student->id)
+            ->where(function($query) use ($counselorIds) {
+                $query->whereIn('counselor_id', $counselorIds)
+                      ->orWhereIn('referred_to_counselor_id', $counselorIds);
+            })
+            ->where('status', 'referred')
+            ->exists();
 
-        // College filter
-        if ($request->has('college') && $request->college) {
-            $query->whereHas('student', function($q) use ($request) {
-                $q->where('college_id', $request->college);
-            });
-        }
-
-        // Date range filter
-        if ($request->has('date_range') && $request->date_range) {
-            $now = Carbon::now();
-            switch ($request->date_range) {
-                case 'today':
-                    $query->whereDate('session_date', $now->toDateString());
-                    break;
-                case 'week':
-                    $query->whereBetween('session_date', [
-                        $now->startOfWeek()->toDateString(),
-                        $now->endOfWeek()->toDateString()
-                    ]);
-                    break;
-                case 'month':
-                    $query->whereBetween('session_date', [
-                        $now->startOfMonth()->toDateString(),
-                        $now->endOfMonth()->toDateString()
-                    ]);
-                    break;
-                case 'last_month':
-                    $lastMonth = $now->copy()->subMonth();
-                    $query->whereBetween('session_date', [
-                        $lastMonth->startOfMonth()->toDateString(),
-                        $lastMonth->endOfMonth()->toDateString()
-                    ]);
-                    break;
-            }
-        }
-
-        $sessionNotes = $query->paginate(20);
-
-        // Calculate session numbers and total sessions per student
-        $sessionNotes->getCollection()->transform(function ($note) use ($studentSessionCounts, $counselorIds) {
-            // Get all session dates for this student with this counselor to calculate session number
-            $studentSessions = SessionNote::where('student_id', $note->student_id)
-                ->whereIn('counselor_id', $counselorIds)
-                ->orderBy('session_date', 'asc')
-                ->orderBy('created_at', 'asc')
-                ->get();
-
-            // Find the position of this session in the ordered list
-            $sessionNumber = 1;
-            foreach ($studentSessions as $index => $session) {
-                if ($session->id === $note->id) {
-                    $sessionNumber = $index + 1;
-                    break;
-                }
-            }
-
-            // Add computed properties
-            $note->session_number = $sessionNumber;
-            $note->student_total_sessions = $studentSessionCounts[$note->student_id]->session_count ?? 0;
-
-            return $note;
-        });
-
-        // Statistics - updated to use multiple counselor IDs
-        $totalNotes = SessionNote::whereIn('counselor_id', $counselorIds)->count();
-        $totalStudents = SessionNote::whereIn('counselor_id', $counselorIds)
-            ->distinct('student_id')
-            ->count('student_id');
-        $notesThisMonth = SessionNote::whereIn('counselor_id', $counselorIds)
-            ->whereYear('session_date', now()->year)
-            ->whereMonth('session_date', now()->month)
-            ->count();
-        $crisisSessions = SessionNote::whereIn('counselor_id', $counselorIds)
-            ->where('session_type', 'crisis')
-            ->count();
-
-        // Calculate average sessions per student
-        $averageSessionsPerStudent = $totalStudents > 0 ? $totalNotes / $totalStudents : 0;
-
-        $sessionTypes = SessionNote::getSessionTypes();
-        $colleges = College::orderBy('name')->get();
-
-        return view('counselor.session-notes.dashboard', compact(
-            'sessionNotes',
-            'totalNotes',
-            'totalStudents',
-            'notesThisMonth',
-            'crisisSessions',
-            'averageSessionsPerStudent',
-            'sessionTypes',
-            'colleges',
-            'allColleges'
-        ));
-    }
-
-    /**
-     * Show session notes for a student
-     */
-    public function index(Student $student)
-    {
-        $counselorIds = $this->getCounselorIds();
-
-        $sessionNotes = SessionNote::with(['appointment', 'counselor.user'])
-            ->where('student_id', $student->id)
-            ->whereIn('counselor_id', $counselorIds)
-            ->orderBy('session_date', 'desc')
-            ->orderBy('created_at', 'desc')
-            ->paginate(10);
-
-        // Verify the student belongs to one of the counselor's assigned colleges
-        $assignedCollegeIds = $this->getAssignedColleges()->pluck('id');
-        if (!$assignedCollegeIds->contains($student->college_id)) {
-            abort(403, 'You are not assigned to this student\'s college.');
-        }
-
-        return view('counselor.session-notes.index', compact('student', 'sessionNotes'));
+        return $hasReferredAppointment;
     }
 
     /**
@@ -206,40 +58,59 @@ class SessionNoteController extends Controller
      */
     public function create(Student $student, Request $request)
     {
+        $counselor = Counselor::where('user_id', Auth::id())->first();
         $counselorIds = $this->getCounselorIds();
         $allColleges = $this->getAssignedColleges();
 
-        // Verify the student belongs to one of the counselor's assigned colleges
-        $assignedCollegeIds = $allColleges->pluck('id');
-        if (!$assignedCollegeIds->contains($student->college_id)) {
-            abort(403, 'You are not assigned to this student\'s college.');
-        }
+        Log::info('SessionNoteController@create', [
+            'counselor_id' => $counselor->id,
+            'student_id' => $student->id,
+            'student_college_id' => $student->college_id,
+            'appointment_id' => $request->appointment_id,
+            'assigned_colleges' => $allColleges->pluck('id')->toArray(),
+            'has_appointment_id' => $request->has('appointment_id')
+        ]);
 
         // Get appointment if provided
         $appointment = null;
         if ($request->has('appointment_id')) {
-            $appointment = Appointment::where('id', $request->appointment_id)
-                ->whereIn('counselor_id', $counselorIds)
-                ->where('student_id', $student->id)
-                ->first();
+            $appointment = Appointment::find($request->appointment_id);
+
+            Log::info('Appointment found', [
+                'appointment_id' => $appointment ? $appointment->id : null,
+                'appointment_counselor_id' => $appointment ? $appointment->counselor_id : null,
+                'referred_to_counselor_id' => $appointment ? $appointment->referred_to_counselor_id : null,
+                'can_manage' => $appointment ? $appointment->canBeManagedBy($counselor->id) : false
+            ]);
+
+            // Verify the counselor can manage this appointment
+            if (!$appointment || !$appointment->canBeManagedBy($counselor->id)) {
+                abort(403, 'You cannot add session notes for this appointment.');
+            }
+
+            Log::info('Passed appointment authorization - should skip college check');
+
+        } else {
+            Log::info('No appointment ID - checking college assignment and referrals');
+
+            // Check if counselor can manage this student (either same college or through referrals)
+            if (!$this->canManageStudent($student, $counselorIds, $allColleges)) {
+                Log::warning('College and referral check failed', [
+                    'student_college_id' => $student->college_id,
+                    'assigned_college_ids' => $allColleges->pluck('id')->toArray(),
+                    'counselor_ids' => $counselorIds->toArray()
+                ]);
+                abort(403, 'You are not authorized to add session notes for this student.');
+            }
         }
 
-        // Get recent appointments with this student for reference
-        $recentAppointments = Appointment::with('sessionNotes')
-            ->where('student_id', $student->id)
-            ->whereIn('counselor_id', $counselorIds)
-            ->whereIn('status', ['completed', 'approved'])
-            ->orderBy('appointment_date', 'desc')
-            ->limit(10)
-            ->get();
-
+        // Rest of your create method...
         $sessionTypes = SessionNote::getSessionTypes();
         $moodLevels = SessionNote::getMoodLevels();
 
         return view('counselor.session-notes.create', compact(
             'student',
             'appointment',
-            'recentAppointments',
             'sessionTypes',
             'moodLevels',
             'allColleges'
@@ -254,10 +125,9 @@ class SessionNoteController extends Controller
         $counselorIds = $this->getCounselorIds();
         $allColleges = $this->getAssignedColleges();
 
-        // Verify the student belongs to one of the counselor's assigned colleges
-        $assignedCollegeIds = $allColleges->pluck('id');
-        if (!$assignedCollegeIds->contains($student->college_id)) {
-            abort(403, 'You are not assigned to this student\'s college.');
+        // Verify the counselor can manage this student
+        if (!$this->canManageStudent($student, $counselorIds, $allColleges)) {
+            abort(403, 'You are not authorized to add session notes for this student.');
         }
 
         $validated = $request->validate([
@@ -279,7 +149,10 @@ class SessionNoteController extends Controller
         // Verify appointment belongs to this counselor and student if provided
         if ($request->filled('appointment_id')) {
             $appointment = Appointment::where('id', $request->appointment_id)
-                ->whereIn('counselor_id', $counselorIds)
+                ->where(function($query) use ($counselorIds) {
+                    $query->whereIn('counselor_id', $counselorIds)
+                          ->orWhereIn('referred_to_counselor_id', $counselorIds);
+                })
                 ->where('student_id', $student->id)
                 ->first();
 
@@ -328,6 +201,30 @@ class SessionNoteController extends Controller
         return redirect()->route('counselor.session-notes.index', $student)
             ->with('success', $successMessage);
     }
+
+    /**
+     * Show session notes for a student
+     */
+    public function index(Student $student)
+    {
+        $counselorIds = $this->getCounselorIds();
+        $allColleges = $this->getAssignedColleges();
+
+        // Verify the counselor can manage this student
+        if (!$this->canManageStudent($student, $counselorIds, $allColleges)) {
+            abort(403, 'You are not authorized to view session notes for this student.');
+        }
+
+        $sessionNotes = SessionNote::with(['appointment', 'counselor.user'])
+            ->where('student_id', $student->id)
+            ->whereIn('counselor_id', $counselorIds)
+            ->orderBy('session_date', 'desc')
+            ->orderBy('created_at', 'desc')
+            ->paginate(10);
+
+        return view('counselor.session-notes.index', compact('student', 'sessionNotes'));
+    }
+
 
     /**
      * Create follow-up appointment (without creating session notes)
@@ -615,4 +512,66 @@ if ($request->has('requires_follow_up') && $hasFollowUpData) {
 
         return $labels[$moodLevel] ?? 'Not Specified';
     }
+
+    // In SessionNoteController - update dashboard method
+
+/**
+ * Show comprehensive session notes dashboard with session numbers
+ */
+public function dashboard(Request $request)
+{
+    $counselorIds = $this->getCounselorIds();
+    $allColleges = $this->getAssignedColleges();
+
+    // Get student session counts - include students from referrals
+    $studentSessionCounts = SessionNote::whereIn('counselor_id', $counselorIds)
+        ->select('student_id', DB::raw('COUNT(*) as session_count'))
+        ->groupBy('student_id')
+        ->get()
+        ->keyBy('student_id');
+
+    // Base query for session notes with session numbers
+    $query = SessionNote::with([
+            'student.user',
+            'student.college',
+            'appointment',
+            'counselor.user'
+        ])
+        ->whereIn('counselor_id', $counselorIds)
+        ->orderBy('session_date', 'desc')
+        ->orderBy('created_at', 'desc');
+
+    // Search functionality
+    if ($request->has('search') && $request->search) {
+        $search = strtolower($request->search);
+        $query->where(function($q) use ($search) {
+            $q->whereHas('student.user', function($q) use ($search) {
+                $q->whereRaw('LOWER(first_name) LIKE ?', ["%{$search}%"])
+                  ->orWhereRaw('LOWER(last_name) LIKE ?', ["%{$search}%"]);
+            })
+            ->orWhereHas('student', function($q) use ($search) {
+                $q->whereRaw('LOWER(student_id) LIKE ?', ["%{$search}%"]);
+            })
+            ->orWhereHas('student.college', function($q) use ($search) {
+                $q->whereRaw('LOWER(name) LIKE ?', ["%{$search}%"]);
+            })
+            ->orWhereRaw('LOWER(notes) LIKE ?', ["%{$search}%"])
+            ->orWhereRaw('LOWER(follow_up_actions) LIKE ?', ["%{$search}%"]);
+        });
+    }
+
+    // Session type filter
+    if ($request->has('session_type') && $request->session_type) {
+        $query->where('session_type', $request->session_type);
+    }
+
+    // College filter - include all students that counselor has session notes for
+    if ($request->has('college') && $request->college) {
+        $query->whereHas('student', function($q) use ($request) {
+            $q->where('college_id', $request->college);
+        });
+    }
+
+    // ... rest of your dashboard method remains the same
+}
 }
