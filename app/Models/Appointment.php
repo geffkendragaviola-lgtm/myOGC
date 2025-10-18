@@ -62,3 +62,4 @@ class Appointment extends Model
         return $this->sessionNotes()->count();
     }
 }
+

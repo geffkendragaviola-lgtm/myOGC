@@ -1,11 +1,9 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Edit User - Admin Dashboard</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+@extends('layouts.admin')
+
+@section('title', 'Feedback Details - Admin Panel')
+
+@section('content')
+
     <style>
         .profile-container {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -31,23 +29,8 @@
             font-weight: 600;
         }
     </style>
-</head>
-<body class="bg-gray-50">
-    <div class="profile-container">
-        <!-- Navigation -->
-        <nav class="profile-navbar py-4">
-            <div class="container mx-auto px-6 flex justify-between items-center">
-                <div class="flex items-center">
-                    <div class="text-white font-bold text-2xl mr-10">OGC Admin</div>
-                    <div class="hidden md:flex space-x-8">
-                        <a href="{{ route('admin.dashboard') }}" class="text-white font-semibold hover:text-yellow-300 transition">
-                            <i class="fas fa-tachometer-alt mr-2"></i> Dashboard
-                        </a>
-                        <a href="{{ route('admin.users') }}" class="text-white font-semibold hover:text-yellow-300 transition">
-                            <i class="fas fa-users mr-2"></i> Users
-                        </a>
-                    </div>
-                </div>
+
+
 
                 <div class="flex items-center space-x-4">
                     <div class="text-white">
@@ -396,13 +379,7 @@
             </div>
         </div>
 
-        <!-- Footer -->
-        <footer class="bg-gray-800 text-white py-8 mt-12">
-            <div class="container mx-auto px-6 text-center">
-                <p>&copy; 2025 Office of Guidance and Counseling. All rights reserved.</p>
-            </div>
-        </footer>
-    </div>
+      
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
@@ -430,25 +407,8 @@
             });
 
             // Auto-hide status messages
-            const statusMessages = document.querySelectorAll('.mb-6.bg-');
-            statusMessages.forEach(message => {
-                const hasStatusStyle = message.classList.contains('bg-green-50') ||
-                                      message.classList.contains('bg-blue-50') ||
-                                      message.classList.contains('bg-red-50') ||
-                                      message.classList.contains('bg-yellow-50');
 
-                if (hasStatusStyle) {
-                    setTimeout(() => {
-                        message.style.transition = 'opacity 0.5s ease';
-                        message.style.opacity = '0';
-                        setTimeout(() => {
-                            if (message.parentNode) {
-                                message.remove();
-                            }
-                        }, 500);
-                    }, 5000);
-                }
-            });
+
         });
     </script>
 </body>

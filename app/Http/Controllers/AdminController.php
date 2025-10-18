@@ -7,6 +7,8 @@ use App\Models\Student;
 use App\Models\Counselor;
 use App\Models\Admin;
 use App\Models\College;
+use App\Models\Event;
+use App\Models\EventRegistration;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -16,6 +18,9 @@ use Carbon\Carbon;
 
 class AdminController extends Controller
 {
+    /**
+     * Display admin dashboard
+     */
     public function dashboard()
     {
         $user = Auth::user();
@@ -33,21 +38,381 @@ class AdminController extends Controller
             ]);
         }
 
-        // Simple stats without relationships
+        // Stats with relationships
         $stats = [
             'total_users' => User::count(),
             'total_students' => Student::count(),
             'total_counselors' => Counselor::count(),
             'total_admins' => Admin::count(),
-            'pending_users' => 0, // Temporary
+            'total_events' => Event::count(),
+            'active_events' => Event::where('is_active', true)->count(),
+            'upcoming_events' => Event::where('event_start_date', '>=', now()->toDateString())->count(),
+          
         ];
 
-        // Simple recent users without relationships
-        $recentUsers = User::latest()->limit(10)->get();
+        // Recent events for admin dashboard
+        $recentEvents = Event::with('user')
+            ->latest()
+            ->limit(5)
+            ->get();
 
-        return view('admin.dashboard', compact('admin', 'stats', 'recentUsers'));
+        // Recent users
+        $recentUsers = User::with(['student', 'counselor', 'admin'])
+            ->latest()
+            ->limit(10)
+            ->get();
+
+        return view('admin.dashboard', compact('admin', 'stats', 'recentUsers', 'recentEvents'));
     }
 
+    /**
+     * Display all events in the system
+     */
+    public function events(Request $request)
+    {
+        $userId = Auth::id();
+        $admin = Admin::with('user')->where('user_id', $userId)->first();
+
+        $search = $request->get('search');
+        $status = $request->get('status', 'all');
+        $type = $request->get('type', 'all');
+        $counselor = $request->get('counselor', 'all');
+
+        $query = Event::with(['user', 'registrations']);
+
+        // Search functionality
+        if ($search) {
+            $query->where(function($q) use ($search) {
+                $q->where('title', 'like', "%{$search}%")
+                  ->orWhere('description', 'like', "%{$search}%")
+                  ->orWhere('location', 'like', "%{$search}%")
+                  ->orWhereHas('user', function($q) use ($search) {
+                      $q->where('first_name', 'like', "%{$search}%")
+                        ->orWhere('last_name', 'like', "%{$search}%");
+                  });
+            });
+        }
+
+        // Status filter
+        if ($status !== 'all') {
+            if ($status === 'active') {
+                $query->where('is_active', true);
+            } elseif ($status === 'inactive') {
+                $query->where('is_active', false);
+            } elseif ($status === 'upcoming') {
+                $query->where('event_start_date', '>=', now()->toDateString());
+            } elseif ($status === 'past') {
+                $query->where('event_end_date', '<', now()->toDateString());
+            }
+        }
+
+        // Type filter
+        if ($type !== 'all') {
+            $query->where('type', $type);
+        }
+
+        // Counselor filter
+        if ($counselor !== 'all') {
+            $query->where('user_id', $counselor);
+        }
+
+        $events = $query->orderBy('event_start_date', 'desc')
+                       ->orderBy('start_time', 'desc')
+                       ->paginate(15);
+
+        $counselors = Counselor::with('user')->get();
+
+        return view('admin.events.index', compact('admin', 'events', 'search', 'status', 'type', 'counselor', 'counselors'));
+    }
+
+    /**
+     * Show the form for creating a new event as admin
+     */
+    public function createEvent()
+    {
+        $userId = Auth::id();
+        $admin = Admin::with('user')->where('user_id', $userId)->first();
+        $counselors = Counselor::with('user')->get();
+
+        return view('admin.events.create', compact('admin', 'counselors'));
+    }
+
+    /**
+     * Store a newly created event as admin
+     */
+    public function storeEvent(Request $request)
+    {
+        $request->validate([
+            'title' => 'required|string|max:255',
+            'description' => 'required|string',
+            'type' => 'required|in:workshop,seminar,webinar,conference,other',
+            'event_start_date' => 'required|date',
+            'event_end_date' => 'required|date|after_or_equal:event_start_date',
+            'start_time' => 'required',
+            'end_time' => 'required|after:start_time',
+            'location' => 'required|string|max:255',
+            'max_attendees' => 'nullable|integer|min:1',
+            'user_id' => 'required|exists:users,id',
+            'is_active' => 'boolean'
+        ]);
+
+        DB::beginTransaction();
+
+        try {
+            $event = Event::create([
+                'user_id' => $request->user_id,
+                'title' => strip_tags($request->title),
+                'description' => strip_tags($request->description),
+                'type' => $request->type,
+                'event_start_date' => $request->event_start_date,
+                'event_end_date' => $request->event_end_date,
+                'start_time' => $request->start_time,
+                'end_time' => $request->end_time,
+                'location' => strip_tags($request->location),
+                'max_attendees' => $request->max_attendees,
+                'is_active' => $request->has('is_active'),
+            ]);
+
+            DB::commit();
+
+            return redirect()->route('admin.events')->with('success', 'Event created successfully!');
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return redirect()->back()
+                ->withInput()
+                ->withErrors(['error' => 'Failed to create event: ' . $e->getMessage()]);
+        }
+    }
+
+    /**
+     * Show the form for editing an event as admin
+     */
+    public function editEvent(Event $event)
+    {
+        $userId = Auth::id();
+        $admin = Admin::with('user')->where('user_id', $userId)->first();
+        $counselors = Counselor::with('user')->get();
+
+        return view('admin.events.edit', compact('admin', 'event', 'counselors'));
+    }
+
+    /**
+     * Update the specified event as admin
+     */
+    public function updateEvent(Request $request, Event $event)
+    {
+        $request->validate([
+            'title' => 'required|string|max:255',
+            'description' => 'required|string',
+            'type' => 'required|in:workshop,seminar,webinar,conference,other',
+            'event_start_date' => 'required|date',
+            'event_end_date' => 'required|date|after_or_equal:event_start_date',
+            'start_time' => 'required',
+            'end_time' => 'required|after:start_time',
+            'location' => 'required|string|max:255',
+            'max_attendees' => 'nullable|integer|min:1',
+            'user_id' => 'required|exists:users,id',
+            'is_active' => 'boolean'
+        ]);
+
+        DB::beginTransaction();
+
+        try {
+            $event->update([
+                'user_id' => $request->user_id,
+                'title' => strip_tags($request->title),
+                'description' => strip_tags($request->description),
+                'type' => $request->type,
+                'event_start_date' => $request->event_start_date,
+                'event_end_date' => $request->event_end_date,
+                'start_time' => $request->start_time,
+                'end_time' => $request->end_time,
+                'location' => strip_tags($request->location),
+                'max_attendees' => $request->max_attendees,
+                'is_active' => $request->has('is_active'),
+            ]);
+
+            DB::commit();
+
+            return redirect()->route('admin.events')->with('success', 'Event updated successfully!');
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return redirect()->back()
+                ->withInput()
+                ->withErrors(['error' => 'Failed to update event: ' . $e->getMessage()]);
+        }
+    }
+
+    /**
+     * Delete an event as admin
+     */
+    public function deleteEvent(Event $event)
+    {
+        DB::beginTransaction();
+
+        try {
+            // Delete related registrations first
+            EventRegistration::where('event_id', $event->id)->delete();
+
+            // Delete the event
+            $event->delete();
+
+            DB::commit();
+
+            return redirect()->route('admin.events')->with('success', 'Event deleted successfully!');
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return redirect()->back()->with('error', 'Failed to delete event: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Toggle event status (active/inactive) as admin
+     */
+    public function toggleEventStatus(Event $event)
+    {
+        try {
+            $event->update([
+                'is_active' => !$event->is_active
+            ]);
+
+            $status = $event->is_active ? 'activated' : 'deactivated';
+
+            return redirect()->route('admin.events')
+                ->with('success', "Event {$status} successfully!");
+
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Failed to update event status: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Show event registrations as admin
+     */
+    public function showEventRegistrations(Event $event)
+    {
+        $userId = Auth::id();
+        $admin = Admin::with('user')->where('user_id', $userId)->first();
+
+        $registrations = EventRegistration::with(['student.user', 'student.college'])
+            ->where('event_id', $event->id)
+            ->orderBy('registered_at', 'desc')
+            ->get();
+
+        $registrationStats = [
+            'total' => $registrations->count(),
+            'registered' => $registrations->where('status', 'registered')->count(),
+            'attended' => $registrations->where('status', 'attended')->count(),
+            'cancelled' => $registrations->where('status', 'cancelled')->count(),
+        ];
+
+        return view('admin.events.registrations', compact('admin', 'event', 'registrations', 'registrationStats'));
+    }
+
+    /**
+     * Update registration status as admin
+     */
+    public function updateEventRegistrationStatus(Request $request, Event $event, EventRegistration $registration)
+    {
+        $request->validate([
+            'status' => 'required|in:registered,attended,cancelled'
+        ]);
+
+        // Verify the registration belongs to the event
+        if ($registration->event_id !== $event->id) {
+            return redirect()->back()->with('error', 'Invalid registration for this event.');
+        }
+
+        try {
+            $registration->update([
+                'status' => $request->status
+            ]);
+
+            return redirect()->back()->with('success', 'Registration status updated successfully!');
+
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Failed to update registration status: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Export event registrations to CSV as admin
+     */
+    public function exportEventRegistrations(Event $event)
+    {
+        $registrations = EventRegistration::with(['student.user', 'student.college'])
+            ->where('event_id', $event->id)
+            ->orderBy('registered_at', 'desc')
+            ->get();
+
+        $fileName = 'event-registrations-' . $event->id . '-' . now()->format('Y-m-d') . '.csv';
+
+        $headers = [
+            'Content-Type' => 'text/csv',
+            'Content-Disposition' => 'attachment; filename="' . $fileName . '"',
+        ];
+
+        $callback = function() use ($registrations, $event) {
+            $file = fopen('php://output', 'w');
+
+            // Add headers
+            fputcsv($file, [
+                'Event: ' . $event->title,
+                'Date: ' . $event->date_range,
+                'Location: ' . $event->location,
+                'Counselor: ' . $event->user->first_name . ' ' . $event->user->last_name,
+                ''
+            ]);
+
+            // Column headers
+            fputcsv($file, [
+                'Student ID',
+                'First Name',
+                'Middle Name',
+                'Last Name',
+                'Age',
+                'Gender',
+                'Phone Number',
+                'Email',
+                'College',
+                'Year Level',
+                'Registration Date',
+                'Status'
+            ]);
+
+            // Data rows
+            foreach ($registrations as $registration) {
+                $student = $registration->student;
+                $user = $student->user;
+
+                fputcsv($file, [
+                    $student->student_id ?? 'N/A',
+                    $user->first_name,
+                    $user->middle_name ?? '',
+                    $user->last_name,
+                    $user->age ?? 'N/A',
+                    $user->gender ?? 'N/A',
+                    $user->phone_number ?? 'N/A',
+                    $user->email,
+                    $student->college->name ?? 'N/A',
+                    $student->year_level ?? 'N/A',
+                    $registration->registered_at->format('M j, Y g:i A'),
+                    ucfirst($registration->status)
+                ]);
+            }
+
+            fclose($file);
+        };
+
+        return response()->stream($callback, 200, $headers);
+    }
+
+    /**
+     * Display all users
+     */
     public function users(Request $request)
     {
         $userId = Auth::id();
@@ -83,6 +448,9 @@ class AdminController extends Controller
         return view('admin.users.index', compact('admin', 'users', 'role', 'search'));
     }
 
+    /**
+     * Show form to create new user
+     */
     public function createUser()
     {
         $userId = Auth::id();
@@ -92,6 +460,9 @@ class AdminController extends Controller
         return view('admin.users.create', compact('admin', 'colleges'));
     }
 
+    /**
+     * Store a newly created user
+     */
     public function storeUser(Request $request)
     {
         // Base validation rules
@@ -157,7 +528,7 @@ class AdminController extends Controller
                 'affiliation' => $request->affiliation ? strip_tags($request->affiliation) : null,
                 'civil_status' => $request->civil_status,
                 'citizenship' => $request->citizenship ? strip_tags($request->citizenship) : null,
-                'email_verified_at' => now(), // Auto-verify for admin-created users
+
             ]);
 
             // Create role-specific profile
@@ -199,6 +570,9 @@ class AdminController extends Controller
         }
     }
 
+    /**
+     * Show form to edit user
+     */
     public function editUser(User $user)
     {
         $userId = Auth::id();
@@ -208,6 +582,9 @@ class AdminController extends Controller
         return view('admin.users.edit', compact('adminUser', 'user', 'colleges'));
     }
 
+    /**
+     * Update the specified user
+     */
     public function updateUser(Request $request, User $user)
     {
         // Base validation rules
@@ -335,6 +712,9 @@ class AdminController extends Controller
         }
     }
 
+    /**
+     * Delete a user
+     */
     public function deleteUser(User $user)
     {
         // Prevent admin from deleting themselves
@@ -377,6 +757,9 @@ class AdminController extends Controller
         }
     }
 
+    /**
+     * Display all students
+     */
     public function students(Request $request)
     {
         $userId = Auth::id();
@@ -411,6 +794,9 @@ class AdminController extends Controller
         return view('admin.students.index', compact('admin', 'students', 'colleges', 'search'));
     }
 
+    /**
+     * Display all counselors
+     */
     public function counselors(Request $request)
     {
         $userId = Auth::id();

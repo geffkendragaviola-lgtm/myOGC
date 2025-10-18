@@ -27,15 +27,216 @@
         </div>
     @endif
 
+    {{-- Statistics Cards --}}
+    @php
+        $stats = [
+            'total' => $appointments->count(),
+            'pending' => $appointments->where('status', 'pending')->count(),
+            'approved' => $appointments->where('status', 'approved')->count(),
+            'completed' => $appointments->where('status', 'completed')->count(),
+            'with_assignments' => $appointments->where('status', 'completed')->filter(function($appointment) {
+                return $appointment->latestSessionNote && $appointment->latestSessionNote->follow_up_actions;
+            })->count()
+        ];
+    @endphp
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        {{-- Total Appointments --}}
+        <div class="bg-white rounded-xl shadow-md p-6 border-l-4 border-blue-500">
+            <div class="flex items-center">
+                <div class="p-3 bg-blue-100 rounded-lg mr-4">
+                    <i class="fas fa-calendar-alt text-blue-600 text-xl"></i>
+                </div>
+                <div>
+                    <p class="text-sm text-gray-600">Total Appointments</p>
+                    <p class="text-2xl font-bold text-gray-800">{{ $stats['total'] }}</p>
+                </div>
+            </div>
+        </div>
+
+        {{-- Pending --}}
+        <div class="bg-white rounded-xl shadow-md p-6 border-l-4 border-yellow-500">
+            <div class="flex items-center">
+                <div class="p-3 bg-yellow-100 rounded-lg mr-4">
+                    <i class="fas fa-clock text-yellow-600 text-xl"></i>
+                </div>
+                <div>
+                    <p class="text-sm text-gray-600">Pending</p>
+                    <p class="text-2xl font-bold text-gray-800">{{ $stats['pending'] }}</p>
+                </div>
+            </div>
+        </div>
+
+        {{-- Approved --}}
+        <div class="bg-white rounded-xl shadow-md p-6 border-l-4 border-green-500">
+            <div class="flex items-center">
+                <div class="p-3 bg-green-100 rounded-lg mr-4">
+                    <i class="fas fa-check-circle text-green-600 text-xl"></i>
+                </div>
+                <div>
+                    <p class="text-sm text-gray-600">Approved</p>
+                    <p class="text-2xl font-bold text-gray-800">{{ $stats['approved'] }}</p>
+                </div>
+            </div>
+        </div>
+
+        {{-- With Assignments --}}
+        <div class="bg-white rounded-xl shadow-md p-6 border-l-4 border-purple-500">
+            <div class="flex items-center">
+                <div class="p-3 bg-purple-100 rounded-lg mr-4">
+                    <i class="fas fa-tasks text-purple-600 text-xl"></i>
+                </div>
+                <div>
+                    <p class="text-sm text-gray-600">With Assignments</p>
+                    <p class="text-2xl font-bold text-gray-800">{{ $stats['with_assignments'] }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {{-- Search and Filters Section --}}
+    <div class="bg-white rounded-xl shadow-sm p-6 mb-6">
+        <form method="GET" action="{{ route('appointments.index') }}" class="space-y-4 md:space-y-0 md:grid md:grid-cols-4 md:gap-4">
+
+            {{-- Search by Date --}}
+            <div>
+                <label for="search_date" class="block text-sm font-medium text-gray-700 mb-2">Search by Date</label>
+                <input type="date"
+                       name="search_date"
+                       id="search_date"
+                       value="{{ request('search_date') }}"
+                       class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+            </div>
+
+            {{-- Status Filter --}}
+            <div>
+                <label for="status" class="block text-sm font-medium text-gray-700 mb-2">Status Filter</label>
+                <select name="status"
+                        id="status"
+                        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                    <option value="">All Statuses</option>
+                    <option value="pending" {{ request('status') == 'pending' ? 'selected' : '' }}>Pending</option>
+                    <option value="approved" {{ request('status') == 'approved' ? 'selected' : '' }}>Approved</option>
+                    <option value="completed" {{ request('status') == 'completed' ? 'selected' : '' }}>Completed</option>
+                    <option value="rejected" {{ request('status') == 'rejected' ? 'selected' : '' }}>Rejected</option>
+                    <option value="cancelled" {{ request('status') == 'cancelled' ? 'selected' : '' }}>Cancelled</option>
+                </select>
+            </div>
+
+            {{-- Assignment Filter --}}
+            <div>
+                <label for="has_assignment" class="block text-sm font-medium text-gray-700 mb-2">Assignment Filter</label>
+                <select name="has_assignment"
+                        id="has_assignment"
+                        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                    <option value="">All Appointments</option>
+                    <option value="yes" {{ request('has_assignment') == 'yes' ? 'selected' : '' }}>With Assignments</option>
+                    <option value="no" {{ request('has_assignment') == 'no' ? 'selected' : '' }}>Without Assignments</option>
+                </select>
+            </div>
+
+            {{-- Action Buttons --}}
+            <div class="flex items-end space-x-2">
+                <button type="submit"
+                        class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition flex items-center">
+                    <i class="fas fa-search mr-2"></i> Search
+                </button>
+                <a href="{{ route('appointments.index') }}"
+                   class="bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700 transition flex items-center">
+                    <i class="fas fa-refresh mr-2"></i> Reset
+                </a>
+            </div>
+        </form>
+
+        {{-- Active Filters Display --}}
+        @if(request()->anyFilled(['search_date', 'status', 'has_assignment']))
+        <div class="mt-4 pt-4 border-t border-gray-200">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-2 text-sm">
+                    <span class="text-gray-600">Active filters:</span>
+                    @if(request('search_date'))
+                        <span class="bg-blue-100 text-blue-800 px-2 py-1 rounded-full flex items-center">
+                            Date: {{ \Carbon\Carbon::parse(request('search_date'))->format('M j, Y') }}
+                            <a href="{{ request()->fullUrlWithQuery(['search_date' => null]) }}" class="ml-1 text-blue-600 hover:text-blue-800">
+                                <i class="fas fa-times"></i>
+                            </a>
+                        </span>
+                    @endif
+                    @if(request('status'))
+                        <span class="bg-green-100 text-green-800 px-2 py-1 rounded-full flex items-center">
+                            Status: {{ ucfirst(request('status')) }}
+                            <a href="{{ request()->fullUrlWithQuery(['status' => null]) }}" class="ml-1 text-green-600 hover:text-green-800">
+                                <i class="fas fa-times"></i>
+                            </a>
+                        </span>
+                    @endif
+                    @if(request('has_assignment'))
+                        <span class="bg-purple-100 text-purple-800 px-2 py-1 rounded-full flex items-center">
+                            Assignments: {{ request('has_assignment') == 'yes' ? 'With Assignments' : 'Without Assignments' }}
+                            <a href="{{ request()->fullUrlWithQuery(['has_assignment' => null]) }}" class="ml-1 text-purple-600 hover:text-purple-800">
+                                <i class="fas fa-times"></i>
+                            </a>
+                        </span>
+                    @endif
+                </div>
+                <span class="text-sm text-gray-500">
+                    {{ $appointments->count() }} appointment(s) found
+                </span>
+            </div>
+        </div>
+        @endif
+    </div>
+
+    {{-- Quick Filter Buttons --}}
+    <div class="bg-white rounded-xl shadow-sm p-6 mb-6">
+        <div class="flex flex-wrap gap-2">
+            <a href="{{ route('appointments.index') }}"
+               class="px-4 py-2 rounded-lg transition flex items-center {{ !request('status') && !request('has_assignment') && !request('search_date') ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300' }}">
+                <i class="fas fa-list mr-2"></i> All Appointments
+            </a>
+            <a href="{{ route('appointments.index', ['status' => 'pending']) }}"
+               class="px-4 py-2 rounded-lg transition flex items-center {{ request('status') == 'pending' ? 'bg-yellow-600 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300' }}">
+                <i class="fas fa-clock mr-2"></i> Pending
+            </a>
+            <a href="{{ route('appointments.index', ['status' => 'approved']) }}"
+               class="px-4 py-2 rounded-lg transition flex items-center {{ request('status') == 'approved' ? 'bg-green-600 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300' }}">
+                <i class="fas fa-check mr-2"></i> Approved
+            </a>
+            <a href="{{ route('appointments.index', ['status' => 'completed']) }}"
+               class="px-4 py-2 rounded-lg transition flex items-center {{ request('status') == 'completed' ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300' }}">
+                <i class="fas fa-check-double mr-2"></i> Completed
+            </a>
+            <a href="{{ route('appointments.index', ['status' => 'rejected']) }}"
+               class="px-4 py-2 rounded-lg transition flex items-center {{ request('status') == 'rejected' ? 'bg-red-600 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300' }}">
+                <i class="fas fa-times mr-2"></i> Rejected
+            </a>
+            <a href="{{ route('appointments.index', ['status' => 'cancelled']) }}"
+               class="px-4 py-2 rounded-lg transition flex items-center {{ request('status') == 'cancelled' ? 'bg-gray-600 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300' }}">
+                <i class="fas fa-ban mr-2"></i> Cancelled
+            </a>
+            <a href="{{ route('appointments.index', ['has_assignment' => 'yes']) }}"
+               class="px-4 py-2 rounded-lg transition flex items-center {{ request('has_assignment') == 'yes' ? 'bg-purple-600 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300' }}">
+                <i class="fas fa-tasks mr-2"></i> With Assignments
+            </a>
+        </div>
+    </div>
+
     {{-- Appointments Table --}}
     <div class="bg-white rounded-xl shadow-md overflow-hidden">
         @if($appointments->isEmpty())
             <div class="text-center py-12">
                 <i class="fas fa-calendar-times text-4xl text-gray-400 mb-4"></i>
                 <p class="text-gray-500 text-lg">No appointments found.</p>
-                <a href="{{ route('appointments.create') }}" class="text-blue-600 hover:text-blue-800 mt-2 inline-block">
-                    Book your first appointment
-                </a>
+                @if(request()->anyFilled(['search_date', 'status', 'has_assignment']))
+                    <p class="text-gray-400 text-sm mt-2">Try adjusting your filters</p>
+                    <a href="{{ route('appointments.index') }}" class="text-blue-600 hover:text-blue-800 mt-2 inline-block">
+                        Clear all filters
+                    </a>
+                @else
+                    <a href="{{ route('appointments.create') }}" class="text-blue-600 hover:text-blue-800 mt-2 inline-block">
+                        Book your first appointment
+                    </a>
+                @endif
             </div>
         @else
             <div class="overflow-x-auto">
@@ -46,6 +247,7 @@
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Counselor</th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Concern</th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Assignments</th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
                         </tr>
                     </thead>
@@ -70,7 +272,7 @@
                                     </div>
                                 </td>
                                 <td class="px-6 py-4">
-                                    <div class="text-sm text-gray-900 max-w-xs truncate">
+                                    <div class="text-sm text-gray-900 max-w-xs truncate" title="{{ $appointment->concern }}">
                                         {{ $appointment->concern }}
                                     </div>
                                 </td>
@@ -84,22 +286,43 @@
                                             'completed' => 'bg-blue-100 text-blue-800'
                                         ];
                                     @endphp
-                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full {{ $statusColors[$appointment->status] }}">
+                                    <span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full {{ $statusColors[$appointment->status] }}">
                                         {{ ucfirst($appointment->status) }}
                                     </span>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    @if($appointment->status === 'completed')
+                                        @if($appointment->latestSessionNote && $appointment->latestSessionNote->follow_up_actions)
+                                            <button type="button"
+                                                    onclick="showFollowUpActions('{{ addslashes($appointment->latestSessionNote->follow_up_actions) }}')"
+                                                    class="bg-green-100 text-green-800 text-xs px-3 py-2 rounded-full flex items-center hover:bg-green-200 transition cursor-pointer">
+                                                <i class="fas fa-tasks mr-2"></i>
+                                                <span>View Assignment</span>
+                                            </button>
+                                        @else
+                                            <span class="bg-gray-100 text-gray-600 text-xs px-3 py-2 rounded-full flex items-center">
+                                                <i class="fas fa-times-circle mr-2"></i>
+                                                <span>No Assignment</span>
+                                            </span>
+                                        @endif
+                                    @else
+                                        <span class="text-gray-400 text-sm">-</span>
+                                    @endif
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                     @if(in_array($appointment->status, ['pending', 'approved']) && Auth::user()->role === 'student')
                                         <form action="{{ route('appointments.cancel', $appointment) }}" method="POST" class="inline">
                                             @csrf
                                             <button type="submit"
-                                                    class="text-red-600 hover:text-red-900"
+                                                    class="text-red-600 hover:text-red-900 px-3 py-1 border border-red-300 rounded hover:bg-red-50 transition"
                                                     onclick="return confirm('Are you sure you want to cancel this appointment? The time slot will become available for others.')">
-                                                Cancel
+                                                <i class="fas fa-times mr-1"></i>Cancel
                                             </button>
                                         </form>
                                     @elseif($appointment->status === 'cancelled')
-                                        <span class="text-gray-500">Cancelled</span>
+                                        <span class="text-gray-500 italic">Cancelled</span>
+                                    @elseif($appointment->status === 'rejected')
+                                        <span class="text-red-500 italic">Rejected</span>
                                     @endif
                                 </td>
                             </tr>
@@ -110,4 +333,69 @@
         @endif
     </div>
 </div>
+
+{{-- Modal for Follow-up Actions --}}
+<div id="followUpModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden z-50">
+    <div class="relative top-20 mx-auto p-5 border w-11/12 md:w-2/3 lg:w-1/2 shadow-lg rounded-md bg-white">
+        <div class="mt-3">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-lg font-medium text-gray-900">
+                    <i class="fas fa-tasks mr-2 text-blue-600"></i>Your Assignments
+                </h3>
+                <button onclick="closeFollowUpModal()" class="text-gray-400 hover:text-gray-600 text-lg">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="mt-2">
+                <p id="followUpContent" class="text-gray-700 whitespace-pre-line p-4 bg-gray-50 rounded-lg max-h-96 overflow-y-auto border border-gray-200"></p>
+            </div>
+            <div class="flex justify-end mt-4">
+                <button onclick="closeFollowUpModal()"
+                        class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition flex items-center">
+                    <i class="fas fa-times mr-2"></i> Close
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function showFollowUpActions(actions) {
+    document.getElementById('followUpContent').textContent = actions;
+    document.getElementById('followUpModal').classList.remove('hidden');
+}
+
+function closeFollowUpModal() {
+    document.getElementById('followUpModal').classList.add('hidden');
+}
+
+// Close modal when clicking outside
+document.getElementById('followUpModal').addEventListener('click', function(e) {
+    if (e.target.id === 'followUpModal') {
+        closeFollowUpModal();
+    }
+});
+
+// Auto-dismiss alerts
+document.addEventListener('DOMContentLoaded', function() {
+    const alerts = document.querySelectorAll('.bg-green-100, .bg-red-100');
+    alerts.forEach(alert => {
+        setTimeout(() => {
+            alert.style.transition = 'opacity 0.5s ease';
+            alert.style.opacity = '0';
+            setTimeout(() => {
+                if (alert.parentNode) {
+                    alert.remove();
+                }
+            }, 500);
+        }, 5000);
+    });
+});
+</script>
+
+<style>
+.whitespace-pre-line {
+    white-space: pre-line;
+}
+</style>
 @endsection

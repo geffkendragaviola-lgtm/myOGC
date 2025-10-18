@@ -1,38 +1,9 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Create User - Admin Panel</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-</head>
-<body class="bg-gray-100">
-    <!-- Navigation -->
-    <nav class="bg-blue-600 shadow-lg">
-        <div class="max-w-7xl mx-auto px-4">
-            <div class="flex justify-between h-16">
-                <div class="flex items-center">
-                    <div class="text-white text-xl font-bold">Admin Panel</div>
-                    <div class="hidden md:ml-6 md:flex md:space-x-4">
-                        <a href="{{ route('admin.dashboard') }}" class="text-white hover:bg-blue-700 px-3 py-2 rounded-md">Dashboard</a>
-                        <a href="{{ route('admin.users') }}" class="text-white hover:bg-blue-700 px-3 py-2 rounded-md">Users</a>
-                        <a href="{{ route('admin.students') }}" class="text-white hover:bg-blue-700 px-3 py-2 rounded-md">Students</a>
-                        <a href="{{ route('admin.counselors') }}" class="text-white hover:bg-blue-700 px-3 py-2 rounded-md">Counselors</a>
-                    </div>
-                </div>
-                <div class="flex items-center">
-                    <span class="text-white mr-4">Welcome, {{ Auth::user()->first_name }}</span>
-                    <form method="POST" action="{{ route('logout') }}">
-                        @csrf
-                        <button type="submit" class="text-white hover:bg-blue-700 px-3 py-2 rounded-md">
-                            Logout
-                        </button>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </nav>
+@extends('layouts.admin')
+
+@section('title', 'Feedback Details - Admin Panel')
+
+@section('content')
+
 
     <!-- Main Content -->
     <div class="container mx-auto px-4 py-8">
@@ -383,5 +354,4 @@
             toggleRoleFields();
         });
     </script>
-</body>
-</html>
+@endsection

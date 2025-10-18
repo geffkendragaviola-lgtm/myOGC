@@ -198,6 +198,9 @@
             <i class="fas fa-users mr-2"></i> Manage Users
         </a>
 
+<a href="{{ route('admin.events') }}" class="block px-4 py-2 text-gray-800 hover:bg-blue-100">
+            <i class="fas fa-calendar-alt mr-2"></i> Manage Events
+        </a>
         <a href="{{ route('admin.users.create') }}" class="block px-4 py-2 text-gray-800 hover:bg-blue-100">
             <i class="fas fa-user-plus mr-2"></i> Create User
         </a>

@@ -1,36 +1,9 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Dashboard - Office of Guidance and Counseling</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-</head>
-<body class="bg-gray-50">
-    <div class="min-h-screen">
-        <!-- Navigation -->
-        <nav class="bg-blue-800 text-white shadow-lg">
-            <div class="container mx-auto px-6 py-4">
-                <div class="flex justify-between items-center">
-                    <div class="flex items-center space-x-8">
-                        <div class="text-xl font-bold">OGC Admin</div>
-                        <div class="hidden md:flex space-x-6">
-                            <a href="{{ route('admin.dashboard') }}" class="hover:text-yellow-300 font-semibold">Dashboard</a>
-                            <a href="{{ route('admin.users') }}" class="hover:text-yellow-300">Users</a>
-                            <a href="{{ route('admin.students') }}" class="hover:text-yellow-300">Students</a>
-                            <a href="{{ route('admin.counselors') }}" class="hover:text-yellow-300">Counselors</a>
-                        </div>
-                    </div>
-                    <div class="flex items-center space-x-4">
-                        <span>Welcome, {{ $admin->user->first_name }}</span>
-                        <a href="{{ route('dashboard') }}" class="hover:text-yellow-300">
-                            <i class="fas fa-home"></i>
-                        </a>
-                    </div>
-                </div>
-            </div>
-        </nav>
+@extends('layouts.admin')
+
+@section('title', 'Feedback Details - Admin Panel')
+
+@section('content')
+
 
         <!-- Main Content -->
         <div class="container mx-auto px-6 py-8">
@@ -89,10 +62,7 @@
                         <div class="p-3 bg-yellow-100 rounded-lg">
                             <i class="fas fa-clock text-yellow-600 text-xl"></i>
                         </div>
-                        <div class="ml-4">
-                            <p class="text-sm font-medium text-gray-600">Pending</p>
-                            <p class="text-2xl font-semibold text-gray-900">{{ $stats['pending_users'] }}</p>
-                        </div>
+
                     </div>
                 </div>
             </div>
@@ -183,5 +153,4 @@
             </div>
         </div>
     </div>
-</body>
-</html>
+@endsection

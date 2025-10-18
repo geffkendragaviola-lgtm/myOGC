@@ -11,27 +11,55 @@ use Carbon\Carbon;
 
 class AppointmentController extends Controller
 {
-    public function index()
-    {
-        $user = Auth::user();
+public function index(Request $request)
+{
+    $user = Auth::user();
 
-        if ($user->role === 'student') {
-            $student = Student::where('user_id', $user->id)->first();
-            $appointments = Appointment::with('counselor.user', 'counselor.college')
-                ->where('student_id', $student->id)
-                ->orderBy('appointment_date', 'desc')
-                ->orderBy('start_time', 'desc')
-                ->get();
-        } else {
-            $appointments = Appointment::with('student.user', 'counselor.user')
-                ->orderBy('appointment_date', 'desc')
-                ->orderBy('start_time', 'desc')
-                ->get();
+    if ($user->role === 'student') {
+        $student = Student::where('user_id', $user->id)->first();
+        $query = Appointment::with('counselor.user', 'counselor.college', 'sessionNotes')
+            ->where('student_id', $student->id);
+
+        // Date filter
+        if ($request->has('search_date') && $request->search_date) {
+            $query->where('appointment_date', $request->search_date);
         }
 
-        return view('appointments.index', compact('appointments'));
+        // Status filter
+        if ($request->has('status') && $request->status) {
+            $query->where('status', $request->status);
+        }
+
+        // Assignment filter
+        if ($request->has('has_assignment') && $request->has_assignment) {
+            if ($request->has_assignment === 'yes') {
+                $query->whereHas('sessionNotes', function($q) {
+                    $q->whereNotNull('follow_up_actions')->where('follow_up_actions', '!=', '');
+                })->where('status', 'completed');
+            } elseif ($request->has_assignment === 'no') {
+                $query->where(function($q) {
+                    $q->where('status', '!=', 'completed')
+                      ->orWhereDoesntHave('sessionNotes')
+                      ->orWhereHas('sessionNotes', function($q) {
+                          $q->whereNull('follow_up_actions')->orWhere('follow_up_actions', '');
+                      });
+                });
+            }
+        }
+
+        $appointments = $query->orderBy('appointment_date', 'desc')
+            ->orderBy('start_time', 'desc')
+            ->get();
+    } else {
+        // Counselor/admin view logic here
+        $appointments = Appointment::with('student.user', 'counselor.user', 'sessionNotes')
+            ->orderBy('appointment_date', 'desc')
+            ->orderBy('start_time', 'desc')
+            ->get();
     }
 
+    return view('appointments.index', compact('appointments'));
+}
 public function create()
 {
     $student = Student::with('college')->where('user_id', Auth::id())->first();
@@ -277,25 +305,70 @@ public function getAvailableSlots(Request $request)
             ->with('success', 'Appointment cancelled successfully. The time slot is now available for booking.');
     }
 
-    public function updateStatus(Request $request, Appointment $appointment)
-    {
-        $request->validate([
-            'status' => 'required|in:approved,rejected,cancelled,completed'
-        ]);
+// In your AppointmentController updateStatus method
+public function updateStatus(Request $request, Appointment $appointment)
+{
+    $request->validate([
+        'status' => 'required|in:approved,rejected,cancelled,completed',
+        'notes' => 'nullable|string|max:500',
+        'transfer_to_counselor' => 'sometimes|boolean'
+    ]);
 
-        $appointment->update([
-            'status' => $request->status,
-            'notes' => $request->notes
-        ]);
+    $oldStatus = $appointment->status;
+    $appointment->update([
+        'status' => $request->status,
+        'notes' => $request->notes ?: $appointment->notes
+    ]);
 
-        $statusMessages = [
-            'approved' => 'Appointment approved successfully.',
-            'rejected' => 'Appointment rejected.',
-            'cancelled' => 'Appointment cancelled.',
-            'completed' => 'Appointment marked as completed.'
-        ];
-
-        return redirect()->back()->with('success', $statusMessages[$request->status]);
+    // Handle transfer logic
+    if ($request->has('transfer_to_counselor')) {
+        // You can add notification logic here to inform the student
+        // to book with another counselor
+        // Example: Send email notification or create a notification record
     }
+
+    $statusMessages = [
+        'approved' => 'Appointment approved successfully.',
+        'rejected' => $request->has('transfer_to_counselor')
+            ? 'Appointment transferred. Student can book with another counselor.'
+            : 'Appointment rejected.',
+        'cancelled' => 'Appointment cancelled.',
+        'completed' => 'Appointment marked as completed.'
+    ];
+
+    return redirect()->back()->with('success', $statusMessages[$request->status]);
+}
+    // Add this method to your AppointmentController
+public function transfer(Request $request, Appointment $appointment)
+{
+    $request->validate([
+        'new_counselor_id' => 'required|exists:counselors,id',
+        'transfer_reason' => 'required|string|max:500'
+    ]);
+
+    // Check if the counselor owns this appointment
+    $counselorIds = Counselor::where('user_id', Auth::id())->pluck('id');
+    if (!$counselorIds->contains($appointment->counselor_id)) {
+        return redirect()->back()->with('error', 'You can only transfer your own appointments.');
+    }
+
+    // Get the new counselor
+    $newCounselor = Counselor::findOrFail($request->new_counselor_id);
+
+    // Store old counselor info
+    $oldCounselorName = $appointment->counselor->user->first_name . ' ' . $appointment->counselor->user->last_name;
+    $newCounselorName = $newCounselor->user->first_name . ' ' . $newCounselor->user->last_name;
+
+    // Update the appointment
+    $appointment->update([
+        'counselor_id' => $request->new_counselor_id,
+        'status' => 'pending', // Reset status to pending for new counselor
+        'notes' => ($appointment->notes ? $appointment->notes . "\n\n" : '') .
+                  "TRANSFERRED from {$oldCounselorName} to {$newCounselorName} on " . now()->toDateTimeString() .
+                  "\nReason: " . $request->transfer_reason
+    ]);
+
+    return redirect()->back()->with('success', "Appointment transferred successfully to {$newCounselorName}. The student has been notified.");
+}
 
 }

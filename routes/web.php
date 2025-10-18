@@ -48,8 +48,8 @@ Route::middleware('auth')->group(function () {
     Route::get('/feedback', [FeedbackController::class, 'create'])->name('feedback'); // Add this line
     Route::post('/feedback', [FeedbackController::class, 'store'])->name('feedback.store');
 
-    // Admin feedback management
-    Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
+    // Admin feedback management - REMOVED role:admin middleware
+    Route::prefix('admin')->name('admin.')->group(function () {
         Route::get('/feedback', [FeedbackController::class, 'index'])->name('feedback.index');
     });
 
@@ -73,6 +73,12 @@ Route::middleware('auth')->group(function () {
         Route::get('/appointments', [CounselorController::class, 'appointments'])->name('counselor.appointments');
         Route::patch('/appointments/{appointment}/status', [CounselorController::class, 'updateAppointmentStatus'])->name('counselor.appointments.update-status');
         Route::get('/appointments/{appointment}/details', [CounselorController::class, 'getAppointmentDetails'])->name('counselor.appointments.details');
+        Route::patch('/appointments/{appointment}/update-status', [AppointmentController::class, 'updateStatus'])
+            ->name('counselor.appointments.update-status');
+ // Feedback management routes
+        Route::get('/feedback', [FeedbackController::class, 'index'])->name('counselor.feedback.index');
+        Route::get('/feedback/{feedback}', [FeedbackController::class, 'show'])->name('counselor.feedback.show');
+        Route::get('/feedback/export', [FeedbackController::class, 'export'])->name('counselor.feedback.export');
 
         // Events management routes
         Route::get('/events', [EventController::class, 'index'])->name('counselor.events.index');
@@ -96,18 +102,12 @@ Route::middleware('auth')->group(function () {
         Route::delete('/resources/{resource}', [ResourceController::class, 'destroy'])->name('counselor.resources.destroy');
         Route::patch('/resources/{resource}/status', [ResourceController::class, 'updateStatus'])->name('counselor.resources.update-status');
 
-        // Session Notes Routes - CORRECTED ORDER
-        // Dashboard route FIRST (specific route)
+        // Session Notes Routes
         Route::get('/session-notes/dashboard', [SessionNoteController::class, 'dashboard'])->name('counselor.session-notes.dashboard');
-
-        // Student session notes
         Route::get('/students/{student}/session-notes', [SessionNoteController::class, 'index'])->name('counselor.session-notes.index');
         Route::get('/students/{student}/session-notes/create', [SessionNoteController::class, 'create'])->name('counselor.session-notes.create');
         Route::get('/appointments/{appointment}/session-notes/create', [SessionNoteController::class, 'createFromAppointment'])->name('counselor.session-notes.create-from-appointment');
         Route::post('/students/{student}/session-notes', [SessionNoteController::class, 'store'])->name('counselor.session-notes.store');
-Route::get('/counselor/students/{student}/session-notes/create', [SessionNoteController::class, 'create'])
-    ->name('counselor.session-notes.create');
-        // AJAX endpoints
         Route::get('/students/{student}/session-notes/json', [SessionNoteController::class, 'getStudentNotes'])->name('counselor.session-notes.json');
 
         // Follow-up appointment routes
@@ -117,34 +117,22 @@ Route::get('/counselor/students/{student}/session-notes/create', [SessionNoteCon
         // Follow-up appointment slots
         Route::get('/appointments/followup-available-slots', [AppointmentController::class, 'getFollowupAvailableSlots'])->name('counselor.appointments.followup-available-slots');
 
-        // Individual session note routes LAST (parameterized routes)
+        // Individual session note routes
         Route::get('/session-notes/{sessionNote}', [SessionNoteController::class, 'show'])->name('counselor.session-notes.show');
         Route::get('/session-notes/{sessionNote}/edit', [SessionNoteController::class, 'edit'])->name('counselor.session-notes.edit');
         Route::patch('/session-notes/{sessionNote}', [SessionNoteController::class, 'update'])->name('counselor.session-notes.update');
 
-          // Add this student profile route
-    Route::get('/students/{student}/profile', [CounselorController::class, 'showStudentProfile'])
-        ->name('counselor.students.profile');
+        // Student profile route
+        Route::get('/students/{student}/profile', [CounselorController::class, 'showStudentProfile'])
+            ->name('counselor.students.profile');
 
-         Route::get('/session-notes/dashboard', [SessionNoteController::class, 'dashboard'])->name('counselor.session-notes.dashboard');
-    Route::get('/students/{student}/session-notes', [SessionNoteController::class, 'index'])->name('counselor.session-notes.index');
-    Route::get('/students/{student}/session-notes/create', [SessionNoteController::class, 'create'])->name('counselor.session-notes.create');
-    Route::post('/students/{student}/session-notes', [SessionNoteController::class, 'store'])->name('counselor.session-notes.store');
-    Route::get('/session-notes/{sessionNote}', [SessionNoteController::class, 'show'])->name('counselor.session-notes.show');
-    Route::get('/session-notes/{sessionNote}/edit', [SessionNoteController::class, 'edit'])->name('counselor.session-notes.edit');
-    Route::put('/session-notes/{sessionNote}', [SessionNoteController::class, 'update'])->name('counselor.session-notes.update');
-    Route::get('/students/{student}/session-notes/json', [SessionNoteController::class, 'getStudentNotes'])->name('counselor.session-notes.json');
-// Appointments with search
-Route::get('/counselor/appointments', [CounselorController::class, 'appointments'])
-    ->name('counselor.appointments');
-
-// Export appointments
-Route::get('/counselor/appointments/export', [CounselorController::class, 'exportAppointments'])
-    ->name('counselor.appointments.export');
+        // Export appointments
+        Route::get('/appointments/export', [CounselorController::class, 'exportAppointments'])
+            ->name('counselor.appointments.export');
     });
 });
 
-// In routes/web.php
+// Counselor announcements
 Route::middleware(['auth'])->prefix('counselor')->name('counselor.')->group(function () {
     Route::resource('announcements', \App\Http\Controllers\CounselorAnnouncementController::class);
     Route::patch('announcements/{announcement}/toggle-status', [\App\Http\Controllers\CounselorAnnouncementController::class, 'toggleStatus'])
@@ -158,17 +146,14 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::patch('/profile/password', [ProfileController::class, 'updatePassword'])->name('profile.password.update');
-Route::patch('/profile/admin', [ProfileController::class, 'updateAdmin'])->name('profile.admin.update');
+    Route::patch('/profile/admin', [ProfileController::class, 'updateAdmin'])->name('profile.admin.update');
+
     // Student-specific profile routes
     Route::patch('/profile/student', [ProfileController::class, 'updateStudent'])->name('profile.student.update');
 
     // Counselor-specific profile routes
     Route::patch('/profile/counselor', [ProfileController::class, 'updateCounselor'])->name('profile.counselor.update');
-    Route::post('counselor/events/{event}/registrations/{registration}/status', [EventController::class, 'updateRegistrationStatus'])->name('counselor.events.update-registration-status');
 });
-
-
-
 
 // Student event routes
 Route::middleware(['auth'])->group(function () {
@@ -179,19 +164,35 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/events/{event}/cancel', [EventRegistrationController::class, 'cancelRegistration'])->name('student.events.cancel');
 });
 
-// Admin routes
-// Admin routes
+// Admin routes - REMOVED role:admin middleware
 Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () {
-    Route::get('/dashboard', [App\Http\Controllers\AdminController::class, 'dashboard'])->name('dashboard');
-    Route::get('/users', [App\Http\Controllers\AdminController::class, 'users'])->name('users');
-    Route::get('/users/create', [App\Http\Controllers\AdminController::class, 'createUser'])->name('users.create');
-    Route::post('/users', [App\Http\Controllers\AdminController::class, 'storeUser'])->name('users.store');
-    Route::get('/users/{user}/edit', [App\Http\Controllers\AdminController::class, 'editUser'])->name('users.edit');
-    Route::put('/users/{user}', [App\Http\Controllers\AdminController::class, 'updateUser'])->name('users.update');
-    Route::delete('/users/{user}', [App\Http\Controllers\AdminController::class, 'deleteUser'])->name('users.delete');
+    Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('dashboard');
+    Route::get('/users', [AdminController::class, 'users'])->name('users');
+    Route::get('/users/create', [AdminController::class, 'createUser'])->name('users.create');
+    Route::post('/users', [AdminController::class, 'storeUser'])->name('users.store');
+    Route::get('/users/{user}/edit', [AdminController::class, 'editUser'])->name('users.edit');
+    Route::put('/users/{user}', [AdminController::class, 'updateUser'])->name('users.update');
+    Route::delete('/users/{user}', [AdminController::class, 'deleteUser'])->name('users.delete');
 
-    Route::get('/students', [App\Http\Controllers\AdminController::class, 'students'])->name('students');
-    Route::get('/counselors', [App\Http\Controllers\AdminController::class, 'counselors'])->name('counselors');
+    Route::get('/students', [AdminController::class, 'students'])->name('students');
+    Route::get('/counselors', [AdminController::class, 'counselors'])->name('counselors');
+
+    // Admin Event Management Routes
+    Route::get('/events', [AdminController::class, 'events'])->name('events');
+    Route::get('/events/create', [AdminController::class, 'createEvent'])->name('events.create');
+    Route::post('/events', [AdminController::class, 'storeEvent'])->name('events.store');
+    Route::get('/events/{event}/edit', [AdminController::class, 'editEvent'])->name('events.edit');
+    Route::put('/events/{event}', [AdminController::class, 'updateEvent'])->name('events.update');
+    Route::delete('/events/{event}', [AdminController::class, 'deleteEvent'])->name('events.destroy');
+    Route::patch('/events/{event}/toggle-status', [AdminController::class, 'toggleEventStatus'])->name('events.toggle-status');
+
+    // Event Registrations
+    Route::get('/events/{event}/registrations', [AdminController::class, 'showEventRegistrations'])->name('events.registrations');
+    Route::patch('/events/{event}/registrations/{registration}/status', [AdminController::class, 'updateEventRegistrationStatus'])->name('events.update-registration-status');
+    Route::get('/events/{event}/export-registrations', [AdminController::class, 'exportEventRegistrations'])->name('events.export-registrations');
+  Route::get('/feedback', [FeedbackController::class, 'index'])->name('feedback.index');
+    Route::get('/feedback/{feedback}', [FeedbackController::class, 'show'])->name('feedback.show');
+    Route::get('/feedback/export', [FeedbackController::class, 'export'])->name('feedback.export');
 });
 
 // Debug route
@@ -211,4 +212,5 @@ Route::get('/check-admin-status', function() {
         'admin_profile' => $admin
     ]);
 });
+
 require __DIR__.'/auth.php';

@@ -61,4 +61,19 @@ class Feedback extends Model
     {
         return $query->where('is_anonymous', false);
     }
+
+    /**
+ * Get the status color for a given rating
+ */
+public function getRatingColorAttribute()
+{
+    switch($this->satisfaction_rating) {
+        case 5: return 'green';
+        case 4: return 'blue';
+        case 3: return 'yellow';
+        case 2: return 'orange';
+        case 1: return 'red';
+        default: return 'gray';
+    }
+}
 }

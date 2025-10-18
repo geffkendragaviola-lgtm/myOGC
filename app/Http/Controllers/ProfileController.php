@@ -2,239 +2,284 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Feedback;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Redirect;
-use Illuminate\View\View;
-use App\Models\Student;
-use App\Models\Counselor;
-use App\Models\Admin;
-use Illuminate\Support\Facades\Log;
-use App\Models\College;
+use Illuminate\Support\Str;
 
-class ProfileController extends Controller
+class FeedbackController extends Controller
 {
     /**
-     * Display the user's profile form.
+     * Display a listing of all feedback for counselors
      */
-    public function edit(Request $request): View
+    public function index(Request $request)
     {
-        try {
-            $user = $request->user();
-            $studentProfile = null;
-            $counselorProfile = null;
-            $adminProfile = null;
+        $userId = Auth::id();
 
-            if ($user->role === 'student') {
-                $studentProfile = Student::where('user_id', $user->id)->first();
-            } elseif ($user->role === 'counselor') {
-                $counselorProfile = Counselor::where('user_id', $user->id)->first();
-            } elseif ($user->role === 'admin') {
-                $adminProfile = Admin::where('user_id', $user->id)->first();
-            }
+        // Get all counselor assignments for this user
+        $counselorAssignments = \App\Models\Counselor::where('user_id', $userId)->get();
 
-            // Get colleges for dropdown
-            $colleges = College::all();
-
-            return view('profile.edit', compact('user', 'studentProfile', 'counselorProfile', 'adminProfile', 'colleges'));
-        } catch (\Exception $e) {
-            // Log the error and return a simple view
-            Log::error('Profile edit error: ' . $e->getMessage());
-            abort(500, 'Unable to load profile page.');
+        if ($counselorAssignments->isEmpty()) {
+            abort(403, 'Counselor access required.');
         }
+
+        $query = Feedback::with('user')
+            ->orderBy('created_at', 'desc');
+
+        // Search functionality
+        if ($request->has('search') && $request->search) {
+            $search = strtolower($request->search);
+            $query->where(function($q) use ($search) {
+                $q->whereHas('user', function($q) use ($search) {
+                    $q->whereRaw('LOWER(first_name) LIKE ?', ["%{$search}%"])
+                      ->orWhereRaw('LOWER(last_name) LIKE ?', ["%{$search}%"]);
+                })
+                ->orWhere('service_availed', 'like', "%{$search}%")
+                ->orWhere('comments', 'like', "%{$search}%");
+            });
+        }
+
+        // Rating filter
+        if ($request->has('rating') && $request->rating) {
+            $query->where('satisfaction_rating', $request->rating);
+        }
+
+        // Service type filter
+        if ($request->has('service') && $request->service) {
+            $query->where('service_availed', $request->service);
+        }
+
+        // Date range filter
+        if ($request->has('date_range') && $request->date_range) {
+            $now = \Carbon\Carbon::now();
+            switch ($request->date_range) {
+                case 'today':
+                    $query->whereDate('created_at', $now->toDateString());
+                    break;
+                case 'week':
+                    $query->whereBetween('created_at', [
+                        $now->startOfWeek()->toDateTimeString(),
+                        $now->endOfWeek()->toDateTimeString()
+                    ]);
+                    break;
+                case 'month':
+                    $query->whereBetween('created_at', [
+                        $now->startOfMonth()->toDateTimeString(),
+                        $now->endOfMonth()->toDateTimeString()
+                    ]);
+                    break;
+            }
+        }
+
+        // Anonymous filter
+        if ($request->has('anonymous') && $request->anonymous !== '') {
+            $query->where('is_anonymous', $request->anonymous);
+        }
+
+        $feedbacks = $query->paginate(15);
+
+        // Get unique service types for filter dropdown
+        $serviceTypes = Feedback::distinct()->pluck('service_availed')->sort();
+
+        // Calculate statistics
+        $stats = [
+            'total' => Feedback::count(),
+            'average_rating' => round(Feedback::avg('satisfaction_rating') ?? 0, 1),
+            'anonymous_count' => Feedback::where('is_anonymous', true)->count(),
+            'rating_distribution' => Feedback::selectRaw('satisfaction_rating, COUNT(*) as count')
+                ->groupBy('satisfaction_rating')
+                ->orderBy('satisfaction_rating', 'desc')
+                ->get()
+                ->pluck('count', 'satisfaction_rating')
+        ];
+
+        return view('counselor.feedback.index', compact(
+            'feedbacks',
+            'stats',
+            'serviceTypes'
+        ));
     }
 
     /**
-     * Update the user's profile information.
+     * Show the form for creating new feedback (for students)
      */
-    public function update(Request $request)
+    public function create()
     {
-        try {
-            $request->validate([
-                'first_name' => ['required', 'string', 'max:255'],
-                'middle_name' => ['nullable', 'string', 'max:255'],
-                'last_name' => ['required', 'string', 'max:255'],
-                'email' => ['required', 'string', 'email', 'max:255', 'unique:users,email,' . $request->user()->id],
-                'phone' => ['nullable', 'string', 'max:20'],
-                'address' => ['nullable', 'string', 'max:500'],
-            ]);
-
-            $user = $request->user();
-
-            $user->fill($request->all());
-
-            if ($user->isDirty('email')) {
-                $user->email_verified_at = null;
-            }
-
-            $user->save();
-
-            return Redirect::route('profile.edit')->with('status', 'profile-updated');
-        } catch (\Exception $e) {
-            Log::error('Profile update error: ' . $e->getMessage());
-            return back()->withErrors(['error' => 'Failed to update profile.']);
-        }
+        return view('feedback.create');
     }
 
     /**
-     * Update the user's password.
+     * Store a newly created feedback
      */
-    public function updatePassword(Request $request)
+    public function store(Request $request)
     {
-        try {
-            $request->validate([
-                'current_password' => ['required', 'current_password'],
-                'password' => ['required', 'string', 'min:8', 'confirmed'],
-            ]);
+        $request->validate([
+            'service_availed' => 'required|string|max:255',
+            'satisfaction_rating' => 'required|integer|between:1,5',
+            'comments' => 'nullable|string|max:1000',
+            'is_anonymous' => 'boolean'
+        ]);
 
-            $user = $request->user();
+        Feedback::create([
+            'user_id' => Auth::id(),
+            'service_availed' => $request->service_availed,
+            'satisfaction_rating' => $request->satisfaction_rating,
+            'comments' => $request->comments,
+            'is_anonymous' => $request->is_anonymous ?? false
+        ]);
 
-            $user->update([
-                'password' => Hash::make($request->password),
-            ]);
-
-            return Redirect::route('profile.edit')->with('status', 'password-updated');
-        } catch (\Exception $e) {
-            Log::error('Password update error: ' . $e->getMessage());
-            return back()->withErrors(['error' => 'Failed to update password.']);
-        }
+        return redirect()->route('feedback.create')
+            ->with('success', 'Thank you for your feedback! Your input helps us improve our services.');
     }
 
     /**
-     * Update student-specific profile information.
+     * Display individual feedback details
      */
-    public function updateStudent(Request $request)
+    public function show(Feedback $feedback)
     {
-        try {
-            $request->validate([
-                'student_id' => ['required', 'string', 'max:50'],
-                'year_level' => ['required', 'string', 'in:1st Year,2nd Year,3rd Year,4th Year,5th Year,Graduate'],
-                'college_id' => ['required', 'exists:colleges,id'],
-            ]);
+        $userId = Auth::id();
+        $counselorIds = \App\Models\Counselor::where('user_id', $userId)->pluck('id');
 
-            $user = $request->user();
-
-            if ($user->role !== 'student') {
-                return back()->withErrors(['error' => 'Unauthorized action.']);
-            }
-
-            $studentProfile = Student::where('user_id', $user->id)->first();
-
-            if ($studentProfile) {
-                $studentProfile->update($request->all());
-            } else {
-                Student::create(array_merge(
-                    ['user_id' => $user->id],
-                    $request->all()
-                ));
-            }
-
-            return Redirect::route('profile.edit')->with('status', 'student-profile-updated');
-        } catch (\Exception $e) {
-            Log::error('Student profile update error: ' . $e->getMessage());
-            return back()->withErrors(['error' => 'Failed to update student profile.']);
+        if ($counselorIds->isEmpty()) {
+            abort(403, 'Counselor access required.');
         }
+
+        $feedback->load('user');
+
+        return view('counselor.feedback.show', compact('feedback'));
     }
 
     /**
-     * Update counselor-specific profile information.
+     * Export feedback to Excel/CSV
      */
-    public function updateCounselor(Request $request)
+    public function export(Request $request)
     {
-        try {
-            $request->validate([
-                'position' => ['required', 'string', 'max:255'],
-                'credentials' => ['required', 'string', 'max:255'],
-                'specialization' => ['nullable', 'string', 'max:500'],
-                'college_id' => ['required', 'exists:colleges,id'],
+        $userId = Auth::id();
+        $counselorIds = \App\Models\Counselor::where('user_id', $userId)->pluck('id');
+
+        if ($counselorIds->isEmpty()) {
+            abort(403, 'Counselor access required.');
+        }
+
+        $query = Feedback::with('user');
+
+        // Apply filters same as index method
+        if ($request->has('search') && $request->search) {
+            $search = $request->search;
+            $query->where(function($q) use ($search) {
+                $q->whereHas('user', function($q) use ($search) {
+                    $q->where('first_name', 'like', "%{$search}%")
+                      ->orWhere('last_name', 'like', "%{$search}%");
+                })
+                ->orWhere('service_availed', 'like', "%{$search}%")
+                ->orWhere('comments', 'like', "%{$search}%");
+            });
+        }
+
+        if ($request->has('rating') && $request->rating) {
+            $query->where('satisfaction_rating', $request->rating);
+        }
+
+        if ($request->has('service') && $request->service) {
+            $query->where('service_availed', $request->service);
+        }
+
+        $feedbacks = $query->orderBy('created_at', 'desc')->get();
+
+        $fileName = 'feedback_' . date('Y-m-d') . '.csv';
+
+        $headers = [
+            'Content-Type' => 'text/csv',
+            'Content-Disposition' => 'attachment; filename="' . $fileName . '"',
+        ];
+
+        $callback = function() use ($feedbacks) {
+            $file = fopen('php://output', 'w');
+
+            // Add BOM for UTF-8
+            fputs($file, chr(0xEF) . chr(0xBB) . chr(0xBF));
+
+            // Headers
+            fputcsv($file, [
+                'Student Name',
+                'Service Availed',
+                'Satisfaction Rating',
+                'Rating Label',
+                'Comments',
+                'Is Anonymous',
+                'Submitted Date'
             ]);
 
-            $user = $request->user();
+            // Data
+            foreach ($feedbacks as $feedback) {
+                $studentName = $feedback->is_anonymous ?
+                    'Anonymous' :
+                    $feedback->user->first_name . ' ' . $feedback->user->last_name;
 
-            if ($user->role !== 'counselor') {
-                return back()->withErrors(['error' => 'Unauthorized action.']);
+                fputcsv($file, [
+                    $studentName,
+                    $feedback->service_availed,
+                    $feedback->satisfaction_rating,
+                    Feedback::getRatingLabel($feedback->satisfaction_rating),
+                    $feedback->comments,
+                    $feedback->is_anonymous ? 'Yes' : 'No',
+                    $feedback->created_at->format('Y-m-d H:i:s')
+                ]);
             }
 
-            $counselorProfile = Counselor::where('user_id', $user->id)->first();
+            fclose($file);
+        };
 
-            if ($counselorProfile) {
-                $counselorProfile->update($request->all());
-            } else {
-                Counselor::create(array_merge(
-                    ['user_id' => $user->id],
-                    $request->all()
-                ));
-            }
-
-            return Redirect::route('profile.edit')->with('status', 'counselor-profile-updated');
-        } catch (\Exception $e) {
-            Log::error('Counselor profile update error: ' . $e->getMessage());
-            return back()->withErrors(['error' => 'Failed to update counselor profile.']);
-        }
+        return response()->stream($callback, 200, $headers);
     }
 
     /**
-     * Update admin-specific profile information.
+     * Get feedback statistics for dashboard
      */
-    public function updateAdmin(Request $request)
+    public function getStats()
     {
-        try {
-            $request->validate([
-                'position' => ['required', 'string', 'max:255'],
-                'department' => ['required', 'string', 'max:255'],
-                'employee_id' => ['required', 'string', 'max:50'],
-                'office_location' => ['nullable', 'string', 'max:255'],
-                'extension' => ['nullable', 'string', 'max:20'],
-            ]);
+        $userId = Auth::id();
+        $counselorIds = \App\Models\Counselor::where('user_id', $userId)->pluck('id');
 
-            $user = $request->user();
-
-            if ($user->role !== 'admin') {
-                return back()->withErrors(['error' => 'Unauthorized action.']);
-            }
-
-            $adminProfile = Admin::where('user_id', $user->id)->first();
-
-            if ($adminProfile) {
-                $adminProfile->update($request->all());
-            } else {
-                Admin::create(array_merge(
-                    ['user_id' => $user->id],
-                    $request->all()
-                ));
-            }
-
-            return Redirect::route('profile.edit')->with('status', 'admin-profile-updated');
-        } catch (\Exception $e) {
-            Log::error('Admin profile update error: ' . $e->getMessage());
-            return back()->withErrors(['error' => 'Failed to update admin profile.']);
+        if ($counselorIds->isEmpty()) {
+            return response()->json(['error' => 'Unauthorized'], 403);
         }
-    }
 
-    /**
-     * Delete the user's account.
-     */
-    public function destroy(Request $request)
-    {
-        try {
-            $request->validate([
-                'password' => ['required', 'current_password'],
-            ]);
+        $totalFeedback = Feedback::count();
+        $averageRating = round(Feedback::avg('satisfaction_rating') ?? 0, 1);
 
-            $user = $request->user();
+        $recentFeedback = Feedback::with('user')
+            ->orderBy('created_at', 'desc')
+            ->limit(5)
+            ->get()
+            ->map(function($feedback) {
+                return [
+                    'id' => $feedback->id,
+                    'student_name' => $feedback->is_anonymous ?
+                        'Anonymous' :
+                        $feedback->user->first_name . ' ' . $feedback->user->last_name,
+                    'service' => $feedback->service_availed,
+                    'rating' => $feedback->satisfaction_rating,
+                    'rating_label' => Feedback::getRatingLabel($feedback->satisfaction_rating),
+                    'comments' => Str::limit($feedback->comments, 50),
+                    'date' => $feedback->created_at->format('M j, Y'),
+                    'is_anonymous' => $feedback->is_anonymous
+                ];
+            });
 
-            Auth::logout();
+        $ratingDistribution = Feedback::selectRaw('satisfaction_rating, COUNT(*) as count')
+            ->groupBy('satisfaction_rating')
+            ->orderBy('satisfaction_rating', 'desc')
+            ->get()
+            ->mapWithKeys(function($item) {
+                return [$item->satisfaction_rating => $item->count];
+            });
 
-            $user->delete();
-
-            $request->session()->invalidate();
-            $request->session()->regenerateToken();
-
-            return Redirect::to('/');
-        } catch (\Exception $e) {
-            Log::error('Account deletion error: ' . $e->getMessage());
-            return back()->withErrors(['error' => 'Failed to delete account.']);
-        }
+        return response()->json([
+            'total_feedback' => $totalFeedback,
+            'average_rating' => $averageRating,
+            'recent_feedback' => $recentFeedback,
+            'rating_distribution' => $ratingDistribution
+        ]);
     }
 }

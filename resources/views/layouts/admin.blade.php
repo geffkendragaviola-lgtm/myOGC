@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>@yield('title', 'Office of Guidance and Counseling')</title>
+    <title>@yield('title', 'Admin Dashboard - OGC')</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
 
     <style>
-    .dashboard-container {
+        .dashboard-container {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
 
@@ -101,31 +101,55 @@
 </head>
 <body class="bg-gray-50 dashboard-container">
 
-    {{-- ✅ Sidebar for counselors --}}
-    @if(Auth::check() && Auth::user()->role === 'counselor')
-        <!-- Top Navbar for Counselors -->
+    {{-- ✅ Layout for Admin Only --}}
+    @if(Auth::check() && Auth::user()->role === 'admin')
+        <!-- Top Navbar for Admin -->
         <nav class="dashboard-navbar fixed top-0 left-0 right-0 h-16 flex items-center justify-between px-6 z-40">
             <!-- Centered Navigation Items -->
             <div class="flex items-center space-x-8 absolute left-1/2 transform -translate-x-1/2">
-                <a href="{{ route('dashboard') }}" class="text-white font-semibold hover:text-yellow-300 transition">Home</a>
+                <a href="{{ route('admin.dashboard') }}" class="text-white font-semibold hover:text-yellow-300 transition">Home</a>
 
-                <!-- Services Dropdown -->
-                <div class="relative" id="services-dropdown">
-                    <button class="text-white font-semibold hover:text-yellow-300 transition flex items-center" id="services-dropdown-btn">
-                        Services <i class="fas fa-chevron-down ml-1 text-sm"></i>
+                <!-- Quick Actions Dropdown -->
+                <div class="relative" id="quick-actions-dropdown">
+                    <button class="text-white font-semibold hover:text-yellow-300 transition flex items-center" id="quick-actions-dropdown-btn">
+                        Quick Actions <i class="fas fa-chevron-down ml-1 text-sm"></i>
                     </button>
-                    <div class="absolute hidden bg-white rounded-md shadow-lg py-2 mt-1 w-48 z-50" id="services-dropdown-menu">
-                        <a href="{{ route('bap') }}" class="block px-4 py-2 text-gray-800 hover:bg-blue-100">Book an Appointment</a>
-                        <a href="{{ route('mhc') }}" class="block px-4 py-2 text-gray-800 hover:bg-blue-100">Mental Health Corner</a>
+                    <div class="absolute hidden bg-white rounded-md shadow-lg py-2 mt-1 w-48 z-50" id="quick-actions-dropdown-menu">
+                        <a href="{{ route('admin.events.create') }}" class="block px-4 py-2 text-gray-800 hover:bg-blue-100">
+                            <i class="fas fa-plus mr-2"></i> Create Event
+                        </a>
+                        <a href="{{ route('admin.users.create') }}" class="block px-4 py-2 text-gray-800 hover:bg-blue-100">
+                            <i class="fas fa-user-plus mr-2"></i> Add User
+                        </a>
+                        <a href="{{ route('admin.events') }}" class="block px-4 py-2 text-gray-800 hover:bg-blue-100">
+                            <i class="fas fa-calendar-alt mr-2"></i> Manage Events
+                        </a>
                     </div>
                 </div>
 
-                <a href="{{ route('feedback') }}" class="text-white font-semibold hover:text-yellow-300 transition">Feedback</a>
+                <!-- Users Dropdown -->
+                <div class="relative" id="users-dropdown">
+                    <button class="text-white font-semibold hover:text-yellow-300 transition flex items-center" id="users-dropdown-btn">
+                        Users <i class="fas fa-chevron-down ml-1 text-sm"></i>
+                    </button>
+                    <div class="absolute hidden bg-white rounded-md shadow-lg py-2 mt-1 w-48 z-50" id="users-dropdown-menu">
+                        <a href="{{ route('admin.users') }}" class="block px-4 py-2 text-gray-800 hover:bg-blue-100">
+                            <i class="fas fa-users mr-2"></i> All Users
+                        </a>
+                        <a href="{{ route('admin.students') }}" class="block px-4 py-2 text-gray-800 hover:bg-blue-100">
+                            <i class="fas fa-user-graduate mr-2"></i> Students
+                        </a>
+                        <a href="{{ route('admin.counselors') }}" class="block px-4 py-2 text-gray-800 hover:bg-blue-100">
+                            <i class="fas fa-user-tie mr-2"></i> Counselors
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Feedback Link -->
+                <a href="{{ route('admin.feedback.index') }}" class="text-white font-semibold hover:text-yellow-300 transition">Feedback</a>
             </div>
 
             <div class="flex items-center space-x-4 ml-auto">
-
-
                 <button class="text-white p-2 rounded-full hover:bg-blue-700 transition">
                     <i class="fas fa-bell"></i>
                 </button>
@@ -155,33 +179,28 @@
             </div>
         </nav>
 
-        <!-- Sidebar for Counselors -->
+        <!-- Sidebar for Admin -->
         <nav class="sidebar fixed top-16 left-0 h-[calc(100vh-4rem)] w-64 text-white flex flex-col justify-between z-30">
             <div>
                 <!-- User Info in Sidebar Header -->
                 <div class="p-6 border-b border-blue-700">
                     <div class="font-semibold text-lg">{{ Auth::user()->first_name }} {{ Auth::user()->last_name }}</div>
                     <div class="text-sm text-gray-300">{{ Auth::user()->email }}</div>
-                    <!-- Add college information here if available -->
                     <div class="text-xs text-gray-400 mt-1">
-                        @if(Auth::user()->college)
-                            {{ Auth::user()->college }}
-                        @else
-
-                        @endif
+                        <i class="fas fa-shield-alt mr-1"></i> System Administrator
                     </div>
                 </div>
 
                 <div class="mt-6 space-y-1 px-3">
-                    <a href="{{ route('counselor.dashboard') }}"><i class="fas fa-tachometer-alt mr-3"></i> Dashboard</a>
-                    <a href="{{ route('counselor.session-notes.dashboard') }}"><i class="fas fa-sticky-note mr-3"></i> Session Notes</a>
-                    <a href="{{ route('counselor.resources.index') }}"><i class="fas fa-box-open mr-3"></i> Resources</a>
-                    <a href="{{ route('counselor.announcements.index') }}"><i class="fas fa-bullhorn mr-3"></i> Announcements</a>
-                    <a href="{{ route('counselor.events.index') }}"><i class="fas fa-calendar-alt mr-3"></i> Events</a>
-                    <a href="{{ route('counselor.calendar') }}"><i class="fas fa-calendar mr-3"></i> Calendar</a>
-                    <a href="{{ route('counselor.appointments') }}"><i class="fas fa-list mr-3"></i> Appointments</a>
+                    <a href="{{ route('admin.dashboard') }}"><i class="fas fa-tachometer-alt mr-3"></i> Dashboard</a>
+                    <a href="{{ route('admin.users') }}"><i class="fas fa-users mr-3"></i> All Users</a>
+                    <a href="{{ route('admin.students') }}"><i class="fas fa-user-graduate mr-3"></i> Students</a>
+                    <a href="{{ route('admin.counselors') }}"><i class="fas fa-user-tie mr-3"></i> Counselors</a>
+                    <a href="{{ route('admin.events') }}"><i class="fas fa-calendar-alt mr-3"></i> Events</a>
                     <!-- ADDED FEEDBACK LINK -->
-                    <a href="{{ route('counselor.feedback.index') }}"><i class="fas fa-comments mr-3"></i> Feedback</a>
+                    <a href="{{ route('admin.feedback.index') }}"><i class="fas fa-comments mr-3"></i> Feedback</a>
+                    <a href="{{ route('admin.users.create') }}"><i class="fas fa-user-plus mr-3"></i> Create User</a>
+                    <a href="{{ route('admin.events.create') }}"><i class="fas fa-calendar-plus mr-3"></i> Create Event</a>
                 </div>
             </div>
 
@@ -191,7 +210,9 @@
                     <!-- Only showing logout in sidebar now -->
                     <form method="POST" action="{{ route('logout') }}">
                         @csrf
-                        <button type="submit" class="flex items-center w-full text-left text-white hover:bg-blue-700 p-2 rounded"><i class="fas fa-sign-out-alt mr-3"></i> Logout</button>
+                        <button type="submit" class="flex items-center w-full text-left text-white hover:bg-blue-700 p-2 rounded">
+                            <i class="fas fa-sign-out-alt mr-3"></i> Logout
+                        </button>
                     </form>
                 </div>
             </div>
@@ -201,17 +222,14 @@
         <div class="ml-64 pt-16 min-h-screen">
             @yield('content')
         </div>
-    @else
-        {{-- ✅ Default Top Navbar for Students / Guests --}}
-        @include('partials.navbar')
 
+    {{-- ✅ Default Layout for Students / Guests --}}
+    @else
         <main class="min-h-screen">
             @yield('content')
         </main>
     @endif
 
-    {{-- ✅ Reusable Footer --}}
-   {{--   @include('partials.footer')--}}
     @stack('scripts')
 
     <script>
@@ -240,9 +258,8 @@
             }
 
             // Setup all dropdowns
-            setupDropdown('counselor-dropdown', 'counselor-dropdown-btn', 'counselor-dropdown-menu');
-            setupDropdown('student-dropdown', 'student-dropdown-btn', 'student-dropdown-menu');
-            setupDropdown('services-dropdown', 'services-dropdown-btn', 'services-dropdown-menu');
+            setupDropdown('quick-actions-dropdown', 'quick-actions-dropdown-btn', 'quick-actions-dropdown-menu');
+            setupDropdown('users-dropdown', 'users-dropdown-btn', 'users-dropdown-menu');
 
             // Profile dropdown
             const profileBtn = document.getElementById('profile-dropdown-btn');
