@@ -1,493 +1,489 @@
-    @extends('layouts.app')
+@extends('layouts.app')
 
-    @section('title', 'Counselor Dashboard - OGC')
+@section('title', 'Counselor Dashboard - OGC')
 
-    @section('content')
-    <body class="bg-gray-50">
+@section('content')
+<body class="bg-gray-50">
 
-        <div class="container mx-auto px-6 py-8">
-            <!-- Header -->
-            <div class="flex justify-between items-center mb-6">
-                <div>
-                    <h1 class="text-2xl font-bold text-gray-800">Appointment Management</h1>
-                    <p class="text-gray-600 mt-1">Manage student appointments and session notes across all assigned colleges</p>
-                    @if(isset($allColleges) && $allColleges->count() > 1)
-                    <div class="flex items-center mt-2">
-                        <span class="text-sm text-gray-500 mr-2">Assigned to:</span>
-                        <div class="flex flex-wrap gap-1">
-                            @foreach($allColleges as $college)
-                                <span class="bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-xs college-badge">
-                                    {{ $college->name }}
-                                </span>
-                            @endforeach
-                        </div>
+    <div class="container mx-auto px-6 py-8">
+        <!-- Header -->
+        <div class="flex justify-between items-center mb-6">
+            <div>
+                <h1 class="text-2xl font-bold text-gray-800">Appointment Management</h1>
+                <p class="text-gray-600 mt-1">Manage student appointments and session notes across all assigned colleges</p>
+                @if(isset($allColleges) && $allColleges->count() > 1)
+                <div class="flex items-center mt-2">
+                    <span class="text-sm text-gray-500 mr-2">Assigned to:</span>
+                    <div class="flex flex-wrap gap-1">
+                        @foreach($allColleges as $college)
+                            <span class="bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-xs college-badge">
+                                {{ $college->name }}
+                            </span>
+                        @endforeach
                     </div>
-                    @endif
                 </div>
-                <div class="flex space-x-4">
-                    <a href="{{ route('counselor.dashboard') }}"
-                    class="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition">
-                        <i class="fas fa-arrow-left mr-2"></i>Dashboard
-                    </a>
-                    <a href="{{ route('counselor.calendar') }}"
-                    class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">
-                        <i class="fas fa-calendar-alt mr-2"></i>View Calendar
-                    </a>
-                </div>
+                @endif
             </div>
-
-            <!-- Quick Stats -->
-            <div class="grid grid-cols-1 md:grid-cols-6 gap-6 mb-6">
-                <div class="bg-white rounded-xl shadow-sm p-6">
-                    <div class="flex items-center">
-                        <div class="p-3 bg-blue-100 rounded-lg">
-                            <i class="fas fa-calendar-check text-blue-600 text-xl"></i>
-                        </div>
-                        <div class="ml-4">
-                            <p class="text-sm text-gray-600">Total Appointments</p>
-                            <p class="text-2xl font-bold text-gray-800">{{ $appointments->total() }}</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="bg-white rounded-xl shadow-sm p-6">
-                    <div class="flex items-center">
-                        <div class="p-3 bg-yellow-100 rounded-lg">
-                            <i class="fas fa-clock text-yellow-600 text-xl"></i>
-                        </div>
-                        <div class="ml-4">
-                            <p class="text-sm text-gray-600">Pending</p>
-                            <p class="text-2xl font-bold text-gray-800">{{ $appointments->where('status', 'pending')->count() }}</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="bg-white rounded-xl shadow-sm p-6">
-                    <div class="flex items-center">
-                        <div class="p-3 bg-green-100 rounded-lg">
-                            <i class="fas fa-check-circle text-green-600 text-xl"></i>
-                        </div>
-                        <div class="ml-4">
-                            <p class="text-sm text-gray-600">Approved</p>
-                            <p class="text-2xl font-bold text-gray-800">{{ $appointments->where('status', 'approved')->count() }}</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="bg-white rounded-xl shadow-sm p-6">
-                    <div class="flex items-center">
-                        <div class="p-3 bg-blue-100 rounded-lg">
-                            <i class="fas fa-flag-checkered text-blue-600 text-xl"></i>
-                        </div>
-                        <div class="ml-4">
-                            <p class="text-sm text-gray-600">Completed</p>
-                            <p class="text-2xl font-bold text-gray-800">{{ $appointments->where('status', 'completed')->count() }}</p>
-                        </div>
-                    </div>
-                </div>
-    <div class="bg-white rounded-xl shadow-sm p-6">
-        <div class="flex items-center">
-            <div class="p-3 bg-purple-100 rounded-lg">
-                <i class="fas fa-exchange-alt text-purple-600 text-xl"></i>
-            </div>
-            <div class="ml-4">
-                <p class="text-sm text-gray-600">Referred</p>
-                <p class="text-2xl font-bold text-gray-800">{{ $appointments->where('status', 'referred')->count() }}</p>
+            <div class="flex space-x-4">
+                <a href="{{ route('counselor.dashboard') }}"
+                class="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition">
+                    <i class="fas fa-arrow-left mr-2"></i>Dashboard
+                </a>
+                <a href="{{ route('counselor.calendar') }}"
+                class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">
+                    <i class="fas fa-calendar-alt mr-2"></i>View Calendar
+                </a>
             </div>
         </div>
-    </div>
 
-                <div class="bg-white rounded-xl shadow-sm p-6">
-                    <div class="flex items-center">
-                        <div class="p-3 bg-indigo-100 rounded-lg">
-                            <i class="fas fa-clipboard-list text-indigo-600 text-xl"></i>
-                        </div>
-                        <div class="ml-4">
-                            <p class="text-sm text-gray-600">With Notes</p>
-                            <p class="text-2xl font-bold text-gray-800">{{ $appointments->where('has_session_notes', true)->count() }}</p>
-                        </div>
+        <!-- Quick Stats -->
+        <div class="grid grid-cols-1 md:grid-cols-6 gap-6 mb-6">
+            <div class="bg-white rounded-xl shadow-sm p-6">
+                <div class="flex items-center">
+                    <div class="p-3 bg-blue-100 rounded-lg">
+                        <i class="fas fa-calendar-check text-blue-600 text-xl"></i>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-sm text-gray-600">Total Appointments</p>
+                        <p class="text-2xl font-bold text-gray-800">{{ $appointments->total() }}</p>
                     </div>
                 </div>
             </div>
+            <div class="bg-white rounded-xl shadow-sm p-6">
+                <div class="flex items-center">
+                    <div class="p-3 bg-yellow-100 rounded-lg">
+                        <i class="fas fa-clock text-yellow-600 text-xl"></i>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-sm text-gray-600">Pending</p>
+                        <p class="text-2xl font-bold text-gray-800">{{ $appointments->where('status', 'pending')->count() }}</p>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-white rounded-xl shadow-sm p-6">
+                <div class="flex items-center">
+                    <div class="p-3 bg-green-100 rounded-lg">
+                        <i class="fas fa-check-circle text-green-600 text-xl"></i>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-sm text-gray-600">Approved</p>
+                        <p class="text-2xl font-bold text-gray-800">{{ $appointments->where('status', 'approved')->count() }}</p>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-white rounded-xl shadow-sm p-6">
+                <div class="flex items-center">
+                    <div class="p-3 bg-blue-100 rounded-lg">
+                        <i class="fas fa-flag-checkered text-blue-600 text-xl"></i>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-sm text-gray-600">Completed</p>
+                        <p class="text-2xl font-bold text-gray-800">{{ $appointments->where('status', 'completed')->count() }}</p>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-white rounded-xl shadow-sm p-6">
+                <div class="flex items-center">
+                    <div class="p-3 bg-purple-100 rounded-lg">
+                        <i class="fas fa-exchange-alt text-purple-600 text-xl"></i>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-sm text-gray-600">Referred</p>
+                        <p class="text-2xl font-bold text-gray-800">{{ $appointments->where('status', 'referred')->count() }}</p>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-white rounded-xl shadow-sm p-6">
+                <div class="flex items-center">
+                    <div class="p-3 bg-indigo-100 rounded-lg">
+                        <i class="fas fa-clipboard-list text-indigo-600 text-xl"></i>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-sm text-gray-600">With Notes</p>
+                        <p class="text-2xl font-bold text-gray-800">{{ $appointments->where('has_session_notes', true)->count() }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
 
-            <!-- Search and Filters Section -->
-            <div class="bg-white rounded-xl shadow-md p-6 mb-6">
-                <form method="GET" action="{{ route('counselor.appointments') }}">
-                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-                        <!-- Search -->
-                        <div class="md:col-span-2">
-                            <label for="search" class="block text-sm font-medium text-gray-700 mb-2">Search Appointments</label>
-                            <div class="relative">
-                                <input type="text"
-                                    id="search"
-                                    name="search"
-                                    placeholder="Search by student name, ID, college, or concern..."
-                                    value="{{ request('search') }}"
-                                    class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
-                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center">
-                                    <i class="fas fa-search text-gray-400"></i>
-                                </div>
+        <!-- Search and Filters Section -->
+        <div class="bg-white rounded-xl shadow-md p-6 mb-6">
+            <form method="GET" action="{{ route('counselor.appointments') }}">
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                    <!-- Search -->
+                    <div class="md:col-span-2">
+                        <label for="search" class="block text-sm font-medium text-gray-700 mb-2">Search Appointments</label>
+                        <div class="relative">
+                            <input type="text"
+                                id="search"
+                                name="search"
+                                placeholder="Search by student name, ID, college, or concern..."
+                                value="{{ request('search') }}"
+                                class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center">
+                                <i class="fas fa-search text-gray-400"></i>
                             </div>
                         </div>
-
-                        <!-- Date Range Filter -->
-                        <div>
-                            <label for="date_range" class="block text-sm font-medium text-gray-700 mb-2">Date Range</label>
-                            <select id="date_range" name="date_range"
-                                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
-                                <option value="">All Dates</option>
-                                <option value="today" {{ request('date_range') == 'today' ? 'selected' : '' }}>Today</option>
-                                <option value="week" {{ request('date_range') == 'week' ? 'selected' : '' }}>This Week</option>
-                                <option value="month" {{ request('date_range') == 'month' ? 'selected' : '' }}>This Month</option>
-                                <option value="upcoming" {{ request('date_range') == 'upcoming' ? 'selected' : '' }}>Upcoming</option>
-                                <option value="past" {{ request('date_range') == 'past' ? 'selected' : '' }}>Past Appointments</option>
-                            </select>
-                        </div>
-
-                        <!-- College Filter -->
-                        <div>
-                            <label for="college" class="block text-sm font-medium text-gray-700 mb-2">College</label>
-                            <select id="college" name="college"
-                                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
-                                <option value="">All Colleges</option>
-                                @foreach($colleges as $college)
-                                    <option value="{{ $college->id }}" {{ request('college') == $college->id ? 'selected' : '' }}>
-                                        {{ $college->name }}
-                                    </option>
-                                @endforeach
-                            </select>
-                        </div>
                     </div>
 
-                    <!-- Action Buttons -->
-                    <div class="flex justify-between items-center mt-4">
-                        <div class="text-sm text-gray-600">
-                            Showing {{ $appointments->firstItem() ?? 0 }}-{{ $appointments->lastItem() ?? 0 }} of {{ $appointments->total() }} appointments
-                            @if(isset($allColleges) && $allColleges->count() > 1)
-                                <span class="text-blue-600 ml-2">(Across {{ $allColleges->count() }} colleges)</span>
-                            @endif
-                        </div>
-                        <div class="flex space-x-2">
-                            <a href="{{ route('counselor.appointments') }}"
-                            class="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition">
-                                <i class="fas fa-refresh mr-2"></i>Reset
-                            </a>
-                            <button type="submit"
-                                    class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">
-                                <i class="fas fa-filter mr-2"></i>Apply Filters
-                            </button>
-                            <button type="button" onclick="exportAllAppointmentsToExcel()"
-                                    class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition">
-                                <i class="fas fa-file-export mr-2"></i>Export to Excel
-                            </button>
-                        </div>
+                    <!-- Date Range Filter -->
+                    <div>
+                        <label for="date_range" class="block text-sm font-medium text-gray-700 mb-2">Date Range</label>
+                        <select id="date_range" name="date_range"
+                                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
+                            <option value="">All Dates</option>
+                            <option value="today" {{ request('date_range') == 'today' ? 'selected' : '' }}>Today</option>
+                            <option value="week" {{ request('date_range') == 'week' ? 'selected' : '' }}>This Week</option>
+                            <option value="month" {{ request('date_range') == 'month' ? 'selected' : '' }}>This Month</option>
+                            <option value="upcoming" {{ request('date_range') == 'upcoming' ? 'selected' : '' }}>Upcoming</option>
+                            <option value="past" {{ request('date_range') == 'past' ? 'selected' : '' }}>Past Appointments</option>
+                        </select>
                     </div>
-                </form>
-            </div>
 
-            <!-- Status Filter -->
-            <div class="bg-white rounded-xl shadow-md p-6 mb-6">
-                <div class="flex flex-wrap gap-2">
-                    <a href="{{ route('counselor.appointments') }}?{{ http_build_query(request()->except('status', 'page')) }}&status=all"
-                    class="px-4 py-2 rounded-lg {{ ($status === 'all' || !request('status')) ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200' }} transition">
-                        All Appointments
-                    </a>
-                    <a href="{{ route('counselor.appointments') }}?{{ http_build_query(request()->except('status', 'page')) }}&status=pending"
-                    class="px-4 py-2 rounded-lg {{ $status === 'pending' ? 'bg-yellow-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200' }} transition">
-                        Pending
-                    </a>
-                    <a href="{{ route('counselor.appointments') }}?{{ http_build_query(request()->except('status', 'page')) }}&status=approved"
-                    class="px-4 py-2 rounded-lg {{ $status === 'approved' ? 'bg-green-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200' }} transition">
-                        Approved
-                    </a>
-                    <a href="{{ route('counselor.appointments') }}?{{ http_build_query(request()->except('status', 'page')) }}&status=completed"
-                    class="px-4 py-2 rounded-lg {{ $status === 'completed' ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200' }} transition">
-                        Completed
-                    </a>
-                    <!-- ADD TRANSFERRED STATUS FILTER -->
-    <a href="{{ route('counselor.appointments') }}?{{ http_build_query(request()->except('status', 'page')) }}&status=referred"
-    class="px-4 py-2 rounded-lg {{ $status === 'referred' ? 'bg-purple-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200' }} transition">
-        Referred
-    </a>
-                    <a href="{{ route('counselor.appointments') }}?{{ http_build_query(request()->except('status', 'page')) }}&status=rejected"
-                    class="px-4 py-2 rounded-lg {{ $status === 'rejected' ? 'bg-red-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200' }} transition">
-                        Rejected
-                    </a>
-                    <a href="{{ route('counselor.appointments') }}?{{ http_build_query(request()->except('status', 'page')) }}&status=cancelled"
-                    class="px-4 py-2 rounded-lg {{ $status === 'cancelled' ? 'bg-gray-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200' }} transition">
-                        Cancelled
-                    </a>
+                    <!-- College Filter -->
+                    <div>
+                        <label for="college" class="block text-sm font-medium text-gray-700 mb-2">College</label>
+                        <select id="college" name="college"
+                                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
+                            <option value="">All Colleges</option>
+                            @foreach($colleges as $college)
+                                <option value="{{ $college->id }}" {{ request('college') == $college->id ? 'selected' : '' }}>
+                                    {{ $college->name }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
                 </div>
-            </div>
 
-            @if(session('success'))
-                <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-6 fade-in">
-                    <i class="fas fa-check-circle mr-2"></i>{{ session('success') }}
+                <!-- Action Buttons -->
+                <div class="flex justify-between items-center mt-4">
+                    <div class="text-sm text-gray-600">
+                        Showing {{ $appointments->firstItem() ?? 0 }}-{{ $appointments->lastItem() ?? 0 }} of {{ $appointments->total() }} appointments
+                        @if(isset($allColleges) && $allColleges->count() > 1)
+                            <span class="text-blue-600 ml-2">(Across {{ $allColleges->count() }} colleges)</span>
+                        @endif
+                    </div>
+                    <div class="flex space-x-2">
+                        <a href="{{ route('counselor.appointments') }}"
+                        class="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition">
+                            <i class="fas fa-refresh mr-2"></i>Reset
+                        </a>
+                        <button type="submit"
+                                class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">
+                            <i class="fas fa-filter mr-2"></i>Apply Filters
+                        </button>
+                        <button type="button" onclick="exportAllAppointmentsToExcel()"
+                                class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition">
+                            <i class="fas fa-file-export mr-2"></i>Export to Excel
+                        </button>
+                    </div>
                 </div>
-            @endif
+            </form>
+        </div>
 
-            @if(session('error'))
-                <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-6 fade-in">
-                    <i class="fas fa-exclamation-circle mr-2"></i>{{ session('error') }}
-                </div>
-            @endif
-
-            <!-- Appointments Table -->
-    <!-- Appointments Table -->
-    <div class="bg-white rounded-xl shadow-md overflow-hidden">
-        @if($appointments->isEmpty())
-            <div class="text-center py-12">
-                <i class="fas fa-calendar-times text-4xl text-gray-300 mb-4"></i>
-                <p class="text-gray-500 text-lg">No appointments found.</p>
-                <p class="text-gray-400 text-sm mt-1">When students book appointments, they will appear here.</p>
-            </div>
-        @else
-            <div class="overflow-x-auto">
-                <table class="w-full" id="appointmentsTable">
-                    <thead class="bg-gray-50">
-                        <tr>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Student</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date & Time</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Concern</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">College</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Session Notes</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody class="bg-white divide-y divide-gray-200">
-                        @foreach($appointments as $appointment)
-                            @php
-                                // Define status colors with ALL possible statuses
-                                $statusColors = [
-                                    'pending' => 'bg-yellow-100 text-yellow-800',
-                                    'approved' => 'bg-green-100 text-green-800',
-                                    'rejected' => 'bg-red-100 text-red-800',
-                                    'cancelled' => 'bg-gray-100 text-gray-800',
-                                    'completed' => 'bg-blue-100 text-blue-800',
-                                    'referred' => 'bg-purple-100 text-purple-800'
-                                ];
-
-                                // Safe status color lookup with fallback
-                                $statusColor = $statusColors[$appointment->status] ?? 'bg-gray-100 text-gray-800';
-
-                                // Use the new referral context method
-                                $statusText = $appointment->display_status;
-
-                                // Add special styling for referred appointments
-                                $rowClass = 'hover:bg-gray-50 transition fade-in';
-                                if ($appointment->is_referred_out) {
-                                    $rowClass = 'hover:bg-purple-50 transition fade-in bg-purple-50';
-                                } elseif ($appointment->is_referred_in) {
-                                    $rowClass = 'hover:bg-blue-50 transition fade-in bg-blue-50';
-                                }
-                            @endphp
-                            <tr class="{{ $rowClass }}">
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <div class="flex items-center">
-                                        <div class="flex-shrink-0 h-10 w-10 bg-blue-100 rounded-full flex items-center justify-center">
-                                            <i class="fas fa-user text-blue-600"></i>
-                                        </div>
-                                        <div class="ml-4">
-                                            <div class="text-sm font-medium text-gray-900">
-                                                {{ $appointment->student->user->first_name }} {{ $appointment->student->user->last_name }}
-                                                @if($appointment->is_referred_out)
-                                                    <span class="ml-2 text-xs bg-purple-100 text-purple-800 px-2 py-1 rounded-full">
-                                                        <i class="fas fa-share"></i> Referred Out
-                                                    </span>
-                                                @elseif($appointment->is_referred_in)
-                                                    <span class="ml-2 text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded-full">
-                                                        <i class="fas fa-reply"></i> Referred In
-                                                    </span>
-                                                @endif
-                                            </div>
-                                            <div class="text-sm text-gray-500">
-                                                {{ $appointment->student->student_id }}
-                                            </div>
-                                            <div class="text-xs text-gray-400">
-                                                Year {{ $appointment->student->year_level }}
-                                            </div>
-                                        </div>
-                                    </div>
-                                </td>
-        <td class="px-6 py-4 whitespace-nowrap">
-        <div class="flex items-center">
-            <div class="flex-shrink-0 h-10 w-10 bg-blue-100 rounded-full flex items-center justify-center">
-                <i class="fas fa-user text-blue-600"></i>
-            </div>
-            <div class="ml-4">
-                <div class="text-sm font-medium text-gray-900">
-                    {{ $appointment->student->user->first_name }} {{ $appointment->student->user->last_name }}
-                    @if($appointment->is_referred_out)
-                        <span class="ml-2 text-xs bg-purple-100 text-purple-800 px-2 py-1 rounded-full">
-                            <i class="fas fa-share"></i> Referred Out
-                        </span>
-                    @elseif($appointment->is_referred_in)
-                        <span class="ml-2 text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded-full">
-                            <i class="fas fa-reply"></i> Referred In (Cross-College)
-                        </span>
-                    @endif
-                </div>
-                <div class="text-sm text-gray-500">
-                    {{ $appointment->student->student_id }}
-                </div>
-                <div class="text-xs text-gray-400">
-                    Year {{ $appointment->student->year_level }}
-                    @if($appointment->is_referred_in)
-                        • {{ $appointment->student->college->name ?? 'N/A' }}
-                    @endif
-                </div>
+        <!-- Status Filter -->
+        <div class="bg-white rounded-xl shadow-md p-6 mb-6">
+            <div class="flex flex-wrap gap-2">
+                <a href="{{ route('counselor.appointments') }}?{{ http_build_query(request()->except('status', 'page')) }}&status=all"
+                class="px-4 py-2 rounded-lg {{ ($status === 'all' || !request('status')) ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200' }} transition">
+                    All Appointments
+                </a>
+                <a href="{{ route('counselor.appointments') }}?{{ http_build_query(request()->except('status', 'page')) }}&status=pending"
+                class="px-4 py-2 rounded-lg {{ $status === 'pending' ? 'bg-yellow-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200' }} transition">
+                    Pending
+                </a>
+                <a href="{{ route('counselor.appointments') }}?{{ http_build_query(request()->except('status', 'page')) }}&status=approved"
+                class="px-4 py-2 rounded-lg {{ $status === 'approved' ? 'bg-green-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200' }} transition">
+                    Approved
+                </a>
+                <a href="{{ route('counselor.appointments') }}?{{ http_build_query(request()->except('status', 'page')) }}&status=completed"
+                class="px-4 py-2 rounded-lg {{ $status === 'completed' ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200' }} transition">
+                    Completed
+                </a>
+                <a href="{{ route('counselor.appointments') }}?{{ http_build_query(request()->except('status', 'page')) }}&status=referred"
+                class="px-4 py-2 rounded-lg {{ $status === 'referred' ? 'bg-purple-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200' }} transition">
+                    Referred
+                </a>
+                <a href="{{ route('counselor.appointments') }}?{{ http_build_query(request()->except('status', 'page')) }}&status=rejected"
+                class="px-4 py-2 rounded-lg {{ $status === 'rejected' ? 'bg-red-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200' }} transition">
+                    Rejected
+                </a>
+                <a href="{{ route('counselor.appointments') }}?{{ http_build_query(request()->except('status', 'page')) }}&status=cancelled"
+                class="px-4 py-2 rounded-lg {{ $status === 'cancelled' ? 'bg-gray-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200' }} transition">
+                    Cancelled
+                </a>
             </div>
         </div>
-    </td>
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full {{ $statusColor }}">
-                                        {{ $statusText }}
-                                    </span>
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    @if($appointment->has_session_notes)
-                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
-                                            <i class="fas fa-clipboard-check mr-1"></i>
-                                            {{ $appointment->session_notes_count }} note(s)
-                                        </span>
-                                    @elseif($appointment->status === 'completed')
-                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800 session-notes-badge">
-                                            <i class="fas fa-exclamation-circle mr-1"></i>
-                                            Notes needed
-                                        </span>
-                                    @elseif($appointment->status === 'approved')
-    {{-- In your appointments table --}}
-    {{-- In your appointments table --}}
-    <a href="{{ route('counselor.session-notes.create', ['student' => $appointment->student->id, 'appointment_id' => $appointment->id]) }}"
-    class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 hover:bg-green-200 transition">
-        <i class="fas fa-plus mr-1"></i>
-        Add notes
-    </a>
-                                    @else
-                                        <span class="text-gray-400 text-xs">—</span>
-                                    @endif
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                    <div class="flex space-x-2">
-                                        <button onclick="showAppointmentDetails({{ $appointment->id }})"
-                                                class="text-blue-600 hover:text-blue-900 transition"
-                                                title="View Details">
-                                            <i class="fas fa-eye"></i>
-                                        </button>
 
-                                        <!-- Session Notes Actions -->
-                                        @if($appointment->status === 'completed' || $appointment->has_session_notes)
-                                            <button onclick="showSessionNotes({{ $appointment->student->id }}, {{ $appointment->id }})"
-                                                    class="text-purple-600 hover:text-purple-900 transition"
-                                                    title="View Session Notes">
-                                                <i class="fas fa-clipboard-list"></i>
-                                            </button>
-                                        @endif
-
-    <!-- In your appointments.blade.php -->
-
-    <!-- Status Management Actions - Available for current counselor AND referred-to counselor -->
-    @if($appointment->getEffectiveCounselorId() == $counselor->id)
-        @if($appointment->status === 'pending')
-            <!-- Approve button -->
-            <form action="{{ route('counselor.appointments.update-status', $appointment) }}" method="POST" class="inline">
-                @csrf
-                @method('PATCH')
-                <input type="hidden" name="status" value="approved">
-                <button type="submit"
-                        class="text-green-600 hover:text-green-900 transition"
-                        onclick="return confirm('Approve this appointment?')"
-                        title="Approve Appointment">
-                    <i class="fas fa-check"></i>
-                </button>
-            </form>
-            <!-- Reject/Transfer buttons -->
-            <button onclick="showRejectionOptions({{ $appointment->id }})"
-                    class="text-red-600 hover:text-red-900 transition"
-                    title="Reject or Transfer Appointment">
-                <i class="fas fa-times"></i>
-            </button>
-        @elseif($appointment->status === 'approved')
-            <!-- Complete and Cancel buttons -->
-            <form action="{{ route('counselor.appointments.update-status', $appointment) }}" method="POST" class="inline">
-                @csrf
-                @method('PATCH')
-                <input type="hidden" name="status" value="completed">
-                <button type="submit"
-                        class="text-blue-600 hover:text-blue-900 transition"
-                        onclick="return confirm('Mark this appointment as completed?')"
-                        title="Mark as Completed">
-                    <i class="fas fa-flag-checkered"></i>
-                </button>
-            </form>
-
-            <form action="{{ route('counselor.appointments.update-status', $appointment) }}" method="POST" class="inline">
-                @csrf
-                @method('PATCH')
-                <input type="hidden" name="status" value="cancelled">
-                <button type="submit"
-                        class="text-orange-600 hover:text-orange-900 transition"
-                        onclick="return confirm('Cancel this appointment?')"
-                        title="Cancel Appointment">
-                    <i class="fas fa-ban"></i>
-                </button>
-            </form>
-        @elseif($appointment->status === 'referred' && $appointment->referred_to_counselor_id == $counselor->id)
-            <!-- Special actions for referred appointments where this counselor is the receiver -->
-            <form action="{{ route('counselor.appointments.update-status', $appointment) }}" method="POST" class="inline">
-                @csrf
-                @method('PATCH')
-                <input type="hidden" name="status" value="approved">
-                <button type="submit"
-                        class="text-green-600 hover:text-green-900 transition"
-                        onclick="return confirm('Accept this referred appointment?')"
-                        title="Accept Referred Appointment">
-                    <i class="fas fa-check"></i>
-                </button>
-            </form>
-            <form action="{{ route('counselor.appointments.update-status', $appointment) }}" method="POST" class="inline">
-                @csrf
-                @method('PATCH')
-                <input type="hidden" name="status" value="rejected">
-                <input type="hidden" name="notes" value="Unable to accept the referred appointment.">
-                <button type="submit"
-                        class="text-red-600 hover:text-red-900 transition"
-                        onclick="return confirm('Reject this referred appointment?')"
-                        title="Reject Referred Appointment">
-                    <i class="fas fa-times"></i>
-                </button>
-            </form>
+        @if(session('success'))
+            <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-6 fade-in">
+                <i class="fas fa-check-circle mr-2"></i>{{ session('success') }}
+            </div>
         @endif
-    @endif
 
-                                        <!-- Quick Student Profile Link -->
-                                        <a href="{{ route('counselor.session-notes.index', $appointment->student) }}"
-                                        class="text-indigo-600 hover:text-indigo-900 transition"
-                                        title="View Student Profile & Notes">
-                                            <i class="fas fa-user-circle"></i>
-                                        </a>
+        @if(session('error'))
+            <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-6 fade-in">
+                <i class="fas fa-exclamation-circle mr-2"></i>{{ session('error') }}
+            </div>
+        @endif
 
-                                        <!-- Transfer option for current counselor (except for referred-in appointments) -->
-                                        @if($appointment->counselor_id == $counselor->id && $appointment->status !== 'referred')
-                                            <button onclick="showTransferOptions({{ $appointment->id }})"
-                                                    class="text-purple-600 hover:text-purple-900 transition"
-                                                    title="Transfer to Another Counselor">
-                                                <i class="fas fa-exchange-alt"></i>
-                                            </button>
-                                        @endif
-                                    </div>
-                                </td>
+        <!-- Appointments Table -->
+        <div class="bg-white rounded-xl shadow-md overflow-hidden">
+            @if($appointments->isEmpty())
+                <div class="text-center py-12">
+                    <i class="fas fa-calendar-times text-4xl text-gray-300 mb-4"></i>
+                    <p class="text-gray-500 text-lg">No appointments found.</p>
+                    <p class="text-gray-400 text-sm mt-1">When students book appointments, they will appear here.</p>
+                </div>
+            @else
+                <div class="overflow-x-auto">
+                    <table class="w-full" id="appointmentsTable">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Student</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date & Time</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Concern</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">College</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Session Notes</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
                             </tr>
-                        @endforeach
-                    </tbody>
-                </table>
-            </div>
+                        </thead>
+                        <tbody class="bg-white divide-y divide-gray-200">
+                            @foreach($appointments as $appointment)
+                                @php
+                                    // Define status colors with ALL possible statuses
+                                    $statusColors = [
+                                        'pending' => 'bg-yellow-100 text-yellow-800',
+                                        'approved' => 'bg-green-100 text-green-800',
+                                        'rejected' => 'bg-red-100 text-red-800',
+                                        'cancelled' => 'bg-gray-100 text-gray-800',
+                                        'completed' => 'bg-blue-100 text-blue-800',
+                                        'referred' => 'bg-purple-100 text-purple-800'
+                                    ];
 
-            <!-- Pagination -->
-            <div class="bg-white px-4 py-3 border-t border-gray-200 sm:px-6">
-                {{ $appointments->appends(request()->query())->links() }}
-            </div>
-        @endif
-    </div>
+                                    // Safe status color lookup with fallback
+                                    $statusColor = $statusColors[$appointment->status] ?? 'bg-gray-100 text-gray-800';
 
+                                    // Use the new referral context method
+                                    $statusText = $appointment->display_status;
+
+                                    // Add special styling for referred appointments
+                                    $rowClass = 'hover:bg-gray-50 transition fade-in';
+                                    if ($appointment->is_referred_out) {
+                                        $rowClass = 'hover:bg-purple-50 transition fade-in bg-purple-50';
+                                    } elseif ($appointment->is_referred_in) {
+                                        $rowClass = 'hover:bg-blue-50 transition fade-in bg-blue-50';
+                                    }
+                                @endphp
+                                <tr class="{{ $rowClass }}">
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="flex items-center">
+                                            <div class="flex-shrink-0 h-10 w-10 bg-blue-100 rounded-full flex items-center justify-center">
+                                                <i class="fas fa-user text-blue-600"></i>
+                                            </div>
+                                            <div class="ml-4">
+                                                <div class="text-sm font-medium text-gray-900">
+                                                    {{ $appointment->student->user->first_name }} {{ $appointment->student->user->last_name }}
+                                                    @if($appointment->is_referred_out)
+                                                        <span class="ml-2 text-xs bg-purple-100 text-purple-800 px-2 py-1 rounded-full">
+                                                            <i class="fas fa-share"></i> Referred Out
+                                                        </span>
+                                                    @elseif($appointment->is_referred_in)
+                                                        <span class="ml-2 text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded-full">
+                                                            <i class="fas fa-reply"></i> Referred In
+                                                        </span>
+                                                    @endif
+                                                </div>
+                                                <div class="text-sm text-gray-500">
+                                                    {{ $appointment->student->student_id }}
+                                                </div>
+                                                <div class="text-xs text-gray-400">
+                                                    Year {{ $appointment->student->year_level }}
+                                                    @if($appointment->is_referred_in)
+                                                        • {{ $appointment->student->college->name ?? 'N/A' }}
+                                                    @endif
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </td>
+
+                                    <!-- Date & Time Column -->
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="text-sm text-gray-900">
+                                            {{ \Carbon\Carbon::parse($appointment->appointment_date)->format('M j, Y') }}
+                                        </div>
+                                        <div class="text-sm text-gray-500">
+                                            {{ \Carbon\Carbon::parse($appointment->start_time)->format('g:i A') }} -
+                                            {{ \Carbon\Carbon::parse($appointment->end_time)->format('g:i A') }}
+                                        </div>
+                                    </td>
+
+                                    <!-- Concern Column -->
+                                    <td class="px-6 py-4">
+                                        <div class="text-sm text-gray-900 max-w-xs truncate" title="{{ $appointment->concern }}">
+                                            {{ Str::limit($appointment->concern, 50) }}
+                                        </div>
+                                    </td>
+
+                                    <!-- College Column -->
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="text-sm text-gray-900">
+                                            {{ $appointment->student->college->name ?? 'N/A' }}
+                                        </div>
+                                    </td>
+
+                                    <!-- Status Column -->
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full {{ $statusColor }}">
+                                            {{ $statusText }}
+                                        </span>
+                                    </td>
+
+                                    <!-- Session Notes Column -->
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        @if($appointment->has_session_notes)
+                                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
+                                                <i class="fas fa-clipboard-check mr-1"></i>
+                                                {{ $appointment->session_notes_count }} note(s)
+                                            </span>
+                                        @elseif($appointment->status === 'completed')
+                                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800 session-notes-badge">
+                                                <i class="fas fa-exclamation-circle mr-1"></i>
+                                                Notes needed
+                                            </span>
+                                        @elseif($appointment->status === 'approved')
+                                            <a href="{{ route('counselor.session-notes.create', ['student' => $appointment->student->id, 'appointment_id' => $appointment->id]) }}"
+                                            class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 hover:bg-green-200 transition">
+                                                <i class="fas fa-plus mr-1"></i>
+                                                Add notes
+                                            </a>
+                                        @else
+                                            <span class="text-gray-400 text-xs">—</span>
+                                        @endif
+                                    </td>
+
+                                    <!-- Actions Column -->
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                        <div class="flex space-x-2">
+                                            <button onclick="showAppointmentDetails({{ $appointment->id }})"
+                                                    class="text-blue-600 hover:text-blue-900 transition"
+                                                    title="View Details">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+
+                                            <!-- Session Notes Actions -->
+                                            @if($appointment->status === 'completed' || $appointment->has_session_notes)
+                                                <button onclick="showSessionNotes({{ $appointment->student->id }}, {{ $appointment->id }})"
+                                                        class="text-purple-600 hover:text-purple-900 transition"
+                                                        title="View Session Notes">
+                                                    <i class="fas fa-clipboard-list"></i>
+                                                </button>
+                                            @endif
+
+                                            <!-- Status Management Actions - Available for current counselor AND referred-to counselor -->
+                                            @if($appointment->getEffectiveCounselorId() == $counselor->id)
+                                                @if($appointment->status === 'pending')
+                                                    <!-- Approve button -->
+                                                    <form action="{{ route('counselor.appointments.update-status', $appointment) }}" method="POST" class="inline">
+                                                        @csrf
+                                                        @method('PATCH')
+                                                        <input type="hidden" name="status" value="approved">
+                                                        <button type="submit"
+                                                                class="text-green-600 hover:text-green-900 transition"
+                                                                onclick="return confirm('Approve this appointment?')"
+                                                                title="Approve Appointment">
+                                                            <i class="fas fa-check"></i>
+                                                        </button>
+                                                    </form>
+                                                    <!-- Reject/Transfer buttons -->
+                                                    <button onclick="showRejectionOptions({{ $appointment->id }})"
+                                                            class="text-red-600 hover:text-red-900 transition"
+                                                            title="Reject or Transfer Appointment">
+                                                        <i class="fas fa-times"></i>
+                                                    </button>
+                                                @elseif($appointment->status === 'approved')
+                                                    <!-- Complete and Cancel buttons -->
+                                                    <form action="{{ route('counselor.appointments.update-status', $appointment) }}" method="POST" class="inline">
+                                                        @csrf
+                                                        @method('PATCH')
+                                                        <input type="hidden" name="status" value="completed">
+                                                        <button type="submit"
+                                                                class="text-blue-600 hover:text-blue-900 transition"
+                                                                onclick="return confirm('Mark this appointment as completed?')"
+                                                                title="Mark as Completed">
+                                                            <i class="fas fa-flag-checkered"></i>
+                                                        </button>
+                                                    </form>
+
+                                                    <form action="{{ route('counselor.appointments.update-status', $appointment) }}" method="POST" class="inline">
+                                                        @csrf
+                                                        @method('PATCH')
+                                                        <input type="hidden" name="status" value="cancelled">
+                                                        <button type="submit"
+                                                                class="text-orange-600 hover:text-orange-900 transition"
+                                                                onclick="return confirm('Cancel this appointment?')"
+                                                                title="Cancel Appointment">
+                                                            <i class="fas fa-ban"></i>
+                                                        </button>
+                                                    </form>
+                                                @elseif($appointment->status === 'referred' && $appointment->referred_to_counselor_id == $counselor->id)
+                                                    <!-- Special actions for referred appointments where this counselor is the receiver -->
+                                                    <form action="{{ route('counselor.appointments.update-status', $appointment) }}" method="POST" class="inline">
+                                                        @csrf
+                                                        @method('PATCH')
+                                                        <input type="hidden" name="status" value="approved">
+                                                        <button type="submit"
+                                                                class="text-green-600 hover:text-green-900 transition"
+                                                                onclick="return confirm('Accept this referred appointment?')"
+                                                                title="Accept Referred Appointment">
+                                                            <i class="fas fa-check"></i>
+                                                        </button>
+                                                    </form>
+                                                    <form action="{{ route('counselor.appointments.update-status', $appointment) }}" method="POST" class="inline">
+                                                        @csrf
+                                                        @method('PATCH')
+                                                        <input type="hidden" name="status" value="rejected">
+                                                        <input type="hidden" name="notes" value="Unable to accept the referred appointment.">
+                                                        <button type="submit"
+                                                                class="text-red-600 hover:text-red-900 transition"
+                                                                onclick="return confirm('Reject this referred appointment?')"
+                                                                title="Reject Referred Appointment">
+                                                            <i class="fas fa-times"></i>
+                                                        </button>
+                                                    </form>
+                                                @endif
+                                            @endif
+
+                                            <!-- Quick Student Profile Link -->
+                                            <a href="{{ route('counselor.session-notes.index', $appointment->student) }}"
+                                            class="text-indigo-600 hover:text-indigo-900 transition"
+                                            title="View Student Profile & Notes">
+                                                <i class="fas fa-user-circle"></i>
+                                            </a>
+
+                                            <!-- Transfer option for current counselor (except for referred-in appointments) -->
+                                            @if($appointment->counselor_id == $counselor->id && $appointment->status !== 'referred')
+                                                <button onclick="showTransferOptions({{ $appointment->id }})"
+                                                        class="text-purple-600 hover:text-purple-900 transition"
+                                                        title="Transfer to Another Counselor">
+                                                    <i class="fas fa-exchange-alt"></i>
+                                                </button>
+                                            @endif
+                                        </div>
+                                    </td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Pagination -->
+                <div class="bg-white px-4 py-3 border-t border-gray-200 sm:px-6">
+                    {{ $appointments->appends(request()->query())->links() }}
+                </div>
+            @endif
+        </div>
 
         <!-- Appointment Details Modal -->
         <div id="appointmentModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50">

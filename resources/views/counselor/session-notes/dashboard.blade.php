@@ -23,10 +23,13 @@
             font-size: 0.7rem;
             padding: 2px 6px;
         }
+        .modal-content {
+            max-height: 80vh;
+            overflow-y: auto;
+        }
     </style>
 </head>
 <body class="bg-gray-50">
-
 
     <div class="container mx-auto px-6 py-8">
         <!-- Header -->
@@ -301,11 +304,13 @@
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                         <div class="flex space-x-2">
-                                            <a href="{{ route('counselor.session-notes.show', $note) }}"
+                                            <!-- View Details Button - Now opens modal -->
+                                            <button onclick="showSessionNoteDetails({{ $note->id }})"
                                                class="text-blue-600 hover:text-blue-900 transition"
                                                title="View Details">
                                                 <i class="fas fa-eye"></i>
-                                            </a>
+                                            </button>
+
                                             <a href="{{ route('counselor.session-notes.edit', $note) }}"
                                                class="text-green-600 hover:text-green-900 transition"
                                                title="Edit Note">
@@ -337,6 +342,23 @@
         </div>
     </div>
 
+    <!-- Session Note Details Modal -->
+    <div id="sessionNoteModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50">
+        <div class="bg-white rounded-xl shadow-2xl max-w-4xl w-full mx-4 max-h-[90vh] overflow-y-auto">
+            <div class="p-6 border-b border-gray-200">
+                <div class="flex justify-between items-center">
+                    <h3 class="text-xl font-bold text-gray-800">Session Note Details</h3>
+                    <button onclick="closeSessionNoteModal()" class="text-gray-500 hover:text-gray-700 transition">
+                        <i class="fas fa-times text-xl"></i>
+                    </button>
+                </div>
+            </div>
+            <div id="sessionNoteDetails" class="p-6">
+                <!-- Content will be loaded via AJAX -->
+            </div>
+        </div>
+    </div>
+
     <script>
         // Export to Excel functionality
         function exportToExcel() {
@@ -349,7 +371,8 @@
             const today = new Date().toISOString().split('T')[0];
             XLSX.writeFile(wb, `session_notes_${today}.xlsx`);
         }
- // Enhanced Export to Excel functionality
+
+        // Enhanced Export to Excel functionality
         function exportToExcel() {
             // Show loading indicator
             const exportBtn = event.target;
@@ -406,55 +429,213 @@
             }
         }
 
-        // Alternative export function with better formatting
-        function exportToExcelEnhanced() {
-            try {
-                // Get all session note data
-                const table = document.getElementById('sessionNotesTable');
-                const data = [];
+        // Session Note Modal Functions
+        function showSessionNoteDetails(noteId) {
+            // Show loading state
+            document.getElementById('sessionNoteDetails').innerHTML = `
+                <div class="text-center py-8">
+                    <i class="fas fa-spinner fa-spin text-2xl text-blue-600 mb-4"></i>
+                    <p class="text-gray-600">Loading session note details...</p>
+                </div>
+            `;
 
-                // Get headers
-                const headers = [];
-                const headerRow = table.rows[0];
-                for (let i = 0; i < headerRow.cells.length; i++) {
-                    headers.push(headerRow.cells[i].textContent.trim());
-                }
-                data.push(headers);
+            // Show modal
+            document.getElementById('sessionNoteModal').classList.remove('hidden');
 
-                // Get data rows
-                for (let i = 1; i < table.rows.length; i++) {
-                    const row = table.rows[i];
-                    const rowData = [];
-                    for (let j = 0; j < row.cells.length; j++) {
-                        rowData.push(row.cells[j].textContent.trim());
+            // Fetch session note details via AJAX
+            fetch(`/counselor/session-notes/${noteId}/details`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
                     }
-                    data.push(rowData);
-                }
+                    return response.json();
+                })
+                .then(data => {
+                    const modalContent = document.getElementById('sessionNoteDetails');
 
-                // Create worksheet
-                const ws = XLSX.utils.aoa_to_sheet(data);
+                    modalContent.innerHTML = `
+                        <div class="space-y-6">
+                            <!-- Student Information -->
+                            <div class="bg-gray-50 rounded-lg p-4">
+                                <h4 class="text-lg font-semibold text-gray-800 mb-3">Student Information</h4>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700">Name</label>
+                                        <p class="mt-1 text-sm text-gray-900">${data.student.user.first_name} ${data.student.user.last_name}</p>
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700">Student ID</label>
+                                        <p class="mt-1 text-sm text-gray-900">${data.student.student_id}</p>
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700">College</label>
+                                        <p class="mt-1 text-sm text-gray-900">${data.student.college?.name || 'N/A'}</p>
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700">Year Level</label>
+                                        <p class="mt-1 text-sm text-gray-900">${data.student.year_level}</p>
+                                    </div>
+                                </div>
+                            </div>
 
-                // Set column widths
-                const colWidths = headers.map((header, index) => {
-                    const maxLength = Math.max(...data.map(row => (row[index] || '').toString().length));
-                    return { wch: Math.min(maxLength + 2, 50) };
+                            <!-- Session Information -->
+                            <div class="bg-blue-50 rounded-lg p-4">
+                                <h4 class="text-lg font-semibold text-gray-800 mb-3">Session Information</h4>
+                                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700">Session Date</label>
+                                        <p class="mt-1 text-sm text-gray-900">${data.session_date_formatted}</p>
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700">Session Type</label>
+                                        <span class="mt-1 inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getSessionTypeColorClass(data.session_type)}">
+                                            ${data.session_type_label}
+                                        </span>
+                                    </div>
+                                    ${data.mood_level ? `
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700">Mood Level</label>
+                                        <span class="mt-1 inline-flex px-2 py-1 text-xs rounded-full ${getMoodLevelColorClass(data.mood_level)}">
+                                            <i class="fas fa-smile mr-1"></i>${data.mood_level_label}
+                                        </span>
+                                    </div>
+                                    ` : ''}
+                                </div>
+                                ${data.appointment_time ? `
+                                <div class="mt-3">
+                                    <label class="block text-sm font-medium text-gray-700">Appointment Time</label>
+                                    <p class="mt-1 text-sm text-gray-900">${data.appointment_time}</p>
+                                </div>
+                                ` : ''}
+                            </div>
+
+                            <!-- Session Notes -->
+                            <div>
+                                <h4 class="text-lg font-semibold text-gray-800 mb-3">Session Notes</h4>
+                                <div class="bg-white border border-gray-200 rounded-lg p-4">
+                                    <p class="text-gray-700 whitespace-pre-line">${data.notes || 'No notes provided.'}</p>
+                                </div>
+                            </div>
+
+                            <!-- Follow-up Actions -->
+                            ${data.follow_up_actions ? `
+                            <div>
+                                <h4 class="text-lg font-semibold text-gray-800 mb-3">Follow-up Actions</h4>
+                                <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+                                    <p class="text-gray-700 whitespace-pre-line">${data.follow_up_actions}</p>
+                                </div>
+                            </div>
+                            ` : ''}
+
+                            <!-- Follow-up Information -->
+                            ${data.requires_follow_up ? `
+                            <div class="bg-green-50 rounded-lg p-4">
+                                <h4 class="text-lg font-semibold text-gray-800 mb-3">Follow-up Information</h4>
+                                <div class="flex items-center">
+                                    <i class="fas fa-calendar-check text-green-600 mr-3"></i>
+                                    <div>
+                                        <p class="text-sm font-medium text-green-800">Follow-up Session Scheduled</p>
+                                        ${data.next_session_date ? `
+                                        <p class="text-sm text-green-700">Next session: ${data.next_session_date}</p>
+                                        ` : ''}
+                                    </div>
+                                </div>
+                            </div>
+                            ` : ''}
+
+                            <!-- Session Statistics -->
+                            <div class="bg-purple-50 rounded-lg p-4">
+                                <h4 class="text-lg font-semibold text-gray-800 mb-3">Session Statistics</h4>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700">Session Number</label>
+                                        <p class="mt-1 text-sm text-gray-900">${data.session_number}${getOrdinalSuffix(data.session_number)} Session</p>
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700">Total Sessions with Student</label>
+                                        <p class="mt-1 text-sm text-gray-900">${data.total_sessions} sessions</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Action Buttons -->
+                            <div class="flex justify-end space-x-3 pt-4 border-t border-gray-200">
+                                <a href="/counselor/session-notes/${data.id}/edit"
+                                   class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition">
+                                    <i class="fas fa-edit mr-2"></i>Edit Note
+                                </a>
+                                <a href="/counselor/students/${data.student.id}/session-notes"
+                                   class="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition">
+                                    <i class="fas fa-clipboard-list mr-2"></i>All Student Notes
+                                </a>
+                            </div>
+                        </div>
+                    `;
+                })
+                .catch(error => {
+                    console.error('Error fetching session note details:', error);
+                    document.getElementById('sessionNoteDetails').innerHTML = `
+                        <div class="text-center py-8">
+                            <i class="fas fa-exclamation-triangle text-4xl text-red-300 mb-4"></i>
+                            <p class="text-red-500">Error loading session note details. Please try again.</p>
+                            <button onclick="closeSessionNoteModal()"
+                                    class="mt-4 px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition">
+                                Close
+                            </button>
+                        </div>
+                    `;
                 });
-                ws['!cols'] = colWidths;
+        }
 
-                // Create workbook
-                const wb = XLSX.utils.book_new();
-                XLSX.utils.book_append_sheet(wb, ws, "Session Notes");
+        function closeSessionNoteModal() {
+            document.getElementById('sessionNoteModal').classList.add('hidden');
+        }
 
-                // Export
-                const today = new Date().toISOString().split('T')[0];
-                XLSX.writeFile(wb, `session_notes_${today}.xlsx`);
+        // Helper functions for modal
+        function getSessionTypeColorClass(sessionType) {
+            const colors = {
+                'initial': 'bg-blue-100 text-blue-800',
+                'follow_up': 'bg-green-100 text-green-800',
+                'crisis': 'bg-red-100 text-red-800',
+                'regular': 'bg-purple-100 text-purple-800'
+            };
+            return colors[sessionType] || 'bg-gray-100 text-gray-800';
+        }
 
-            } catch (error) {
-                console.error('Error exporting:', error);
-                alert('Error exporting session notes. Please try again.');
+        function getMoodLevelColorClass(moodLevel) {
+            const colors = {
+                'very_good': 'bg-green-100 text-green-800',
+                'good': 'bg-blue-100 text-blue-800',
+                'neutral': 'bg-yellow-100 text-yellow-800',
+                'low': 'bg-orange-100 text-orange-800',
+                'very_low': 'bg-red-100 text-red-800'
+            };
+            return colors[moodLevel] || 'bg-gray-100 text-gray-800';
+        }
+
+        function getOrdinalSuffix(number) {
+            if (number % 100 >= 11 && number % 100 <= 13) return 'th';
+            switch (number % 10) {
+                case 1: return 'st';
+                case 2: return 'nd';
+                case 3: return 'rd';
+                default: return 'th';
             }
         }
 
+        // Close modal when clicking outside
+        document.addEventListener('click', function(e) {
+            if (e.target.id === 'sessionNoteModal') {
+                closeSessionNoteModal();
+            }
+        });
+
+        // Close modal with Escape key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeSessionNoteModal();
+            }
+        });
     </script>
 @endsection
 
@@ -481,4 +662,3 @@ function getMoodLevelColor($moodLevel) {
     return $colors[$moodLevel] ?? 'bg-gray-100 text-gray-800';
 }
 ?>
-

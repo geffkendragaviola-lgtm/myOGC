@@ -40,7 +40,11 @@ class Counselor extends Model
     {
         return $this->hasMany(Appointment::class);
     }
-
+// Relationship to received referrals
+public function receivedReferrals(): HasMany
+{
+    return $this->hasMany(Appointment::class, 'referred_to_counselor_id');
+}
     public function getDefaultAvailability()
     {
         return [

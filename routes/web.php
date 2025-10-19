@@ -75,7 +75,8 @@ Route::middleware('auth')->group(function () {
         Route::get('/appointments/{appointment}/details', [CounselorController::class, 'getAppointmentDetails'])->name('counselor.appointments.details');
         Route::patch('/appointments/{appointment}/update-status', [AppointmentController::class, 'updateStatus'])
             ->name('counselor.appointments.update-status');
-
+ Route::get('/session-notes/dashboard', [SessionNoteController::class, 'dashboard'])->name('counselor.session-notes.dashboard');
+    Route::get('/session-notes/{sessionNote}/details', [SessionNoteController::class, 'getSessionNoteDetails'])->name('counselor.session-notes.details');
         // FIXED: Moved transfer routes INSIDE the counselor middleware group
         Route::patch('/appointments/{appointment}/transfer', [AppointmentController::class, 'transfer'])->name('counselor.appointments.transfer');
         Route::get('/appointments/{appointment}/available-counselors', [AppointmentController::class, 'getAvailableCounselorsForTransfer'])->name('counselor.appointments.available-counselors');
@@ -226,4 +227,7 @@ Route::get('/check-admin-status', function() {
     ]);
 });
 
+
+
+Route::get('/appointments/referred-counselors', [AppointmentController::class, 'getReferredCounselors'])->name('appointments.referred-counselors');
 require __DIR__.'/auth.php';

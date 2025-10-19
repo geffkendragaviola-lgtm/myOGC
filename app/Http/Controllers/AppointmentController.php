@@ -62,229 +62,275 @@ class AppointmentController extends Controller
         return view('appointments.index', compact('appointments'));
     }
 
-    public function create()
-    {
-        $student = Student::with('college')->where('user_id', Auth::id())->first();
+public function create()
+{
+    $student = Student::with('college')->where('user_id', Auth::id())->first();
 
-        if (!$student) {
-            return redirect()->back()->with('error', 'Student profile not found.');
-        }
-
-        // Get counselors from the same college OR counselors who have this college as secondary assignment
-        $counselors = Counselor::with('user', 'college')
-            ->where(function($query) use ($student) {
-                // Primary college assignment
-                $query->where('college_id', $student->college_id);
-            })
-            ->get();
-
-        return view('appointments.create', compact('counselors', 'student'));
+    if (!$student) {
+        return redirect()->back()->with('error', 'Student profile not found.');
     }
+
+    // Get counselors from the same college OR counselors who have received referrals from this student
+    $counselors = Counselor::with('user', 'college')
+        ->where(function($query) use ($student) {
+            // Primary college assignment
+            $query->where('college_id', $student->college_id);
+        })
+        ->orWhereHas('receivedReferrals', function($query) use ($student) {
+            // Counselors who have received referrals for this student
+            $query->where('student_id', $student->id)
+                  ->where('status', 'referred');
+        })
+        ->get()
+        ->unique('id'); // Remove duplicates
+
+    return view('appointments.create', compact('counselors', 'student'));
+}
+/**
+ * Get referred counselors for a student (cross-college allowed)
+ */
+/**
+ * Get referred counselors for a student (cross-college allowed)
+ */
+public function getReferredCounselors(Request $request)
+{
+    $student = Student::where('user_id', Auth::id())->first();
+
+    if (!$student) {
+        return response()->json([]);
+    }
+
+    // Get counselors who have been referred to in past appointments for this student
+    $referredCounselors = Counselor::with('user', 'college')
+        ->whereHas('receivedReferrals', function($query) use ($student) {
+            $query->where('student_id', $student->id)
+                  ->where('status', 'referred');
+        })
+        ->get()
+        ->map(function($counselor) {
+            return [
+                'id' => $counselor->id,
+                'name' => $counselor->user->first_name . ' ' . $counselor->user->last_name,
+                'position' => $counselor->position,
+                'college' => $counselor->college->name ?? 'N/A',
+                'college_id' => $counselor->college_id,
+                'is_referred' => true,
+                'display_text' => $counselor->user->first_name . ' ' . $counselor->user->last_name .
+                                 ' - ' . $counselor->position .
+                                 ' (' . ($counselor->college->name ?? 'N/A') . ')' .
+                                 ' - Previously Referred'
+            ];
+        });
+
+    return response()->json($referredCounselors);
+}
 
     /**
      * Get available slots for follow-up appointments (counselor only)
      */
-    public function getFollowupAvailableSlots(Request $request)
-    {
-        $request->validate([
-            'counselor_id' => 'required|exists:counselors,id',
-            'date' => 'required|date|after:yesterday'
-        ]);
+   /**
+ * Get available slots for follow-up appointments (counselor only)
+ */
+public function getFollowupAvailableSlots(Request $request)
+{
+    $request->validate([
+        'counselor_id' => 'required|exists:counselors,id',
+        'date' => 'required|date|after:yesterday'
+    ]);
 
-        $counselor = Counselor::findOrFail($request->counselor_id);
-        $date = Carbon::parse($request->date);
-        $dayName = strtolower($date->englishDayOfWeek);
+    $counselor = Counselor::findOrFail($request->counselor_id);
+    $date = Carbon::parse($request->date);
+    $dayName = strtolower($date->englishDayOfWeek);
 
-        // Get counselor's availability for that day
-        $availability = $counselor->getAvailability();
-        $dayAvailability = $availability[$dayName] ?? [];
+    // Get counselor's availability for that day
+    $availability = $counselor->getAvailability();
+    $dayAvailability = $availability[$dayName] ?? [];
 
-        if (empty($dayAvailability)) {
-            return response()->json([
-                'available_slots' => [],
-                'booked_slots' => [],
-                'message' => 'No working hours for this day'
-            ]);
-        }
-
-        // Get booked appointments for that date (EXCLUDE cancelled appointments)
-        $bookedAppointments = Appointment::where('counselor_id', $counselor->id)
-            ->where('appointment_date', $date->toDateString())
-            ->whereIn('status', ['pending', 'approved'])
-            ->get(['start_time', 'end_time', 'status']);
-
-        // Generate all possible time slots
-        $allSlots = [];
-        $slotDuration = 60; // 1 hour in minutes
-
-        foreach ($dayAvailability as $timeRange) {
-            list($start, $end) = explode('-', $timeRange);
-
-            $currentTime = Carbon::parse($start);
-            $endTime = Carbon::parse($end);
-
-            while ($currentTime->addMinutes($slotDuration)->lte($endTime)) {
-                $slotStart = $currentTime->copy()->subMinutes($slotDuration);
-                $slotEnd = $currentTime->copy();
-
-                $slotStartTime = $slotStart->format('H:i');
-                $slotEndTime = $slotEnd->format('H:i');
-
-                // Check if this slot is booked
-                $isBooked = $bookedAppointments->contains(function ($appointment) use ($slotStartTime, $slotEndTime) {
-                    $appointmentStart = Carbon::parse($appointment->start_time)->format('H:i');
-                    $appointmentEnd = Carbon::parse($appointment->end_time)->format('H:i');
-
-                    return $slotStartTime === $appointmentStart &&
-                           $slotEndTime === $slotEndTime;
-                });
-
-                $slotData = [
-                    'start' => $slotStartTime,
-                    'end' => $slotEndTime,
-                    'display' => $slotStart->format('g:i A') . ' - ' . $slotEnd->format('g:i A'),
-                    'status' => $isBooked ? 'booked' : 'available'
-                ];
-
-                $allSlots[] = $slotData;
-            }
-        }
-
-        // Separate available and booked slots
-        $availableSlots = array_values(array_filter($allSlots, function($slot) {
-            return $slot['status'] === 'available';
-        }));
-
-        $bookedSlots = array_values(array_filter($allSlots, function($slot) {
-            return $slot['status'] === 'booked';
-        }));
-
+    if (empty($dayAvailability)) {
         return response()->json([
-            'available_slots' => $availableSlots,
-            'booked_slots' => $bookedSlots
+            'available_slots' => [],
+            'booked_slots' => [],
+            'message' => 'No working hours for this day'
         ]);
     }
 
-    public function getAvailableSlots(Request $request)
-    {
-        $request->validate([
-            'counselor_id' => 'required|exists:counselors,id',
-            'date' => 'required|date|after:yesterday'
-        ]);
+    // Get booked appointments for that date - INCLUDE completed, pending, approved, and referred statuses
+    $bookedAppointments = Appointment::where('counselor_id', $counselor->id)
+        ->where('appointment_date', $date->toDateString())
+        ->whereIn('status', ['pending', 'approved', 'completed', 'referred']) // Added completed and referred
+        ->get(['start_time', 'end_time', 'status']);
 
-        $counselor = Counselor::findOrFail($request->counselor_id);
-        $date = Carbon::parse($request->date);
-        $dayName = strtolower($date->englishDayOfWeek);
+    // Generate all possible time slots
+    $allSlots = [];
+    $slotDuration = 60; // 1 hour in minutes
 
-        // Get counselor's availability for that day
-        $availability = $counselor->getAvailability();
-        $dayAvailability = $availability[$dayName] ?? [];
+    foreach ($dayAvailability as $timeRange) {
+        list($start, $end) = explode('-', $timeRange);
 
-        if (empty($dayAvailability)) {
-            return response()->json([
-                'available_slots' => [],
-                'booked_slots' => [],
-                'message' => 'No working hours for this day'
-            ]);
+        $currentTime = Carbon::parse($start);
+        $endTime = Carbon::parse($end);
+
+        while ($currentTime->addMinutes($slotDuration)->lte($endTime)) {
+            $slotStart = $currentTime->copy()->subMinutes($slotDuration);
+            $slotEnd = $currentTime->copy();
+
+            $slotStartTime = $slotStart->format('H:i');
+            $slotEndTime = $slotEnd->format('H:i');
+
+            // Check if this slot is booked (including completed and referred appointments)
+            $isBooked = $bookedAppointments->contains(function ($appointment) use ($slotStartTime, $slotEndTime) {
+                $appointmentStart = Carbon::parse($appointment->start_time)->format('H:i');
+                $appointmentEnd = Carbon::parse($appointment->end_time)->format('H:i');
+
+                return $slotStartTime === $appointmentStart &&
+                       $slotEndTime === $slotEndTime;
+            });
+
+            $slotData = [
+                'start' => $slotStartTime,
+                'end' => $slotEndTime,
+                'display' => $slotStart->format('g:i A') . ' - ' . $slotEnd->format('g:i A'),
+                'status' => $isBooked ? 'booked' : 'available'
+            ];
+
+            $allSlots[] = $slotData;
         }
+    }
 
-        // Get booked appointments for that date (EXCLUDE cancelled appointments)
-        $bookedAppointments = Appointment::where('counselor_id', $counselor->id)
-            ->where('appointment_date', $date->toDateString())
-            ->whereIn('status', ['pending', 'approved']) // Only pending and approved count as booked
-            ->get(['start_time', 'end_time', 'status']);
+    // Separate available and booked slots
+    $availableSlots = array_values(array_filter($allSlots, function($slot) {
+        return $slot['status'] === 'available';
+    }));
 
-        // Generate all possible time slots
-        $allSlots = [];
-        $slotDuration = 60; // 1 hour in minutes
+    $bookedSlots = array_values(array_filter($allSlots, function($slot) {
+        return $slot['status'] === 'booked';
+    }));
 
-        foreach ($dayAvailability as $timeRange) {
-            list($start, $end) = explode('-', $timeRange);
+    return response()->json([
+        'available_slots' => $availableSlots,
+        'booked_slots' => $bookedSlots
+    ]);
+}
+public function getAvailableSlots(Request $request)
+{
+    $request->validate([
+        'counselor_id' => 'required|exists:counselors,id',
+        'date' => 'required|date|after:yesterday'
+    ]);
 
-            $currentTime = Carbon::parse($start);
-            $endTime = Carbon::parse($end);
+    $counselor = Counselor::findOrFail($request->counselor_id);
+    $date = Carbon::parse($request->date);
+    $dayName = strtolower($date->englishDayOfWeek);
 
-            while ($currentTime->addMinutes($slotDuration)->lte($endTime)) {
-                $slotStart = $currentTime->copy()->subMinutes($slotDuration);
-                $slotEnd = $currentTime->copy();
+    // Get counselor's availability for that day
+    $availability = $counselor->getAvailability();
+    $dayAvailability = $availability[$dayName] ?? [];
 
-                $slotStartTime = $slotStart->format('H:i');
-                $slotEndTime = $slotEnd->format('H:i');
-
-                // Check if this slot is booked (excluding cancelled appointments)
-                $isBooked = $bookedAppointments->contains(function ($appointment) use ($slotStartTime, $slotEndTime) {
-                    $appointmentStart = Carbon::parse($appointment->start_time)->format('H:i');
-                    $appointmentEnd = Carbon::parse($appointment->end_time)->format('H:i');
-
-                    return $slotStartTime === $appointmentStart &&
-                           $slotEndTime === $slotEndTime;
-                });
-
-                $slotData = [
-                    'start' => $slotStartTime,
-                    'end' => $slotEndTime,
-                    'display' => $slotStart->format('g:i A') . ' - ' . $slotEnd->format('g:i A'),
-                    'status' => $isBooked ? 'booked' : 'available'
-                ];
-
-                $allSlots[] = $slotData;
-            }
-        }
-
-        // Separate available and booked slots
-        $availableSlots = array_values(array_filter($allSlots, function($slot) {
-            return $slot['status'] === 'available';
-        }));
-
-        $bookedSlots = array_values(array_filter($allSlots, function($slot) {
-            return $slot['status'] === 'booked';
-        }));
-
+    if (empty($dayAvailability)) {
         return response()->json([
-            'available_slots' => $availableSlots,
-            'booked_slots' => $bookedSlots
+            'available_slots' => [],
+            'booked_slots' => [],
+            'message' => 'No working hours for this day'
         ]);
     }
 
-    public function store(Request $request)
-    {
-        $request->validate([
-            'counselor_id' => 'required|exists:counselors,id',
-            'appointment_date' => 'required|date|after:yesterday',
-            'start_time' => 'required|date_format:H:i',
-            'concern' => 'required|string|max:500'
-        ]);
+    // Get booked appointments for that date - INCLUDE completed, pending, approved, and referred statuses
+    $bookedAppointments = Appointment::where('counselor_id', $counselor->id)
+        ->where('appointment_date', $date->toDateString())
+        ->whereIn('status', ['pending', 'approved', 'completed', 'referred']) // Added completed and referred
+        ->get(['start_time', 'end_time', 'status']);
 
-        $student = Student::where('user_id', Auth::id())->first();
+    // Generate all possible time slots
+    $allSlots = [];
+    $slotDuration = 60; // 1 hour in minutes
 
-        // Calculate end time (1 hour duration)
-        $startTime = Carbon::parse($request->start_time);
-        $endTime = $startTime->copy()->addHour();
+    foreach ($dayAvailability as $timeRange) {
+        list($start, $end) = explode('-', $timeRange);
 
-        // Check if slot is still available
-        $existingAppointment = Appointment::where('counselor_id', $request->counselor_id)
-            ->where('appointment_date', $request->appointment_date)
-            ->where('start_time', $request->start_time)
-            ->whereIn('status', ['pending', 'approved'])
-            ->exists();
+        $currentTime = Carbon::parse($start);
+        $endTime = Carbon::parse($end);
 
-        if ($existingAppointment) {
-            return redirect()->back()->with('error', 'This time slot has been booked by another student. Please choose another time.');
+        while ($currentTime->addMinutes($slotDuration)->lte($endTime)) {
+            $slotStart = $currentTime->copy()->subMinutes($slotDuration);
+            $slotEnd = $currentTime->copy();
+
+            $slotStartTime = $slotStart->format('H:i');
+            $slotEndTime = $slotEnd->format('H:i');
+
+            // Check if this slot is booked (including completed and referred appointments)
+            $isBooked = $bookedAppointments->contains(function ($appointment) use ($slotStartTime, $slotEndTime) {
+                $appointmentStart = Carbon::parse($appointment->start_time)->format('H:i');
+                $appointmentEnd = Carbon::parse($appointment->end_time)->format('H:i');
+
+                return $slotStartTime === $appointmentStart &&
+                       $slotEndTime === $slotEndTime;
+            });
+
+            $slotData = [
+                'start' => $slotStartTime,
+                'end' => $slotEndTime,
+                'display' => $slotStart->format('g:i A') . ' - ' . $slotEnd->format('g:i A'),
+                'status' => $isBooked ? 'booked' : 'available'
+            ];
+
+            $allSlots[] = $slotData;
         }
-
-        $appointment = Appointment::create([
-            'student_id' => $student->id,
-            'counselor_id' => $request->counselor_id,
-            'appointment_date' => $request->appointment_date,
-            'start_time' => $request->start_time,
-            'end_time' => $endTime->format('H:i'),
-            'concern' => $request->concern,
-            'status' => 'pending'
-        ]);
-
-        return redirect()->route('appointments.index')
-            ->with('success', 'Appointment booked successfully! It is now pending approval.');
     }
+
+    // Separate available and booked slots
+    $availableSlots = array_values(array_filter($allSlots, function($slot) {
+        return $slot['status'] === 'available';
+    }));
+
+    $bookedSlots = array_values(array_filter($allSlots, function($slot) {
+        return $slot['status'] === 'booked';
+    }));
+
+    return response()->json([
+        'available_slots' => $availableSlots,
+        'booked_slots' => $bookedSlots
+    ]);
+}
+
+public function store(Request $request)
+{
+    $request->validate([
+        'counselor_id' => 'required|exists:counselors,id',
+        'appointment_date' => 'required|date|after:yesterday',
+        'start_time' => 'required|date_format:H:i',
+        'concern' => 'required|string|max:500'
+    ]);
+
+    $student = Student::where('user_id', Auth::id())->first();
+
+    // Calculate end time (1 hour duration)
+    $startTime = Carbon::parse($request->start_time);
+    $endTime = $startTime->copy()->addHour();
+
+    // Check if slot is still available - INCLUDE completed and referred statuses
+    $existingAppointment = Appointment::where('counselor_id', $request->counselor_id)
+        ->where('appointment_date', $request->appointment_date)
+        ->where('start_time', $request->start_time)
+        ->whereIn('status', ['pending', 'approved', 'completed', 'referred']) // Added completed and referred
+        ->exists();
+
+    if ($existingAppointment) {
+        return redirect()->back()->with('error', 'This time slot has been booked by another student. Please choose another time.');
+    }
+
+    $appointment = Appointment::create([
+        'student_id' => $student->id,
+        'counselor_id' => $request->counselor_id,
+        'appointment_date' => $request->appointment_date,
+        'start_time' => $request->start_time,
+        'end_time' => $endTime->format('H:i'),
+        'concern' => $request->concern,
+        'status' => 'pending'
+    ]);
+
+    return redirect()->route('appointments.index')
+        ->with('success', 'Appointment booked successfully! It is now pending approval.');
+}
 
     public function cancel(Appointment $appointment)
     {

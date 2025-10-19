@@ -318,32 +318,32 @@
                                     </span>
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap">
-@if($appointment->status === 'referred' && $appointment->is_referred)
-    <div class="text-sm">
-        <div class="font-medium text-purple-700">
-            <i class="fas fa-user-md mr-1"></i>
-            {{ $appointment->referredCounselor->user->first_name }} {{ $appointment->referredCounselor->user->last_name }}
-        </div>
-        <div class="text-xs text-purple-600 mt-1">
-            <i class="fas fa-university mr-1"></i>
-            {{ $appointment->referredCounselor->college->name ?? 'N/A' }}
-            @if($appointment->student->college_id != $appointment->referredCounselor->college_id)
-                <span class="text-orange-600 ml-1">(Different College)</span>
-            @endif
-        </div>
-@if($appointment->referral_reason)
-    <button type="button"
-            onclick="showReferralReason(
-                '{{ addslashes($appointment->referral_reason) }}',
-                '{{ $appointment->originalCounselor->user->first_name }} {{ $appointment->originalCounselor->user->last_name }}',
-                '{{ $appointment->referredCounselor->user->first_name }} {{ $appointment->referredCounselor->user->last_name }}',
-                {{ $appointment->student->college_id != $appointment->referredCounselor->college_id ? 'true' : 'false' }}
-            )"
-            class="text-xs text-purple-600 hover:text-purple-800 mt-1 flex items-center">
-        <i class="fas fa-info-circle mr-1"></i>
-        View referral reason
-    </button>
-@endif
+                                    @if($appointment->status === 'referred' && $appointment->is_referred)
+                                        <div class="text-sm">
+                                            <div class="font-medium text-purple-700">
+                                                <i class="fas fa-user-md mr-1"></i>
+                                                {{ $appointment->referredCounselor->user->first_name }} {{ $appointment->referredCounselor->user->last_name }}
+                                            </div>
+                                            <div class="text-xs text-purple-600 mt-1">
+                                                <i class="fas fa-university mr-1"></i>
+                                                {{ $appointment->referredCounselor->college->name ?? 'N/A' }}
+                                                @if($appointment->student->college_id != $appointment->referredCounselor->college_id)
+                                                    <span class="text-orange-600 ml-1">(Different College)</span>
+                                                @endif
+                                            </div>
+                                            @if($appointment->referral_reason)
+                                                <button type="button"
+                                                        onclick="showReferralReason(
+                                                            '{{ addslashes($appointment->referral_reason) }}',
+                                                            '{{ $appointment->originalCounselor->user->first_name }} {{ $appointment->originalCounselor->user->last_name }}',
+                                                            '{{ $appointment->referredCounselor->user->first_name }} {{ $appointment->referredCounselor->user->last_name }}',
+                                                            {{ $appointment->student->college_id != $appointment->referredCounselor->college_id ? 'true' : 'false' }}
+                                                        )"
+                                                        class="text-xs text-purple-600 hover:text-purple-800 mt-1 flex items-center">
+                                                    <i class="fas fa-info-circle mr-1"></i>
+                                                    View referral reason
+                                                </button>
+                                            @endif
                                         </div>
                                     @else
                                         <span class="text-gray-400 text-sm">-</span>
@@ -419,6 +419,7 @@
         </div>
     </div>
 </div>
+
 {{-- Modal for Referral Reason --}}
 <div id="referralReasonModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden z-50">
     <div class="relative top-20 mx-auto p-5 border w-11/12 md:w-2/3 lg:w-1/2 shadow-lg rounded-md bg-white">
@@ -448,9 +449,24 @@
 </div>
 
 <script>
+// Function to show follow-up actions modal
+function showFollowUpActions(followUpActions) {
+    // Set the follow-up actions content
+    document.getElementById('followUpContent').textContent = followUpActions || 'No assignments provided.';
+
+    // Show the modal
+    document.getElementById('followUpModal').classList.remove('hidden');
+}
+
+// Function to close follow-up actions modal
+function closeFollowUpModal() {
+    document.getElementById('followUpModal').classList.add('hidden');
+}
+
+// Function to show referral reason modal
 function showReferralReason(reason, originalCounselorName = '', referredCounselorName = '', isDifferentCollege = false) {
     // Set the referral reason content
-    document.getElementById('referralReasonContent').textContent = reason;
+    document.getElementById('referralReasonContent').textContent = reason || 'No referral reason provided.';
 
     // Build counselor info text
     let counselorInfo = '';
@@ -464,19 +480,11 @@ function showReferralReason(reason, originalCounselorName = '', referredCounselo
         counselorInfo += ' (Different College)';
     }
 
-    document.getElementById('counselorInfoText').textContent = counselorInfo;
+    document.getElementById('counselorInfoText').textContent = counselorInfo || 'No counselor information available.';
     document.getElementById('referralReasonModal').classList.remove('hidden');
 }
 
-function closeFollowUpModal() {
-    document.getElementById('followUpModal').classList.add('hidden');
-}
-
-function showReferralReason(reason) {
-    document.getElementById('referralReasonContent').textContent = reason;
-    document.getElementById('referralReasonModal').classList.remove('hidden');
-}
-
+// Function to close referral reason modal
 function closeReferralReasonModal() {
     document.getElementById('referralReasonModal').classList.add('hidden');
 }
@@ -491,26 +499,26 @@ document.addEventListener('click', function(e) {
     }
 });
 
-// Auto-dismiss alerts
-document.addEventListener('DOMContentLoaded', function() {
-    const alerts = document.querySelectorAll('.bg-green-100, .bg-red-100');
-    alerts.forEach(alert => {
-        setTimeout(() => {
-            alert.style.transition = 'opacity 0.5s ease';
-            alert.style.opacity = '0';
-            setTimeout(() => {
-                if (alert.parentNode) {
-                    alert.remove();
-                }
-            }, 500);
-        }, 5000);
-    });
+// Close modals with Escape key
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+        closeFollowUpModal();
+        closeReferralReasonModal();
+    }
 });
+
+
+
 </script>
 
 <style>
 .whitespace-pre-line {
     white-space: pre-line;
+}
+
+/* Modal animations */
+.fixed {
+    transition: opacity 0.3s ease;
 }
 </style>
 @endsection
