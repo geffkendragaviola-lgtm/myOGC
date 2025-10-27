@@ -21,8 +21,8 @@ return new class extends Migration
             $table->enum('sex', ['male', 'female', 'other'])->nullable();
             $table->string('birthplace', 255)->nullable();
             $table->string('religion', 100)->nullable();
-            $table->string('affiliation', 100)->nullable();
-            $table->enum('civil_status', ['single', 'married', 'divorced', 'widowed'])->nullable();
+            $table->enum('civil_status', ['single', 'married', 'not legally married', 'divorced', 'widowed', 'separated', 'others'])->nullable();
+            $table->integer('number_of_children')->nullable()->default(0);
             $table->string('citizenship', 50)->nullable();
             $table->text('address')->nullable();
             $table->string('phone_number', 20)->nullable();

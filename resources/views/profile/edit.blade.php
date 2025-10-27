@@ -214,15 +214,7 @@
                                 @enderror
                             </div>
 
-                            <!-- Affiliation -->
-                            <div>
-                                <label for="affiliation" class="block text-sm font-medium text-gray-700 mb-2">Affiliation</label>
-                                <input type="text" id="affiliation" name="affiliation" value="{{ old('affiliation', $user->affiliation) }}"
-                                       class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
-                                @error('affiliation')
-                                    <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
-                                @enderror
-                            </div>
+
 
                             <!-- Civil Status -->
                             <div>
@@ -307,7 +299,7 @@
                                 <div>
                                     <label for="student_id" class="block text-sm font-medium text-gray-700 mb-2">Student ID</label>
                                     <input type="text" id="student_id" name="student_id"
-                                           value="{{ old('student_id', $studentProfile->student_id ?? '') }}"   
+                                           value="{{ old('student_id', $studentProfile->student_id ?? '') }}"
                                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
                                     @error('student_id')
                                         <p class="text-red-500 text-sm mt-1">{{ $message }}</p>

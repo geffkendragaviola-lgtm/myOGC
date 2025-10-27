@@ -4,7 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@yield('title', 'Office of Guidance and Counseling')</title>
+
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Font Awesome -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
 
     <style>
@@ -34,7 +41,8 @@
         .sidebar a:hover {
             background-color: rgba(255, 255, 255, 0.2);
         }
- .dashboard-profile-dropdown {
+
+        .dashboard-profile-dropdown {
             position: relative;
         }
 
@@ -53,6 +61,27 @@
 
         body {
             overflow-x: hidden;
+        }
+
+        /* Bootstrap Tab Overrides for better styling */
+        .nav-tabs .nav-link {
+            color: #6c757d;
+            font-weight: 500;
+            border: none;
+            border-bottom: 2px solid transparent;
+            padding: 0.75rem 1.5rem;
+        }
+
+        .nav-tabs .nav-link.active {
+            color: #0d6efd;
+            font-weight: 600;
+            background-color: transparent;
+            border-bottom: 2px solid #0d6efd;
+        }
+
+        .nav-tabs .nav-link:hover {
+            border-color: transparent;
+            border-bottom: 2px solid #dee2e6;
         }
     </style>
 
@@ -89,7 +118,7 @@
                     <i class="fas fa-bell"></i>
                 </button>
 
-                    <!-- Profile Dropdown -->
+                <!-- Profile Dropdown -->
                 <div class="dashboard-profile-dropdown">
                     <button class="text-white p-2 rounded-full hover:bg-blue-700 transition" id="profile-dropdown-btn">
                         <i class="fas fa-user"></i>
@@ -127,10 +156,8 @@
                 </div>
 
                 <div class="mt-6 space-y-1 px-3">
-
                     <a href="{{ route('appointments.index') }}"><i class="fas fa-calendar-plus mr-3"></i> My Appointments</a>
                     <a href="{{ route('student.events.my-registrations') }}"><i class="fas fa-list-check mr-3"></i> My Registrations</a>
-
                     <a href="{{ route('bap') }}"><i class="fas fa-calendar-check mr-3"></i> Book Appointment</a>
                 </div>
             </div>
@@ -155,6 +182,9 @@
             @yield('content')
         </main>
     @endif
+
+    <!-- Bootstrap 5 JavaScript with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
     @stack('scripts')
 
@@ -192,6 +222,20 @@
                     if (profileMenu) profileMenu.classList.add('hidden');
                 }
             });
+
+            // Initialize Bootstrap tabs if they exist on the page
+            const tabTriggers = document.querySelectorAll('button[data-bs-toggle="tab"]');
+            if (tabTriggers.length > 0) {
+                console.log('Bootstrap tabs found, initializing...');
+
+                tabTriggers.forEach(triggerEl => {
+                    triggerEl.addEventListener('click', function(event) {
+                        event.preventDefault();
+                        const tab = new bootstrap.Tab(this);
+                        tab.show();
+                    });
+                });
+            }
         });
     </script>
 </body>

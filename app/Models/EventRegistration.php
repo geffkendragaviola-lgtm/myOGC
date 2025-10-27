@@ -23,6 +23,11 @@ class EventRegistration extends Model
         'registered_at' => 'datetime',
     ];
 
+    
+ public function wasOverriddenByCounselor(): bool
+    {
+        return $this->counsellor_override && $this->override_by;
+    }
     /**
      * Get the event that the registration belongs to.
      */

@@ -25,7 +25,8 @@ class Appointment extends Model
         'session_note_id',
         'referred_to_counselor_id',
         'referral_reason',
-        'original_counselor_id'
+        'original_counselor_id',
+          'google_calendar_event_id'
     ];
 
     protected $casts = [

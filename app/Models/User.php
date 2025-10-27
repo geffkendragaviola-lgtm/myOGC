@@ -29,8 +29,8 @@ class User extends Authenticatable
         'sex',
         'birthplace',
         'religion',
-        'affiliation',
         'civil_status',
+        'number_of_children',
         'citizenship',
         'address',
         'phone_number',
@@ -60,6 +60,19 @@ class User extends Authenticatable
         }
     }
 
+    /**
+     * Reset number_of_children to 0 if civil status is not married
+     */
+    public function setCivilStatusAttribute($value)
+    {
+        $this->attributes['civil_status'] = $value;
+
+        // Reset number_of_children to 0 if civil status is not married
+        if ($value !== 'married') {
+            $this->attributes['number_of_children'] = 0;
+        }
+    }
+
     public function announcements(): HasMany
     {
         return $this->hasMany(Announcement::class);
@@ -84,10 +97,11 @@ class User extends Authenticatable
     /**
      * Get the admin record associated with the user.
      */
-public function admin()
-{
-    return $this->hasOne(Admin::class);
-}
+    public function admin()
+    {
+        return $this->hasOne(Admin::class);
+    }
+
     /**
      * Get the role-specific profile based on user role.
      */
@@ -163,6 +177,14 @@ public function admin()
     }
 
     /**
+     * Check if user can have children (only married users)
+     */
+    public function canHaveChildren(): bool
+    {
+        return $this->civil_status === 'married';
+    }
+
+    /**
      * Get the attributes that should be cast.
      *
      * @return array<string, string>
@@ -175,8 +197,4 @@ public function admin()
             'birthdate' => 'date',
         ];
     }
-
-
-
 }
-

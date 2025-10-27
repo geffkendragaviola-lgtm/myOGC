@@ -47,7 +47,7 @@ class AdminController extends Controller
             'total_events' => Event::count(),
             'active_events' => Event::where('is_active', true)->count(),
             'upcoming_events' => Event::where('event_start_date', '>=', now()->toDateString())->count(),
-          
+
         ];
 
         // Recent events for admin dashboard
@@ -479,7 +479,7 @@ class AdminController extends Controller
             'sex' => 'nullable|in:male,female,other',
             'birthplace' => 'nullable|string|max:255',
             'religion' => 'nullable|string|max:100',
-            'affiliation' => 'nullable|string|max:100',
+
             'civil_status' => 'nullable|in:single,married,divorced,widowed',
             'citizenship' => 'nullable|string|max:50',
         ];
@@ -525,7 +525,7 @@ class AdminController extends Controller
                 'sex' => $request->sex,
                 'birthplace' => $request->birthplace ? strip_tags($request->birthplace) : null,
                 'religion' => $request->religion ? strip_tags($request->religion) : null,
-                'affiliation' => $request->affiliation ? strip_tags($request->affiliation) : null,
+
                 'civil_status' => $request->civil_status,
                 'citizenship' => $request->citizenship ? strip_tags($request->citizenship) : null,
 
@@ -599,7 +599,7 @@ class AdminController extends Controller
             'sex' => 'nullable|in:male,female,other',
             'birthplace' => 'nullable|string|max:255',
             'religion' => 'nullable|string|max:100',
-            'affiliation' => 'nullable|string|max:100',
+
             'civil_status' => 'nullable|in:single,married,divorced,widowed',
             'citizenship' => 'nullable|string|max:50',
         ];

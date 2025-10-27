@@ -220,23 +220,25 @@
     </div>
 </div>
         @endif
-                        <!-- Student Dropdown (if user role is student) -->
-                        @if(Auth::user()->role === 'student')
-                        <div class="relative" id="student-dropdown">
-                            <button class="text-white font-semibold hover:text-yellow-300 transition flex items-center" id="student-dropdown-btn">
-                                Student <i class="fas fa-chevron-down ml-1 text-sm"></i>
-                            </button>
-                            <div class="absolute hidden bg-white rounded-md shadow-lg py-2 mt-1 w-48 z-50" id="student-dropdown-menu">
-                                <a href="{{ route('appointments.index') }}" class="block px-4 py-2 text-gray-800 hover:bg-blue-100">
-                                    <i class="fas fa-calendar-plus mr-2"></i>My Appointments
-                                </a>
-                                <a href="{{ route('student.events.my-registrations') }}" class="block px-4 py-2 text-gray-800 hover:bg-blue-100">
-                                    <i class="fas fa-list-check mr-2"></i>My Registrations
-                                </a>
-                            </div>
-                        </div>
-                        @endif
-
+<!-- Student Dropdown (if user role is student) -->
+@if(Auth::user()->role === 'student')
+<div class="relative" id="student-dropdown">
+    <button class="text-white font-semibold hover:text-yellow-300 transition flex items-center" id="student-dropdown-btn">
+        Student <i class="fas fa-chevron-down ml-1 text-sm"></i>
+    </button>
+    <div class="absolute hidden bg-white rounded-md shadow-lg py-2 mt-1 w-48 z-50" id="student-dropdown-menu">
+        <a href="{{ route('student.show', Auth::user()->student->id) }}" class="block px-4 py-2 text-gray-800 hover:bg-blue-100">
+            <i class="fas fa-user mr-2"></i>My Profile
+        </a>
+        <a href="{{ route('appointments.index') }}" class="block px-4 py-2 text-gray-800 hover:bg-blue-100">
+            <i class="fas fa-calendar-plus mr-2"></i>My Appointments
+        </a>
+        <a href="{{ route('student.events.my-registrations') }}" class="block px-4 py-2 text-gray-800 hover:bg-blue-100">
+            <i class="fas fa-list-check mr-2"></i>My Registrations
+        </a>
+    </div>
+</div>
+@endif
                         <a href="#" class="text-white font-semibold hover:text-yellow-300 transition">Home</a>
 
                         <!-- Services Dropdown -->

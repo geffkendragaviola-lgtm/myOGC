@@ -104,12 +104,6 @@
                                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
                         </div>
 
-                        <!-- Affiliation -->
-                        <div>
-                            <label for="affiliation" class="block text-sm font-medium text-gray-700 mb-2">Affiliation</label>
-                            <input type="text" id="affiliation" name="affiliation" value="{{ old('affiliation') }}"
-                                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                        </div>
 
                         <!-- Civil Status -->
                         <div>

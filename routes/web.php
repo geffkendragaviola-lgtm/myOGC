@@ -14,6 +14,7 @@ use App\Http\Controllers\SessionNoteController;
 use App\Http\Controllers\CounselorAnnouncementController;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\AdminController;
+use App\Http\Controllers\StudentController;
 
 Route::get('/', function () {
     return redirect()->route('login');
@@ -22,7 +23,12 @@ Route::get('/', function () {
 Route::get('/dashboard', function () {
     return view('dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
+// In your web.php routes file
+// For student viewing their own profile
+Route::get('/student/{student}', [StudentController::class, 'show'])->name('student.show');
 
+// OR create a dedicated route for student's own profile (recommended)
+Route::get('/my-profile', [StudentController::class, 'myProfile'])->name('student.profile');
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
@@ -207,8 +213,19 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
     Route::get('/feedback', [FeedbackController::class, 'index'])->name('feedback.index');
     Route::get('/feedback/{feedback}', [FeedbackController::class, 'show'])->name('feedback.show');
     Route::get('/feedback/export', [FeedbackController::class, 'export'])->name('feedback.export');
+    // Counselor event registration management
+Route::post('/counselor/events/{event}/registrations/{registration}/reregister', [EventController::class, 'reRegisterStudent'])
+    ->name('counselor.events.re-register-student');
+    // Counselor event registration status updates
+Route::patch('/counselor/events/{event}/registrations/{registration}/status', [EventController::class, 'updateRegistrationStatus'])
+    ->name('counselor.events.update-registration-status');
 });
+// Student Event Routes
+Route::middleware(['auth'])->prefix('student')->name('student.')->group(function () {
 
+    Route::post('/events/{event}/re-register', [EventRegistrationController::class, 'reRegister'])
+        ->name('events.re-register');
+});
 // Debug route
 Route::get('/check-admin-status', function() {
     $user = Auth::user();

@@ -10,10 +10,10 @@ return new class extends Migration
     {
         Schema::create('events', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->constrained()->onDelete('cascade'); // Added this line
+            $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->string('title');
             $table->text('description');
-            $table->string('type'); // webinar, workshop, seminar, activity
+            $table->string('type');
             $table->date('event_start_date');
             $table->date('event_end_date');
             $table->time('start_time');
@@ -21,12 +21,26 @@ return new class extends Migration
             $table->string('location');
             $table->integer('max_attendees')->nullable();
             $table->boolean('is_active')->default(true);
+            $table->boolean('is_required')->default(false); // Add this
+            $table->boolean('for_all_colleges')->default(true); // Add this
+              $table->string('image')->nullable(); 
             $table->timestamps();
+        });
+
+        // Create event_college pivot table
+        Schema::create('event_college', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('event_id')->constrained()->onDelete('cascade');
+            $table->foreignId('college_id')->constrained()->onDelete('cascade');
+            $table->timestamps();
+
+            $table->unique(['event_id', 'college_id']);
         });
     }
 
     public function down(): void
     {
+        Schema::dropIfExists('event_college');
         Schema::dropIfExists('events');
     }
 };

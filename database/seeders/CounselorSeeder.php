@@ -24,7 +24,7 @@ class CounselorSeeder extends Seeder
                 'sex' => 'male',
                 'birthplace' => 'Iligan City',
                 'religion' => 'Roman Catholic',
-                'affiliation' => 'MSU-IIT',
+
                 'civil_status' => 'single',
                 'citizenship' => 'Filipino',
                 'address' => 'Iligan City, Lanao del Norte',
@@ -44,7 +44,7 @@ class CounselorSeeder extends Seeder
                 'sex' => 'female',
                 'birthplace' => 'Iligan City',
                 'religion' => 'Roman Catholic',
-                'affiliation' => 'MSU-IIT',
+
                 'civil_status' => 'single',
                 'citizenship' => 'Filipino',
                 'address' => 'Iligan City, Lanao del Norte',
@@ -64,7 +64,7 @@ class CounselorSeeder extends Seeder
                 'sex' => 'female',
                 'birthplace' => 'Iligan City',
                 'religion' => 'Roman Catholic',
-                'affiliation' => 'MSU-IIT',
+
                 'civil_status' => 'married',
                 'citizenship' => 'Filipino',
                 'address' => 'Iligan City, Lanao del Norte',
@@ -84,7 +84,7 @@ class CounselorSeeder extends Seeder
                 'sex' => 'female',
                 'birthplace' => 'Marawi City',
                 'religion' => 'Islam',
-                'affiliation' => 'MSU-IIT',
+
                 'civil_status' => 'single',
                 'citizenship' => 'Filipino',
                 'address' => 'Iligan City, Lanao del Norte',
@@ -104,7 +104,7 @@ class CounselorSeeder extends Seeder
                 'sex' => 'female',
                 'birthplace' => 'Cagayan de Oro City',
                 'religion' => 'Roman Catholic',
-                'affiliation' => 'MSU-IIT',
+
                 'civil_status' => 'single',
                 'citizenship' => 'Filipino',
                 'address' => 'Iligan City, Lanao del Norte',
@@ -124,7 +124,7 @@ class CounselorSeeder extends Seeder
                 'sex' => 'male',
                 'birthplace' => 'Iligan City',
                 'religion' => 'Protestant',
-                'affiliation' => 'MSU-IIT',
+
                 'civil_status' => 'married',
                 'citizenship' => 'Filipino',
                 'address' => 'Iligan City, Lanao del Norte',
@@ -144,7 +144,7 @@ class CounselorSeeder extends Seeder
                 'sex' => 'female',
                 'birthplace' => 'Iligan City',
                 'religion' => 'Roman Catholic',
-                'affiliation' => 'MSU-IIT',
+         
                 'civil_status' => 'single',
                 'citizenship' => 'Filipino',
                 'address' => 'Iligan City, Lanao del Norte',
