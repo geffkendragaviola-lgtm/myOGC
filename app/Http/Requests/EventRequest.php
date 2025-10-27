@@ -32,9 +32,9 @@ class EventRequest extends FormRequest
 
         // Add image validation for create and update
         if ($this->isMethod('POST')) {
-            $rules['image'] = 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048';
+            $rules['image'] = 'nullable|image|mimes:jpeg,png,jpg,gif|max:10240';
         } else {
-            $rules['image'] = 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048';
+            $rules['image'] = 'nullable|image|mimes:jpeg,png,jpg,gif|max:10240';
         }
 
         return $rules;

@@ -219,6 +219,9 @@ Route::post('/counselor/events/{event}/registrations/{registration}/reregister',
     // Counselor event registration status updates
 Route::patch('/counselor/events/{event}/registrations/{registration}/status', [EventController::class, 'updateRegistrationStatus'])
     ->name('counselor.events.update-registration-status');
+
+Route::delete('/counselor/announcements/{announcement}/remove-image', [CounselorAnnouncementController::class, 'removeImage'])
+    ->name('counselor.announcements.remove-image');
 });
 // Student Event Routes
 Route::middleware(['auth'])->prefix('student')->name('student.')->group(function () {
@@ -226,6 +229,26 @@ Route::middleware(['auth'])->prefix('student')->name('student.')->group(function
     Route::post('/events/{event}/re-register', [EventRegistrationController::class, 'reRegister'])
         ->name('events.re-register');
 });
+
+// Counselor announcement routes
+Route::middleware(['auth'])->prefix('counselor')->name('counselor.')->group(function () {
+    Route::resource('announcements', CounselorAnnouncementController::class);
+
+    // Image removal route
+    Route::delete('announcements/{announcement}/remove-image',
+        [CounselorAnnouncementController::class, 'removeImage']
+    )->name('announcements.remove-image');
+
+    // Your other announcement routes
+    Route::patch('announcements/{announcement}/complete',
+        [CounselorAnnouncementController::class, 'complete']
+    )->name('announcements.complete');
+
+    Route::patch('announcements/{announcement}/toggle-status',
+        [CounselorAnnouncementController::class, 'toggleStatus']
+    )->name('announcements.toggle-status');
+});
+
 // Debug route
 Route::get('/check-admin-status', function() {
     $user = Auth::user();

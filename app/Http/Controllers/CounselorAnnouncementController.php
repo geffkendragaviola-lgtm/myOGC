@@ -3,15 +3,18 @@
 namespace App\Http\Controllers;
 
 use App\Models\Announcement;
+use App\Models\College;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Log;
 
 class CounselorAnnouncementController extends Controller
 {
     public function index()
     {
         $counselor = Auth::user()->counselor;
-        $announcements = Announcement::with('user')
+        $announcements = Announcement::with(['user', 'colleges'])
             ->byCounselor(Auth::id())
             ->latest()
             ->paginate(10);
@@ -19,11 +22,11 @@ class CounselorAnnouncementController extends Controller
         return view('counselor.announcements.index', compact('announcements', 'counselor'));
     }
 
-
     public function create()
     {
         $counselor = Auth::user()->counselor;
-        return view('counselor.announcements.create', compact('counselor'));
+        $colleges = College::all();
+        return view('counselor.announcements.create', compact('counselor', 'colleges'));
     }
 
     public function store(Request $request)
@@ -31,19 +34,37 @@ class CounselorAnnouncementController extends Controller
         $request->validate([
             'title' => 'required|string|max:255',
             'content' => 'required|string',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:10240',
             'start_date' => 'nullable|date|after_or_equal:today',
             'end_date' => 'nullable|date|after:start_date',
-            'is_active' => 'boolean'
+            'is_active' => 'boolean',
+            'for_all_colleges' => 'boolean',
+            'colleges' => 'required_if:for_all_colleges,false|array',
+            'colleges.*' => 'exists:colleges,id'
         ]);
 
-        Announcement::create([
+        $data = [
             'user_id' => Auth::id(),
             'title' => $request->title,
             'content' => $request->content,
             'start_date' => $request->start_date,
             'end_date' => $request->end_date,
-            'is_active' => $request->is_active ?? true
-        ]);
+            'is_active' => $request->is_active ?? true,
+            'for_all_colleges' => $request->for_all_colleges ?? false
+        ];
+
+        // Handle image upload
+if ($request->hasFile('image')) {
+    $imagePath = $request->file('image')->store('announcements', 'public');
+    $data['image'] = $imagePath; // Store full path, not just basename
+}
+
+        $announcement = Announcement::create($data);
+
+        // Attach colleges if not for all colleges
+        if (!$request->for_all_colleges && $request->has('colleges')) {
+            $announcement->colleges()->sync($request->colleges);
+        }
 
         return redirect()->route('counselor.announcements.index')
             ->with('success', 'Announcement created successfully.');
@@ -57,7 +78,10 @@ class CounselorAnnouncementController extends Controller
         }
 
         $counselor = Auth::user()->counselor;
-        return view('counselor.announcements.edit', compact('announcement', 'counselor'));
+        $colleges = College::all();
+        $selectedColleges = $announcement->colleges->pluck('id')->toArray();
+
+        return view('counselor.announcements.edit', compact('announcement', 'counselor', 'colleges', 'selectedColleges'));
     }
 
     public function update(Request $request, Announcement $announcement)
@@ -70,18 +94,42 @@ class CounselorAnnouncementController extends Controller
         $request->validate([
             'title' => 'required|string|max:255',
             'content' => 'required|string',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:10240',
             'start_date' => 'nullable|date',
             'end_date' => 'nullable|date|after:start_date',
-            'is_active' => 'boolean'
+            'is_active' => 'boolean',
+            'for_all_colleges' => 'boolean',
+            'colleges' => 'required_if:for_all_colleges,false|array',
+            'colleges.*' => 'exists:colleges,id'
         ]);
 
-        $announcement->update([
+        $data = [
             'title' => $request->title,
             'content' => $request->content,
             'start_date' => $request->start_date,
             'end_date' => $request->end_date,
-            'is_active' => $request->is_active ?? $announcement->is_active
-        ]);
+            'is_active' => $request->is_active ?? $announcement->is_active,
+            'for_all_colleges' => $request->for_all_colleges ?? false
+        ];
+
+        // Handle image upload
+      if ($request->hasFile('image')) {
+    // Delete old image if exists
+    if ($announcement->image) {
+        Storage::disk('public')->delete($announcement->image); // Remove 'announcements/' prefix
+    }
+    $imagePath = $request->file('image')->store('announcements', 'public');
+    $data['image'] = $imagePath;
+}
+
+        $announcement->update($data);
+
+        // Update colleges
+        if ($request->for_all_colleges) {
+            $announcement->colleges()->detach();
+        } else {
+            $announcement->colleges()->sync($request->colleges ?? []);
+        }
 
         // Check if this was a "mark as done" action
         if ($request->has('mark_done')) {
@@ -98,6 +146,11 @@ class CounselorAnnouncementController extends Controller
         // Verify the counselor owns this announcement
         if ($announcement->user_id !== Auth::id()) {
             abort(403, 'Unauthorized action.');
+        }
+
+        // Delete image if exists
+        if ($announcement->image) {
+            Storage::disk('public')->delete('announcements/' . $announcement->image);
         }
 
         $announcement->delete();
@@ -138,4 +191,35 @@ class CounselorAnnouncementController extends Controller
         return redirect()->route('counselor.announcements.index')
             ->with('success', 'Announcement marked as completed successfully.');
     }
+
+public function removeImage(Announcement $announcement)
+{
+    Log::info('Remove image called for announcement:', [
+        'announcement_id' => $announcement->id,
+        'current_image' => $announcement->image,
+        'user_id' => Auth::id(),
+        'owner_id' => $announcement->user_id
+    ]);
+
+    // Verify the counselor owns this announcement
+    if ($announcement->user_id !== Auth::id()) {
+        abort(403, 'Unauthorized action.');
+    }
+
+    if ($announcement->image) {
+        Log::info('Attempting to delete image:', ['path' => $announcement->image]);
+
+        // Check if file exists before deleting
+        if (Storage::disk('public')->exists($announcement->image)) {
+            Storage::disk('public')->delete($announcement->image);
+            Log::info('Image deleted successfully');
+        } else {
+            Log::warning('Image file not found:', ['path' => $announcement->image]);
+        }
+
+        $announcement->update(['image' => null]);
+    }
+
+    return redirect()->back()->with('success', 'Image removed successfully.');
+}
 }

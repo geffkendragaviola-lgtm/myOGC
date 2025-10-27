@@ -119,6 +119,65 @@
             background: linear-gradient(to right, transparent, #d1d5db, transparent);
             margin: 3rem 0;
         }
+
+        /* New styles for responsive image container */
+        .announcement-image-container {
+            position: relative;
+            width: 100%;
+            overflow: hidden;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            background: #f8fafc;
+        }
+
+        .announcement-image {
+            width: 100%;
+            height: auto;
+            max-height: 500px;
+            object-fit: contain;
+            display: block;
+        }
+
+        .image-placeholder {
+            width: 100%;
+            height: 300px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 1024px) {
+            .announcement-image {
+                max-height: 400px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .announcement-image {
+                max-height: 300px;
+            }
+
+            .image-placeholder {
+                height: 200px;
+                font-size: 1.2rem;
+            }
+        }
+
+        @media (max-width: 640px) {
+            .announcement-image {
+                max-height: 250px;
+            }
+
+            .image-placeholder {
+                height: 150px;
+                font-size: 1rem;
+            }
+        }
     </style>
 </head>
 <body class="bg-gray-50">
@@ -374,68 +433,130 @@
                 </div>
             @endif
 
-            <!-- Announcements Section -->
-            <section class="mb-12">
-                <h2 class="text-2xl font-bold text-gray-800 mb-6">Announcements</h2>
+     <!-- Announcements Section -->
+<section class="mb-12">
+    <h2 class="text-2xl font-bold text-gray-800 mb-6">Announcements</h2>
 
-                @php
-                    use Carbon\Carbon;
-                    $announcements = \App\Models\Announcement::with('user')->active()->orderBy('created_at', 'desc')->get();
-                @endphp
+    @php
+        use Carbon\Carbon;
+        // Get announcements that are active and available for the user's college
+        $userCollegeId = Auth::user()->student->college_id ?? null;
+        $announcements = \App\Models\Announcement::with(['user', 'colleges'])
+            ->active()
+            ->when($userCollegeId, function($query) use ($userCollegeId) {
+                return $query->forCollege($userCollegeId);
+            })
+            ->orderBy('created_at', 'desc')
+            ->get();
+    @endphp
 
-                <div class="bg-white rounded-xl shadow-md p-6">
-                    @if($announcements->isEmpty())
-                        <div class="text-center py-8">
-                            <p class="text-gray-500">No current announcements at this time.</p>
-                        </div>
-                    @else
-                        <div class="dashboard-announcements-container">
-                            @foreach($announcements as $index => $announcement)
-                                <div class="dashboard-announcement-item {{ $index === 0 ? 'dashboard-announcement-active' : '' }}">
-                                    <div class="flex justify-between items-start mb-3">
-                                        <div class="text-sm text-blue-600 font-semibold">
-                                            {{ \Carbon\Carbon::parse($announcement->created_at)->format('F j, Y') }}
-                                        </div>
-                                        @if($announcement->start_date || $announcement->end_date)
-                                            <div class="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded">
-                                                @if($announcement->start_date && $announcement->end_date)
-                                                    Valid: {{ \Carbon\Carbon::parse($announcement->start_date)->format('M j') }} -
-                                                    {{ \Carbon\Carbon::parse($announcement->end_date)->format('M j, Y') }}
-                                                @elseif($announcement->start_date)
-                                                    Starts: {{ \Carbon\Carbon::parse($announcement->start_date)->format('M j, Y') }}
-                                                @elseif($announcement->end_date)
-                                                    Until: {{ \Carbon\Carbon::parse($announcement->end_date)->format('M j, Y') }}
-                                                @endif
-                                            </div>
+    <div class="bg-white rounded-xl shadow-md p-6">
+        @if($announcements->isEmpty())
+            <div class="text-center py-8">
+                <i class="fas fa-bullhorn text-4xl text-gray-300 mb-4"></i>
+                <p class="text-gray-500">No current announcements at this time.</p>
+            </div>
+        @else
+            <div class="dashboard-announcements-container">
+                @foreach($announcements as $index => $announcement)
+                    <div class="dashboard-announcement-item {{ $index === 0 ? 'dashboard-announcement-active' : '' }}">
+                        <!-- Announcement Header -->
+                        <div class="flex flex-col md:flex-row md:justify-between md:items-start mb-4 gap-3">
+                            <div class="flex items-center space-x-3">
+                                <!-- College Badge -->
+                                <div class="flex flex-wrap gap-2">
+                                    @if($announcement->for_all_colleges)
+                                        <span class="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full font-medium">
+                                            <i class="fas fa-globe mr-1"></i> All Colleges
+                                        </span>
+                                    @else
+                                        @foreach($announcement->colleges->take(3) as $college)
+                                            <span class="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full font-medium">
+                                                <i class="fas fa-university mr-1"></i> {{ $college->name }}
+                                            </span>
+                                        @endforeach
+                                        @if($announcement->colleges->count() > 3)
+                                            <span class="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full font-medium">
+                                                +{{ $announcement->colleges->count() - 3 }} more
+                                            </span>
                                         @endif
+                                    @endif
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Announcement Content with Image -->
+                        <div class="flex flex-col lg:flex-row gap-8">
+                            <!-- Image Section - Only show if image exists -->
+                            @if($announcement->image_url)
+                                <div class="lg:w-2/5">
+                                    <div class="announcement-image-container">
+                                        <img src="{{ $announcement->image_url }}"
+                                             alt="{{ $announcement->title }}"
+                                             class="announcement-image"
+                                             onerror="this.style.display='none';">
                                     </div>
+                                </div>
+                            @endif
 
-                                    <h3 class="text-xl font-bold text-gray-800 my-2">{{ $announcement->title }}</h3>
+                            <!-- Text Content Section - Full width if no image -->
+                            <div class="{{ $announcement->image_url ? 'lg:w-3/5' : 'w-full' }}">
+                                <h3 class="text-2xl font-bold text-gray-800 mb-4">{{ $announcement->title }}</h3>
 
-                                    <div class="text-gray-600 whitespace-pre-line">{{ $announcement->content }}</div>
+                                <div class="text-gray-700 whitespace-pre-line leading-relaxed mb-6 text-lg">
+                                    {{ $announcement->content }}
+                                </div>
 
-                                    @if($announcement->user)
-                                        <div class="text-xs text-gray-500 mt-3">
-                                            Posted by: {{ $announcement->user->first_name }} {{ $announcement->user->last_name }}
+                                <!-- Announcement Meta Information -->
+                                <div class="flex flex-wrap gap-4 text-sm text-gray-500 mt-6 pt-4 border-t border-gray-200">
+                                    <div class="flex items-center">
+                                        <i class="fas fa-user mr-2"></i>
+                                        Posted by: {{ $announcement->user->first_name }} {{ $announcement->user->last_name }}
+                                    </div>
+                                    <div class="flex items-center">
+                                        <i class="fas fa-calendar mr-2"></i>
+                                        Posted: {{ $announcement->created_at->format('M j, Y') }}
+                                    </div>
+                                    @if($announcement->start_date || $announcement->end_date)
+                                        <div class="flex items-center">
+                                            <i class="fas fa-clock mr-2"></i>
+                                            @if($announcement->start_date && $announcement->end_date)
+                                                Valid: {{ $announcement->start_date->format('M j') }} - {{ $announcement->end_date->format('M j, Y') }}
+                                            @elseif($announcement->start_date)
+                                                Starts: {{ $announcement->start_date->format('M j, Y') }}
+                                            @elseif($announcement->end_date)
+                                                Until: {{ $announcement->end_date->format('M j, Y') }}
+                                            @endif
                                         </div>
                                     @endif
                                 </div>
-                            @endforeach
-                        </div>
-
-                        @if($announcements->count() > 1)
-                            <div class="flex justify-center mt-6 space-x-4">
-                                <button class="dashboard-prev bg-gray-200 p-2 rounded-full hover:bg-gray-300 transition">
-                                    <i class="fas fa-chevron-left"></i>
-                                </button>
-                                <button class="dashboard-next bg-gray-200 p-2 rounded-full hover:bg-gray-300 transition">
-                                    <i class="fas fa-chevron-right"></i>
-                                </button>
                             </div>
-                        @endif
-                    @endif
+                        </div>
+                    </div>
+                @endforeach
+            </div>
+
+            @if($announcements->count() > 1)
+                <div class="flex justify-between items-center mt-6 pt-4 border-t border-gray-200">
+                    <!-- Announcement Counter -->
+                    <div class="text-sm text-gray-500">
+                        Announcement <span id="current-announcement">1</span> of {{ $announcements->count() }}
+                    </div>
+
+                    <!-- Navigation Buttons -->
+                    <div class="flex space-x-2">
+                        <button class="dashboard-prev bg-blue-600 text-white p-3 rounded-full hover:bg-blue-700 transition shadow-md">
+                            <i class="fas fa-chevron-left"></i>
+                        </button>
+                        <button class="dashboard-next bg-blue-600 text-white p-3 rounded-full hover:bg-blue-700 transition shadow-md">
+                            <i class="fas fa-chevron-right"></i>
+                        </button>
+                    </div>
                 </div>
-            </section>
+            @endif
+        @endif
+    </div>
+</section>
 
             <!-- Divider -->
             <div class="dashboard-divider"></div>
@@ -588,28 +709,42 @@
                 });
             }
 
-            // Announcement slider functionality
-            const announcements = document.querySelectorAll('.dashboard-announcement-item');
-            const prevBtn = document.querySelector('.dashboard-prev');
-            const nextBtn = document.querySelector('.dashboard-next');
-            let currentIndex = 0;
+// Announcement slider functionality
+const announcements = document.querySelectorAll('.dashboard-announcement-item');
+const prevBtn = document.querySelector('.dashboard-prev');
+const nextBtn = document.querySelector('.dashboard-next');
+const currentCounter = document.getElementById('current-announcement');
+let currentIndex = 0;
 
-            if (announcements.length > 0 && prevBtn && nextBtn) {
-                function showAnnouncement(index) {
-                    announcements.forEach(ann => ann.classList.remove('dashboard-announcement-active'));
-                    announcements[index].classList.add('dashboard-announcement-active');
-                }
+if (announcements.length > 0 && prevBtn && nextBtn) {
+    function showAnnouncement(index) {
+        announcements.forEach(ann => ann.classList.remove('dashboard-announcement-active'));
+        announcements[index].classList.add('dashboard-announcement-active');
 
-                prevBtn.addEventListener('click', function() {
-                    currentIndex = (currentIndex - 1 + announcements.length) % announcements.length;
-                    showAnnouncement(currentIndex);
-                });
+        // Update counter
+        if (currentCounter) {
+            currentCounter.textContent = index + 1;
+        }
+    }
 
-                nextBtn.addEventListener('click', function() {
-                    currentIndex = (currentIndex + 1) % announcements.length;
-                    showAnnouncement(currentIndex);
-                });
-            }
+    prevBtn.addEventListener('click', function() {
+        currentIndex = (currentIndex - 1 + announcements.length) % announcements.length;
+        showAnnouncement(currentIndex);
+    });
+
+    nextBtn.addEventListener('click', function() {
+        currentIndex = (currentIndex + 1) % announcements.length;
+        showAnnouncement(currentIndex);
+    });
+
+    // Auto-advance announcements every 8 seconds
+    setInterval(() => {
+        if (announcements.length > 1) {
+            currentIndex = (currentIndex + 1) % announcements.length;
+            showAnnouncement(currentIndex);
+        }
+    }, 8000);
+}
         });
 
         // Admin Dropdown functionality
@@ -632,6 +767,16 @@ if (adminDropdownBtn && adminDropdownMenu) {
         e.stopPropagation();
     });
 }
+
+// Image error handling - simplified to just hide broken images
+document.addEventListener('DOMContentLoaded', function() {
+    const images = document.querySelectorAll('.announcement-image');
+    images.forEach(img => {
+        img.addEventListener('error', function() {
+            this.style.display = 'none';
+        });
+    });
+});
     </script>
 </body>
 </html>
