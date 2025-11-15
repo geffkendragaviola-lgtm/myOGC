@@ -5,10 +5,11 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Facades\Storage;
 
 class Resource extends Model
 {
-    use HasFactory; // Remove SoftDeletes from here
+    use HasFactory;
 
     protected $fillable = [
         'user_id',
@@ -18,12 +19,17 @@ class Resource extends Model
         'button_text',
         'link',
         'category',
+        'image_path',
+        'use_yt_thumbnail',
         'is_active',
-        'order'
+        'show_disclaimer',
+        'disclaimer_text'
     ];
 
     protected $casts = [
         'is_active' => 'boolean',
+        'use_yt_thumbnail' => 'boolean',
+        'show_disclaimer' => 'boolean',
     ];
 
     /**
@@ -47,7 +53,7 @@ class Resource extends Model
      */
     public function scopeOrdered($query)
     {
-        return $query->orderBy('order')->orderBy('title');
+        return $query->orderBy('created_at', 'desc');
     }
 
     /**
@@ -68,6 +74,7 @@ class Resource extends Model
             'ebooks' => 'eBooks',
             'private' => 'Private Videos',
             'ogc' => 'OGC Resources',
+
         ];
     }
 
@@ -77,5 +84,75 @@ class Resource extends Model
     public function getCategoryLabelAttribute(): string
     {
         return self::getCategories()[$this->category] ?? ucfirst($this->category);
+    }
+
+    /**
+     * Get the image URL
+     */
+    public function getImageUrlAttribute(): string
+    {
+        if ($this->use_yt_thumbnail && $this->link) {
+            return $this->getYoutubeThumbnail($this->link);
+        }
+
+        if ($this->image_path) {
+            return Storage::url($this->image_path);
+        }
+
+        // Default placeholder image
+        return asset('images/default-resource.jpg');
+    }
+
+    /**
+     * Extract YouTube thumbnail from URL
+     */
+    private function getYoutubeThumbnail($url): string
+    {
+        // Extract video ID from various YouTube URL formats
+        $videoId = $this->extractYoutubeVideoId($url);
+
+        if ($videoId) {
+            return "https://img.youtube.com/vi/{$videoId}/maxresdefault.jpg";
+        }
+
+        return asset('images/default-resource.jpg');
+    }
+
+    /**
+     * Extract YouTube video ID from URL
+     */
+    private function extractYoutubeVideoId($url): ?string
+    {
+        $pattern = '/(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/';
+        preg_match($pattern, $url, $matches);
+
+        return $matches[1] ?? null;
+    }
+
+    /**
+     * Check if resource is a YouTube video
+     */
+    public function getIsYoutubeAttribute(): bool
+    {
+        return $this->category === 'youtube' && $this->link && str_contains($this->link, 'youtube.com');
+    }
+
+    /**
+     * Get default disclaimer text
+     */
+    public function getDefaultDisclaimerAttribute(): string
+    {
+        return 'We We do not claim ownership of this content. All rights, credits, and copyrights belong to the original owners. These resources are shared for educational and informational purposes only.';
+    }
+
+    /**
+     * Get the display disclaimer text
+     */
+    public function getDisplayDisclaimerAttribute(): string
+    {
+        if ($this->show_disclaimer) {
+            return $this->disclaimer_text ?: $this->default_disclaimer;
+        }
+        return '';
     }
 }

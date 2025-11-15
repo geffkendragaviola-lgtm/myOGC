@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Resource;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 
 class ResourceController extends Controller
 {
@@ -56,12 +57,22 @@ class ResourceController extends Controller
             'button_text' => 'required|string|max:50',
             'link' => 'required|url|max:500',
             'category' => 'required|in:youtube,ebooks,private,ogc',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'use_yt_thumbnail' => 'boolean',
             'is_active' => 'boolean',
-            'order' => 'integer|min:0',
+            'show_disclaimer' => 'boolean',
+            'disclaimer_text' => 'nullable|string|max:1000',
         ]);
 
         $validated['user_id'] = Auth::id();
         $validated['is_active'] = $request->has('is_active');
+        $validated['use_yt_thumbnail'] = $request->has('use_yt_thumbnail');
+        $validated['show_disclaimer'] = $request->has('show_disclaimer');
+
+        // Handle image upload
+        if ($request->hasFile('image')) {
+            $validated['image_path'] = $request->file('image')->store('resources', 'public');
+        }
 
         Resource::create($validated);
 
@@ -105,11 +116,31 @@ class ResourceController extends Controller
             'button_text' => 'required|string|max:50',
             'link' => 'required|url|max:500',
             'category' => 'required|in:youtube,ebooks,private,ogc',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'use_yt_thumbnail' => 'boolean',
             'is_active' => 'boolean',
-            'order' => 'integer|min:0',
+            'show_disclaimer' => 'boolean',
+            'disclaimer_text' => 'nullable|string|max:1000',
         ]);
 
         $validated['is_active'] = $request->has('is_active');
+        $validated['use_yt_thumbnail'] = $request->has('use_yt_thumbnail');
+        $validated['show_disclaimer'] = $request->has('show_disclaimer');
+
+        // Handle image upload
+        if ($request->hasFile('image')) {
+            // Delete old image if exists
+            if ($resource->image_path) {
+                Storage::disk('public')->delete($resource->image_path);
+            }
+            $validated['image_path'] = $request->file('image')->store('resources', 'public');
+        }
+
+        // If use_yt_thumbnail is checked, remove custom image
+        if ($validated['use_yt_thumbnail'] && $resource->image_path) {
+            Storage::disk('public')->delete($resource->image_path);
+            $validated['image_path'] = null;
+        }
 
         $resource->update($validated);
 
@@ -122,6 +153,11 @@ class ResourceController extends Controller
      */
     public function destroy(Resource $resource)
     {
+        // Delete associated image
+        if ($resource->image_path) {
+            Storage::disk('public')->delete($resource->image_path);
+        }
+
         $resource->delete();
 
         return redirect()->route('counselor.resources.index')
@@ -129,7 +165,26 @@ class ResourceController extends Controller
     }
 
     /**
-     * Update resource status (following the same pattern as appointments)
+     * Display resources by category for students
+     */
+    public function showCategory($category)
+    {
+        $categories = Resource::getCategories();
+
+        if (!array_key_exists($category, $categories)) {
+            abort(404);
+        }
+
+        $resources = Resource::byCategory($category)
+            ->active()
+            ->ordered()
+            ->get();
+
+        return view('student.resources.category', compact('resources', 'category', 'categories'));
+    }
+
+    /**
+     * Update resource status
      */
     public function updateStatus(Request $request, Resource $resource)
     {

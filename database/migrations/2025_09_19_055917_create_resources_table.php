@@ -15,10 +15,13 @@ return new class extends Migration
             $table->text('description');
             $table->string('icon'); // Font Awesome icon class
             $table->string('button_text');
-            $table->string('link')->nullable(); // Route for the button
+            $table->string('link')->nullable();
             $table->string('category'); // youtube, ebooks, private, ogc
+            $table->string('image_path')->nullable(); // Custom uploaded image
+            $table->boolean('use_yt_thumbnail')->default(false); // Use YT thumbnail instead of custom image
+            $table->boolean('show_disclaimer')->default(false); // Show disclaimer for this resource
+            $table->text('disclaimer_text')->nullable(); // Custom disclaimer text
             $table->boolean('is_active')->default(true);
-            $table->integer('order')->default(0);
             $table->timestamps();
         });
     }

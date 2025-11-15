@@ -17,7 +17,7 @@ class DatabaseSeeder extends Seeder
             AnnouncementSeeder::class,
           ServiceSeeder::class,
              EventSeeder::class,
-              ResourceSeeder::class,
+      
                 FAQSeeder::class,
 
 

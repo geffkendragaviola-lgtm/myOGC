@@ -481,43 +481,59 @@
                 </section>
 
                 <!-- Resources Section -->
-                <section class="mb-12">
-                    <div class="flex justify-between items-center mb-6">
-                        <h2 class="text-2xl font-bold text-gray-800">Access Resources</h2>
-                        <a href="#" class="text-blue-600 hover:text-blue-800 font-semibold">Browse All Resources</a>
-                    </div>
+<section class="mb-12">
+    <div class="flex justify-between items-center mb-6">
+        <h2 class="text-2xl font-bold text-gray-800">Access Resources</h2>
+    </div>
 
-                    @php
-                        $resources = \App\Models\Resource::active()->ordered()->get();
-                    @endphp
+    @php
+        $categories = \App\Models\Resource::getCategories();
+        $categoryResources = [];
+        foreach ($categories as $key => $name) {
+            $categoryResources[$key] = \App\Models\Resource::byCategory($key)->active()->ordered()->get();
+        }
+    @endphp
 
-                    @if($resources->isEmpty())
-                        <div class="bg-white rounded-xl shadow-md p-8 text-center">
-                            <p class="text-gray-500">No resources available at this time.</p>
-                        </div>
-                    @else
-                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                            @foreach($resources as $resource)
-                                <div class="mhc-category-card bg-white rounded-xl shadow-md p-6 text-center">
-                                    <i class="{{ $resource->icon }} mhc-category-icon mb-4 text-3xl text-blue-600"></i>
-                                    <h3 class="text-lg font-semibold text-gray-800 mb-2">{{ $resource->title }}</h3>
-                                    <p class="text-gray-600 mb-4">{{ $resource->description }}</p>
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        @foreach($categories as $key => $name)
+            @php
+                $resources = $categoryResources[$key];
+                $firstResource = $resources->first();
+            @endphp
 
-                                    @if($resource->link)
-                                        <a href="{{ $resource->link }}" target="_blank" rel="noopener noreferrer"
-                                           class="inline-block bg-blue-100 text-blue-700 px-4 py-2 rounded-lg hover:bg-blue-200 transition">
-                                            {{ $resource->button_text }}
-                                        </a>
-                                    @else
-                                        <button class="inline-block bg-blue-100 text-blue-700 px-4 py-2 rounded-lg hover:bg-blue-200 transition">
-                                            {{ $resource->button_text }}
-                                        </button>
-                                    @endif
-                                </div>
-                            @endforeach
-                        </div>
+            <div class="mhc-category-card bg-white rounded-xl shadow-md overflow-hidden">
+                <!-- Category Header Image -->
+                <div class="relative h-32 bg-gradient-to-r from-blue-500 to-purple-600">
+                    @if($firstResource && $firstResource->image_url)
+                        <img src="{{ $firstResource->image_url }}"
+                             alt="{{ $name }}"
+                             class="w-full h-full object-cover opacity-80">
                     @endif
-                </section>
+                    <div class="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center">
+                        <i class="{{ $firstResource->icon ?? 'fas fa-folder' }} text-white text-3xl"></i>
+                    </div>
+                </div>
+
+                <!-- Category Content -->
+                <div class="p-6 text-center">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-2">{{ $name }}</h3>
+                    <p class="text-gray-600 mb-4 text-sm">
+                        {{ $resources->count() }} resource{{ $resources->count() !== 1 ? 's' : '' }} available
+                    </p>
+
+                    <a href="{{ route('student.resources.category', $key) }}"
+                       class="inline-block bg-blue-100 text-blue-700 px-4 py-2 rounded-lg hover:bg-blue-200 transition font-semibold">
+                        @if($key === 'youtube') Explore Videos
+                        @elseif($key === 'ebooks') Browse eBooks
+                        @elseif($key === 'private') Access Content
+                        @else View Resources
+                        @endif
+                    </a>
+                </div>
+            </div>
+        @endforeach
+    </div>
+</section>
 
                 <!-- FAQs Section -->
                 <section class="mb-12">

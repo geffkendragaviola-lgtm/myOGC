@@ -267,7 +267,9 @@ Route::get('/check-admin-status', function() {
     ]);
 });
 
-
+// Student resource routes
+Route::get('/mental-health-corner/{category}', [ResourceController::class, 'showCategory'])
+    ->name('student.resources.category');
 
 Route::get('/appointments/referred-counselors', [AppointmentController::class, 'getReferredCounselors'])->name('appointments.referred-counselors');
 require __DIR__.'/auth.php';
