@@ -200,6 +200,18 @@
                 class="px-4 py-2 rounded-lg {{ $status === 'completed' ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200' }} transition">
                     Completed
                 </a>
+                <a href="{{ route('counselor.appointments') }}?{{ http_build_query(request()->except('status', 'page')) }}&status=reschedule_requested"
+                class="px-4 py-2 rounded-lg {{ $status === 'reschedule_requested' ? 'bg-orange-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200' }} transition">
+                    Reschedule Requested
+                </a>
+                <a href="{{ route('counselor.appointments') }}?{{ http_build_query(request()->except('status', 'page')) }}&status=rescheduled"
+                class="px-4 py-2 rounded-lg {{ $status === 'rescheduled' ? 'bg-indigo-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200' }} transition">
+                    Rescheduled
+                </a>
+                <a href="{{ route('counselor.appointments') }}?{{ http_build_query(request()->except('status', 'page')) }}&status=reschedule_rejected"
+                class="px-4 py-2 rounded-lg {{ $status === 'reschedule_rejected' ? 'bg-rose-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200' }} transition">
+                    Rejected by Student
+                </a>
                 <a href="{{ route('counselor.appointments') }}?{{ http_build_query(request()->except('status', 'page')) }}&status=referred"
                 class="px-4 py-2 rounded-lg {{ $status === 'referred' ? 'bg-purple-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200' }} transition">
                     Referred
@@ -242,10 +254,9 @@
                             <tr>
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Student</th>
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date & Time</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Concern</th>
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">College</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Booking Type</th>
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Session Notes</th>
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
                             </tr>
                         </thead>
@@ -259,7 +270,10 @@
                                         'rejected' => 'bg-red-100 text-red-800',
                                         'cancelled' => 'bg-gray-100 text-gray-800',
                                         'completed' => 'bg-blue-100 text-blue-800',
-                                        'referred' => 'bg-purple-100 text-purple-800'
+                                        'referred' => 'bg-purple-100 text-purple-800',
+                                        'rescheduled' => 'bg-indigo-100 text-indigo-800',
+                                        'reschedule_requested' => 'bg-orange-100 text-orange-800',
+                                        'reschedule_rejected' => 'bg-rose-100 text-rose-800'
                                     ];
 
                                     // Safe status color lookup with fallback
@@ -298,6 +312,9 @@
                                                 <div class="text-sm text-gray-500">
                                                     {{ $appointment->student->student_id }}
                                                 </div>
+                                                <div class="text-sm text-gray-500">
+                                                    {{ $appointment->student->user->sex ?? 'Not provided' }}
+                                                </div>
                                                 <div class="text-xs text-gray-400">
                                                     Year {{ $appointment->student->year_level }}
                                                     @if($appointment->is_referred_in)
@@ -310,21 +327,36 @@
 
                                     <!-- Date & Time Column -->
                                     <td class="px-6 py-4 whitespace-nowrap">
-                                        <div class="text-sm text-gray-900">
-                                            {{ \Carbon\Carbon::parse($appointment->appointment_date)->format('M j, Y') }}
-                                        </div>
-                                        <div class="text-sm text-gray-500">
-                                            {{ \Carbon\Carbon::parse($appointment->start_time)->format('g:i A') }} -
-                                            {{ \Carbon\Carbon::parse($appointment->end_time)->format('g:i A') }}
-                                        </div>
+                                        @if($appointment->status === 'reschedule_requested' && $appointment->proposed_date)
+                                            <div class="text-xs font-semibold text-orange-700 uppercase tracking-wide">
+                                                New (Proposed)
+                                            </div>
+                                            <div class="text-sm text-orange-700 font-semibold">
+                                                {{ \Carbon\Carbon::parse($appointment->proposed_date)->format('M j, Y') }}
+                                            </div>
+                                            <div class="text-sm text-orange-700">
+                                                {{ \Carbon\Carbon::parse($appointment->proposed_start_time)->format('g:i A') }} -
+                                                {{ \Carbon\Carbon::parse($appointment->proposed_end_time)->format('g:i A') }}
+                                            </div>
+                                            <div class="text-xs font-semibold text-gray-500 uppercase tracking-wide mt-2">
+                                                Old (Current)
+                                            </div>
+                                            <div class="text-xs text-gray-500 mt-1">
+                                                {{ \Carbon\Carbon::parse($appointment->appointment_date)->format('M j, Y') }}
+                                                {{ \Carbon\Carbon::parse($appointment->start_time)->format('g:i A') }} -
+                                                {{ \Carbon\Carbon::parse($appointment->end_time)->format('g:i A') }}
+                                            </div>
+                                        @else
+                                            <div class="text-sm text-gray-900">
+                                                {{ \Carbon\Carbon::parse($appointment->appointment_date)->format('M j, Y') }}
+                                            </div>
+                                            <div class="text-sm text-gray-500">
+                                                {{ \Carbon\Carbon::parse($appointment->start_time)->format('g:i A') }} -
+                                                {{ \Carbon\Carbon::parse($appointment->end_time)->format('g:i A') }}
+                                            </div>
+                                        @endif
                                     </td>
 
-                                    <!-- Concern Column -->
-                                    <td class="px-6 py-4">
-                                        <div class="text-sm text-gray-900 max-w-xs truncate" title="{{ $appointment->concern }}">
-                                            {{ Str::limit($appointment->concern, 50) }}
-                                        </div>
-                                    </td>
 
                                     <!-- College Column -->
                                     <td class="px-6 py-4 whitespace-nowrap">
@@ -333,34 +365,18 @@
                                         </div>
                                     </td>
 
+                                    <!-- Booking Type Column -->
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <span class="text-sm text-gray-900">
+                                            {{ $appointment->booking_type ? ucwords(str_replace('_', ' ', $appointment->booking_type)) : '—' }}
+                                        </span>
+                                    </td>
+
                                     <!-- Status Column -->
                                     <td class="px-6 py-4 whitespace-nowrap">
                                         <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full {{ $statusColor }}">
                                             {{ $statusText }}
                                         </span>
-                                    </td>
-
-                                    <!-- Session Notes Column -->
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                        @if($appointment->has_session_notes)
-                                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
-                                                <i class="fas fa-clipboard-check mr-1"></i>
-                                                {{ $appointment->session_notes_count }} note(s)
-                                            </span>
-                                        @elseif($appointment->status === 'completed')
-                                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800 session-notes-badge">
-                                                <i class="fas fa-exclamation-circle mr-1"></i>
-                                                Notes needed
-                                            </span>
-                                        @elseif($appointment->status === 'approved')
-                                            <a href="{{ route('counselor.session-notes.create', ['student' => $appointment->student->id, 'appointment_id' => $appointment->id]) }}"
-                                            class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 hover:bg-green-200 transition">
-                                                <i class="fas fa-plus mr-1"></i>
-                                                Add notes
-                                            </a>
-                                        @else
-                                            <span class="text-gray-400 text-xs">—</span>
-                                        @endif
                                     </td>
 
                                     <!-- Actions Column -->
@@ -382,7 +398,7 @@
                                             @endif
 
                                             <!-- Status Management Actions - Available for current counselor AND referred-to counselor -->
-                                            @if($appointment->getEffectiveCounselorId() == $counselor->id)
+                                            @if(in_array($appointment->getEffectiveCounselorId(), $counselorIds, true))
                                                 @if($appointment->status === 'pending')
                                                     <!-- Approve button -->
                                                     <form action="{{ route('counselor.appointments.update-status', $appointment) }}" method="POST" class="inline">
@@ -427,24 +443,21 @@
                                                             <i class="fas fa-ban"></i>
                                                         </button>
                                                     </form>
-                                                @elseif($appointment->status === 'referred' && $appointment->referred_to_counselor_id == $counselor->id)
+                                                @elseif($appointment->status === 'referred' && in_array($appointment->referred_to_counselor_id, $counselorIds, true))
                                                     <!-- Special actions for referred appointments where this counselor is the receiver -->
-                                                    <form action="{{ route('counselor.appointments.update-status', $appointment) }}" method="POST" class="inline">
+                                                    <form action="{{ route('counselor.appointments.referral.accept', $appointment) }}" method="POST" class="inline">
                                                         @csrf
                                                         @method('PATCH')
-                                                        <input type="hidden" name="status" value="approved">
                                                         <button type="submit"
                                                                 class="text-green-600 hover:text-green-900 transition"
-                                                                onclick="return confirm('Accept this referred appointment?')"
+                                                                onclick="return confirm('Accept this referred appointment and schedule it?')"
                                                                 title="Accept Referred Appointment">
                                                             <i class="fas fa-check"></i>
                                                         </button>
                                                     </form>
-                                                    <form action="{{ route('counselor.appointments.update-status', $appointment) }}" method="POST" class="inline">
+                                                    <form action="{{ route('counselor.appointments.referral.reject', $appointment) }}" method="POST" class="inline">
                                                         @csrf
                                                         @method('PATCH')
-                                                        <input type="hidden" name="status" value="rejected">
-                                                        <input type="hidden" name="notes" value="Unable to accept the referred appointment.">
                                                         <button type="submit"
                                                                 class="text-red-600 hover:text-red-900 transition"
                                                                 onclick="return confirm('Reject this referred appointment?')"
@@ -462,14 +475,24 @@
                                                 <i class="fas fa-user-circle"></i>
                                             </a>
 
-                                            <!-- Transfer option for current counselor (except for referred-in appointments) -->
-                                            @if($appointment->counselor_id == $counselor->id && $appointment->status !== 'referred')
-                                                <button onclick="showTransferOptions({{ $appointment->id }})"
-                                                        class="text-purple-600 hover:text-purple-900 transition"
-                                                        title="Transfer to Another Counselor">
-                                                    <i class="fas fa-exchange-alt"></i>
+                                            <!-- Reschedule option for effective counselor -->
+                                            @if(in_array($appointment->getEffectiveCounselorId(), $counselorIds, true) && in_array($appointment->status, ['pending', 'approved', 'referred', 'rescheduled', 'reschedule_rejected', 'rejected']))
+                                                <button onclick="showRescheduleModal({{ $appointment->id }}, {{ $appointment->getEffectiveCounselorId() }}, '{{ $appointment->appointment_date->format('Y-m-d') }}')"
+                                                        class="text-orange-600 hover:text-orange-900 transition"
+                                                        title="Reschedule Appointment">
+                                                    <i class="fas fa-calendar-alt"></i>
                                                 </button>
                                             @endif
+
+                                            <!-- Referral option for current counselor -->
+                                            @if(in_array($appointment->counselor_id, $counselorIds, true) && in_array($appointment->status, ['pending', 'approved', 'rescheduled', 'reschedule_rejected'], true))
+                                                <button onclick="showReferralModal({{ $appointment->id }}, '{{ $appointment->appointment_date->format('Y-m-d') }}', {{ $appointment->student_id }}, {{ $appointment->counselor_id }})"
+                                                        class="text-purple-600 hover:text-purple-900 transition"
+                                                        title="Refer to Another Counselor">
+                                                    <i class="fas fa-share"></i>
+                                                </button>
+                                            @endif
+
                                         </div>
                                     </td>
                                 </tr>
@@ -531,62 +554,189 @@
                     </div>
                 </div>
                 <div class="p-6">
-                    <p class="text-gray-600 mb-4">Choose how you want to handle this appointment:</p>
+                    <p class="text-gray-600 mb-4">Confirm rejection for this appointment.</p>
 
-                    <div class="space-y-3">
-                        <!-- Direct Rejection -->
-                        <form id="directRejectForm" method="POST" class="inline">
-                            @csrf
-                            @method('PATCH')
-                            <input type="hidden" name="status" value="rejected">
-                            <input type="hidden" name="notes" id="rejectionNotes" value="I am unavailable at this time. Please book with another counselor.">
-                            <button type="submit"
-                                    class="w-full text-left p-4 border border-red-300 rounded-lg hover:bg-red-50 transition">
-                                <div class="flex items-center">
-                                    <div class="p-2 bg-red-100 rounded-lg mr-3">
-                                        <i class="fas fa-times text-red-600"></i>
-                                    </div>
-                                    <div>
-                                        <h4 class="font-semibold text-red-800">Reject Directly</h4>
-                                        <p class="text-sm text-red-600">Appointment will be cancelled</p>
-                                    </div>
-                                </div>
-                            </button>
-                        </form>
-
-                        <!-- Transfer to Another Counselor -->
-                        <button onclick="showTransferOptions({{ $appointment->id ?? 0 }})"
-                                class="w-full text-left p-4 border border-blue-300 rounded-lg hover:bg-blue-50 transition">
+                    <form id="directRejectForm" method="POST" class="inline">
+                        @csrf
+                        @method('PATCH')
+                        <input type="hidden" name="status" value="rejected">
+                        <input type="hidden" name="notes" id="rejectionNotes" value="I am unavailable at this time. Please book with another counselor.">
+                        <button type="submit"
+                                class="w-full text-left p-4 border border-red-300 rounded-lg hover:bg-red-50 transition">
                             <div class="flex items-center">
-                                <div class="p-2 bg-blue-100 rounded-lg mr-3">
-                                    <i class="fas fa-exchange-alt text-blue-600"></i>
+                                <div class="p-2 bg-red-100 rounded-lg mr-3">
+                                    <i class="fas fa-times text-red-600"></i>
                                 </div>
                                 <div>
-                                    <h4 class="font-semibold text-blue-800">Transfer to Another Counselor</h4>
-                                    <p class="text-sm text-blue-600">Appointment will be transferred to selected counselor</p>
+                                    <h4 class="font-semibold text-red-800">Reject Appointment</h4>
+                                    <p class="text-sm text-red-600">Appointment will be cancelled</p>
                                 </div>
                             </div>
                         </button>
-                    </div>
+                    </form>
                 </div>
             </div>
         </div>
 
-        <!-- Transfer Options Modal -->
-        <div id="transferModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50">
+        <!-- Referral Modal -->
+        <div id="referralModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50">
             <div class="bg-white rounded-xl shadow-2xl max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
                 <div class="p-6 border-b border-gray-200">
                     <div class="flex justify-between items-center">
-                        <h3 class="text-xl font-bold text-gray-800">Transfer Appointment</h3>
-                        <button onclick="closeTransferModal()" class="text-gray-500 hover:text-gray-700 transition">
+                        <h3 class="text-xl font-bold text-gray-800">Refer Appointment</h3>
+                        <button onclick="closeReferralModal()" class="text-gray-500 hover:text-gray-700 transition">
                             <i class="fas fa-times text-xl"></i>
                         </button>
                     </div>
                 </div>
                 <div class="p-6">
-                    <div id="transferModalContent">
-                        <!-- Content will be loaded dynamically -->
+                    <form id="referralForm" method="POST">
+                        @csrf
+                        @method('PATCH')
+                        <div class="space-y-4">
+                            <div>
+                                <label for="referralCounselorSelect" class="block text-sm font-medium text-gray-700 mb-2">
+                                    Select Counselor
+                                </label>
+                                <select id="referralCounselorSelect" name="referred_to_counselor_id"
+                                        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
+                                        required>
+                                    <option value="">Loading counselors...</option>
+                                </select>
+                                <p class="text-xs text-gray-500 mt-1">Choose a counselor from any college.</p>
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Select Date</label>
+                                <div class="border border-gray-200 rounded-xl bg-white p-4 shadow-sm">
+                                    <div class="flex items-center justify-between mb-4">
+                                        <button type="button" id="referralCalendarPrev"
+                                                class="h-9 w-9 rounded-full border border-gray-200 text-gray-600 hover:bg-gray-50 transition">
+                                            ‹
+                                        </button>
+                                        <h3 id="referralCalendarMonthLabel" class="text-lg font-semibold text-gray-800"></h3>
+                                        <button type="button" id="referralCalendarNext"
+                                                class="h-9 w-9 rounded-full border border-gray-200 text-gray-600 hover:bg-gray-50 transition">
+                                            ›
+                                        </button>
+                                    </div>
+                                    <div class="grid grid-cols-7 text-xs font-semibold text-gray-500 mb-2">
+                                        <span class="text-center">Sun</span>
+                                        <span class="text-center">Mon</span>
+                                        <span class="text-center">Tue</span>
+                                        <span class="text-center">Wed</span>
+                                        <span class="text-center">Thu</span>
+                                        <span class="text-center">Fri</span>
+                                        <span class="text-center">Sat</span>
+                                    </div>
+                                    <div id="referralCalendarGrid" class="grid grid-cols-7 gap-2 text-sm"></div>
+                                    <p id="referralCalendarStatus" class="mt-3 text-sm text-gray-500">
+                                        Select a counselor to load available dates.
+                                    </p>
+                                </div>
+                                <input type="hidden" name="appointment_date" id="referralDateSelect" required>
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Available Time Slots</label>
+                                <div id="referralTimeSlots" class="grid grid-cols-2 md:grid-cols-3 gap-3">
+                                    <div class="text-gray-500 text-center p-4 border-2 border-dashed border-gray-300 rounded-lg">
+                                        Select a date to see available time slots
+                                    </div>
+                                </div>
+                                <input type="hidden" name="start_time" id="referralSelectedTime" required>
+                            </div>
+
+                            <div>
+                                <label for="referral_reason" class="block text-sm font-medium text-gray-700 mb-2">Reason (optional)</label>
+                                <textarea id="referral_reason" name="referral_reason" rows="3"
+                                          class="w-full border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+                                          placeholder="Explain the reason for referring the student..."></textarea>
+                            </div>
+
+                            <div class="flex justify-end space-x-3">
+                                <button type="button" onclick="closeReferralModal()" class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition">
+                                    Cancel
+                                </button>
+                                <button type="submit" class="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition">
+                                    Send Referral Request
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Reschedule Modal -->
+        <div id="rescheduleModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50">
+            <div class="bg-white rounded-xl shadow-2xl max-w-lg w-full mx-4">
+                <div class="p-6 border-b border-gray-200">
+                    <div class="flex justify-between items-center">
+                        <h3 class="text-xl font-bold text-gray-800">Reschedule Appointment</h3>
+                        <button onclick="closeRescheduleModal()" class="text-gray-500 hover:text-gray-700 transition">
+                            <i class="fas fa-times text-xl"></i>
+                        </button>
                     </div>
+                </div>
+                <div class="p-6">
+                    <form id="rescheduleForm" method="POST">
+                        @csrf
+                        @method('PATCH')
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Select Date</label>
+                                <div class="border border-gray-200 rounded-xl bg-white p-4 shadow-sm">
+                                    <div class="flex items-center justify-between mb-4">
+                                        <button type="button" id="rescheduleCalendarPrev"
+                                                class="h-9 w-9 rounded-full border border-gray-200 text-gray-600 hover:bg-gray-50 transition">
+                                            ‹
+                                        </button>
+                                        <h3 id="rescheduleCalendarMonthLabel" class="text-lg font-semibold text-gray-800"></h3>
+                                        <button type="button" id="rescheduleCalendarNext"
+                                                class="h-9 w-9 rounded-full border border-gray-200 text-gray-600 hover:bg-gray-50 transition">
+                                            ›
+                                        </button>
+                                    </div>
+                                    <div class="grid grid-cols-7 text-xs font-semibold text-gray-500 mb-2">
+                                        <span class="text-center">Sun</span>
+                                        <span class="text-center">Mon</span>
+                                        <span class="text-center">Tue</span>
+                                        <span class="text-center">Wed</span>
+                                        <span class="text-center">Thu</span>
+                                        <span class="text-center">Fri</span>
+                                        <span class="text-center">Sat</span>
+                                    </div>
+                                    <div id="rescheduleCalendarGrid" class="grid grid-cols-7 gap-2 text-sm"></div>
+                                    <p id="rescheduleCalendarStatus" class="mt-3 text-sm text-gray-500">
+                                        Select a counselor to load available dates.
+                                    </p>
+                                </div>
+                                <input type="hidden" name="appointment_date" id="rescheduleDateSelect" required>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Available Time Slots</label>
+                                <div id="rescheduleTimeSlots" class="grid grid-cols-2 md:grid-cols-3 gap-3">
+                                    <div class="text-gray-500 text-center p-4 border-2 border-dashed border-gray-300 rounded-lg">
+                                        Select a date to see available time slots
+                                    </div>
+                                </div>
+                                <input type="hidden" name="start_time" id="rescheduleSelectedTime" required>
+                            </div>
+                            <div>
+                                <label for="reschedule_reason" class="block text-sm font-medium text-gray-700 mb-2">Reason (optional)</label>
+                                <textarea id="reschedule_reason" name="reason" rows="3" class="w-full border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500" placeholder="Explain the reason for rescheduling..."></textarea>
+                            </div>
+                            <div class="flex justify-end space-x-3">
+                                <button type="button" onclick="closeRescheduleModal()" class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition">
+                                    Cancel
+                                </button>
+                                <button type="submit" class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition">
+                                    Save Changes
+                                </button>
+                            </div>
+                        </div>
+                    </form>
                 </div>
             </div>
         </div>
@@ -699,191 +849,600 @@
             }
 
             // Transfer Options Modal
-            function showTransferOptions(appointmentId) {
-                currentAppointmentId = appointmentId;
-                closeRejectionModal();
+            // Referral Modal
+            let referralCounselorId = null;
+            let referralCurrentMonth = null;
+            let referralSelectedDate = null;
+            let referralAvailabilityByDate = new Map();
+            let referralAvailabilityRequestId = 0;
 
-                // Show loading state
-                document.getElementById('transferModalContent').innerHTML = `
-                    <div class="text-center py-8">
-                        <i class="fas fa-spinner fa-spin text-2xl text-blue-600 mb-4"></i>
-                        <p class="text-gray-600">Loading available counselors...</p>
-                    </div>
-                `;
+            const referralMinDate = new Date();
+            referralMinDate.setHours(0, 0, 0, 0);
 
-                document.getElementById('transferModal').classList.remove('hidden');
+            function referralFormatDateValue(date) {
+                const year = date.getFullYear();
+                const month = String(date.getMonth() + 1).padStart(2, '0');
+                const day = String(date.getDate()).padStart(2, '0');
+                return `${year}-${month}-${day}`;
+            }
 
-                // Fetch available counselors
-                fetch(`/counselor/appointments/${appointmentId}/available-counselors`, {
+            function referralFormatMonthLabel(date) {
+                return date.toLocaleString('en-US', { month: 'long', year: 'numeric' });
+            }
+
+            function referralIsSameDay(a, b) {
+                return a && b &&
+                    a.getFullYear() === b.getFullYear() &&
+                    a.getMonth() === b.getMonth() &&
+                    a.getDate() === b.getDate();
+            }
+
+            function setReferralCalendarStatus(message, tone = 'muted') {
+                const calendarStatus = document.getElementById('referralCalendarStatus');
+                if (!calendarStatus) {
+                    return;
+                }
+                calendarStatus.textContent = message;
+                calendarStatus.classList.remove('text-gray-500', 'text-green-600', 'text-red-600');
+                if (tone === 'success') {
+                    calendarStatus.classList.add('text-green-600');
+                } else if (tone === 'error') {
+                    calendarStatus.classList.add('text-red-600');
+                } else {
+                    calendarStatus.classList.add('text-gray-500');
+                }
+            }
+
+            function renderReferralCalendar() {
+                const calendarGrid = document.getElementById('referralCalendarGrid');
+                const calendarMonthLabel = document.getElementById('referralCalendarMonthLabel');
+
+                if (!calendarGrid || !calendarMonthLabel || !referralCurrentMonth) {
+                    return;
+                }
+
+                calendarMonthLabel.textContent = referralFormatMonthLabel(referralCurrentMonth);
+                calendarGrid.innerHTML = '';
+
+                const firstDayOfMonth = new Date(referralCurrentMonth.getFullYear(), referralCurrentMonth.getMonth(), 1);
+                const startDay = firstDayOfMonth.getDay();
+                const daysInMonth = new Date(referralCurrentMonth.getFullYear(), referralCurrentMonth.getMonth() + 1, 0).getDate();
+
+                for (let i = 0; i < startDay; i++) {
+                    const spacer = document.createElement('div');
+                    calendarGrid.appendChild(spacer);
+                }
+
+                for (let day = 1; day <= daysInMonth; day++) {
+                    const date = new Date(referralCurrentMonth.getFullYear(), referralCurrentMonth.getMonth(), day);
+                    const dateValue = referralFormatDateValue(date);
+                    const isPast = date < referralMinDate;
+                    const availabilityKnown = referralAvailabilityByDate.has(dateValue);
+                    const isAvailable = referralAvailabilityByDate.get(dateValue) === true;
+                    const isDisabled = !referralCounselorId || isPast || !availabilityKnown || !isAvailable;
+
+                    const button = document.createElement('button');
+                    button.type = 'button';
+                    button.textContent = day;
+                    button.disabled = isDisabled;
+                    button.className = 'h-10 w-10 md:h-11 md:w-11 rounded-lg border text-sm font-medium transition';
+
+                    if (isDisabled) {
+                        button.classList.add('border-transparent', 'text-gray-300', 'cursor-not-allowed');
+                    } else {
+                        button.classList.add('border-[#7c1d2a]/30', 'text-[#7c1d2a]', 'hover:bg-[#7c1d2a]/10');
+                    }
+
+                    if (referralSelectedDate && referralIsSameDay(referralSelectedDate, date)) {
+                        button.classList.remove('border-[#7c1d2a]/30', 'text-[#7c1d2a]', 'hover:bg-[#7c1d2a]/10');
+                        button.classList.add('bg-[#7c1d2a]', 'text-white', 'border-[#7c1d2a]');
+                    }
+
+                    button.addEventListener('click', () => {
+                        if (button.disabled) {
+                            return;
+                        }
+                        referralSelectedDate = date;
+                        document.getElementById('referralDateSelect').value = referralFormatDateValue(date);
+                        document.getElementById('referralSelectedTime').value = '';
+                        setReferralCalendarStatus(
+                            `Selected date: ${date.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}`,
+                            'success'
+                        );
+                        renderReferralCalendar();
+                        loadReferralAvailableSlots();
+                    });
+
+                    calendarGrid.appendChild(button);
+                }
+            }
+
+            async function loadReferralMonthAvailability() {
+                referralAvailabilityByDate = new Map();
+                renderReferralCalendar();
+
+                if (!referralCounselorId) {
+                    setReferralCalendarStatus('Select a counselor to load available dates.');
+                    return;
+                }
+
+                const requestId = ++referralAvailabilityRequestId;
+                setReferralCalendarStatus('Checking available dates...');
+                const monthValue = `${referralCurrentMonth.getFullYear()}-${String(referralCurrentMonth.getMonth() + 1).padStart(2, '0')}`;
+
+                try {
+                    const response = await fetch(`/appointments/available-dates?counselor_id=${referralCounselorId}&month=${monthValue}&allow_today=1`);
+                    const data = await response.json();
+                    if (requestId !== referralAvailabilityRequestId) {
+                        return;
+                    }
+                    const availability = data.availability || {};
+                    Object.keys(availability).forEach(dateValue => {
+                        referralAvailabilityByDate.set(dateValue, availability[dateValue] === true);
+                    });
+                } catch (error) {
+                    if (requestId !== referralAvailabilityRequestId) {
+                        return;
+                    }
+                }
+
+                if (requestId !== referralAvailabilityRequestId) {
+                    return;
+                }
+
+                const hasAnyAvailability = Array.from(referralAvailabilityByDate.values()).some(value => value);
+                if (!hasAnyAvailability) {
+                    setReferralCalendarStatus('No available dates for this counselor in the selected month.', 'error');
+                } else {
+                    setReferralCalendarStatus('Available dates are highlighted. Select a date to continue.');
+                }
+
+                if (referralSelectedDate && (!referralAvailabilityByDate.get(referralFormatDateValue(referralSelectedDate)))) {
+                    referralSelectedDate = null;
+                    document.getElementById('referralDateSelect').value = '';
+                    document.getElementById('referralSelectedTime').value = '';
+                }
+
+                renderReferralCalendar();
+                if (referralSelectedDate) {
+                    loadReferralAvailableSlots();
+                }
+            }
+
+            function loadReferralAvailableSlots() {
+                const date = document.getElementById('referralDateSelect').value;
+                const timeSlots = document.getElementById('referralTimeSlots');
+                const selectedTime = document.getElementById('referralSelectedTime');
+
+                if (!referralCounselorId || !date) {
+                    timeSlots.innerHTML = '<div class="text-gray-500 text-center p-4 border-2 border-dashed border-gray-300 rounded-lg">Select a date to see available time slots</div>';
+                    selectedTime.value = '';
+                    return;
+                }
+
+                timeSlots.innerHTML = '<div class="text-gray-500 text-center p-4 border-2 border-dashed border-gray-300 rounded-lg">Loading available slots...</div>';
+
+                fetch(`{{ route('appointments.available-slots') }}?counselor_id=${referralCounselorId}&date=${date}`, {
+                    headers: { 'Accept': 'application/json' }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.message) {
+                        timeSlots.innerHTML = `<div class="text-red-500 text-center p-4 border-2 border-dashed border-red-300 rounded-lg">${data.message}</div>`;
+                        selectedTime.value = '';
+                        return;
+                    }
+
+                    if (data.available_slots.length === 0 && data.booked_slots.length === 0) {
+                        timeSlots.innerHTML = '<div class="text-red-500 text-center p-4 border-2 border-dashed border-red-300 rounded-lg">No working hours for this date. Please choose another date.</div>';
+                        selectedTime.value = '';
+                        return;
+                    }
+
+                    const availableSlots = [...data.available_slots].sort((a, b) => a.start.localeCompare(b.start));
+
+                    if (availableSlots.length === 0) {
+                        timeSlots.innerHTML = '<div class="text-yellow-700 text-center p-4 bg-yellow-50 border border-yellow-200 rounded-lg">No available time slots for this date. Please choose another date.</div>';
+                        selectedTime.value = '';
+                        return;
+                    }
+
+                    timeSlots.innerHTML = '';
+
+                    availableSlots.forEach(slot => {
+                        const slotElement = document.createElement('button');
+                        slotElement.type = 'button';
+                        slotElement.className = 'referral-time-slot p-4 border-2 border-gray-200 rounded-lg text-center hover:border-blue-500 hover:bg-blue-50 transition cursor-pointer';
+                        slotElement.textContent = slot.display;
+
+                        slotElement.addEventListener('click', function() {
+                            document.querySelectorAll('.referral-time-slot').forEach(s => {
+                                s.classList.remove('border-blue-500', 'bg-blue-100', 'text-blue-700');
+                                s.classList.add('border-gray-200', 'text-gray-700');
+                            });
+
+                            this.classList.remove('border-gray-200', 'text-gray-700');
+                            this.classList.add('border-blue-500', 'bg-blue-100', 'text-blue-700');
+
+                            selectedTime.value = slot.start;
+                        });
+
+                        slotElement.dataset.start = slot.start;
+                        slotElement.dataset.end = slot.end;
+                        slotElement.dataset.status = slot.status;
+                        timeSlots.appendChild(slotElement);
+                    });
+                })
+                .catch(() => {
+                    timeSlots.innerHTML = '<div class="text-red-500 text-center p-4 border-2 border-dashed border-red-300 rounded-lg">Error loading time slots. Please try again.</div>';
+                });
+            }
+
+            function showReferralModal(appointmentId, currentDate, studentId, currentCounselorId) {
+                referralCounselorId = null;
+                const modal = document.getElementById('referralModal');
+                const form = document.getElementById('referralForm');
+                const counselorSelect = document.getElementById('referralCounselorSelect');
+                const timeSlots = document.getElementById('referralTimeSlots');
+                const dateSelect = document.getElementById('referralDateSelect');
+                const selectedTime = document.getElementById('referralSelectedTime');
+
+                form.action = `/counselor/appointments/${appointmentId}/refer`;
+
+                const parsedDate = currentDate ? new Date(`${currentDate}T00:00:00`) : null;
+                referralSelectedDate = parsedDate;
+                referralCurrentMonth = new Date(
+                    (parsedDate || referralMinDate).getFullYear(),
+                    (parsedDate || referralMinDate).getMonth(),
+                    1
+                );
+
+                dateSelect.value = parsedDate ? referralFormatDateValue(parsedDate) : '';
+                selectedTime.value = '';
+                timeSlots.innerHTML = '<div class="text-gray-500 text-center p-4 border-2 border-dashed border-gray-300 rounded-lg">Select a date to see available time slots</div>';
+
+                counselorSelect.innerHTML = '<option value="">Loading counselors...</option>';
+
+                fetch(`{{ route('counselor.appointments.available-counselors') }}?student_id=${studentId}&current_counselor_id=${currentCounselorId}`, {
                     headers: {
                         'Accept': 'application/json',
                         'X-Requested-With': 'XMLHttpRequest'
                     }
                 })
                 .then(response => {
-                    console.log('Response status:', response.status);
                     if (!response.ok) {
                         throw new Error(`HTTP error! status: ${response.status}`);
                     }
                     return response.json();
                 })
                 .then(counselors => {
-                    console.log('Counselors data received:', counselors);
+                    counselorSelect.innerHTML = '<option value="">Choose a counselor</option>';
 
-                    if (counselors.error) {
-                        throw new Error(counselors.error);
+                    if (counselors.error || !Array.isArray(counselors) || counselors.length === 0) {
+                        counselorSelect.innerHTML = '<option value="">No counselors available</option>';
+                        return;
                     }
 
-                    let counselorOptions = '<option value="">Choose a counselor</option>';
+                    counselors.sort((a, b) => a.display_text.localeCompare(b.display_text));
+                    counselors.forEach(counselor => {
+                        const option = document.createElement('option');
+                        option.value = counselor.id;
+                        option.textContent = counselor.display_text || counselor.name;
+                        counselorSelect.appendChild(option);
+                    });
+                })
+                .catch(() => {
+                    counselorSelect.innerHTML = '<option value="">Error loading counselors</option>';
+                });
 
-                    if (!counselors || counselors.length === 0) {
-                        counselorOptions = '<option value="">No other counselors available in the system</option>';
-                        console.log('No counselors found in response');
+                counselorSelect.onchange = () => {
+                    referralCounselorId = counselorSelect.value || null;
+                    referralSelectedDate = parsedDate;
+                    dateSelect.value = parsedDate ? referralFormatDateValue(parsedDate) : '';
+                    selectedTime.value = '';
+                    loadReferralMonthAvailability();
+                };
+
+                loadReferralMonthAvailability();
+                modal.classList.remove('hidden');
+            }
+
+            function closeReferralModal() {
+                document.getElementById('referralModal').classList.add('hidden');
+                referralCounselorId = null;
+                referralSelectedDate = null;
+            }
+
+            // Reschedule Modal
+            let rescheduleCounselorId = null;
+            let rescheduleCurrentMonth = null;
+            let rescheduleSelectedDate = null;
+            let rescheduleAvailabilityByDate = new Map();
+            let rescheduleAvailabilityRequestId = 0;
+
+            const rescheduleMinDate = new Date();
+            rescheduleMinDate.setHours(0, 0, 0, 0);
+
+            function rescheduleFormatDateValue(date) {
+                const year = date.getFullYear();
+                const month = String(date.getMonth() + 1).padStart(2, '0');
+                const day = String(date.getDate()).padStart(2, '0');
+                return `${year}-${month}-${day}`;
+            }
+
+            function rescheduleFormatMonthLabel(date) {
+                return date.toLocaleString('en-US', { month: 'long', year: 'numeric' });
+            }
+
+            function rescheduleIsSameDay(a, b) {
+                return a && b &&
+                    a.getFullYear() === b.getFullYear() &&
+                    a.getMonth() === b.getMonth() &&
+                    a.getDate() === b.getDate();
+            }
+
+            function setRescheduleCalendarStatus(message, tone = 'muted') {
+                const calendarStatus = document.getElementById('rescheduleCalendarStatus');
+                if (!calendarStatus) {
+                    return;
+                }
+                calendarStatus.textContent = message;
+                calendarStatus.classList.remove('text-gray-500', 'text-green-600', 'text-red-600');
+                if (tone === 'success') {
+                    calendarStatus.classList.add('text-green-600');
+                } else if (tone === 'error') {
+                    calendarStatus.classList.add('text-red-600');
+                } else {
+                    calendarStatus.classList.add('text-gray-500');
+                }
+            }
+
+            function renderRescheduleCalendar() {
+                const calendarGrid = document.getElementById('rescheduleCalendarGrid');
+                const calendarMonthLabel = document.getElementById('rescheduleCalendarMonthLabel');
+
+                if (!calendarGrid || !calendarMonthLabel || !rescheduleCurrentMonth) {
+                    return;
+                }
+
+                calendarMonthLabel.textContent = rescheduleFormatMonthLabel(rescheduleCurrentMonth);
+                calendarGrid.innerHTML = '';
+
+                const firstDayOfMonth = new Date(rescheduleCurrentMonth.getFullYear(), rescheduleCurrentMonth.getMonth(), 1);
+                const startDay = firstDayOfMonth.getDay();
+                const daysInMonth = new Date(rescheduleCurrentMonth.getFullYear(), rescheduleCurrentMonth.getMonth() + 1, 0).getDate();
+
+                for (let i = 0; i < startDay; i++) {
+                    const spacer = document.createElement('div');
+                    calendarGrid.appendChild(spacer);
+                }
+
+                for (let day = 1; day <= daysInMonth; day++) {
+                    const date = new Date(rescheduleCurrentMonth.getFullYear(), rescheduleCurrentMonth.getMonth(), day);
+                    const dateValue = rescheduleFormatDateValue(date);
+                    const isPast = date < rescheduleMinDate;
+                    const availabilityKnown = rescheduleAvailabilityByDate.has(dateValue);
+                    const isAvailable = rescheduleAvailabilityByDate.get(dateValue) === true;
+                    const isDisabled = !rescheduleCounselorId || isPast || !availabilityKnown || !isAvailable;
+
+                    const button = document.createElement('button');
+                    button.type = 'button';
+                    button.textContent = day;
+                    button.disabled = isDisabled;
+                    button.className = 'h-10 w-10 md:h-11 md:w-11 rounded-lg border text-sm font-medium transition';
+
+                    if (isDisabled) {
+                        button.classList.add('border-transparent', 'text-gray-300', 'cursor-not-allowed');
                     } else {
-                        // Sort counselors: same college first, then different colleges
-                        counselors.sort((a, b) => {
-                            if (a.same_college && !b.same_college) return -1;
-                            if (!a.same_college && b.same_college) return 1;
-                            return a.name.localeCompare(b.name);
+                        button.classList.add('border-[#7c1d2a]/30', 'text-[#7c1d2a]', 'hover:bg-[#7c1d2a]/10');
+                    }
+
+                    if (rescheduleSelectedDate && rescheduleIsSameDay(rescheduleSelectedDate, date)) {
+                        button.classList.remove('border-[#7c1d2a]/30', 'text-[#7c1d2a]', 'hover:bg-[#7c1d2a]/10');
+                        button.classList.add('bg-[#7c1d2a]', 'text-white', 'border-[#7c1d2a]');
+                    }
+
+                    button.addEventListener('click', () => {
+                        if (button.disabled) {
+                            return;
+                        }
+                        rescheduleSelectedDate = date;
+                        document.getElementById('rescheduleDateSelect').value = rescheduleFormatDateValue(date);
+                        document.getElementById('rescheduleSelectedTime').value = '';
+                        setRescheduleCalendarStatus(
+                            `Selected date: ${date.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}`,
+                            'success'
+                        );
+                        renderRescheduleCalendar();
+                        loadRescheduleAvailableSlots();
+                    });
+
+                    calendarGrid.appendChild(button);
+                }
+            }
+
+            async function loadRescheduleMonthAvailability() {
+                rescheduleAvailabilityByDate = new Map();
+                renderRescheduleCalendar();
+
+                if (!rescheduleCounselorId) {
+                    setRescheduleCalendarStatus('Select a counselor to load available dates.');
+                    return;
+                }
+
+                const requestId = ++rescheduleAvailabilityRequestId;
+                setRescheduleCalendarStatus('Checking available dates...');
+                const monthValue = `${rescheduleCurrentMonth.getFullYear()}-${String(rescheduleCurrentMonth.getMonth() + 1).padStart(2, '0')}`;
+
+                try {
+                    const response = await fetch(`/appointments/available-dates?counselor_id=${rescheduleCounselorId}&month=${monthValue}&allow_today=1`);
+                    const data = await response.json();
+                    if (requestId !== rescheduleAvailabilityRequestId) {
+                        return;
+                    }
+                    const availability = data.availability || {};
+                    Object.keys(availability).forEach(dateValue => {
+                        rescheduleAvailabilityByDate.set(dateValue, availability[dateValue] === true);
+                    });
+                } catch (error) {
+                    if (requestId !== rescheduleAvailabilityRequestId) {
+                        return;
+                    }
+                }
+
+                if (requestId !== rescheduleAvailabilityRequestId) {
+                    return;
+                }
+
+                const hasAnyAvailability = Array.from(rescheduleAvailabilityByDate.values()).some(value => value);
+                if (!hasAnyAvailability) {
+                    setRescheduleCalendarStatus('No available dates for this counselor in the selected month.', 'error');
+                } else {
+                    setRescheduleCalendarStatus('Available dates are highlighted. Select a date to continue.');
+                }
+
+                if (rescheduleSelectedDate && (!rescheduleAvailabilityByDate.get(rescheduleFormatDateValue(rescheduleSelectedDate)))) {
+                    rescheduleSelectedDate = null;
+                    document.getElementById('rescheduleDateSelect').value = '';
+                    document.getElementById('rescheduleSelectedTime').value = '';
+                }
+
+                renderRescheduleCalendar();
+                if (rescheduleSelectedDate) {
+                    loadRescheduleAvailableSlots();
+                }
+            }
+
+            function loadRescheduleAvailableSlots() {
+                const date = document.getElementById('rescheduleDateSelect').value;
+                const timeSlots = document.getElementById('rescheduleTimeSlots');
+                const selectedTime = document.getElementById('rescheduleSelectedTime');
+
+                if (!rescheduleCounselorId || !date) {
+                    timeSlots.innerHTML = '<div class="text-gray-500 text-center p-4 border-2 border-dashed border-gray-300 rounded-lg">Select a date to see available time slots</div>';
+                    selectedTime.value = '';
+                    return;
+                }
+
+                timeSlots.innerHTML = '<div class="text-gray-500 text-center p-4 border-2 border-dashed border-gray-300 rounded-lg">Loading available slots...</div>';
+
+                fetch(`{{ route('appointments.available-slots') }}?counselor_id=${rescheduleCounselorId}&date=${date}`, {
+                    headers: { 'Accept': 'application/json' }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.message) {
+                        timeSlots.innerHTML = `<div class="text-red-500 text-center p-4 border-2 border-dashed border-red-300 rounded-lg">${data.message}</div>`;
+                        selectedTime.value = '';
+                        return;
+                    }
+
+                    if (data.available_slots.length === 0 && data.booked_slots.length === 0) {
+                        timeSlots.innerHTML = '<div class="text-red-500 text-center p-4 border-2 border-dashed border-red-300 rounded-lg">No working hours for this date. Please choose another date.</div>';
+                        selectedTime.value = '';
+                        return;
+                    }
+
+                    const availableSlots = [...data.available_slots].sort((a, b) => a.start.localeCompare(b.start));
+
+                    if (availableSlots.length === 0) {
+                        timeSlots.innerHTML = '<div class="text-yellow-700 text-center p-4 bg-yellow-50 border border-yellow-200 rounded-lg">No available time slots for this date. Please choose another date.</div>';
+                        selectedTime.value = '';
+                        return;
+                    }
+
+                    timeSlots.innerHTML = '';
+
+                    availableSlots.forEach(slot => {
+                        const slotElement = document.createElement('button');
+                        slotElement.type = 'button';
+                        slotElement.className = 'reschedule-time-slot p-4 border-2 border-gray-200 rounded-lg text-center hover:border-blue-500 hover:bg-blue-50 transition cursor-pointer';
+                        slotElement.textContent = slot.display;
+
+                        slotElement.addEventListener('click', function() {
+                            document.querySelectorAll('.reschedule-time-slot').forEach(s => {
+                                s.classList.remove('border-blue-500', 'bg-blue-100', 'text-blue-700');
+                                s.classList.add('border-gray-200', 'text-gray-700');
+                            });
+
+                            this.classList.remove('border-gray-200', 'text-gray-700');
+                            this.classList.add('border-blue-500', 'bg-blue-100', 'text-blue-700');
+
+                            selectedTime.value = slot.start;
                         });
 
-                        // Group counselors by college type
-                        const sameCollegeCounselors = counselors.filter(c => c.same_college);
-                        const differentCollegeCounselors = counselors.filter(c => !c.same_college);
-
-                        if (sameCollegeCounselors.length > 0) {
-                            counselorOptions += '<optgroup label="Same College Counselors">';
-                            sameCollegeCounselors.forEach(counselor => {
-                                counselorOptions += `<option value="${counselor.id}">${counselor.name} - ${counselor.position}</option>`;
-                            });
-                            counselorOptions += '</optgroup>';
-                        }
-
-                        if (differentCollegeCounselors.length > 0) {
-                            counselorOptions += '<optgroup label="Other College Counselors">';
-                            differentCollegeCounselors.forEach(counselor => {
-                                counselorOptions += `<option value="${counselor.id}">${counselor.name} - ${counselor.position} (${counselor.college})</option>`;
-                            });
-                            counselorOptions += '</optgroup>';
-                        }
-
-                        console.log(`Loaded ${counselors.length} counselors (${sameCollegeCounselors.length} same college, ${differentCollegeCounselors.length} different college)`);
-                    }
-
-                    const transferForm = `
-                        <form id="transferForm" action="/counselor/appointments/${appointmentId}/transfer" method="POST">
-                            @csrf
-                            @method('PATCH')
-
-                            <p class="text-gray-600 mb-4">Transfer this appointment to another counselor. You can choose counselors from any college.</p>
-
-                            <!-- Statistics -->
-                            <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
-                                <div class="flex items-center">
-                                    <i class="fas fa-info-circle text-blue-600 mr-2"></i>
-                                    <div>
-                                        <h4 class="font-semibold text-blue-800">Available Counselors</h4>
-                                        <p class="text-blue-700 text-sm">
-                                            Total: ${counselors ? counselors.length : 0} counselors available
-                                            ${counselors && counselors.filter(c => c.same_college).length > 0 ?
-                                                `(${counselors.filter(c => c.same_college).length} from same college,
-                                                ${counselors.filter(c => !c.same_college).length} from other colleges)` :
-                                                ''}
-                                        </p>
-                                    </div>
-                                </div>
-                            </div>
-
-                            ${!counselors || counselors.length === 0 ? `
-                            <div class="bg-red-50 border border-red-200 rounded-lg p-4 mb-4">
-                                <div class="flex items-center">
-                                    <i class="fas fa-exclamation-triangle text-red-600 mr-2"></i>
-                                    <p class="text-red-800 text-sm">
-                                        No other counselors available in the system.
-                                        Please contact administration to add more counselors.
-                                    </p>
-                                </div>
-                            </div>
-                            ` : ''}
-
-                            <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-4">
-                                <div class="flex items-center">
-                                    <i class="fas fa-info-circle text-yellow-600 mr-2"></i>
-                                    <p class="text-yellow-800 text-sm">
-                                        <strong>Note:</strong> You can now transfer to counselors from any college.
-                                        The appointment will be transferred and status reset to "Pending" for the new counselor's approval.
-                                    </p>
-                                </div>
-                            </div>
-
-                            <div class="mb-4">
-                                <label for="counselorSelect" class="block text-sm font-medium text-gray-700 mb-2">
-                                    Select Counselor to Transfer To
-                                </label>
-                                <select name="new_counselor_id" id="counselorSelect"
-                                        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
-                                        ${!counselors || counselors.length === 0 ? 'disabled' : 'required'}>
-                                    ${counselorOptions}
-                                </select>
-                                <p class="text-gray-500 text-xs mt-1">
-                                    Counselors are grouped by college for easier selection
-                                </p>
-                            </div>
-
-                            <div class="mb-4">
-                                <label for="transferReason" class="block text-sm font-medium text-gray-700 mb-2">
-                                    Reason for Transfer
-                                </label>
-                                <textarea name="transfer_reason" id="transferReason" rows="3"
-                                        placeholder="Please explain why you are transferring this appointment to another counselor..."
-                                        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
-                                        ${!counselors || counselors.length === 0 ? 'disabled' : 'required'}></textarea>
-                                <p class="text-gray-500 text-xs mt-1">
-                                    This reason will be visible to the student and the receiving counselor
-                                </p>
-                            </div>
-
-                            <div class="flex justify-end space-x-3">
-                                <button type="button"
-                                        onclick="closeTransferModal()"
-                                        class="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition">
-                                    Cancel
-                                </button>
-                                <button type="submit"
-                                        class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition ${!counselors || counselors.length === 0 ? 'opacity-50 cursor-not-allowed' : ''}"
-                                        ${!counselors || counselors.length === 0 ? 'disabled' : ''}>
-                                    <i class="fas fa-exchange-alt mr-2"></i>Transfer Appointment
-                                </button>
-                            </div>
-                        </form>
-                    `;
-
-                    document.getElementById('transferModalContent').innerHTML = transferForm;
+                        slotElement.dataset.start = slot.start;
+                        slotElement.dataset.end = slot.end;
+                        slotElement.dataset.status = slot.status;
+                        timeSlots.appendChild(slotElement);
+                    });
                 })
-                .catch(error => {
-                    console.error('Error loading counselors:', error);
-                    document.getElementById('transferModalContent').innerHTML = `
-                        <div class="text-center py-8">
-                            <i class="fas fa-exclamation-triangle text-2xl text-red-600 mb-4"></i>
-                            <p class="text-red-500 mb-2">Error loading available counselors.</p>
-                            <p class="text-gray-600 text-sm mb-4">Error: ${error.message}</p>
-                            <div class="space-x-2">
-                                <button onclick="closeTransferModal()" class="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition">
-                                    Close
-                                </button>
-                                <button onclick="showTransferOptions(${appointmentId})" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">
-                                    Try Again
-                                </button>
-                            </div>
-                        </div>
-                    `;
+                .catch(() => {
+                    timeSlots.innerHTML = '<div class="text-red-500 text-center p-4 border-2 border-dashed border-red-300 rounded-lg">Error loading time slots. Please try again.</div>';
                 });
             }
 
-            function closeTransferModal() {
-                document.getElementById('transferModal').classList.add('hidden');
-                currentAppointmentId = null;
+            function showRescheduleModal(appointmentId, counselorId, currentDate) {
+                rescheduleCounselorId = counselorId;
+                const modal = document.getElementById('rescheduleModal');
+                const form = document.getElementById('rescheduleForm');
+                const timeSlots = document.getElementById('rescheduleTimeSlots');
+                const dateSelect = document.getElementById('rescheduleDateSelect');
+                const selectedTime = document.getElementById('rescheduleSelectedTime');
+
+                form.action = `/counselor/appointments/${appointmentId}/reschedule`;
+
+                const parsedDate = currentDate ? new Date(`${currentDate}T00:00:00`) : null;
+                rescheduleSelectedDate = parsedDate;
+                rescheduleCurrentMonth = new Date(
+                    (parsedDate || rescheduleMinDate).getFullYear(),
+                    (parsedDate || rescheduleMinDate).getMonth(),
+                    1
+                );
+
+                dateSelect.value = parsedDate ? rescheduleFormatDateValue(parsedDate) : '';
+                selectedTime.value = '';
+                timeSlots.innerHTML = '<div class="text-gray-500 text-center p-4 border-2 border-dashed border-gray-300 rounded-lg">Select a date to see available time slots</div>';
+
+                loadRescheduleMonthAvailability();
+                modal.classList.remove('hidden');
             }
+
+            function closeRescheduleModal() {
+                document.getElementById('rescheduleModal').classList.add('hidden');
+                rescheduleCounselorId = null;
+                rescheduleSelectedDate = null;
+            }
+
+            document.getElementById('referralCalendarPrev')?.addEventListener('click', function() {
+                const prevMonth = new Date(referralCurrentMonth.getFullYear(), referralCurrentMonth.getMonth() - 1, 1);
+                const minMonth = new Date(referralMinDate.getFullYear(), referralMinDate.getMonth(), 1);
+                if (prevMonth < minMonth) {
+                    return;
+                }
+                referralCurrentMonth = prevMonth;
+                loadReferralMonthAvailability();
+            });
+
+            document.getElementById('referralCalendarNext')?.addEventListener('click', function() {
+                referralCurrentMonth = new Date(referralCurrentMonth.getFullYear(), referralCurrentMonth.getMonth() + 1, 1);
+                loadReferralMonthAvailability();
+            });
+
+            document.getElementById('rescheduleCalendarPrev')?.addEventListener('click', function() {
+                const prevMonth = new Date(rescheduleCurrentMonth.getFullYear(), rescheduleCurrentMonth.getMonth() - 1, 1);
+                const minMonth = new Date(rescheduleMinDate.getFullYear(), rescheduleMinDate.getMonth(), 1);
+                if (prevMonth < minMonth) {
+                    return;
+                }
+                rescheduleCurrentMonth = prevMonth;
+                loadRescheduleMonthAvailability();
+            });
+
+            document.getElementById('rescheduleCalendarNext')?.addEventListener('click', function() {
+                rescheduleCurrentMonth = new Date(rescheduleCurrentMonth.getFullYear(), rescheduleCurrentMonth.getMonth() + 1, 1);
+                loadRescheduleMonthAvailability();
+            });
 
             // Appointment Details Modal
             function showAppointmentDetails(appointmentId) {
@@ -921,6 +1480,12 @@
                                         <p class="mt-1 text-sm text-gray-900">${data.student.year_level}</p>
                                     </div>
                                 </div>
+                            <div class="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700">Initial Interview Completed</label>
+                                    <p class="mt-1 text-sm text-gray-900">${data.student.initial_interview_completed_label}</p>
+                                </div>
+                            </div>
 
                                 <div class="grid grid-cols-2 gap-4">
                                     <div>
@@ -932,6 +1497,10 @@
                                         <p class="mt-1 text-sm text-gray-900">${data.formatted_time}</p>
                                     </div>
                                 </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700">Type of Booking</label>
+                                <p class="mt-1 text-sm text-gray-900">${data.appointment.booking_type || 'N/A'}</p>
+                            </div>
 
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700">Concern</label>
@@ -956,21 +1525,6 @@
             ${data.appointment.status_display || (data.appointment.status.charAt(0).toUpperCase() + data.appointment.status.slice(1))}
         </span>
     </div>
-
-                                ${data.appointment.status === 'transferred' && data.appointment.counselor ? `
-                                <div class="bg-purple-50 border border-purple-200 rounded-lg p-4">
-                                    <div class="flex items-center">
-                                        <i class="fas fa-exchange-alt text-purple-600 mr-2"></i>
-                                        <div>
-                                            <h4 class="font-semibold text-purple-800">Transferred To</h4>
-                                            <p class="text-purple-700 text-sm">
-                                                ${data.appointment.counselor.user.first_name} ${data.appointment.counselor.user.last_name}
-                                                ${data.appointment.counselor.college ? `(${data.appointment.counselor.college.name})` : ''}
-                                            </p>
-                                        </div>
-                                    </div>
-                                </div>
-                                ` : ''}
 
                                 ${data.appointment.has_session_notes ? `
                                 <div class="border-t pt-4 mt-4">
@@ -1014,6 +1568,13 @@
                                     </a>
                                 </div>
                                 ` : ''}
+
+                                <div class="border-t pt-4 mt-4 flex justify-end">
+                                    <a href="${data.student.profile_url}"
+                                       class="inline-flex items-center px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition text-sm">
+                                        <i class="fas fa-user mr-2"></i> View Student Profile
+                                    </a>
+                                </div>
                             </div>
                         `;
 
@@ -1168,8 +1729,11 @@
                 if (e.target.id === 'rejectionModal') {
                     closeRejectionModal();
                 }
-                if (e.target.id === 'transferModal') {
-                    closeTransferModal();
+                if (e.target.id === 'referralModal') {
+                    closeReferralModal();
+                }
+                if (e.target.id === 'rescheduleModal') {
+                    closeRescheduleModal();
                 }
             });
         </script>

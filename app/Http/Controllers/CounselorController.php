@@ -4,10 +4,13 @@ namespace App\Http\Controllers;
 
 use App\Models\Appointment;
 use App\Models\Counselor;
+use App\Models\Student;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\College;
+use App\Services\GoogleCalendarService;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Log;
 
 class CounselorController extends Controller
 {
@@ -182,6 +185,8 @@ public function appointments(Request $request)
         }
     }
 
+    $counselorIds = Counselor::where('user_id', $counselor->user_id)->pluck('id')->all();
+
     $appointments = $query->orderBy('appointment_date', 'desc')
         ->orderBy('start_time', 'desc')
         ->paginate(15);
@@ -207,9 +212,74 @@ public function appointments(Request $request)
 
     return view('counselor.appointments.appointments', compact(
         'counselor',
+        'counselorIds',
         'appointments',
         'status',
         'colleges'
+    ));
+}
+
+public function calendar(Request $request)
+{
+    $userId = Auth::id();
+
+    $counselorAssignments = Counselor::with('user', 'college')
+        ->where('user_id', $userId)
+        ->get();
+
+    if ($counselorAssignments->isEmpty()) {
+        abort(404, 'Counselor profile not found.');
+    }
+
+    $counselor = $counselorAssignments->first();
+    $counselorIds = $counselorAssignments->pluck('id');
+
+    $date = $request->filled('date')
+        ? Carbon::parse($request->input('date'))
+        : Carbon::today();
+
+    $appointments = Appointment::with(['student.user'])
+        ->where(function ($query) use ($counselorIds, $counselor) {
+            $query->whereIn('counselor_id', $counselorIds)
+                ->orWhere('referred_to_counselor_id', $counselor->id);
+        })
+        ->whereDate('appointment_date', $date->toDateString())
+        ->whereIn('status', ['pending', 'approved', 'completed', 'referred', 'rescheduled', 'reschedule_requested', 'reschedule_rejected'])
+        ->orderBy('start_time')
+        ->get()
+        ->map(function ($appointment) {
+            $appointment->formatted_start_time = Carbon::parse($appointment->start_time)->format('H:i');
+            return $appointment;
+        });
+
+    $selectedDate = $date->format('Y-m-d');
+    $googleCalendarId = $counselor->google_calendar_id;
+    $busyIntervals = [];
+    $googleCalendarEvents = [];
+
+    if ($googleCalendarId) {
+        try {
+            $calendarService = app(GoogleCalendarService::class);
+            $googleCalendarEvents = $calendarService->getBusyIntervalsForDate($googleCalendarId, $date);
+            $busyIntervals = $googleCalendarEvents;
+        } catch (\Throwable $exception) {
+            Log::warning('Failed to load Google Calendar schedule', [
+                'counselor_id' => $counselor->id,
+                'calendar_id' => $googleCalendarId,
+                'date' => $selectedDate,
+                'error' => $exception->getMessage(),
+            ]);
+        }
+    }
+
+    return view('counselor.appointments.calendar', compact(
+        'counselor',
+        'appointments',
+        'date',
+        'selectedDate',
+        'googleCalendarId',
+        'busyIntervals',
+        'googleCalendarEvents'
     ));
 }
 
@@ -414,6 +484,7 @@ public function getAppointmentDetails(Appointment $appointment)
             'notes' => $appointment->notes,
             'status' => $appointment->status,
             'status_display' => $appointment->getStatusWithReferralContext($currentCounselor->id), // ADD THIS
+            'booking_type' => $appointment->booking_type,
             'appointment_date' => $appointment->appointment_date->format('Y-m-d'),
             'start_time' => $appointment->start_time,
             'end_time' => $appointment->end_time,
@@ -424,6 +495,11 @@ public function getAppointmentDetails(Appointment $appointment)
             'id' => $appointment->student->id,
             'student_id' => $appointment->student->student_id,
             'year_level' => $appointment->student->year_level,
+            'initial_interview_completed' => $appointment->student->initial_interview_completed,
+            'initial_interview_completed_label' => $appointment->student->initial_interview_completed === null
+                ? 'Not provided'
+                : ($appointment->student->initial_interview_completed ? 'Yes' : 'No'),
+            'profile_url' => route('counselor.students.profile', $appointment->student->id),
             'user' => [
                 'first_name' => $appointment->student->user->first_name,
                 'last_name' => $appointment->student->user->last_name,
@@ -446,7 +522,11 @@ public function getAppointmentDetails(Appointment $appointment)
             'approved' => 'green',
             'rejected' => 'red',
             'completed' => 'blue',
-            'cancelled' => 'gray'
+            'cancelled' => 'gray',
+            'referred' => 'purple',
+            'rescheduled' => 'indigo',
+            'reschedule_requested' => 'orange',
+            'reschedule_rejected' => 'rose'
         ];
 
         return $colors[$status] ?? 'gray';
@@ -510,6 +590,24 @@ public function processReferral(Request $request, Appointment $appointment)
 
     return redirect()->route('counselor.appointments')
         ->with('success', "Appointment referred to {$referredCounselorName} successfully. The student has been notified.");
+}
+
+public function showStudentProfile(Student $student)
+{
+    $student->load([
+        'user',
+        'college',
+        'personalData',
+        'familyData',
+        'academicData',
+        'learningResources',
+        'psychosocialData',
+        'needsAssessment',
+        'appointments',
+        'events'
+    ]);
+
+    return view('student.show', compact('student'));
 }
 
 }

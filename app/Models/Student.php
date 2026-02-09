@@ -28,6 +28,7 @@ class Student extends Model
         'academic_year',
         'profile_picture',
         'student_status',
+        'initial_interview_completed',
     ];
 
     /**
@@ -37,6 +38,7 @@ class Student extends Model
      */
     protected $casts = [
         'msu_sase_score' => 'decimal:2',
+        'initial_interview_completed' => 'boolean',
     ];
     public function getProfilePictureUrlAttribute(): string
     {

@@ -29,12 +29,19 @@ Route::get('/student/{student}', [StudentController::class, 'show'])->name('stud
 
 // OR create a dedicated route for student's own profile (recommended)
 Route::get('/my-profile', [StudentController::class, 'myProfile'])->name('student.profile');
+
+// Registration routes must be public (no auth)
+Route::get('register', [RegisteredUserController::class, 'create'])->name('register');
+Route::post('register', [RegisteredUserController::class, 'store']);
+Route::post('register/email/send', [RegisteredUserController::class, 'sendEmailVerificationCode'])
+    ->name('register.email.send');
+Route::post('register/email/verify', [RegisteredUserController::class, 'verifyEmailCode'])
+    ->name('register.email.verify');
+
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
-    Route::get('register', [RegisteredUserController::class, 'create'])->name('register');
-    Route::post('register', [RegisteredUserController::class, 'store']);
 
     // Mental Health Corner route
     Route::get('/mental-health-corner', function () {
@@ -65,9 +72,18 @@ Route::middleware('auth')->group(function () {
         Route::get('/appointments', [AppointmentController::class, 'index'])->name('appointments.index');
         Route::get('/appointments/create', [AppointmentController::class, 'create'])->name('appointments.create');
         Route::post('/appointments', [AppointmentController::class, 'store'])->name('appointments.store');
+        Route::get('/appointments/available-dates', [AppointmentController::class, 'getAvailableDates'])->name('appointments.available-dates');
         Route::get('/appointments/available-slots', [AppointmentController::class, 'getAvailableSlots'])->name('appointments.available-slots');
 
         Route::post('/appointments/{appointment}/cancel', [AppointmentController::class, 'cancel'])->name('appointments.cancel');
+        Route::patch('/appointments/{appointment}/reschedule/accept', [AppointmentController::class, 'acceptReschedule'])
+            ->name('appointments.reschedule.accept');
+        Route::patch('/appointments/{appointment}/reschedule/reject', [AppointmentController::class, 'rejectReschedule'])
+            ->name('appointments.reschedule.reject');
+        Route::patch('/appointments/{appointment}/referral/accept', [AppointmentController::class, 'acceptReferral'])
+            ->name('appointments.referral.accept');
+        Route::patch('/appointments/{appointment}/referral/reject', [AppointmentController::class, 'rejectReferral'])
+            ->name('appointments.referral.reject');
 
         // Counselor/Admin routes
         Route::patch('/appointments/{appointment}/status', [AppointmentController::class, 'updateStatus'])->name('appointments.update-status');
@@ -81,16 +97,16 @@ Route::middleware('auth')->group(function () {
         Route::get('/appointments/{appointment}/details', [CounselorController::class, 'getAppointmentDetails'])->name('counselor.appointments.details');
         Route::patch('/appointments/{appointment}/update-status', [AppointmentController::class, 'updateStatus'])
             ->name('counselor.appointments.update-status');
+    Route::patch('/appointments/{appointment}/reschedule', [AppointmentController::class, 'reschedule'])
+        ->name('counselor.appointments.reschedule');
  Route::get('/session-notes/dashboard', [SessionNoteController::class, 'dashboard'])->name('counselor.session-notes.dashboard');
     Route::get('/session-notes/{sessionNote}/details', [SessionNoteController::class, 'getSessionNoteDetails'])->name('counselor.session-notes.details');
-        // FIXED: Moved transfer routes INSIDE the counselor middleware group
-        Route::patch('/appointments/{appointment}/transfer', [AppointmentController::class, 'transfer'])->name('counselor.appointments.transfer');
-        Route::get('/appointments/{appointment}/available-counselors', [AppointmentController::class, 'getAvailableCounselorsForTransfer'])->name('counselor.appointments.available-counselors');
-
         // Feedback management routes
         Route::get('/feedback', [FeedbackController::class, 'index'])->name('counselor.feedback.index');
         Route::get('/feedback/{feedback}', [FeedbackController::class, 'show'])->name('counselor.feedback.show');
         Route::get('/feedback/export', [FeedbackController::class, 'export'])->name('counselor.feedback.export');
+        Route::get('/availability', [ProfileController::class, 'editAvailability'])->name('counselor.availability.edit');
+        Route::patch('/availability', [ProfileController::class, 'updateAvailability'])->name('counselor.availability.update');
 
         // Events management routes
         Route::get('/events', [EventController::class, 'index'])->name('counselor.events.index');
@@ -144,7 +160,11 @@ Route::middleware('auth')->group(function () {
 
         // Referral routes
         Route::get('/appointments/{appointment}/refer-form', [CounselorController::class, 'showReferralForm'])->name('counselor.appointments.refer-form');
-        Route::post('/appointments/{appointment}/refer', [CounselorController::class, 'processReferral'])->name('counselor.appointments.refer');
+        Route::patch('/appointments/{appointment}/refer', [AppointmentController::class, 'refer'])->name('counselor.appointments.refer');
+        Route::patch('/appointments/{appointment}/referral/accept', [AppointmentController::class, 'acceptReferralByCounselor'])
+            ->name('counselor.appointments.referral.accept');
+        Route::patch('/appointments/{appointment}/referral/reject', [AppointmentController::class, 'rejectReferralByCounselor'])
+            ->name('counselor.appointments.referral.reject');
 
         // API route for getting available counselors (for referrals)
         Route::get('/appointments/available-counselors', [AppointmentController::class, 'getAvailableCounselors'])->name('counselor.appointments.available-counselors');
@@ -264,6 +284,13 @@ Route::get('/check-admin-status', function() {
         'user_role' => $user->role,
         'has_admin_profile' => $admin ? 'Yes' : 'No',
         'admin_profile' => $admin
+    ]);
+});
+
+Route::get('/oauth2callback', function (\Illuminate\Http\Request $request) {
+    return response()->json([
+        'code' => $request->query('code'),
+        'error' => $request->query('error'),
     ]);
 });
 

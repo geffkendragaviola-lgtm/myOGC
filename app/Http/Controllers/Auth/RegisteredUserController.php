@@ -22,6 +22,8 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rules;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\View\View;
 use Carbon\Carbon;
 
@@ -37,12 +39,124 @@ class RegisteredUserController extends Controller
     }
 
     /**
+     * Send a verification code to the student's email.
+     */
+    public function sendEmailVerificationCode(Request $request): RedirectResponse
+    {
+        $request->validate([
+            'email' => [
+                'required',
+                'string',
+                'lowercase',
+                'email',
+                'max:100',
+                'unique:' . User::class,
+                'regex:/^[a-zA-Z0-9._%+-]+@g\.msuiit\.edu\.ph$/i',
+            ],
+        ], [
+            'email.regex' => 'You must use your MSU-IIT email (@g.msuiit.edu.ph).',
+        ]);
+
+        $email = strtolower(trim($request->email));
+        $code = (string) random_int(100000, 999999);
+
+        $request->session()->put('registration_email_pending', $email);
+        $request->session()->put('registration_email_code', Hash::make($code));
+        $request->session()->put('registration_email_code_expires', now()->addMinutes(10)->timestamp);
+
+        try {
+            Mail::raw(
+                "Your MSU-IIT registration verification code is {$code}. It expires in 10 minutes.",
+                function ($message) use ($email) {
+                    $message->to($email)
+                        ->subject('MSU-IIT Registration Verification Code');
+                }
+            );
+        } catch (\Throwable $exception) {
+            Log::error('Email verification send failed: ' . $exception->getMessage(), [
+                'email' => $email,
+            ]);
+
+            return redirect()
+                ->route('register')
+                ->withErrors(['email' => 'Email sending failed. Please check mail settings and try again.']);
+        }
+
+        $mailDriver = config('mail.default');
+        $statusMessage = 'Verification code sent. Please check your email.';
+        if (in_array($mailDriver, ['log', 'array'], true)) {
+            $statusMessage = "Verification code generated, but mail driver is '{$mailDriver}'. Check logs or configure SMTP.";
+        }
+
+        return redirect()
+            ->route('register')
+            ->with('status', $statusMessage);
+    }
+
+    /**
+     * Verify the submitted email code.
+     */
+    public function verifyEmailCode(Request $request): RedirectResponse
+    {
+        $request->validate([
+            'code' => ['required', 'digits:6'],
+        ]);
+
+        $pendingEmail = $request->session()->get('registration_email_pending');
+        $storedHash = $request->session()->get('registration_email_code');
+        $expiresAt = $request->session()->get('registration_email_code_expires');
+
+        if (!$pendingEmail || !$storedHash || !$expiresAt) {
+            return redirect()
+                ->route('register')
+                ->withErrors(['code' => 'Please request a new verification code.']);
+        }
+
+        if (now()->timestamp > $expiresAt) {
+            $request->session()->forget([
+                'registration_email_code',
+                'registration_email_code_expires',
+            ]);
+
+            return redirect()
+                ->route('register')
+                ->withErrors(['code' => 'Verification code expired. Please request a new code.']);
+        }
+
+        if (!Hash::check($request->code, $storedHash)) {
+            return redirect()
+                ->route('register')
+                ->withErrors(['code' => 'Invalid verification code.']);
+        }
+
+        $request->session()->put('registration_email_verified', $pendingEmail);
+        $request->session()->forget([
+            'registration_email_pending',
+            'registration_email_code',
+            'registration_email_code_expires',
+        ]);
+
+        return redirect()
+            ->route('register')
+            ->with('status', 'Email verified. You can now complete registration.');
+    }
+
+    /**
      * Handle an incoming registration request.
      *
      * @throws \Illuminate\Validation\ValidationException
      */
     public function store(Request $request): RedirectResponse
     {
+        $verifiedEmail = $request->session()->get('registration_email_verified');
+        if (!$verifiedEmail) {
+            return redirect()
+                ->route('register')
+                ->withErrors(['email' => 'Please verify your MSU-IIT email before registering.']);
+        }
+
+        $request->merge(['email' => $verifiedEmail]);
+
         $rules = [
             'first_name' => ['required', 'string', 'max:100'],
             'middle_name' => ['nullable', 'string', 'max:100'],
@@ -52,6 +166,7 @@ class RegisteredUserController extends Controller
             'birthplace' => ['nullable', 'string', 'max:255'],
             'religion' => ['nullable', 'string', 'max:100'],
             'civil_status' => ['nullable', 'string', 'in:single,married,not legally married,divorced,widowed,separated,others'],
+            'civil_status_other' => ['nullable', 'string', 'max:255'],
             'number_of_children' => ['nullable', 'integer', 'min:0'],
             'citizenship' => ['nullable', 'string', 'max:50'],
             'address' => ['nullable', 'string', 'max:500'],
@@ -74,11 +189,13 @@ class RegisteredUserController extends Controller
             // School Data
             $rules['student_id'] = ['required', 'string', 'max:50', 'unique:students'];
             $rules['year_level'] = ['required', 'string', 'max:50'];
+            $rules['initial_interview_completed'] = ['required_if:year_level,2nd Year', 'in:yes,no'];
             $rules['course'] = ['required', 'string', 'max:100'];
             $rules['college_id'] = ['required', 'exists:colleges,id'];
-            $rules['msu_sase_score'] = ['nullable', 'numeric', 'min:0', 'max:100'];
+            $rules['msu_sase_score'] = ['nullable', 'numeric', 'min:0', 'max:180'];
             $rules['academic_year'] = ['nullable', 'string', 'max:20'];
             $rules['student_status'] = ['required', 'string', 'in:new,transferee,returnee,shiftee'];
+            $rules['profile_picture'] = ['nullable', 'image', 'max:2048'];
 
             // Personal Data
             $rules['nickname'] = ['nullable', 'string', 'max:100'];
@@ -89,25 +206,25 @@ class RegisteredUserController extends Controller
             $rules['leisure_activities'] = ['nullable', 'string'];
             $rules['serious_medical_condition'] = ['nullable', 'string', 'max:255'];
             $rules['physical_disability'] = ['nullable', 'string', 'max:255'];
-            $rules['gender_identity'] = ['nullable', 'string', 'in:male/man,female/woman,transgender male/man,transgender female/woman,gender variant/nonconforming,not listed,prefer not to say'];
-            $rules['romantic_attraction'] = ['nullable', 'string', 'in:my same gender,opposite gender,both men and women,all genders,neither gender,prefer not to answer'];
+            $rules['sex_identity'] = ['nullable', 'string', 'in:male/man,female/woman,transsex male/man,transsex female/woman,sex variant/nonconforming,not listed,prefer not to say'];
+            $rules['romantic_attraction'] = ['nullable', 'string', 'in:my same sex,opposite sex,both men and women,all sexes,neither sex,prefer not to answer'];
 
             // Family Data
-            $rules['father_name'] = ['nullable', 'string', 'max:100'];
-            $rules['father_occupation'] = ['nullable', 'string', 'max:100'];
-            $rules['father_phone_number'] = ['nullable', 'string', 'max:20'];
-            $rules['mother_name'] = ['nullable', 'string', 'max:100'];
-            $rules['mother_occupation'] = ['nullable', 'string', 'max:100'];
-            $rules['mother_phone_number'] = ['nullable', 'string', 'max:20'];
-            $rules['parents_marital_status'] = ['nullable', 'string', 'in:married,not legally married,separated,both parents remarried,one parent remarried'];
-            $rules['family_monthly_income'] = ['nullable', 'string', 'in:below 3k,3001-5000,5001-8000,8001-10000,10001-15000,15001-20000,20001 above'];
+            $rules['father_name'] = ['required', 'string', 'max:100'];
+            $rules['father_occupation'] = ['required', 'string', 'max:100'];
+            $rules['father_phone_number'] = ['required', 'string', 'max:20'];
+            $rules['mother_name'] = ['required', 'string', 'max:100'];
+            $rules['mother_occupation'] = ['required', 'string', 'max:100'];
+            $rules['mother_phone_number'] = ['required', 'string', 'max:20'];
+            $rules['parents_marital_status'] = ['required', 'string', 'in:married,not legally married,separated,both parents remarried,one parent remarried'];
+            $rules['family_monthly_income'] = ['required', 'string', 'in:below 3k,3001-5000,5001-8000,8001-10000,10001-15000,15001-20000,20001 above'];
             $rules['guardian_name'] = ['nullable', 'string', 'max:100'];
             $rules['guardian_occupation'] = ['nullable', 'string', 'max:100'];
             $rules['guardian_phone_number'] = ['nullable', 'string', 'max:20'];
             $rules['guardian_relationship'] = ['nullable', 'string', 'max:50'];
-            $rules['ordinal_position'] = ['nullable', 'string', 'in:only child,eldest,middle,youngest'];
-            $rules['number_of_siblings'] = ['nullable', 'integer', 'min:0'];
-            $rules['home_environment_description'] = ['nullable', 'string'];
+            $rules['ordinal_position'] = ['required', 'string', 'in:only child,eldest,middle,youngest'];
+            $rules['number_of_siblings'] = ['required', 'integer', 'min:0'];
+            $rules['home_environment_description'] = ['required', 'string'];
 
             // Academic Data
             $rules['shs_gpa'] = ['nullable', 'numeric', 'min:0', 'max:100'];
@@ -121,12 +238,22 @@ class RegisteredUserController extends Controller
             $rules['career_option_2'] = ['nullable', 'string', 'max:100'];
             $rules['career_option_3'] = ['nullable', 'string', 'max:100'];
             $rules['course_choice_by'] = ['nullable', 'string', 'in:own choice,parents choice,relative choice,sibling choice,according to MSU-SASE score/slot,others'];
+            $rules['course_choice_other'] = ['nullable', 'string', 'max:255'];
             $rules['future_career_plans'] = ['nullable', 'string'];
+            $rules['msu_choice_reasons'] = ['nullable', 'array'];
+            $rules['msu_choice_reasons.*'] = ['nullable', 'string', 'max:255'];
+            $rules['msu_choice_other'] = ['nullable', 'string', 'max:255'];
 
             // Learning Resources
             $rules['internet_access'] = ['nullable', 'string', 'in:no internet access,limited internet access,full internet access'];
             $rules['distance_learning_readiness'] = ['nullable', 'string', 'in:fully ready,ready,a little ready,not ready'];
             $rules['learning_space_description'] = ['nullable', 'string'];
+            $rules['technology_gadgets'] = ['nullable', 'array'];
+            $rules['technology_gadgets.*'] = ['nullable', 'string', 'max:255'];
+            $rules['technology_gadgets_other'] = ['nullable', 'string', 'max:255'];
+            $rules['internet_connectivity'] = ['nullable', 'array'];
+            $rules['internet_connectivity.*'] = ['nullable', 'string', 'max:255'];
+            $rules['internet_connectivity_other'] = ['nullable', 'string', 'max:255'];
 
             // Psychosocial Data
             $rules['personality_characteristics'] = ['nullable', 'string'];
@@ -136,9 +263,25 @@ class RegisteredUserController extends Controller
             $rules['sought_psychologist_help'] = ['nullable', 'boolean'];
             $rules['needs_immediate_counseling'] = ['nullable', 'boolean'];
             $rules['future_counseling_concerns'] = ['nullable', 'string'];
+            $rules['problem_sharing_targets'] = ['nullable', 'array'];
+            $rules['problem_sharing_targets.*'] = ['nullable', 'string', 'max:255'];
+            $rules['problem_sharing_other'] = ['nullable', 'string', 'max:255'];
 
             // Needs Assessment
             $rules['easy_discussion_target'] = ['nullable', 'string', 'in:guidance counselor,parents,teachers,brothers/sisters,friends/relatives,nobody,others'];
+            $rules['easy_discussion_other'] = ['nullable', 'string', 'max:255'];
+            $rules['improvement_needs'] = ['nullable', 'array'];
+            $rules['improvement_needs.*'] = ['nullable', 'string', 'max:255'];
+            $rules['improvement_needs_other'] = ['nullable', 'string', 'max:255'];
+            $rules['financial_assistance_needs'] = ['nullable', 'array'];
+            $rules['financial_assistance_needs.*'] = ['nullable', 'string', 'max:255'];
+            $rules['financial_assistance_needs_other'] = ['nullable', 'string', 'max:255'];
+            $rules['personal_social_needs'] = ['nullable', 'array'];
+            $rules['personal_social_needs.*'] = ['nullable', 'string', 'max:255'];
+            $rules['personal_social_needs_other'] = ['nullable', 'string', 'max:255'];
+            $rules['stress_responses'] = ['nullable', 'array'];
+            $rules['stress_responses.*'] = ['nullable', 'string', 'max:255'];
+            $rules['stress_responses_other'] = ['nullable', 'string', 'max:255'];
 
         } elseif ($request->role === 'counselor') {
             $rules['position'] = ['required', 'string', 'max:100'];
@@ -150,9 +293,49 @@ class RegisteredUserController extends Controller
         }
 
         // Validate with custom error message
-        $request->validate($rules, [
+        $validator = Validator::make($request->all(), $rules, [
             'email.regex' => 'You must use your MSU-IIT email (@g.msuiit.edu.ph).',
         ]);
+        $validator->after(function ($validator) use ($request) {
+            $requireOther = function (string $field, string $otherValue, string $otherField, string $label) use ($validator, $request) {
+                $values = $request->input($field, []);
+                if (in_array($otherValue, is_array($values) ? $values : [], true)) {
+                    $otherText = trim((string) $request->input($otherField, ''));
+                    if ($otherText === '') {
+                        $validator->errors()->add($otherField, "Please specify {$label}.");
+                    }
+                }
+            };
+
+            $requireOther('msu_choice_reasons', 'Others', 'msu_choice_other', 'MSU choice reason');
+            $requireOther('technology_gadgets', 'Other', 'technology_gadgets_other', 'other technology gadget');
+            $requireOther('internet_connectivity', 'Others', 'internet_connectivity_other', 'internet connectivity');
+            $requireOther('problem_sharing_targets', 'Others', 'problem_sharing_other', 'problem sharing target');
+            $requireOther('improvement_needs', 'Others', 'improvement_needs_other', 'improvement need');
+            $requireOther('financial_assistance_needs', 'Others', 'financial_assistance_needs_other', 'financial assistance need');
+            $requireOther('personal_social_needs', 'Others', 'personal_social_needs_other', 'personal-social need');
+            $requireOther('stress_responses', 'Others', 'stress_responses_other', 'stress response');
+
+            if ($request->input('course_choice_by') === 'others') {
+                $courseChoiceOther = trim((string) $request->input('course_choice_other', ''));
+                if ($courseChoiceOther === '') {
+                    $validator->errors()->add('course_choice_other', 'Please specify the course choice.');
+                }
+            }
+            if ($request->input('civil_status') === 'others') {
+                $civilStatusOther = trim((string) $request->input('civil_status_other', ''));
+                if ($civilStatusOther === '') {
+                    $validator->errors()->add('civil_status_other', 'Please specify civil status.');
+                }
+            }
+            if ($request->input('easy_discussion_target') === 'others') {
+                $easyDiscussionOther = trim((string) $request->input('easy_discussion_other', ''));
+                if ($easyDiscussionOther === '') {
+                    $validator->errors()->add('easy_discussion_other', 'Please specify who you can discuss problems with.');
+                }
+            }
+        });
+        $validator->validate();
 
         // Use transaction to ensure data consistency
         DB::beginTransaction();
@@ -164,6 +347,79 @@ class RegisteredUserController extends Controller
                 $age = Carbon::parse($request->birthdate)->age;
             }
 
+            $profilePicturePath = null;
+            if ($request->hasFile('profile_picture')) {
+                $profilePicturePath = $request->file('profile_picture')
+                    ->store('profile_pictures', 'public');
+            }
+
+            $appendOtherOption = function ($values, string $otherValue, ?string $otherText) {
+                $values = is_array($values) ? array_values($values) : [];
+                if (!in_array($otherValue, $values, true)) {
+                    return $values ?: null;
+                }
+
+                $values = array_values(array_filter($values, fn($value) => $value !== $otherValue));
+                $cleanOtherText = $otherText ? trim(strip_tags($otherText)) : '';
+                if ($cleanOtherText !== '') {
+                    $values[] = $cleanOtherText;
+                } else {
+                    $values[] = $otherValue;
+                }
+
+                return $values ?: null;
+            };
+
+            $msuChoiceReasons = $appendOtherOption(
+                $request->msu_choice_reasons,
+                'Others',
+                $request->msu_choice_other
+            );
+            $technologyGadgets = $appendOtherOption(
+                $request->technology_gadgets,
+                'Other',
+                $request->technology_gadgets_other
+            );
+            $internetConnectivity = $appendOtherOption(
+                $request->internet_connectivity,
+                'Others',
+                $request->internet_connectivity_other
+            );
+            $problemSharingTargets = $appendOtherOption(
+                $request->problem_sharing_targets,
+                'Others',
+                $request->problem_sharing_other
+            );
+            $improvementNeeds = $appendOtherOption(
+                $request->improvement_needs,
+                'Others',
+                $request->improvement_needs_other
+            );
+            $financialAssistanceNeeds = $appendOtherOption(
+                $request->financial_assistance_needs,
+                'Others',
+                $request->financial_assistance_needs_other
+            );
+            $personalSocialNeeds = $appendOtherOption(
+                $request->personal_social_needs,
+                'Others',
+                $request->personal_social_needs_other
+            );
+            $stressResponses = $appendOtherOption(
+                $request->stress_responses,
+                'Others',
+                $request->stress_responses_other
+            );
+            $courseChoiceBy = $request->course_choice_by === 'others'
+                ? trim(strip_tags((string) $request->course_choice_other))
+                : $request->course_choice_by;
+            $civilStatus = $request->civil_status === 'others'
+                ? trim(strip_tags((string) $request->civil_status_other))
+                : $request->civil_status;
+            $easyDiscussionTarget = $request->easy_discussion_target === 'others'
+                ? trim(strip_tags((string) $request->easy_discussion_other))
+                : $request->easy_discussion_target;
+
             // Step 1: Create User
             $user = User::create([
                 'first_name' => strip_tags($request->first_name),
@@ -174,7 +430,7 @@ class RegisteredUserController extends Controller
                 'sex' => $request->sex,
                 'birthplace' => $request->birthplace ? strip_tags($request->birthplace) : null,
                 'religion' => $request->religion ? strip_tags($request->religion) : null,
-                'civil_status' => $request->civil_status,
+                'civil_status' => $civilStatus ?: null,
                 'number_of_children' => $request->number_of_children ?? 0,
                 'citizenship' => $request->citizenship ? strip_tags($request->citizenship) : null,
                 'address' => $request->address ? strip_tags($request->address) : null,
@@ -187,6 +443,13 @@ class RegisteredUserController extends Controller
             // Step 2: Create role-specific record
             switch ($request->role) {
                 case 'student':
+                    $initialInterviewCompleted = null;
+                    if ($request->year_level === '1st Year') {
+                        $initialInterviewCompleted = false;
+                    } elseif ($request->year_level === '2nd Year') {
+                        $initialInterviewCompleted = $request->initial_interview_completed === 'yes';
+                    }
+
                     // Create main student record
                     $student = Student::create([
                         'user_id' => $user->id,
@@ -196,7 +459,9 @@ class RegisteredUserController extends Controller
                         'college_id' => $request->college_id,
                         'msu_sase_score' => $request->msu_sase_score,
                         'academic_year' => $request->academic_year,
+                        'profile_picture' => $profilePicturePath,
                         'student_status' => $request->student_status,
+                        'initial_interview_completed' => $initialInterviewCompleted,
                     ]);
 
                     // Create Personal Data
@@ -210,7 +475,7 @@ class RegisteredUserController extends Controller
 'leisure_activities' => $request->leisure_activities ? json_encode(array_map('trim', explode(',', $request->leisure_activities))) : null,
 'serious_medical_condition' => $request->serious_medical_condition ? strip_tags($request->serious_medical_condition) : null,
                         'physical_disability' => $request->physical_disability ? strip_tags($request->physical_disability) : null,
-                        'gender_identity' => $request->gender_identity,
+                        'sex_identity' => $request->sex_identity,
                         'romantic_attraction' => $request->romantic_attraction,
                     ]);
 
@@ -255,10 +520,10 @@ class RegisteredUserController extends Controller
     'career_option_1' => $request->career_option_1 ? strip_tags($request->career_option_1) : null,
                         'career_option_2' => $request->career_option_2 ? strip_tags($request->career_option_2) : null,
                         'career_option_3' => $request->career_option_3 ? strip_tags($request->career_option_3) : null,
-                        'course_choice_by' => $request->course_choice_by,
+                        'course_choice_by' => $courseChoiceBy ?: null,
                         'course_choice_reason' => $request->course_choice_reason ? strip_tags($request->course_choice_reason) : null,
-                        'msu_choice_reasons' => $request->msu_choice_reasons
-    ? json_encode($request->msu_choice_reasons)
+                        'msu_choice_reasons' => $msuChoiceReasons
+    ? json_encode($msuChoiceReasons)
     : null,
 
                         'future_career_plans' => $request->future_career_plans ? strip_tags($request->future_career_plans) : null,
@@ -268,12 +533,12 @@ class RegisteredUserController extends Controller
                     StudentLearningResources::create([
                         'student_id' => $student->id,
                         'internet_access' => $request->internet_access,
-                      'technology_gadgets' => $request->technology_gadgets
-    ? json_encode($request->technology_gadgets)
+                      'technology_gadgets' => $technologyGadgets
+    ? json_encode($technologyGadgets)
     : null,
 
-'internet_connectivity' => $request->internet_connectivity
-    ? json_encode($request->internet_connectivity)
+'internet_connectivity' => $internetConnectivity
+    ? json_encode($internetConnectivity)
     : null,
 'distance_learning_readiness' => $request->distance_learning_readiness,
                         'learning_space_description' => $request->learning_space_description ? strip_tags($request->learning_space_description) : null,
@@ -289,7 +554,7 @@ class RegisteredUserController extends Controller
                             'mental_health_perception' => $request->mental_health_perception ? strip_tags($request->mental_health_perception) : null,
                         'had_counseling_before' => $request->had_counseling_before ?? false,
                         'sought_psychologist_help' => $request->sought_psychologist_help ?? false,
-                       'problem_sharing_targets' => $request->problem_sharing_targets ? json_encode($request->problem_sharing_targets) : null,
+                       'problem_sharing_targets' => $problemSharingTargets ? json_encode($problemSharingTargets) : null,
                        'needs_immediate_counseling' => $request->needs_immediate_counseling ?? false,
                         'future_counseling_concerns' => $request->future_counseling_concerns ? strip_tags($request->future_counseling_concerns) : null,
                     ]);
@@ -297,11 +562,11 @@ class RegisteredUserController extends Controller
                     // Create Needs Assessment
                     StudentNeedsAssessment::create([
                         'student_id' => $student->id,
-                        'improvement_needs' => $request->improvement_needs ? json_encode($request->improvement_needs) : null,
-                        'financial_assistance_needs' => $request->financial_assistance_needs ? json_encode($request->financial_assistance_needs) : null,
-                        'personal_social_needs' => $request->personal_social_needs ? json_encode($request->personal_social_needs) : null,
-                        'stress_responses' => $request->stress_responses ? json_encode($request->stress_responses) : null,
-                        'easy_discussion_target' => $request->easy_discussion_target,
+                        'improvement_needs' => $improvementNeeds ? json_encode($improvementNeeds) : null,
+                        'financial_assistance_needs' => $financialAssistanceNeeds ? json_encode($financialAssistanceNeeds) : null,
+                        'personal_social_needs' => $personalSocialNeeds ? json_encode($personalSocialNeeds) : null,
+                        'stress_responses' => $stressResponses ? json_encode($stressResponses) : null,
+                        'easy_discussion_target' => $easyDiscussionTarget ?: null,
                         'counseling_perceptions' => $request->counseling_perceptions ? json_encode($request->counseling_perceptions) : null,
                     ]);
                     break;
@@ -328,6 +593,8 @@ class RegisteredUserController extends Controller
 
             event(new Registered($user));
             Auth::login($user);
+
+            $request->session()->forget('registration_email_verified');
 
             // Redirect based on role
             return redirect()->intended(

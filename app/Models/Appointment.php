@@ -19,24 +19,45 @@ class Appointment extends Model
         'appointment_date',
         'start_time',
         'end_time',
+        'booking_type',
         'concern',
         'status',
         'notes',
         'session_note_id',
         'referred_to_counselor_id',
         'referral_reason',
+        'referral_previous_status',
+        'referral_requested_at',
         'original_counselor_id',
-          'google_calendar_event_id'
+        'google_calendar_event_id',
+        'proposed_date',
+        'proposed_start_time',
+        'proposed_end_time',
+        'reschedule_reason',
+        'reschedule_requested_at',
     ];
 
     protected $casts = [
         'appointment_date' => 'date',
+        'proposed_date' => 'date',
+        'reschedule_requested_at' => 'datetime',
+        'referral_requested_at' => 'datetime',
     ];
 
     // Add this method to get all valid statuses
     public static function getStatuses()
     {
-        return ['pending', 'approved', 'rejected', 'cancelled', 'completed', 'referred'];
+        return [
+            'pending',
+            'approved',
+            'rejected',
+            'cancelled',
+            'completed',
+            'referred',
+            'rescheduled',
+            'reschedule_requested',
+            'reschedule_rejected'
+        ];
     }
 
     // Relationship to session notes (an appointment can have multiple session notes)
@@ -130,6 +151,12 @@ class Appointment extends Model
     // Helper method to get status with referral context based on counselor perspective
     public function getStatusWithReferralContext($counselorId): string
     {
+        $statusLabels = [
+            'reschedule_requested' => 'Reschedule Requested (Pending Student Approval)',
+            'reschedule_rejected' => 'Rejected by Student',
+            'rescheduled' => 'Scheduled (Rescheduled)',
+        ];
+
         if ($this->status === 'referred') {
             if ($this->original_counselor_id == $counselorId) {
                 // This is the referring counselor
@@ -139,7 +166,7 @@ class Appointment extends Model
                 return $this->getReferralDisplayForReceivingCounselor();
             }
         }
-        return ucfirst($this->status);
+        return $statusLabels[$this->status] ?? ucfirst($this->status);
     }
 
 

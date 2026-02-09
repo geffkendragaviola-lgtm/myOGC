@@ -6,12 +6,14 @@ use App\Models\Appointment;
 use App\Models\SessionNote;
 use App\Models\Student;
 use App\Models\Counselor;
+use App\Models\CounselorScheduleOverride;
 use App\Models\College;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use App\Services\GoogleCalendarService;
 
 class SessionNoteController extends Controller
 {
@@ -28,6 +30,71 @@ class SessionNoteController extends Controller
         return College::whereHas('counselors', function($query) {
             $query->where('user_id', Auth::id());
         })->get();
+    }
+
+    private function getBookingStatuses(): array
+    {
+        return ['pending', 'approved', 'completed', 'referred'];
+    }
+
+    private function getCounselorBookingsForDate(int $counselorId, Carbon $date, ?int $excludeAppointmentId = null): int
+    {
+        $query = Appointment::where('counselor_id', $counselorId)
+            ->where('appointment_date', $date->toDateString())
+            ->whereIn('status', $this->getBookingStatuses());
+
+        if ($excludeAppointmentId) {
+            $query->where('id', '!=', $excludeAppointmentId);
+        }
+
+        return $query->count();
+    }
+
+    private function isSlotWithinAvailability(Counselor $counselor, Carbon $date, string $startTime, string $endTime): bool
+    {
+        $dayAvailability = $this->getAvailabilityForDate($counselor, $date);
+
+        foreach ($dayAvailability as $timeRange) {
+            [$start, $end] = explode('-', $timeRange);
+            if ($startTime >= $start && $endTime <= $end) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private function getDailyBookingLimit(Counselor $counselor): int
+    {
+        return $counselor->getDailyBookingLimit();
+    }
+
+    private function getAvailabilityForDate(Counselor $counselor, Carbon $date): array
+    {
+        $override = CounselorScheduleOverride::where('counselor_id', $counselor->id)
+            ->whereDate('date', $date->toDateString())
+            ->first();
+
+        if ($override && $override->is_closed) {
+            return [];
+        }
+
+        if ($override && !empty($override->time_slots)) {
+            return $override->time_slots;
+        }
+
+        $availability = $counselor->getAvailability();
+        $dayName = strtolower($date->englishDayOfWeek);
+
+        return $availability[$dayName] ?? [];
+    }
+
+    private function isDateClosed(Counselor $counselor, Carbon $date): bool
+    {
+        return CounselorScheduleOverride::where('counselor_id', $counselor->id)
+            ->whereDate('date', $date->toDateString())
+            ->where('is_closed', true)
+            ->exists();
     }
 
     /**
@@ -240,14 +307,37 @@ public function create(Student $student, Request $request)
      */
     private function createFollowupAppointment($request, $student, $counselorId, $sessionNote)
     {
+        $date = Carbon::parse($request->followup_appointment_date);
         $startTime = Carbon::parse($request->followup_start_time);
         $endTime = $startTime->copy()->addHour();
+        $endTimeFormatted = $endTime->format('H:i');
+        $counselor = Counselor::find($counselorId);
+
+        if (!$counselor) {
+            session()->flash('warning', 'Session notes saved, but follow-up could not be scheduled (counselor not found).');
+            return null;
+        }
+
+        if ($this->isDateClosed($counselor, $date)) {
+            session()->flash('warning', 'Session notes saved, but the counselor is not available on that date.');
+            return null;
+        }
+
+        if ($this->getCounselorBookingsForDate($counselorId, $date) >= $this->getDailyBookingLimit($counselor)) {
+            session()->flash('warning', 'Session notes saved, but the counselor daily booking limit has been reached.');
+            return null;
+        }
+
+        if (!$this->isSlotWithinAvailability($counselor, $date, $request->followup_start_time, $endTimeFormatted)) {
+            session()->flash('warning', 'Session notes saved, but the follow-up time is outside counselor availability.');
+            return null;
+        }
 
         // Check if slot is still available
         $existingAppointment = Appointment::where('counselor_id', $counselorId)
             ->where('appointment_date', $request->followup_appointment_date)
             ->where('start_time', $request->followup_start_time)
-            ->whereIn('status', ['pending', 'approved'])
+            ->whereIn('status', $this->getBookingStatuses())
             ->exists();
 
         if ($existingAppointment) {
@@ -256,18 +346,77 @@ public function create(Student $student, Request $request)
             return null;
         }
 
-        $appointment = Appointment::create([
-            'student_id' => $student->id,
-            'counselor_id' => $counselorId,
-            'appointment_date' => $request->followup_appointment_date,
-            'start_time' => $request->followup_start_time,
-            'end_time' => $endTime->format('H:i'),
-            'concern' => $request->followup_concern,
-            'status' => $request->has('auto_approve_followup') ? 'approved' : 'pending',
-            'notes' => "Follow-up appointment created from session notes #{$sessionNote->id}",
-            // Important: Do NOT link this back to the session note to avoid circular reference
-            'session_note_id' => null
-        ]);
+        if (!$counselor->google_calendar_id) {
+            session()->flash('warning', 'Session notes saved, but counselor calendar is not configured.');
+            return null;
+        }
+
+        $calendarService = new GoogleCalendarService();
+        $timezone = config('app.timezone') ?: 'Asia/Manila';
+        $slotStartDateTime = Carbon::createFromFormat('Y-m-d H:i', $date->toDateString() . ' ' . $request->followup_start_time, $timezone);
+        $slotEndDateTime = Carbon::createFromFormat('Y-m-d H:i', $date->toDateString() . ' ' . $endTimeFormatted, $timezone);
+
+        try {
+            if (!$calendarService->isSlotAvailable($counselor->google_calendar_id, $slotStartDateTime, $slotEndDateTime)) {
+                session()->flash('warning', 'Session notes saved, but the follow-up slot is no longer available.');
+                return null;
+            }
+        } catch (\Throwable $exception) {
+            Log::error('Failed to check follow-up Google Calendar availability', [
+                'counselor_id' => $counselorId,
+                'calendar_id' => $counselor->google_calendar_id,
+                'error' => $exception->getMessage(),
+            ]);
+            session()->flash('warning', 'Session notes saved, but calendar availability could not be verified.');
+            return null;
+        }
+
+        $event = null;
+        try {
+            DB::beginTransaction();
+
+            $appointment = Appointment::create([
+                'student_id' => $student->id,
+                'counselor_id' => $counselorId,
+                'appointment_date' => $request->followup_appointment_date,
+                'start_time' => $request->followup_start_time,
+                'end_time' => $endTimeFormatted,
+                'concern' => $request->followup_concern,
+                'status' => $request->has('auto_approve_followup') ? 'approved' : 'pending',
+                'notes' => "Follow-up appointment created from session notes #{$sessionNote->id}",
+                // Important: Do NOT link this back to the session note to avoid circular reference
+                'session_note_id' => null
+            ]);
+
+            $eventData = [
+                'name' => 'Counseling Follow-up - ' . $student->user->first_name . ' ' . $student->user->last_name,
+                'description' => "Student ID: {$student->student_id}\nConcern: {$request->followup_concern}\nSession Note: {$sessionNote->id}",
+                'startDateTime' => $slotStartDateTime,
+                'endDateTime' => $slotEndDateTime,
+            ];
+
+            $event = $calendarService->createAppointmentEvent($eventData, $counselor->google_calendar_id);
+
+            $appointment->update([
+                'google_calendar_event_id' => $event->id
+            ]);
+
+            DB::commit();
+        } catch (\Throwable $exception) {
+            if (DB::transactionLevel() > 0) {
+                DB::rollBack();
+            }
+            if ($event) {
+                $calendarService->deleteEvent($event->id, $counselor->google_calendar_id);
+            }
+            Log::error('Failed to create follow-up appointment with Google Calendar event', [
+                'counselor_id' => $counselorId,
+                'student_id' => $student->id,
+                'error' => $exception->getMessage(),
+            ]);
+            session()->flash('warning', 'Session notes saved, but follow-up appointment could not be scheduled.');
+            return null;
+        }
 
         // Update the session note to indicate it has a follow-up
         $sessionNote->update([
@@ -380,19 +529,44 @@ if ($request->has('requires_follow_up') && $hasFollowUpData) {
     {
         $counselorId = $sessionNote->counselor_id;
         $student = $sessionNote->student;
+        $date = Carbon::parse($request->followup_appointment_date);
 
         $startTime = Carbon::parse($request->followup_start_time);
         $endTime = $startTime->copy()->addHour();
+        $endTimeFormatted = $endTime->format('H:i');
+        $appointment = $sessionNote->appointment;
+        $excludeAppointmentId = $appointment?->id;
+        $counselor = Counselor::find($counselorId);
+
+        if (!$counselor) {
+            session()->flash('warning', 'Session notes updated, but follow-up could not be scheduled (counselor not found).');
+            return;
+        }
+
+        if ($this->isDateClosed($counselor, $date)) {
+            session()->flash('warning', 'Session notes updated, but the counselor is not available on that date.');
+            return;
+        }
+
+        if ($this->getCounselorBookingsForDate($counselorId, $date, $excludeAppointmentId) >= $this->getDailyBookingLimit($counselor)) {
+            session()->flash('warning', 'Session notes updated, but the counselor daily booking limit has been reached.');
+            return;
+        }
+
+        if (!$this->isSlotWithinAvailability($counselor, $date, $request->followup_start_time, $endTimeFormatted)) {
+            session()->flash('warning', 'Session notes updated, but the follow-up time is outside counselor availability.');
+            return;
+        }
 
         // Check if slot is still available (excluding the current follow-up appointment if it exists)
         $existingAppointmentQuery = Appointment::where('counselor_id', $counselorId)
             ->where('appointment_date', $request->followup_appointment_date)
             ->where('start_time', $request->followup_start_time)
-            ->whereIn('status', ['pending', 'approved']);
+            ->whereIn('status', $this->getBookingStatuses());
 
         // Exclude the current follow-up appointment if it exists
-        if ($sessionNote->appointment) {
-            $existingAppointmentQuery->where('id', '!=', $sessionNote->appointment->id);
+        if ($excludeAppointmentId) {
+            $existingAppointmentQuery->where('id', '!=', $excludeAppointmentId);
         }
 
         $existingAppointment = $existingAppointmentQuery->exists();
@@ -402,34 +576,99 @@ if ($request->has('requires_follow_up') && $hasFollowUpData) {
             return;
         }
 
-        // Update existing appointment or create new one
-        if ($sessionNote->appointment) {
-            // Update existing follow-up appointment
-            $sessionNote->appointment->update([
-                'appointment_date' => $request->followup_appointment_date,
-                'start_time' => $request->followup_start_time,
-                'end_time' => $endTime->format('H:i'),
-                'concern' => $request->followup_concern,
-                'status' => $request->has('auto_approve_followup') ? 'approved' : 'pending',
-                'notes' => "Follow-up appointment updated from session notes #{$sessionNote->id}"
-            ]);
-        } else {
-            // Create new follow-up appointment
-            $appointment = Appointment::create([
-                'student_id' => $student->id,
-                'counselor_id' => $counselorId,
-                'appointment_date' => $request->followup_appointment_date,
-                'start_time' => $request->followup_start_time,
-                'end_time' => $endTime->format('H:i'),
-                'concern' => $request->followup_concern,
-                'status' => $request->has('auto_approve_followup') ? 'approved' : 'pending',
-                'notes' => "Follow-up appointment created from session notes #{$sessionNote->id}"
-            ]);
+        if (!$counselor->google_calendar_id) {
+            session()->flash('warning', 'Session notes updated, but counselor calendar is not configured.');
+            return;
+        }
 
-            // Link the appointment to the session note
-            $sessionNote->update([
-                'appointment_id' => $appointment->id
+        $calendarService = new GoogleCalendarService();
+        $timezone = config('app.timezone') ?: 'Asia/Manila';
+        $slotStartDateTime = Carbon::createFromFormat('Y-m-d H:i', $date->toDateString() . ' ' . $request->followup_start_time, $timezone);
+        $slotEndDateTime = Carbon::createFromFormat('Y-m-d H:i', $date->toDateString() . ' ' . $endTimeFormatted, $timezone);
+
+        try {
+            if (!$calendarService->isSlotAvailable(
+                $counselor->google_calendar_id,
+                $slotStartDateTime,
+                $slotEndDateTime,
+                $appointment?->google_calendar_event_id
+            )) {
+                session()->flash('warning', 'Session notes updated, but the follow-up slot is no longer available.');
+                return;
+            }
+        } catch (\Throwable $exception) {
+            Log::error('Failed to check follow-up Google Calendar availability', [
+                'counselor_id' => $counselorId,
+                'calendar_id' => $counselor->google_calendar_id,
+                'error' => $exception->getMessage(),
             ]);
+            session()->flash('warning', 'Session notes updated, but calendar availability could not be verified.');
+            return;
+        }
+
+        $event = null;
+        $oldEventId = $appointment?->google_calendar_event_id;
+
+        try {
+            $eventData = [
+                'name' => 'Counseling Follow-up - ' . $student->user->first_name . ' ' . $student->user->last_name,
+                'description' => "Student ID: {$student->student_id}\nConcern: {$request->followup_concern}\nSession Note: {$sessionNote->id}",
+                'startDateTime' => $slotStartDateTime,
+                'endDateTime' => $slotEndDateTime,
+            ];
+
+            $event = $calendarService->createAppointmentEvent($eventData, $counselor->google_calendar_id);
+
+            DB::beginTransaction();
+
+            // Update existing appointment or create new one
+            if ($appointment) {
+                $appointment->update([
+                    'appointment_date' => $request->followup_appointment_date,
+                    'start_time' => $request->followup_start_time,
+                    'end_time' => $endTimeFormatted,
+                    'concern' => $request->followup_concern,
+                    'status' => $request->has('auto_approve_followup') ? 'approved' : 'pending',
+                    'notes' => "Follow-up appointment updated from session notes #{$sessionNote->id}",
+                    'google_calendar_event_id' => $event->id,
+                ]);
+            } else {
+                $appointment = Appointment::create([
+                    'student_id' => $student->id,
+                    'counselor_id' => $counselorId,
+                    'appointment_date' => $request->followup_appointment_date,
+                    'start_time' => $request->followup_start_time,
+                    'end_time' => $endTimeFormatted,
+                    'concern' => $request->followup_concern,
+                    'status' => $request->has('auto_approve_followup') ? 'approved' : 'pending',
+                    'notes' => "Follow-up appointment created from session notes #{$sessionNote->id}",
+                    'google_calendar_event_id' => $event->id,
+                ]);
+
+                // Link the appointment to the session note
+                $sessionNote->update([
+                    'appointment_id' => $appointment->id
+                ]);
+            }
+
+            DB::commit();
+
+            if ($oldEventId && $oldEventId !== $event->id) {
+                $calendarService->deleteEvent($oldEventId, $counselor->google_calendar_id);
+            }
+        } catch (\Throwable $exception) {
+            if (DB::transactionLevel() > 0) {
+                DB::rollBack();
+            }
+            if ($event) {
+                $calendarService->deleteEvent($event->id, $counselor->google_calendar_id);
+            }
+            Log::error('Failed to update follow-up appointment with Google Calendar event', [
+                'counselor_id' => $counselorId,
+                'student_id' => $student->id,
+                'error' => $exception->getMessage(),
+            ]);
+            session()->flash('warning', 'Session notes updated, but follow-up appointment could not be scheduled.');
         }
     }
 

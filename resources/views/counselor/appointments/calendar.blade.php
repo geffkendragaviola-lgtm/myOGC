@@ -7,6 +7,13 @@
 <body class="bg-gray-50">
 
     <div class="container mx-auto px-6 py-8">
+        @php
+            $googleCalendarId = $googleCalendarId
+                ?? ($counselor->google_calendar_id ?? optional(Auth::user()->counselor)->google_calendar_id);
+            $googleCalendarUrl = $googleCalendarId
+                ? 'https://calendar.google.com/calendar/u/0/r?cid=' . urlencode($googleCalendarId)
+                : null;
+        @endphp
         <div class="flex justify-between items-center mb-6">
             <h1 class="text-2xl font-bold text-gray-800">Appointment Calendar</h1>
             <div class="flex space-x-4">
@@ -18,6 +25,19 @@
                    class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">
                     <i class="fas fa-list mr-2"></i>View All Appointments
                 </a>
+                @if($googleCalendarUrl)
+                    <a href="{{ $googleCalendarUrl }}"
+                       target="_blank"
+                       rel="noopener"
+                       class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition">
+                        <i class="fab fa-google mr-2"></i>Open Google Calendar
+                    </a>
+                @else
+                    <a href="{{ route('profile.edit') }}"
+                       class="px-4 py-2 border border-yellow-300 text-yellow-700 rounded-lg hover:bg-yellow-50 transition">
+                        <i class="fas fa-link mr-2"></i>Add Calendar ID
+                    </a>
+                @endif
             </div>
         </div>
 
@@ -94,14 +114,42 @@
 
         <!-- Time Slots Grid - Only show on weekdays -->
         @if(!$date->isWeekend())
+        @php
+            $busyIntervals = $busyIntervals ?? [];
+            $googleCalendarEvents = $googleCalendarEvents ?? $busyIntervals;
+            $morningSlots = ['08:00', '09:00', '10:00', '11:00'];
+            $afternoonSlots = ['13:00', '14:00', '15:00', '16:00'];
+            $allSlots = array_merge($morningSlots, $afternoonSlots);
+
+            $isSlotBusy = function (\Carbon\Carbon $slotStart, \Carbon\Carbon $slotEnd) use ($busyIntervals) {
+                foreach ($busyIntervals as $interval) {
+                    if (!isset($interval['start'], $interval['end'])) {
+                        continue;
+                    }
+                    if ($slotStart < $interval['end'] && $slotEnd > $interval['start']) {
+                        return true;
+                    }
+                }
+                return false;
+            };
+
+            $findEventForSlot = function (\Carbon\Carbon $slotStart, \Carbon\Carbon $slotEnd) use ($googleCalendarEvents) {
+                foreach ($googleCalendarEvents as $event) {
+                    if (!isset($event['start'], $event['end'])) {
+                        continue;
+                    }
+                    if ($slotStart < $event['end'] && $slotEnd > $event['start']) {
+                        return $event;
+                    }
+                }
+                return null;
+            };
+        @endphp
         <div class="bg-white rounded-xl shadow-md overflow-hidden">
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 p-6">
                 <!-- Morning Session (8AM - 12PM) -->
                 <div class="space-y-3">
                     <h3 class="font-semibold text-gray-800 border-b pb-2">Morning (8AM - 12PM)</h3>
-                    @php
-                        $morningSlots = ['08:00', '09:00', '10:00', '11:00'];
-                    @endphp
 
                     @foreach($morningSlots as $slot)
                         @php
@@ -109,6 +157,10 @@
                             $appointment = $appointments->first(function($appt) use ($slot) {
                                 return isset($appt->formatted_start_time) && $appt->formatted_start_time === $slot;
                             });
+                            $slotStart = $date->copy()->setTimeFromTimeString($slot);
+                            $slotEnd = $slotStart->copy()->addHour();
+                            $event = $findEventForSlot($slotStart, $slotEnd);
+                            $isBusy = !$appointment && $event;
                         @endphp
 
                         <div class="p-3 border rounded-lg
@@ -119,6 +171,8 @@
                                 @elseif($appointment->status === 'rejected') bg-red-50 border-red-200
                                 @elseif($appointment->status === 'cancelled') bg-gray-50 border-gray-200
                                 @else bg-gray-50 border-gray-200 @endif
+                            @elseif($isBusy)
+                                bg-purple-50 border-purple-200
                             @else
                                 bg-gray-50 border-gray-200
                             @endif">
@@ -135,6 +189,8 @@
                                         @else bg-gray-100 text-gray-800 @endif">
                                         {{ ucfirst($appointment->status) }}
                                     </span>
+                                @elseif($isBusy)
+                                    <span class="text-xs text-purple-700">Google Calendar</span>
                                 @else
                                     <span class="text-xs text-gray-500">Available</span>
                                 @endif
@@ -185,7 +241,19 @@
                                 </div>
                             @else
                                 <!-- Show available slot -->
-                                <p class="text-sm text-gray-500">No appointment</p>
+                                @if($isBusy)
+                                    <div class="text-sm text-purple-700">
+                                        <p class="font-semibold">{{ $event['title'] ?? 'Busy' }}</p>
+                                        @if(!empty($event['location']))
+                                            <p class="text-xs text-purple-700">{{ $event['location'] }}</p>
+                                        @endif
+                                        @if(!empty($event['description']))
+                                            <p class="text-xs text-purple-700">{{ Str::limit($event['description'], 60) }}</p>
+                                        @endif
+                                    </div>
+                                @else
+                                    <p class="text-sm text-gray-500">No appointment</p>
+                                @endif
                             @endif
                         </div>
                     @endforeach
@@ -194,9 +262,6 @@
                 <!-- Afternoon Session (1PM - 5PM) -->
                 <div class="space-y-3">
                     <h3 class="font-semibold text-gray-800 border-b pb-2">Afternoon (1PM - 5PM)</h3>
-                    @php
-                        $afternoonSlots = ['13:00', '14:00', '15:00', '16:00'];
-                    @endphp
 
                     @foreach($afternoonSlots as $slot)
                         @php
@@ -204,6 +269,10 @@
                             $appointment = $appointments->first(function($appt) use ($slot) {
                                 return isset($appt->formatted_start_time) && $appt->formatted_start_time === $slot;
                             });
+                            $slotStart = $date->copy()->setTimeFromTimeString($slot);
+                            $slotEnd = $slotStart->copy()->addHour();
+                            $event = $findEventForSlot($slotStart, $slotEnd);
+                            $isBusy = !$appointment && $event;
                         @endphp
 
                         <div class="p-3 border rounded-lg
@@ -214,6 +283,8 @@
                                 @elseif($appointment->status === 'rejected') bg-red-50 border-red-200
                                 @elseif($appointment->status === 'cancelled') bg-gray-50 border-gray-200
                                 @else bg-gray-50 border-gray-200 @endif
+                            @elseif($isBusy)
+                                bg-purple-50 border-purple-200
                             @else
                                 bg-gray-50 border-gray-200
                             @endif">
@@ -230,6 +301,8 @@
                                         @else bg-gray-100 text-gray-800 @endif">
                                         {{ ucfirst($appointment->status) }}
                                     </span>
+                                @elseif($isBusy)
+                                    <span class="text-xs text-purple-700">Google Calendar</span>
                                 @else
                                     <span class="text-xs text-gray-500">Available</span>
                                 @endif
@@ -280,7 +353,19 @@
                                 </div>
                             @else
                                 <!-- Show available slot -->
-                                <p class="text-sm text-gray-500">No appointment</p>
+                                @if($isBusy)
+                                    <div class="text-sm text-purple-700">
+                                        <p class="font-semibold">{{ $event['title'] ?? 'Busy' }}</p>
+                                        @if(!empty($event['location']))
+                                            <p class="text-xs text-purple-700">{{ $event['location'] }}</p>
+                                        @endif
+                                        @if(!empty($event['description']))
+                                            <p class="text-xs text-purple-700">{{ Str::limit($event['description'], 60) }}</p>
+                                        @endif
+                                    </div>
+                                @else
+                                    <p class="text-sm text-gray-500">No appointment</p>
+                                @endif
                             @endif
                         </div>
                     @endforeach
@@ -311,6 +396,10 @@
                             <div class="w-4 h-4 bg-gray-100 border border-gray-300 rounded"></div>
                             <span class="text-sm text-gray-700">Available Slot</span>
                         </div>
+                        <div class="flex items-center space-x-2">
+                            <div class="w-4 h-4 bg-purple-100 border border-purple-300 rounded"></div>
+                            <span class="text-sm text-gray-700">Google Calendar Busy</span>
+                        </div>
                     </div>
 
                     <!-- Daily Summary -->
@@ -337,7 +426,21 @@
                                 <span class="text-gray-600">Available Slots:</span>
                                 @php
                                     $bookedSlots = $appointments->whereIn('status', ['pending', 'approved', 'completed'])->count();
-                                    $availableSlots = 8 - $bookedSlots;
+                                    $busySlots = 0;
+                                    foreach ($allSlots as $slot) {
+                                        $appointmentForSlot = $appointments->first(function($appt) use ($slot) {
+                                            return isset($appt->formatted_start_time) && $appt->formatted_start_time === $slot;
+                                        });
+                                        if ($appointmentForSlot) {
+                                            continue;
+                                        }
+                                        $slotStart = $date->copy()->setTimeFromTimeString($slot);
+                                        $slotEnd = $slotStart->copy()->addHour();
+                                        if ($isSlotBusy($slotStart, $slotEnd)) {
+                                            $busySlots++;
+                                        }
+                                    }
+                                    $availableSlots = count($allSlots) - $bookedSlots - $busySlots;
                                 @endphp
                                 <span class="font-semibold text-gray-600">{{ $availableSlots }}</span>
                             </div>
@@ -407,6 +510,12 @@
                                     <p class="mt-1 text-sm text-gray-900">${data.student.year_level}</p>
                                 </div>
                             </div>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700">Initial Interview Completed</label>
+                                <p class="mt-1 text-sm text-gray-900">${data.student.initial_interview_completed_label}</p>
+                            </div>
+                        </div>
 
                             <div class="grid grid-cols-2 gap-4">
                                 <div>
@@ -417,6 +526,10 @@
                                     <label class="block text-sm font-medium text-gray-700">Time</label>
                                     <p class="mt-1 text-sm text-gray-900">${data.formatted_time}</p>
                                 </div>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700">Type of Booking</label>
+                                <p class="mt-1 text-sm text-gray-900">${data.appointment.booking_type || 'N/A'}</p>
                             </div>
 
                             <div>

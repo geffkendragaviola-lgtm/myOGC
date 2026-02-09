@@ -65,7 +65,7 @@
             <div class="card shadow-sm mb-4">
                 <div class="card-body text-center">
                     @if($student->profile_picture)
-                        <img src="{{ asset('storage/' . $student->profile_picture) }}"
+                        <img src="{{ $student->profile_picture_url }}"
                              alt="Profile Picture"
                              class="rounded-circle mb-3"
                              style="width: 150px; height: 150px; object-fit: cover;">
@@ -116,6 +116,10 @@
                     <div class="mb-3">
                         <strong>Phone:</strong><br>
                         {{ $student->phone_number ?: 'Not provided' }}
+                    </div>
+                    <div class="mb-3">
+                        <strong>Address:</strong><br>
+                        {{ $student->user->address ?? 'Not provided' }}
                     </div>
                     <div>
                         <strong>College:</strong><br>
@@ -179,6 +183,110 @@
 
                         <!-- Personal Data Tab -->
                         <div class="tab-pane fade show active" id="personal" role="tabpanel">
+                            <div class="row mb-3">
+                                <div class="col-12">
+                                    <h6>Basic Information</h6>
+                                </div>
+                                <div class="col-md-6">
+                                    <table class="table table-sm">
+                                        <tr>
+                                            <th width="40%">First Name:</th>
+                                            <td>{{ $student->user->first_name ?? 'Not provided' }}</td>
+                                        </tr>
+                                        <tr>
+                                            <th>Middle Name:</th>
+                                            <td>{{ $student->user->middle_name ?: 'Not provided' }}</td>
+                                        </tr>
+                                        <tr>
+                                            <th>Last Name:</th>
+                                            <td>{{ $student->user->last_name ?? 'Not provided' }}</td>
+                                        </tr>
+                                        <tr>
+                                            <th>Birthdate:</th>
+                                            <td>{{ $student->user->birthdate ? \Carbon\Carbon::parse($student->user->birthdate)->format('M d, Y') : 'Not provided' }}</td>
+                                        </tr>
+                                        <tr>
+                                            <th>Age:</th>
+                                            <td>{{ $student->user->age ?? 'Not provided' }}</td>
+                                        </tr>
+                                        <tr>
+                                            <th>Sex:</th>
+                                            <td>{{ $student->user->sex ?: 'Not provided' }}</td>
+                                        </tr>
+                                    </table>
+                                </div>
+                                <div class="col-md-6">
+                                    <table class="table table-sm">
+                                        <tr>
+                                            <th width="40%">Birthplace:</th>
+                                            <td>{{ $student->user->birthplace ?: 'Not provided' }}</td>
+                                        </tr>
+                                        <tr>
+                                            <th>Religion:</th>
+                                            <td>{{ $student->user->religion ?: 'Not provided' }}</td>
+                                        </tr>
+                                        <tr>
+                                            <th>Civil Status:</th>
+                                            <td>{{ $student->user->civil_status ?: 'Not provided' }}</td>
+                                        </tr>
+                                        <tr>
+                                            <th>Number of Children:</th>
+                                            <td>{{ $student->user->number_of_children ?? 'Not provided' }}</td>
+                                        </tr>
+                                        <tr>
+                                            <th>Citizenship:</th>
+                                            <td>{{ $student->user->citizenship ?: 'Not provided' }}</td>
+                                        </tr>
+                                        <tr>
+                                            <th>Email:</th>
+                                            <td>{{ $student->email ?: 'Not provided' }}</td>
+                                        </tr>
+                                    </table>
+                                </div>
+                            </div>
+
+                            <div class="row mb-3">
+                                <div class="col-12">
+                                    <h6>Registration Details</h6>
+                                </div>
+                                <div class="col-md-6">
+                                    <table class="table table-sm">
+                                        <tr>
+                                            <th width="40%">Student ID:</th>
+                                            <td>{{ $student->student_id ?: 'Not provided' }}</td>
+                                        </tr>
+                                        <tr>
+                                            <th>Year Level:</th>
+                                            <td>{{ $student->year_level ?: 'Not provided' }}</td>
+                                        </tr>
+                                        <tr>
+                                            <th>Course:</th>
+                                            <td>{{ $student->course ?: 'Not provided' }}</td>
+                                        </tr>
+                                        <tr>
+                                            <th>College:</th>
+                                            <td>{{ $student->college->name ?? 'Not assigned' }}</td>
+                                        </tr>
+                                    </table>
+                                </div>
+                                <div class="col-md-6">
+                                    <table class="table table-sm">
+                                        <tr>
+                                            <th width="40%">MSU SASE Score:</th>
+                                            <td>{{ $student->msu_sase_score ?? 'Not provided' }}</td>
+                                        </tr>
+                                        <tr>
+                                            <th>Academic Year:</th>
+                                            <td>{{ $student->academic_year ?: 'Not provided' }}</td>
+                                        </tr>
+                                        <tr>
+                                            <th>Student Status:</th>
+                                            <td>{{ $student->student_status ?: 'Not provided' }}</td>
+                                        </tr>
+                                    </table>
+                                </div>
+                            </div>
+
                             @if($student->personalData)
                                 <div class="row">
                                     <div class="col-md-6">
@@ -204,8 +312,8 @@
                                     <div class="col-md-6">
                                         <table class="table table-sm">
                                             <tr>
-                                                <th width="40%">Gender Identity:</th>
-                                                <td>{{ $student->personalData->gender_identity ?: 'Not provided' }}</td>
+                                                <th width="40%">Sex Identity:</th>
+                                                <td>{{ $student->personalData->sex_identity ?: 'Not provided' }}</td>
                                             </tr>
                                             <tr>
                                                 <th>Romantic Attraction:</th>
@@ -224,30 +332,50 @@
                                 </div>
 
                                 <!-- Arrays Data -->
-<!-- Personal Data Tab - Fix arrays -->
-<div class="row mt-3">
-    @if($student->personalData && $student->personalData->talents_skills && is_array($student->personalData->talents_skills))
-    <div class="col-md-6">
-        <h6>Talents & Skills</h6>
-        <div class="d-flex flex-wrap gap-1">
-            @foreach($student->personalData->talents_skills as $skill)
-                <span class="badge bg-primary">{{ $skill }}</span>
-            @endforeach
-        </div>
-    </div>
-    @endif
+                                @php
+                                    $talentsSkills = $student->personalData ? $student->personalData->talents_skills : null;
+                                    if (is_string($talentsSkills)) {
+                                        $decoded = json_decode($talentsSkills, true);
+                                        $talentsSkills = is_array($decoded)
+                                            ? $decoded
+                                            : array_filter(array_map('trim', explode(',', $talentsSkills)));
+                                    }
 
-    @if($student->personalData && $student->personalData->leisure_activities && is_array($student->personalData->leisure_activities))
-    <div class="col-md-6">
-        <h6>Leisure Activities</h6>
-        <div class="d-flex flex-wrap gap-1">
-            @foreach($student->personalData->leisure_activities as $activity)
-                <span class="badge bg-success">{{ $activity }}</span>
-            @endforeach
-        </div>
-    </div>
-    @endif
-</div>
+                                    $leisureActivities = $student->personalData ? $student->personalData->leisure_activities : null;
+                                    if (is_string($leisureActivities)) {
+                                        $decoded = json_decode($leisureActivities, true);
+                                        $leisureActivities = is_array($decoded)
+                                            ? $decoded
+                                            : array_filter(array_map('trim', explode(',', $leisureActivities)));
+                                    }
+                                @endphp
+                                <div class="row mt-3">
+                                    <div class="col-md-6">
+                                        <h6>Talents & Skills</h6>
+                                        @if($talentsSkills && count($talentsSkills))
+                                            <div class="d-flex flex-wrap gap-1">
+                                                @foreach($talentsSkills as $skill)
+                                                    <span class="badge bg-primary">{{ $skill }}</span>
+                                                @endforeach
+                                            </div>
+                                        @else
+                                            <span class="text-muted">Not provided</span>
+                                        @endif
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <h6>Leisure Activities</h6>
+                                        @if($leisureActivities && count($leisureActivities))
+                                            <div class="d-flex flex-wrap gap-1">
+                                                @foreach($leisureActivities as $activity)
+                                                    <span class="badge bg-success">{{ $activity }}</span>
+                                                @endforeach
+                                            </div>
+                                        @else
+                                            <span class="text-muted">Not provided</span>
+                                        @endif
+                                    </div>
+                                </div>
                             @else
                                 <div class="text-center py-4">
                                     <i class="fas fa-user-slash fa-3x text-muted mb-3"></i>
@@ -477,54 +605,95 @@
                                     </div>
                                 </div>
 
-<!-- Academic Data Arrays -->
-<div class="row mt-3">
-    @if($student->academicData && $student->academicData->awards_honors && is_array($student->academicData->awards_honors))
-    <div class="col-md-4">
-        <h6>Awards & Honors</h6>
-        <div class="d-flex flex-wrap gap-1">
-            @foreach($student->academicData->awards_honors as $award)
-                <span class="badge bg-warning text-dark">{{ $award }}</span>
-            @endforeach
-        </div>
-    </div>
-    @endif
+                                <!-- Academic Data Arrays -->
+                                @php
+                                    $awardsHonors = $student->academicData ? $student->academicData->awards_honors : null;
+                                    if (is_string($awardsHonors)) {
+                                        $decoded = json_decode($awardsHonors, true);
+                                        $awardsHonors = is_array($decoded)
+                                            ? $decoded
+                                            : array_filter(array_map('trim', explode(',', $awardsHonors)));
+                                    }
 
-    @if($student->academicData && $student->academicData->student_organizations && is_array($student->academicData->student_organizations))
-    <div class="col-md-4">
-        <h6>Organizations</h6>
-        <div class="d-flex flex-wrap gap-1">
-            @foreach($student->academicData->student_organizations as $org)
-                <span class="badge bg-info">{{ $org }}</span>
-            @endforeach
-        </div>
-    </div>
-    @endif
+                                    $studentOrganizations = $student->academicData ? $student->academicData->student_organizations : null;
+                                    if (is_string($studentOrganizations)) {
+                                        $decoded = json_decode($studentOrganizations, true);
+                                        $studentOrganizations = is_array($decoded)
+                                            ? $decoded
+                                            : array_filter(array_map('trim', explode(',', $studentOrganizations)));
+                                    }
 
-    @if($student->academicData && $student->academicData->co_curricular_activities && is_array($student->academicData->co_curricular_activities))
-    <div class="col-md-4">
-        <h6>Co-curricular Activities</h6>
-        <div class="d-flex flex-wrap gap-1">
-            @foreach($student->academicData->co_curricular_activities as $activity)
-                <span class="badge bg-success">{{ $activity }}</span>
-            @endforeach
-        </div>
-    </div>
-    @endif
-</div>
+                                    $coCurricularActivities = $student->academicData ? $student->academicData->co_curricular_activities : null;
+                                    if (is_string($coCurricularActivities)) {
+                                        $decoded = json_decode($coCurricularActivities, true);
+                                        $coCurricularActivities = is_array($decoded)
+                                            ? $decoded
+                                            : array_filter(array_map('trim', explode(',', $coCurricularActivities)));
+                                    }
 
-@if($student->academicData && $student->academicData->msu_choice_reasons && is_array($student->academicData->msu_choice_reasons))
-<div class="row mt-3">
-    <div class="col-12">
-        <h6>MSU Choice Reasons</h6>
-        <div class="d-flex flex-wrap gap-1">
-            @foreach($student->academicData->msu_choice_reasons as $reason)
-                <span class="badge bg-primary">{{ $reason }}</span>
-            @endforeach
-        </div>
-    </div>
-</div>
-@endif
+                                    $msuChoiceReasons = $student->academicData ? $student->academicData->msu_choice_reasons : null;
+                                    if (is_string($msuChoiceReasons)) {
+                                        $decoded = json_decode($msuChoiceReasons, true);
+                                        $msuChoiceReasons = is_array($decoded)
+                                            ? $decoded
+                                            : array_filter(array_map('trim', explode(',', $msuChoiceReasons)));
+                                    }
+                                @endphp
+                                <div class="row mt-3">
+                                    <div class="col-md-4">
+                                        <h6>Awards & Honors</h6>
+                                        @if($awardsHonors && count($awardsHonors))
+                                            <div class="d-flex flex-wrap gap-1">
+                                                @foreach($awardsHonors as $award)
+                                                    <span class="badge bg-warning text-dark">{{ $award }}</span>
+                                                @endforeach
+                                            </div>
+                                        @else
+                                            <span class="text-muted">Not provided</span>
+                                        @endif
+                                    </div>
+
+                                    <div class="col-md-4">
+                                        <h6>Student Organizations</h6>
+                                        @if($studentOrganizations && count($studentOrganizations))
+                                            <div class="d-flex flex-wrap gap-1">
+                                                @foreach($studentOrganizations as $org)
+                                                    <span class="badge bg-info">{{ $org }}</span>
+                                                @endforeach
+                                            </div>
+                                        @else
+                                            <span class="text-muted">Not provided</span>
+                                        @endif
+                                    </div>
+
+                                    <div class="col-md-4">
+                                        <h6>Co-curricular Activities</h6>
+                                        @if($coCurricularActivities && count($coCurricularActivities))
+                                            <div class="d-flex flex-wrap gap-1">
+                                                @foreach($coCurricularActivities as $activity)
+                                                    <span class="badge bg-success">{{ $activity }}</span>
+                                                @endforeach
+                                            </div>
+                                        @else
+                                            <span class="text-muted">Not provided</span>
+                                        @endif
+                                    </div>
+                                </div>
+
+                                <div class="row mt-3">
+                                    <div class="col-12">
+                                        <h6>MSU Choice Reasons</h6>
+                                        @if($msuChoiceReasons && count($msuChoiceReasons))
+                                            <div class="d-flex flex-wrap gap-1">
+                                                @foreach($msuChoiceReasons as $reason)
+                                                    <span class="badge bg-primary">{{ $reason }}</span>
+                                                @endforeach
+                                            </div>
+                                        @else
+                                            <span class="text-muted">Not provided</span>
+                                        @endif
+                                    </div>
+                                </div>
 
                                 @if($student->academicData->future_career_plans)
                                 <div class="mt-3">
@@ -532,6 +701,17 @@
                                     <div class="card bg-light">
                                         <div class="card-body">
                                             {{ $student->academicData->future_career_plans }}
+                                        </div>
+                                    </div>
+                                </div>
+                                @endif
+
+                                @if($student->academicData->course_choice_reason)
+                                <div class="mt-3">
+                                    <h6>Reason for Choosing the Course</h6>
+                                    <div class="card bg-light">
+                                        <div class="card-body">
+                                            {{ $student->academicData->course_choice_reason }}
                                         </div>
                                     </div>
                                 </div>
@@ -585,35 +765,55 @@
                                     </div>
                                 </div>
 
-<!-- Technology Gadgets -->
-@if($student->learningResources && $student->learningResources->technology_gadgets && is_array($student->learningResources->technology_gadgets))
-<div class="row mt-3">
-    <div class="col-12">
-        <h6>Available Technology Gadgets</h6>
-        <div class="d-flex flex-wrap gap-2">
-            @foreach($student->learningResources->technology_gadgets as $gadget)
-                <span class="badge bg-primary">
-                    <i class="fas fa-mobile-alt me-1"></i>{{ $gadget }}
-                </span>
-            @endforeach
-        </div>
-    </div>
-</div>
-@endif
+                                <!-- Technology Gadgets -->
+                                @php
+                                    $technologyGadgets = $student->learningResources ? $student->learningResources->technology_gadgets : null;
+                                    if (is_string($technologyGadgets)) {
+                                        $decoded = json_decode($technologyGadgets, true);
+                                        $technologyGadgets = is_array($decoded)
+                                            ? $decoded
+                                            : array_filter(array_map('trim', explode(',', $technologyGadgets)));
+                                    }
 
-<!-- Internet Connectivity -->
-@if($student->learningResources && $student->learningResources->internet_connectivity && is_array($student->learningResources->internet_connectivity))
-<div class="row mt-3">
-    <div class="col-12">
-        <h6>Internet Connectivity Types</h6>
-        <div class="d-flex flex-wrap gap-2">
-            @foreach($student->learningResources->internet_connectivity as $connectivity)
-                <span class="badge bg-success">{{ $connectivity }}</span>
-            @endforeach
-        </div>
-    </div>
-</div>
-@endif
+                                    $internetConnectivity = $student->learningResources ? $student->learningResources->internet_connectivity : null;
+                                    if (is_string($internetConnectivity)) {
+                                        $decoded = json_decode($internetConnectivity, true);
+                                        $internetConnectivity = is_array($decoded)
+                                            ? $decoded
+                                            : array_filter(array_map('trim', explode(',', $internetConnectivity)));
+                                    }
+                                @endphp
+                                <div class="row mt-3">
+                                    <div class="col-12">
+                                        <h6>Technology Gadgets</h6>
+                                        @if($technologyGadgets && count($technologyGadgets))
+                                            <div class="d-flex flex-wrap gap-2">
+                                                @foreach($technologyGadgets as $gadget)
+                                                    <span class="badge bg-primary">
+                                                        <i class="fas fa-mobile-alt me-1"></i>{{ $gadget }}
+                                                    </span>
+                                                @endforeach
+                                            </div>
+                                        @else
+                                            <span class="text-muted">Not provided</span>
+                                        @endif
+                                    </div>
+                                </div>
+
+                                <div class="row mt-3">
+                                    <div class="col-12">
+                                        <h6>Means of Internet Connectivity</h6>
+                                        @if($internetConnectivity && count($internetConnectivity))
+                                            <div class="d-flex flex-wrap gap-2">
+                                                @foreach($internetConnectivity as $connectivity)
+                                                    <span class="badge bg-success">{{ $connectivity }}</span>
+                                                @endforeach
+                                            </div>
+                                        @else
+                                            <span class="text-muted">Not provided</span>
+                                        @endif
+                                    </div>
+                                </div>
 
 
 
@@ -669,47 +869,88 @@
                                                     @endif
                                                 </td>
                                             </tr>
+                                            <tr>
+                                                <th>Need Immediate Counseling:</th>
+                                                <td>
+                                                    @if($student->psychosocialData->needs_immediate_counseling)
+                                                        <span class="badge bg-danger">Yes</span>
+                                                    @else
+                                                        <span class="badge bg-secondary">No</span>
+                                                    @endif
+                                                </td>
+                                            </tr>
                                         </table>
                                     </div>
                                 </div>
 
-<!-- Arrays Data -->
-<div class="row mt-3">
-    @if($student->psychosocialData && $student->psychosocialData->personality_characteristics && is_array($student->psychosocialData->personality_characteristics))
-    <div class="col-md-6">
-        <h6>Personality Characteristics</h6>
-        <div class="d-flex flex-wrap gap-1">
-            @foreach($student->psychosocialData->personality_characteristics as $characteristic)
-                <span class="badge bg-primary">{{ $characteristic }}</span>
-            @endforeach
-        </div>
-    </div>
-    @endif
+                                <!-- Arrays Data -->
+                                @php
+                                    $personalityCharacteristics = $student->psychosocialData ? $student->psychosocialData->personality_characteristics : null;
+                                    if (is_string($personalityCharacteristics)) {
+                                        $decoded = json_decode($personalityCharacteristics, true);
+                                        $personalityCharacteristics = is_array($decoded)
+                                            ? $decoded
+                                            : array_filter(array_map('trim', explode(',', $personalityCharacteristics)));
+                                    }
 
-    @if($student->psychosocialData && $student->psychosocialData->coping_mechanisms && is_array($student->psychosocialData->coping_mechanisms))
-    <div class="col-md-6">
-        <h6>Coping Mechanisms</h6>
-        <div class="d-flex flex-wrap gap-1">
-            @foreach($student->psychosocialData->coping_mechanisms as $mechanism)
-                <span class="badge bg-success">{{ $mechanism }}</span>
-            @endforeach
-        </div>
-    </div>
-    @endif
-</div>
+                                    $copingMechanisms = $student->psychosocialData ? $student->psychosocialData->coping_mechanisms : null;
+                                    if (is_string($copingMechanisms)) {
+                                        $decoded = json_decode($copingMechanisms, true);
+                                        $copingMechanisms = is_array($decoded)
+                                            ? $decoded
+                                            : array_filter(array_map('trim', explode(',', $copingMechanisms)));
+                                    }
 
-@if($student->psychosocialData && $student->psychosocialData->problem_sharing_targets && is_array($student->psychosocialData->problem_sharing_targets))
-<div class="row mt-3">
-    <div class="col-12">
-        <h6>Problem Sharing Targets</h6>
-        <div class="d-flex flex-wrap gap-2">
-            @foreach($student->psychosocialData->problem_sharing_targets as $target)
-                <span class="badge bg-warning text-dark">{{ $target }}</span>
-            @endforeach
-        </div>
-    </div>
-</div>
-@endif
+                                    $problemSharingTargets = $student->psychosocialData ? $student->psychosocialData->problem_sharing_targets : null;
+                                    if (is_string($problemSharingTargets)) {
+                                        $decoded = json_decode($problemSharingTargets, true);
+                                        $problemSharingTargets = is_array($decoded)
+                                            ? $decoded
+                                            : array_filter(array_map('trim', explode(',', $problemSharingTargets)));
+                                    }
+                                @endphp
+                                <div class="row mt-3">
+                                    <div class="col-md-6">
+                                        <h6>Personality Characteristics</h6>
+                                        @if($personalityCharacteristics && count($personalityCharacteristics))
+                                            <div class="d-flex flex-wrap gap-1">
+                                                @foreach($personalityCharacteristics as $characteristic)
+                                                    <span class="badge bg-primary">{{ $characteristic }}</span>
+                                                @endforeach
+                                            </div>
+                                        @else
+                                            <span class="text-muted">Not provided</span>
+                                        @endif
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <h6>Coping Mechanisms</h6>
+                                        @if($copingMechanisms && count($copingMechanisms))
+                                            <div class="d-flex flex-wrap gap-1">
+                                                @foreach($copingMechanisms as $mechanism)
+                                                    <span class="badge bg-success">{{ $mechanism }}</span>
+                                                @endforeach
+                                            </div>
+                                        @else
+                                            <span class="text-muted">Not provided</span>
+                                        @endif
+                                    </div>
+                                </div>
+
+                                <div class="row mt-3">
+                                    <div class="col-12">
+                                        <h6>Problem Sharing Targets</h6>
+                                        @if($problemSharingTargets && count($problemSharingTargets))
+                                            <div class="d-flex flex-wrap gap-2">
+                                                @foreach($problemSharingTargets as $target)
+                                                    <span class="badge bg-warning text-dark">{{ $target }}</span>
+                                                @endforeach
+                                            </div>
+                                        @else
+                                            <span class="text-muted">Not provided</span>
+                                        @endif
+                                    </div>
+                                </div>
 
                                 @if($student->psychosocialData->mental_health_perception)
                                 <div class="mt-3">
@@ -754,67 +995,133 @@
                                     </div>
                                 </div>
 
-<!-- Arrays Data -->
-<div class="row mt-3">
-    @if($student->needsAssessment && $student->needsAssessment->improvement_needs && is_array($student->needsAssessment->improvement_needs))
-    <div class="col-md-4">
-        <h6>Improvement Needs</h6>
-        <div class="d-flex flex-wrap gap-1">
-            @foreach($student->needsAssessment->improvement_needs as $need)
-                <span class="badge bg-primary">{{ $need }}</span>
-            @endforeach
-        </div>
-    </div>
-    @endif
+                                <!-- Arrays Data -->
+                                @php
+                                    $improvementNeeds = $student->needsAssessment ? $student->needsAssessment->improvement_needs : null;
+                                    if (is_string($improvementNeeds)) {
+                                        $decoded = json_decode($improvementNeeds, true);
+                                        $improvementNeeds = is_array($decoded)
+                                            ? $decoded
+                                            : array_filter(array_map('trim', explode(',', $improvementNeeds)));
+                                    }
 
-    @if($student->needsAssessment && $student->needsAssessment->financial_assistance_needs && is_array($student->needsAssessment->financial_assistance_needs))
-    <div class="col-md-4">
-        <h6>Financial Assistance Needs</h6>
-        <div class="d-flex flex-wrap gap-1">
-            @foreach($student->needsAssessment->financial_assistance_needs as $need)
-                <span class="badge bg-warning text-dark">{{ $need }}</span>
-            @endforeach
-        </div>
-    </div>
-    @endif
+                                    $financialAssistanceNeeds = $student->needsAssessment ? $student->needsAssessment->financial_assistance_needs : null;
+                                    if (is_string($financialAssistanceNeeds)) {
+                                        $decoded = json_decode($financialAssistanceNeeds, true);
+                                        $financialAssistanceNeeds = is_array($decoded)
+                                            ? $decoded
+                                            : array_filter(array_map('trim', explode(',', $financialAssistanceNeeds)));
+                                    }
 
-    @if($student->needsAssessment && $student->needsAssessment->personal_social_needs && is_array($student->needsAssessment->personal_social_needs))
-    <div class="col-md-4">
-        <h6>Personal & Social Needs</h6>
-        <div class="d-flex flex-wrap gap-1">
-            @foreach($student->needsAssessment->personal_social_needs as $need)
-                <span class="badge bg-success">{{ $need }}</span>
-            @endforeach
-        </div>
-    </div>
-    @endif
-</div>
+                                    $personalSocialNeeds = $student->needsAssessment ? $student->needsAssessment->personal_social_needs : null;
+                                    if (is_string($personalSocialNeeds)) {
+                                        $decoded = json_decode($personalSocialNeeds, true);
+                                        $personalSocialNeeds = is_array($decoded)
+                                            ? $decoded
+                                            : array_filter(array_map('trim', explode(',', $personalSocialNeeds)));
+                                    }
 
-@if($student->needsAssessment && $student->needsAssessment->stress_responses && is_array($student->needsAssessment->stress_responses))
-<div class="row mt-3">
-    <div class="col-12">
-        <h6>Stress Responses</h6>
-        <div class="d-flex flex-wrap gap-2">
-            @foreach($student->needsAssessment->stress_responses as $response)
-                <span class="badge bg-danger">{{ $response }}</span>
-            @endforeach
-        </div>
-    </div>
-</div>
-@endif
+                                    $stressResponses = $student->needsAssessment ? $student->needsAssessment->stress_responses : null;
+                                    if (is_string($stressResponses)) {
+                                        $decoded = json_decode($stressResponses, true);
+                                        $stressResponses = is_array($decoded)
+                                            ? $decoded
+                                            : array_filter(array_map('trim', explode(',', $stressResponses)));
+                                    }
 
-@if($student->needsAssessment && $student->needsAssessment->counseling_perceptions && is_array($student->needsAssessment->counseling_perceptions))
-<div class="row mt-3">
-    <div class="col-12">
-        <h6>Counseling Perceptions</h6>
-        <div class="d-flex flex-wrap gap-2">
-            @foreach($student->needsAssessment->counseling_perceptions as $perception)
-                <span class="badge bg-info">{{ $perception }}</span>
-            @endforeach
-        </div>
-    </div>
-</div>
-@endif
+                                    $counselingPerceptions = $student->needsAssessment ? $student->needsAssessment->counseling_perceptions : null;
+                                    if (is_string($counselingPerceptions)) {
+                                        $decoded = json_decode($counselingPerceptions, true);
+                                        $counselingPerceptions = is_array($decoded)
+                                            ? $decoded
+                                            : [];
+                                    }
+                                @endphp
+                                <div class="row mt-3">
+                                    <div class="col-md-4">
+                                        <h6>Need to Improve the Following</h6>
+                                        @if($improvementNeeds && count($improvementNeeds))
+                                            <div class="d-flex flex-wrap gap-1">
+                                                @foreach($improvementNeeds as $need)
+                                                    <span class="badge bg-primary">{{ $need }}</span>
+                                                @endforeach
+                                            </div>
+                                        @else
+                                            <span class="text-muted">Not provided</span>
+                                        @endif
+                                    </div>
+
+                                    <div class="col-md-4">
+                                        <h6>Assistance Needs</h6>
+                                        @if($financialAssistanceNeeds && count($financialAssistanceNeeds))
+                                            <div class="d-flex flex-wrap gap-1">
+                                                @foreach($financialAssistanceNeeds as $need)
+                                                    <span class="badge bg-warning text-dark">{{ $need }}</span>
+                                                @endforeach
+                                            </div>
+                                        @else
+                                            <span class="text-muted">Not provided</span>
+                                        @endif
+                                    </div>
+
+                                    <div class="col-md-4">
+                                        <h6>Personal-Social Assistance</h6>
+                                        @if($personalSocialNeeds && count($personalSocialNeeds))
+                                            <div class="d-flex flex-wrap gap-1">
+                                                @foreach($personalSocialNeeds as $need)
+                                                    <span class="badge bg-success">{{ $need }}</span>
+                                                @endforeach
+                                            </div>
+                                        @else
+                                            <span class="text-muted">Not provided</span>
+                                        @endif
+                                    </div>
+                                </div>
+
+                                <div class="row mt-3">
+                                    <div class="col-12">
+                                        <h6>Stress Responses</h6>
+                                        @if($stressResponses && count($stressResponses))
+                                            <div class="d-flex flex-wrap gap-2">
+                                                @foreach($stressResponses as $response)
+                                                    <span class="badge bg-danger">{{ $response }}</span>
+                                                @endforeach
+                                            </div>
+                                        @else
+                                            <span class="text-muted">Not provided</span>
+                                        @endif
+                                    </div>
+                                </div>
+
+                                <div class="row mt-3">
+                                    <div class="col-12">
+                                        <h6>Counseling Perceptions</h6>
+                                        @php
+                                            $counselingStatements = [
+                                                'I willfully came for counseling when I had a problem.',
+                                                'I experienced counseling upon referral by teachers, friends, parents, etc.',
+                                                'I know that help is available at the Guidance and Counseling Center of MSU-IIT.',
+                                                'I am afraid to go to the Guidance and Counseling Center of MSU-IIT.',
+                                                'I am shy to ask assistance/seek counseling from my guidance counselor.'
+                                            ];
+                                        @endphp
+                                        <table class="table table-sm">
+                                            @foreach($counselingStatements as $index => $statement)
+                                                @php
+                                                    $perceptionValue = $counselingPerceptions[$index]
+                                                        ?? $counselingPerceptions[$statement]
+                                                        ?? null;
+                                                @endphp
+                                                <tr>
+                                                    <th width="70%">{{ $statement }}</th>
+                                                    <td class="text-capitalize">
+                                                        {{ $perceptionValue ?: 'Not provided' }}
+                                                    </td>
+                                                </tr>
+                                            @endforeach
+                                        </table>
+                                    </div>
+                                </div>
                             @else
                                 <div class="text-center py-4">
                                     <i class="fas fa-clipboard-list fa-3x text-muted mb-3"></i>

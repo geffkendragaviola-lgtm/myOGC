@@ -25,8 +25,8 @@ $table->enum('working_student', [
             $table->text('leisure_activities')->nullable();
             $table->string('serious_medical_condition', 255)->nullable();
             $table->string('physical_disability', 255)->nullable();
-            $table->enum('gender_identity', ['male/man', 'female/woman', 'transgender male/man', 'transgender female/woman', 'gender variant/nonconforming', 'not listed', 'prefer not to say'])->nullable();
-            $table->enum('romantic_attraction', ['my same gender', 'opposite gender', 'both men and women', 'all genders', 'neither gender', 'prefer not to answer'])->nullable();
+            $table->enum('sex_identity', ['male/man', 'female/woman', 'transsex male/man', 'transsex female/woman', 'sex variant/nonconforming', 'not listed', 'prefer not to say'])->nullable();
+            $table->enum('romantic_attraction', ['my same sex', 'opposite sex', 'both men and women', 'all sexes', 'neither sex', 'prefer not to answer'])->nullable();
             $table->timestamps();
 
             $table->unique('student_id');

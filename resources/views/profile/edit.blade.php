@@ -391,6 +391,19 @@
                                     @enderror
                                 </div>
 
+                                <!-- Google Calendar ID -->
+                                <div class="md:col-span-2">
+                                    <label for="google_calendar_id" class="block text-sm font-medium text-gray-700 mb-2">Google Calendar ID</label>
+                                    <input type="text" id="google_calendar_id" name="google_calendar_id"
+                                           value="{{ old('google_calendar_id', $counselorProfile->google_calendar_id ?? '') }}"
+                                           placeholder="e.g. counselor@yourdomain.com"
+                                           class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
+                                    <p class="text-xs text-gray-500 mt-1">Used to sync booked appointments to your calendar.</p>
+                                    @error('google_calendar_id')
+                                        <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                                    @enderror
+                                </div>
+
                                 <!-- College -->
                                 <div class="md:col-span-2">
                                     <label for="college_id" class="block text-sm font-medium text-gray-700 mb-2">Assigned College</label>
@@ -421,6 +434,7 @@
                                         <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                                     @enderror
                                 </div>
+
                             </div>
 
                             <div class="mt-8 flex justify-end">
@@ -561,6 +575,7 @@
                     }, 5000);
                 }
             });
+
         });
     </script>
 </body>

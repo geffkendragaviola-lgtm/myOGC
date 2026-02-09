@@ -29,7 +29,7 @@ class CounselorSeeder extends Seeder
                 'citizenship' => 'Filipino',
                 'address' => 'Iligan City, Lanao del Norte',
                 'phone_number' => '09123456789',
-                'email' => 'mamauag@g.msuiit.edu.ph',
+                'email' => 'jullianephilip.ouano@g.msuiit.edu.ph',
                 'password' => Hash::make('1234567890'),
                 'role' => 'counselor',
                 'created_at' => now(),
@@ -144,12 +144,12 @@ class CounselorSeeder extends Seeder
                 'sex' => 'female',
                 'birthplace' => 'Iligan City',
                 'religion' => 'Roman Catholic',
-         
+
                 'civil_status' => 'single',
                 'citizenship' => 'Filipino',
                 'address' => 'Iligan City, Lanao del Norte',
                 'phone_number' => '09123456795',
-                'email' => 'encabo@g.msuiit.edu.ph',
+                'email' => 'geffkendra.gaviola@g.msuiit.edu.ph',
                 'password' => Hash::make('1234567890'),
                 'role' => 'counselor',
                 'created_at' => now(),
@@ -159,7 +159,11 @@ class CounselorSeeder extends Seeder
 
         // Insert users
         foreach ($users as $user) {
-            $userId = DB::table('users')->insertGetId($user);
+            DB::table('users')->updateOrInsert(
+                ['email' => $user['email']],
+                array_merge($user, ['updated_at' => now()])
+            );
+            $userId = DB::table('users')->where('email', $user['email'])->value('id');
             $userIds[$user['last_name']] = $userId;
         }
 
@@ -174,6 +178,7 @@ class CounselorSeeder extends Seeder
                 'position' => 'Guidance Counselor III',
                 'credentials' => 'RGC, RPm, LPT',
                 'is_head' => true,
+                'google_calendar_id' => 'jullianephilip.ouano@g.msuiit.edu.ph',
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
@@ -183,6 +188,7 @@ class CounselorSeeder extends Seeder
                 'position' => 'Guidance Counselor III',
                 'credentials' => 'RPm',
                 'is_head' => false,
+                'google_calendar_id' => 'gabutan@g.msuiit.edu.ph',
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
@@ -192,6 +198,7 @@ class CounselorSeeder extends Seeder
                 'position' => 'Guidance Counselor III',
                 'credentials' => 'RGC',
                 'is_head' => false,
+                'google_calendar_id' => 'saquin@g.msuiit.edu.ph',
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
@@ -201,6 +208,7 @@ class CounselorSeeder extends Seeder
                 'position' => 'Guidance Counselor III',
                 'credentials' => 'RGC, LPT',
                 'is_head' => false,
+                'google_calendar_id' => 'dumarpa@g.msuiit.edu.ph',
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
@@ -210,6 +218,7 @@ class CounselorSeeder extends Seeder
                 'position' => 'Guidance Services Associate I',
                 'credentials' => 'MAEd',
                 'is_head' => false,
+                'google_calendar_id' => 'evardone@g.msuiit.edu.ph',
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
@@ -219,6 +228,7 @@ class CounselorSeeder extends Seeder
                 'position' => 'Guidance Services Associate I',
                 'credentials' => 'RPm',
                 'is_head' => false,
+                'google_calendar_id' => 'bagalanon@g.msuiit.edu.ph',
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
@@ -229,6 +239,7 @@ class CounselorSeeder extends Seeder
                 'position' => 'Guidance Counselor III',
                 'credentials' => 'RGC, LPT',
                 'is_head' => false,
+                'google_calendar_id' => 'geffkendra.gaviola@g.msuiit.edu.ph',
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
@@ -239,11 +250,20 @@ class CounselorSeeder extends Seeder
                 'position' => 'Guidance Counselor III',
                 'credentials' => 'RGC, LPT',
                 'is_head' => false,
+                'google_calendar_id' => 'geffkendra.gaviola@g.msuiit.edu.ph',
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
         ];
 
-        DB::table('counselors')->insert($counselors);
+        foreach ($counselors as $counselor) {
+            DB::table('counselors')->updateOrInsert(
+                [
+                    'user_id' => $counselor['user_id'],
+                    'college_id' => $counselor['college_id'],
+                ],
+                array_merge($counselor, ['updated_at' => now()])
+            );
+        }
     }
 }

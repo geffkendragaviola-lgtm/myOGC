@@ -18,12 +18,15 @@ class Counselor extends Model
         'credentials',
         'is_head',
         'specialization',
-        'availability'
+        'availability',
+        'google_calendar_id',
+        'daily_booking_limit',
     ];
 
     protected $casts = [
         'is_head' => 'boolean',
-        'availability' => 'array'
+        'availability' => 'array',
+        'daily_booking_limit' => 'integer',
     ];
 
     public function user(): BelongsTo
@@ -39,6 +42,10 @@ class Counselor extends Model
     public function appointments(): HasMany
     {
         return $this->hasMany(Appointment::class);
+    }
+    public function scheduleOverrides(): HasMany
+    {
+        return $this->hasMany(CounselorScheduleOverride::class);
     }
 // Relationship to received referrals
 public function receivedReferrals(): HasMany
@@ -59,6 +66,17 @@ public function receivedReferrals(): HasMany
     public function getAvailability()
     {
         return $this->availability ?? $this->getDefaultAvailability();
+    }
+
+    public function getDailyBookingLimit(): int
+    {
+        $limit = $this->daily_booking_limit;
+
+        if (is_null($limit)) {
+            return 3;
+        }
+
+        return max(0, (int) $limit);
     }
 
 }

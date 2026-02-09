@@ -131,6 +131,9 @@
                     <option value="">All Statuses</option>
                     <option value="pending" {{ request('status') == 'pending' ? 'selected' : '' }}>Pending</option>
                     <option value="approved" {{ request('status') == 'approved' ? 'selected' : '' }}>Approved</option>
+                    <option value="reschedule_requested" {{ request('status') == 'reschedule_requested' ? 'selected' : '' }}>Reschedule Requested</option>
+                    <option value="rescheduled" {{ request('status') == 'rescheduled' ? 'selected' : '' }}>Rescheduled</option>
+                    <option value="reschedule_rejected" {{ request('status') == 'reschedule_rejected' ? 'selected' : '' }}>Rejected by Student</option>
                     <option value="completed" {{ request('status') == 'completed' ? 'selected' : '' }}>Completed</option>
                     <option value="referred" {{ request('status') == 'referred' ? 'selected' : '' }}>Referred</option>
                     <option value="rejected" {{ request('status') == 'rejected' ? 'selected' : '' }}>Rejected</option>
@@ -179,7 +182,14 @@
                     @endif
                     @if(request('status'))
                         <span class="bg-green-100 text-green-800 px-2 py-1 rounded-full flex items-center">
-                            Status: {{ ucfirst(request('status')) }}
+                            @php
+                                $filterStatusLabels = [
+                                    'reschedule_rejected' => 'Rejected by Student',
+                                    'reschedule_requested' => 'Reschedule Requested (Pending Student Approval)',
+                                    'rescheduled' => 'Scheduled (Rescheduled)',
+                                ];
+                            @endphp
+                            Status: {{ $filterStatusLabels[request('status')] ?? ucwords(str_replace('_', ' ', request('status'))) }}
                             <a href="{{ request()->fullUrlWithQuery(['status' => null]) }}" class="ml-1 text-green-600 hover:text-green-800">
                                 <i class="fas fa-times"></i>
                             </a>
@@ -216,6 +226,18 @@
             <a href="{{ route('appointments.index', ['status' => 'approved']) }}"
                class="px-4 py-2 rounded-lg transition flex items-center {{ request('status') == 'approved' ? 'bg-green-600 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300' }}">
                 <i class="fas fa-check mr-2"></i> Approved
+            </a>
+            <a href="{{ route('appointments.index', ['status' => 'reschedule_requested']) }}"
+               class="px-4 py-2 rounded-lg transition flex items-center {{ request('status') == 'reschedule_requested' ? 'bg-orange-600 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300' }}">
+                <i class="fas fa-calendar-alt mr-2"></i> Reschedule Requested
+            </a>
+            <a href="{{ route('appointments.index', ['status' => 'rescheduled']) }}"
+               class="px-4 py-2 rounded-lg transition flex items-center {{ request('status') == 'rescheduled' ? 'bg-indigo-600 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300' }}">
+                <i class="fas fa-calendar-alt mr-2"></i> Rescheduled
+            </a>
+            <a href="{{ route('appointments.index', ['status' => 'reschedule_rejected']) }}"
+               class="px-4 py-2 rounded-lg transition flex items-center {{ request('status') == 'reschedule_rejected' ? 'bg-rose-600 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300' }}">
+                <i class="fas fa-times mr-2"></i> Rejected by Student
             </a>
             <a href="{{ route('appointments.index', ['status' => 'completed']) }}"
                class="px-4 py-2 rounded-lg transition flex items-center {{ request('status') == 'completed' ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300' }}">
@@ -282,6 +304,29 @@
                                         {{ \Carbon\Carbon::parse($appointment->start_time)->format('g:i A') }} -
                                         {{ \Carbon\Carbon::parse($appointment->end_time)->format('g:i A') }}
                                     </div>
+                                    @if($appointment->status === 'reschedule_requested' && $appointment->proposed_date)
+                                        <div class="text-xs text-orange-700 mt-1">
+                                            Proposed: {{ \Carbon\Carbon::parse($appointment->proposed_date)->format('M j, Y') }}
+                                            {{ \Carbon\Carbon::parse($appointment->proposed_start_time)->format('g:i A') }} -
+                                            {{ \Carbon\Carbon::parse($appointment->proposed_end_time)->format('g:i A') }}
+                                        </div>
+                                        @if($appointment->reschedule_reason)
+                                            <div class="text-xs text-orange-600">
+                                                Reason: {{ $appointment->reschedule_reason }}
+                                            </div>
+                                        @endif
+                                    @elseif($appointment->status === 'referred' && $appointment->proposed_date)
+                                        <div class="text-xs text-purple-700 mt-1">
+                                            Proposed: {{ \Carbon\Carbon::parse($appointment->proposed_date)->format('M j, Y') }}
+                                            {{ \Carbon\Carbon::parse($appointment->proposed_start_time)->format('g:i A') }} -
+                                            {{ \Carbon\Carbon::parse($appointment->proposed_end_time)->format('g:i A') }}
+                                        </div>
+                                        @if($appointment->referral_reason)
+                                            <div class="text-xs text-purple-600">
+                                                Reason: {{ $appointment->referral_reason }}
+                                            </div>
+                                        @endif
+                                    @endif
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap">
                                     <div class="text-sm font-medium text-gray-900">
@@ -310,11 +355,19 @@
                                             'rejected' => 'bg-red-100 text-red-800',
                                             'cancelled' => 'bg-gray-100 text-gray-800',
                                             'completed' => 'bg-blue-100 text-blue-800',
-                                            'referred' => 'bg-purple-100 text-purple-800'
+                                            'referred' => 'bg-purple-100 text-purple-800',
+                                            'rescheduled' => 'bg-indigo-100 text-indigo-800',
+                                            'reschedule_requested' => 'bg-orange-100 text-orange-800',
+                                            'reschedule_rejected' => 'bg-rose-100 text-rose-800'
+                                        ];
+                                        $statusLabels = [
+                                            'rescheduled' => 'Scheduled (Rescheduled)',
+                                            'reschedule_requested' => 'Reschedule Requested (Pending Student Approval)',
+                                            'reschedule_rejected' => 'Rejected by Student',
                                         ];
                                     @endphp
                                     <span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full {{ $statusColors[$appointment->status] }}">
-                                        {{ $appointment->status_with_referral }}
+                                        {{ $appointment->status_with_referral ?? ($statusLabels[$appointment->status] ?? ucwords(str_replace('_', ' ', $appointment->status))) }}
                                     </span>
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap">
@@ -369,7 +422,53 @@
                                     @endif
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                    @if(in_array($appointment->status, ['pending', 'approved']) && Auth::user()->role === 'student')
+                                    @if($appointment->status === 'reschedule_requested' && Auth::user()->role === 'student')
+                                        <div class="flex items-center space-x-2">
+                                            <form action="{{ route('appointments.reschedule.accept', $appointment) }}" method="POST" class="inline">
+                                                @csrf
+                                                @method('PATCH')
+                                                <button type="submit"
+                                                        class="text-green-700 hover:text-green-900 px-3 py-1 border border-green-300 rounded hover:bg-green-50 transition"
+                                                        onclick="return confirm('Accept the new appointment time?')">
+                                                    <i class="fas fa-check mr-1"></i>Accept
+                                                </button>
+                                            </form>
+                                            <form action="{{ route('appointments.reschedule.reject', $appointment) }}" method="POST" class="inline">
+                                                @csrf
+                                                @method('PATCH')
+                                                <button type="submit"
+                                                        class="text-red-600 hover:text-red-900 px-3 py-1 border border-red-300 rounded hover:bg-red-50 transition"
+                                                        onclick="return confirm('Reject the proposed time and keep the original schedule?')">
+                                                    <i class="fas fa-times mr-1"></i>Reject
+                                                </button>
+                                            </form>
+                                        </div>
+                                    @elseif($appointment->status === 'referred' && Auth::user()->role === 'student')
+                                        @if($appointment->proposed_date && $appointment->proposed_start_time && $appointment->proposed_end_time)
+                                            <div class="flex items-center space-x-2">
+                                                <form action="{{ route('appointments.referral.accept', $appointment) }}" method="POST" class="inline">
+                                                    @csrf
+                                                    @method('PATCH')
+                                                    <button type="submit"
+                                                            class="text-green-700 hover:text-green-900 px-3 py-1 border border-green-300 rounded hover:bg-green-50 transition"
+                                                            onclick="return confirm('Accept the referral schedule with the new counselor?')">
+                                                        <i class="fas fa-check mr-1"></i>Accept
+                                                    </button>
+                                                </form>
+                                                <form action="{{ route('appointments.referral.reject', $appointment) }}" method="POST" class="inline">
+                                                    @csrf
+                                                    @method('PATCH')
+                                                    <button type="submit"
+                                                            class="text-red-600 hover:text-red-900 px-3 py-1 border border-red-300 rounded hover:bg-red-50 transition"
+                                                            onclick="return confirm('Cancel this referral and keep your original counselor?')">
+                                                        <i class="fas fa-times mr-1"></i>Cancel
+                                                    </button>
+                                                </form>
+                                            </div>
+                                        @else
+                                            <span class="text-purple-600 italic">Awaiting referral details</span>
+                                        @endif
+                                    @elseif(in_array($appointment->status, ['pending', 'approved', 'rescheduled']) && Auth::user()->role === 'student')
                                         <form action="{{ route('appointments.cancel', $appointment) }}" method="POST" class="inline">
                                             @csrf
                                             <button type="submit"
@@ -378,10 +477,14 @@
                                                 <i class="fas fa-times mr-1"></i>Cancel
                                             </button>
                                         </form>
+                                    @elseif($appointment->status === 'reschedule_requested')
+                                        <span class="text-orange-600 italic">Awaiting your response</span>
                                     @elseif($appointment->status === 'cancelled')
                                         <span class="text-gray-500 italic">Cancelled</span>
                                     @elseif($appointment->status === 'rejected')
                                         <span class="text-red-500 italic">Rejected</span>
+                                    @elseif($appointment->status === 'reschedule_rejected')
+                                        <span class="text-rose-500 italic">Rejected by student</span>
                                     @elseif($appointment->status === 'referred')
                                         <span class="text-purple-500 italic">Referred</span>
                                     @endif

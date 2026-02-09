@@ -19,7 +19,7 @@ class StudentPersonalData extends Model
         'leisure_activities',
         'serious_medical_condition',
         'physical_disability',
-        'gender_identity',
+        'sex_identity',
         'romantic_attraction',
     ];
 

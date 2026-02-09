@@ -62,8 +62,8 @@ class StudentSeeder extends Seeder
             'leisure_activities' => json_encode(['reading', 'coding', 'gaming']),
             'serious_medical_condition' => 'None',
             'physical_disability' => 'None',
-            'gender_identity' => 'female/woman',
-            'romantic_attraction' => 'opposite gender',
+            'sex_identity' => 'female/woman',
+            'romantic_attraction' => 'opposite sex',
         ]);
 
         // Family Data for Student 1
@@ -188,8 +188,8 @@ class StudentSeeder extends Seeder
             'leisure_activities' => json_encode(['reading medical journals', 'volunteering']),
             'serious_medical_condition' => 'None',
             'physical_disability' => 'None',
-            'gender_identity' => 'female/woman',
-            'romantic_attraction' => 'opposite gender',
+            'sex_identity' => 'female/woman',
+            'romantic_attraction' => 'opposite sex',
         ]);
 
         // 🧍 3rd Student (CASS)
@@ -233,7 +233,7 @@ class StudentSeeder extends Seeder
             'leisure_activities' => json_encode(['reading novels', 'debating']),
             'serious_medical_condition' => 'None',
             'physical_disability' => 'None',
-            'gender_identity' => 'male/man',
+            'sex_identity' => 'male/man',
             'romantic_attraction' => 'both men and women',
         ]);
 
@@ -278,8 +278,8 @@ class StudentSeeder extends Seeder
             'leisure_activities' => json_encode(['basketball', 'engineering projects']),
             'serious_medical_condition' => 'None',
             'physical_disability' => 'None',
-            'gender_identity' => 'male/man',
-            'romantic_attraction' => 'opposite gender',
+            'sex_identity' => 'male/man',
+            'romantic_attraction' => 'opposite sex',
         ]);
 
         // 🧍 5th Student (COET)
@@ -323,7 +323,7 @@ class StudentSeeder extends Seeder
             'leisure_activities' => json_encode(['robotics', 'gaming']),
             'serious_medical_condition' => 'None',
             'physical_disability' => 'None',
-            'gender_identity' => 'female/woman',
+            'sex_identity' => 'female/woman',
             'romantic_attraction' => 'prefer not to answer',
         ]);
 
@@ -368,8 +368,8 @@ class StudentSeeder extends Seeder
             'leisure_activities' => json_encode(['business case studies', 'networking events']),
             'serious_medical_condition' => 'None',
             'physical_disability' => 'None',
-            'gender_identity' => 'female/woman',
-            'romantic_attraction' => 'opposite gender',
+            'sex_identity' => 'female/woman',
+            'romantic_attraction' => 'opposite sex',
         ]);
 
         // 🧍 7th Student (CED)
@@ -413,8 +413,8 @@ class StudentSeeder extends Seeder
             'leisure_activities' => json_encode(['tutoring', 'reading educational materials']),
             'serious_medical_condition' => 'None',
             'physical_disability' => 'None',
-            'gender_identity' => 'male/man',
-            'romantic_attraction' => 'opposite gender',
+            'sex_identity' => 'male/man',
+            'romantic_attraction' => 'opposite sex',
         ]);
 
         // 🧍 8th Student (CSM)
@@ -458,7 +458,7 @@ class StudentSeeder extends Seeder
             'leisure_activities' => json_encode(['nature walks', 'scientific experiments']),
             'serious_medical_condition' => 'None',
             'physical_disability' => 'None',
-            'gender_identity' => 'female/woman',
+            'sex_identity' => 'female/woman',
             'romantic_attraction' => 'prefer not to answer',
         ]);
 
@@ -503,8 +503,8 @@ class StudentSeeder extends Seeder
             'leisure_activities' => json_encode(['gaming', 'tech tutorials']),
             'serious_medical_condition' => 'None',
             'physical_disability' => 'None',
-            'gender_identity' => 'male/man',
-            'romantic_attraction' => 'opposite gender',
+            'sex_identity' => 'male/man',
+            'romantic_attraction' => 'opposite sex',
         ]);
 
         $user10 = User::create([
@@ -547,7 +547,7 @@ class StudentSeeder extends Seeder
             'leisure_activities' => json_encode(['reading psychology books', 'meditation']),
             'serious_medical_condition' => 'None',
             'physical_disability' => 'None',
-            'gender_identity' => 'female/woman',
+            'sex_identity' => 'female/woman',
             'romantic_attraction' => 'both men and women',
         ]);
     }

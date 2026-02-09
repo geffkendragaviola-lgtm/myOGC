@@ -182,6 +182,7 @@
                     <a href="{{ route('counselor.appointments') }}"><i class="fas fa-list mr-3"></i> Appointments</a>
                     <!-- ADDED FEEDBACK LINK -->
                     <a href="{{ route('counselor.feedback.index') }}"><i class="fas fa-comments mr-3"></i> Feedback</a>
+                    <a href="{{ route('counselor.availability.edit') }}"><i class="fas fa-calendar-check mr-3"></i> Availability &amp; Booking Limits</a>
                 </div>
             </div>
 

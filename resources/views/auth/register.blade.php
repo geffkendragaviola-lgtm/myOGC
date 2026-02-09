@@ -1,21 +1,90 @@
 <x-guest-layout>
-    <form method="POST" action="{{ route('register') }}" enctype="multipart/form-data">
-        @csrf
+    @php
+        $verifiedEmail = session('registration_email_verified');
+        $pendingEmail = session('registration_email_pending');
+    @endphp
 
-        <!-- Add this at the top of your form -->
-        @if ($errors->any())
-            <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
-                <ul>
-                    @foreach ($errors->all() as $error)
-                        <li>{{ $error }}</li>
-                    @endforeach
-                </ul>
-            </div>
-        @endif
+    @if (session('status'))
+        <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4">
+            {{ session('status') }}
+        </div>
+    @endif
 
-        <!-- Basic Information Section -->
+    @if ($errors->any())
+        <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+            <ul>
+                @foreach ($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+    @endif
+
+    @if (!$verifiedEmail)
         <div class="mb-8 p-6 border border-gray-200 rounded-lg">
-            <h2 class="text-xl font-bold mb-4 text-gray-800">Basic Information</h2>
+            <h2 class="text-xl font-bold mb-4 text-gray-800">Verify MSU-IIT Email</h2>
+
+            <form method="POST" action="{{ route('register.email.send') }}" class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                @csrf
+                <div class="md:col-span-2">
+                    <x-input-label for="verify_email" :value="__('MSU-IIT Email')" />
+                    <x-text-input id="verify_email"
+                        class="block mt-1 w-full"
+                        type="email"
+                        name="email"
+                        :value="old('email', $pendingEmail)"
+                        required
+                        autocomplete="email"
+                        pattern="^[a-zA-Z0-9._%+-]+@g\.msuiit\.edu\.ph$"
+                        title="Please use your MSU-IIT email (@g.msuiit.edu.ph)" />
+                    <x-input-error :messages="$errors->get('email')" class="mt-2" />
+                </div>
+
+                <div>
+                    <x-primary-button>
+                        {{ __('Send Verification Code') }}
+                    </x-primary-button>
+                </div>
+            </form>
+
+            <form method="POST" action="{{ route('register.email.verify') }}" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                @csrf
+                <div>
+                    <x-input-label for="verification_code" :value="__('Verification Code')" />
+                    <x-text-input id="verification_code"
+                        class="block mt-1 w-full"
+                        type="text"
+                        name="code"
+                        inputmode="numeric"
+                        maxlength="6"
+                        placeholder="Enter 6-digit code"
+                        required />
+                    <x-input-error :messages="$errors->get('code')" class="mt-2" />
+                </div>
+
+                <div class="flex items-end">
+                    <x-primary-button>
+                        {{ __('Verify Email') }}
+                    </x-primary-button>
+                </div>
+            </form>
+        </div>
+    @else
+        <form method="POST" action="{{ route('register') }}" enctype="multipart/form-data">
+            @csrf
+
+            <div class="mb-8">
+                <h2 class="text-lg font-semibold text-gray-800">Registration Steps</h2>
+                <p class="text-sm text-gray-600 mt-1">Complete each section to continue.</p>
+                <div id="registrationStepIndicators" class="mt-4 flex flex-wrap gap-2"></div>
+                <div class="mt-4 h-2 w-full bg-gray-200 rounded-full">
+                    <div id="registrationProgress" class="h-2 bg-indigo-600 rounded-full" style="width: 0%"></div>
+                </div>
+            </div>
+
+            <!-- Basic Information Section -->
+            <div class="registration-step mb-8 p-6 border border-gray-200 rounded-lg" data-title="Basic Information">
+                <h2 class="text-xl font-bold mb-4 text-gray-800">Basic Information</h2>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <!-- First Name -->
@@ -94,6 +163,11 @@
                     </select>
                     <x-input-error :messages="$errors->get('civil_status')" class="mt-2" />
                 </div>
+                <div id="civil_status_other_container" class="{{ old('civil_status') == 'others' ? '' : 'hidden' }}">
+                    <x-input-label for="civil_status_other" :value="__('Please specify civil status')" />
+                    <x-text-input id="civil_status_other" class="block mt-1 w-full" type="text" name="civil_status_other" :value="old('civil_status_other')" placeholder="Please specify" />
+                    <x-input-error :messages="$errors->get('civil_status_other')" class="mt-2" />
+                </div>
 
                 <!-- Number of Children -->
                 <div>
@@ -111,7 +185,7 @@
 
                 <!-- Address -->
                 <div class="md:col-span-2">
-                    <x-input-label for="address" :value="__('Address')" />
+                    <x-input-label for="address" :value="__('Address (in Iligan City)')" />
                     <textarea id="address" name="address" class="block mt-1 w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" autocomplete="street-address">{{ old('address') }}</textarea>
                     <x-input-error :messages="$errors->get('address')" class="mt-2" />
                 </div>
@@ -123,25 +197,28 @@
                     <x-input-error :messages="$errors->get('phone_number')" class="mt-2" />
                 </div>
 
-                <!-- Email -->
+                <!-- Verified Email -->
                 <div>
                     <x-input-label for="email" :value="__('MSU-IIT Email')" />
                     <x-text-input id="email"
-                        class="block mt-1 w-full"
+                        class="block mt-1 w-full bg-gray-100"
                         type="email"
-                        name="email"
-                        :value="old('email')"
-                        required
-                        autocomplete="email"
-                        pattern="^[a-zA-Z0-9._%+-]+@g\.msuiit\.edu\.ph$"
-                        title="Please use your MSU-IIT email (@g.msuiit.edu.ph)" />
+                        name="email_display"
+                        :value="$verifiedEmail"
+                        readonly />
+                    <input type="hidden" name="email" value="{{ $verifiedEmail }}">
                     <x-input-error :messages="$errors->get('email')" class="mt-2" />
                 </div>
+            </div>
+            <div class="mt-6 flex items-center justify-end">
+                <button type="button" class="step-next inline-flex items-center px-4 py-2 bg-indigo-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
+                    Next: School Data
+                </button>
             </div>
         </div>
 
         <!-- School Data Section -->
-        <div class="mb-8 p-6 border border-gray-200 rounded-lg">
+        <div class="registration-step mb-8 p-6 border border-gray-200 rounded-lg" data-title="School Data">
             <h2 class="text-xl font-bold mb-4 text-gray-800">School Data</h2>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -164,6 +241,18 @@
                         <option value="5th Year" {{ old('year_level') == '5th Year' ? 'selected' : '' }}>5th Year</option>
                     </select>
                     <x-input-error :messages="$errors->get('year_level')" class="mt-2" />
+                </div>
+
+                <!-- Initial Interview Completion (2nd Year Only) -->
+                <div id="initialInterviewCompletedWrapper" class="hidden">
+                    <x-input-label for="initial_interview_completed" :value="__('Initial Interview Completion')" />
+                    <select id="initial_interview_completed" name="initial_interview_completed" class="block mt-1 w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" autocomplete="off">
+                        <option value="">Select an option</option>
+                        <option value="yes" {{ old('initial_interview_completed') == 'yes' ? 'selected' : '' }}>Yes, I already completed it</option>
+                        <option value="no" {{ old('initial_interview_completed') == 'no' ? 'selected' : '' }}>No, I have not completed it yet</option>
+                    </select>
+                    <p class="mt-2 text-sm text-gray-500">Required for 2nd year students only.</p>
+                    <x-input-error :messages="$errors->get('initial_interview_completed')" class="mt-2" />
                 </div>
 
                 <!-- Course -->
@@ -221,10 +310,18 @@
                     <x-input-error :messages="$errors->get('profile_picture')" class="mt-2" />
                 </div>
             </div>
+            <div class="mt-6 flex items-center justify-between">
+                <button type="button" class="step-back inline-flex items-center px-4 py-2 bg-white border border-gray-300 rounded-md font-semibold text-xs text-gray-700 uppercase tracking-widest hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
+                    Back
+                </button>
+                <button type="button" class="step-next inline-flex items-center px-4 py-2 bg-indigo-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
+                    Next: Personal Data
+                </button>
+            </div>
         </div>
 
         <!-- Personal Data Section -->
-        <div class="mb-8 p-6 border border-gray-200 rounded-lg">
+        <div class="registration-step mb-8 p-6 border border-gray-200 rounded-lg" data-title="Personal Data">
             <h2 class="text-xl font-bold mb-4 text-gray-800">Personal Data</h2>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -296,20 +393,20 @@
     <x-text-input id="physical_disability" class="block mt-1 w-full" type="text" name="physical_disability" :value="old('physical_disability')" placeholder="Specify physical disability or leave blank if none" />
     <x-input-error :messages="$errors->get('physical_disability')" class="mt-2" />
 </div>
-                <!-- Gender Identity -->
+                <!-- Sex Identity -->
                 <div>
-                    <x-input-label for="gender_identity" :value="__('Gender Identity')" />
-                    <select id="gender_identity" name="gender_identity" class="block mt-1 w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
-                        <option value="">Select Gender Identity</option>
-                        <option value="male/man" {{ old('gender_identity') == 'male/man' ? 'selected' : '' }}>Male/Man</option>
-                        <option value="female/woman" {{ old('gender_identity') == 'female/woman' ? 'selected' : '' }}>Female/Woman</option>
-                        <option value="transgender male/man" {{ old('gender_identity') == 'transgender male/man' ? 'selected' : '' }}>Transgender Male/Man</option>
-                        <option value="transgender female/woman" {{ old('gender_identity') == 'transgender female/woman' ? 'selected' : '' }}>Transgender Female/Woman</option>
-                        <option value="gender variant/nonconforming" {{ old('gender_identity') == 'gender variant/nonconforming' ? 'selected' : '' }}>Gender Variant/Nonconforming</option>
-                        <option value="not listed" {{ old('gender_identity') == 'not listed' ? 'selected' : '' }}>Not Listed</option>
-                        <option value="prefer not to say" {{ old('gender_identity') == 'prefer not to say' ? 'selected' : '' }}>Prefer not to say</option>
+                    <x-input-label for="sex_identity" :value="__('Sex Identity')" />
+                    <select id="sex_identity" name="sex_identity" class="block mt-1 w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+                        <option value="">Select Sex Identity</option>
+                        <option value="male/man" {{ old('sex_identity') == 'male/man' ? 'selected' : '' }}>Male/Man</option>
+                        <option value="female/woman" {{ old('sex_identity') == 'female/woman' ? 'selected' : '' }}>Female/Woman</option>
+                        <option value="transsex male/man" {{ old('sex_identity') == 'transsex male/man' ? 'selected' : '' }}>Transsex Male/Man</option>
+                        <option value="transsex female/woman" {{ old('sex_identity') == 'transsex female/woman' ? 'selected' : '' }}>Transsex Female/Woman</option>
+                        <option value="sex variant/nonconforming" {{ old('sex_identity') == 'sex variant/nonconforming' ? 'selected' : '' }}>Sex Variant/Nonconforming</option>
+                        <option value="not listed" {{ old('sex_identity') == 'not listed' ? 'selected' : '' }}>Not Listed</option>
+                        <option value="prefer not to say" {{ old('sex_identity') == 'prefer not to say' ? 'selected' : '' }}>Prefer not to say</option>
                     </select>
-                    <x-input-error :messages="$errors->get('gender_identity')" class="mt-2" />
+                    <x-input-error :messages="$errors->get('sex_identity')" class="mt-2" />
                 </div>
 
                 <!-- Romantic Attraction -->
@@ -317,27 +414,35 @@
                     <x-input-label for="romantic_attraction" :value="__('Romantic/Emotional/Sexual Attraction')" />
                     <select id="romantic_attraction" name="romantic_attraction" class="block mt-1 w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
                         <option value="">Select Option</option>
-                        <option value="my same gender" {{ old('romantic_attraction') == 'my same gender' ? 'selected' : '' }}>My same gender</option>
-                        <option value="opposite gender" {{ old('romantic_attraction') == 'opposite gender' ? 'selected' : '' }}>Opposite gender</option>
+                        <option value="my same sex" {{ old('romantic_attraction') == 'my same sex' ? 'selected' : '' }}>My same sex</option>
+                        <option value="opposite sex" {{ old('romantic_attraction') == 'opposite sex' ? 'selected' : '' }}>Opposite sex</option>
                         <option value="both men and women" {{ old('romantic_attraction') == 'both men and women' ? 'selected' : '' }}>Both men and women</option>
-                        <option value="all genders" {{ old('romantic_attraction') == 'all genders' ? 'selected' : '' }}>All genders</option>
-                        <option value="neither gender" {{ old('romantic_attraction') == 'neither gender' ? 'selected' : '' }}>Neither gender</option>
+                        <option value="all sexes" {{ old('romantic_attraction') == 'all sexes' ? 'selected' : '' }}>All sexes</option>
+                        <option value="neither sex" {{ old('romantic_attraction') == 'neither sex' ? 'selected' : '' }}>Neither sex</option>
                         <option value="prefer not to answer" {{ old('romantic_attraction') == 'prefer not to answer' ? 'selected' : '' }}>Prefer not to answer</option>
                     </select>
                     <x-input-error :messages="$errors->get('romantic_attraction')" class="mt-2" />
                 </div>
             </div>
+            <div class="mt-6 flex items-center justify-between">
+                <button type="button" class="step-back inline-flex items-center px-4 py-2 bg-white border border-gray-300 rounded-md font-semibold text-xs text-gray-700 uppercase tracking-widest hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
+                    Back
+                </button>
+                <button type="button" class="step-next inline-flex items-center px-4 py-2 bg-indigo-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
+                    Next: Family Data
+                </button>
+            </div>
         </div>
 
         <!-- Family Data Section -->
-        <div class="mb-8 p-6 border border-gray-200 rounded-lg">
+        <div class="registration-step mb-8 p-6 border border-gray-200 rounded-lg" data-title="Family Data">
             <h2 class="text-xl font-bold mb-4 text-gray-800">Family Data</h2>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <!-- Father's Name -->
                 <div>
                     <x-input-label for="father_name" :value="__('Father\'s Name')" />
-                    <x-text-input id="father_name" class="block mt-1 w-full" type="text" name="father_name" :value="old('father_name')" autocomplete="off" />
+                    <x-text-input id="father_name" class="block mt-1 w-full" type="text" name="father_name" :value="old('father_name')" autocomplete="off" required />
                     <div class="mt-2">
                         <label class="inline-flex items-center">
                             <input type="checkbox" name="father_deceased" value="1" {{ old('father_deceased') ? 'checked' : '' }} class="rounded border-gray-300 text-indigo-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
@@ -350,21 +455,21 @@
                 <!-- Father's Occupation -->
                 <div>
                     <x-input-label for="father_occupation" :value="__('Father\'s Occupation')" />
-                    <x-text-input id="father_occupation" class="block mt-1 w-full" type="text" name="father_occupation" :value="old('father_occupation')" autocomplete="off" />
+                    <x-text-input id="father_occupation" class="block mt-1 w-full" type="text" name="father_occupation" :value="old('father_occupation')" autocomplete="off" required />
                     <x-input-error :messages="$errors->get('father_occupation')" class="mt-2" />
                 </div>
 
                 <!-- Father's Phone Number -->
                 <div>
                     <x-input-label for="father_phone_number" :value="__('Father\'s Phone Number')" />
-                    <x-text-input id="father_phone_number" class="block mt-1 w-full" type="text" name="father_phone_number" :value="old('father_phone_number')" autocomplete="off" />
+                    <x-text-input id="father_phone_number" class="block mt-1 w-full" type="text" name="father_phone_number" :value="old('father_phone_number')" autocomplete="off" required />
                     <x-input-error :messages="$errors->get('father_phone_number')" class="mt-2" />
                 </div>
 
                 <!-- Mother's Name -->
                 <div>
                     <x-input-label for="mother_name" :value="__('Mother\'s Name')" />
-                    <x-text-input id="mother_name" class="block mt-1 w-full" type="text" name="mother_name" :value="old('mother_name')" autocomplete="off" />
+                    <x-text-input id="mother_name" class="block mt-1 w-full" type="text" name="mother_name" :value="old('mother_name')" autocomplete="off" required />
                     <div class="mt-2">
                         <label class="inline-flex items-center">
                             <input type="checkbox" name="mother_deceased" value="1" {{ old('mother_deceased') ? 'checked' : '' }} class="rounded border-gray-300 text-indigo-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
@@ -377,21 +482,21 @@
                 <!-- Mother's Occupation -->
                 <div>
                     <x-input-label for="mother_occupation" :value="__('Mother\'s Occupation')" />
-                    <x-text-input id="mother_occupation" class="block mt-1 w-full" type="text" name="mother_occupation" :value="old('mother_occupation')" autocomplete="off" />
+                    <x-text-input id="mother_occupation" class="block mt-1 w-full" type="text" name="mother_occupation" :value="old('mother_occupation')" autocomplete="off" required />
                     <x-input-error :messages="$errors->get('mother_occupation')" class="mt-2" />
                 </div>
 
                 <!-- Mother's Phone Number -->
                 <div>
                     <x-input-label for="mother_phone_number" :value="__('Mother\'s Phone Number')" />
-                    <x-text-input id="mother_phone_number" class="block mt-1 w-full" type="text" name="mother_phone_number" :value="old('mother_phone_number')" autocomplete="off" />
+                    <x-text-input id="mother_phone_number" class="block mt-1 w-full" type="text" name="mother_phone_number" :value="old('mother_phone_number')" autocomplete="off" required />
                     <x-input-error :messages="$errors->get('mother_phone_number')" class="mt-2" />
                 </div>
 
                 <!-- Parents' Marital Status -->
                 <div>
                     <x-input-label for="parents_marital_status" :value="__('Parents\' Marital Status')" />
-                    <select id="parents_marital_status" name="parents_marital_status" class="block mt-1 w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+                    <select id="parents_marital_status" name="parents_marital_status" class="block mt-1 w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" required>
                         <option value="">Select Status</option>
                         <option value="married" {{ old('parents_marital_status') == 'married' ? 'selected' : '' }}>Married</option>
                         <option value="not legally married" {{ old('parents_marital_status') == 'not legally married' ? 'selected' : '' }}>Not Legally Married</option>
@@ -405,7 +510,7 @@
                 <!-- Family Monthly Income -->
                 <div>
                     <x-input-label for="family_monthly_income" :value="__('Family Monthly Income')" />
-                    <select id="family_monthly_income" name="family_monthly_income" class="block mt-1 w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+                    <select id="family_monthly_income" name="family_monthly_income" class="block mt-1 w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" required>
                         <option value="">Select Income Range</option>
                         <option value="below 3k" {{ old('family_monthly_income') == 'below 3k' ? 'selected' : '' }}>Below ₱3,000</option>
                         <option value="3001-5000" {{ old('family_monthly_income') == '3001-5000' ? 'selected' : '' }}>₱3,001 - ₱5,000</option>
@@ -449,7 +554,7 @@
                 <!-- Ordinal Position -->
                 <div>
                     <x-input-label for="ordinal_position" :value="__('Ordinal Position in Family')" />
-                    <select id="ordinal_position" name="ordinal_position" class="block mt-1 w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+                    <select id="ordinal_position" name="ordinal_position" class="block mt-1 w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" required>
                         <option value="">Select Position</option>
                         <option value="only child" {{ old('ordinal_position') == 'only child' ? 'selected' : '' }}>Only Child</option>
                         <option value="eldest" {{ old('ordinal_position') == 'eldest' ? 'selected' : '' }}>Eldest</option>
@@ -462,21 +567,29 @@
                 <!-- Number of Siblings -->
                 <div>
                     <x-input-label for="number_of_siblings" :value="__('Number of Siblings (excluding yourself)')" />
-                    <x-text-input id="number_of_siblings" class="block mt-1 w-full" type="number" name="number_of_siblings" :value="old('number_of_siblings', 0)" min="0" autocomplete="off" />
+                    <x-text-input id="number_of_siblings" class="block mt-1 w-full" type="number" name="number_of_siblings" :value="old('number_of_siblings', 0)" min="0" autocomplete="off" required />
                     <x-input-error :messages="$errors->get('number_of_siblings')" class="mt-2" />
                 </div>
 
                 <!-- Home Environment Description -->
                 <div class="md:col-span-2">
                     <x-input-label for="home_environment_description" :value="__('Describe Your Home Environment')" />
-                    <textarea id="home_environment_description" name="home_environment_description" class="block mt-1 w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">{{ old('home_environment_description') }}</textarea>
+                    <textarea id="home_environment_description" name="home_environment_description" class="block mt-1 w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" required>{{ old('home_environment_description') }}</textarea>
                     <x-input-error :messages="$errors->get('home_environment_description')" class="mt-2" />
                 </div>
+            </div>
+            <div class="mt-6 flex items-center justify-between">
+                <button type="button" class="step-back inline-flex items-center px-4 py-2 bg-white border border-gray-300 rounded-md font-semibold text-xs text-gray-700 uppercase tracking-widest hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
+                    Back
+                </button>
+                <button type="button" class="step-next inline-flex items-center px-4 py-2 bg-indigo-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
+                    Next: Academic & Career
+                </button>
             </div>
         </div>
 
         <!-- Academic and Career Data Section -->
-        <div class="mb-8 p-6 border border-gray-200 rounded-lg">
+        <div class="registration-step mb-8 p-6 border border-gray-200 rounded-lg" data-title="Academic & Career">
             <h2 class="text-xl font-bold mb-4 text-gray-800">Academic and Career Data</h2>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -569,19 +682,19 @@
 
                 <!-- Career Options -->
                 <div>
-                    <x-input-label for="career_option_1" :value="__('1st Career Choice')" />
+                    <x-input-label for="career_option_1" :value="__('1st Career/Course Option')" />
                     <x-text-input id="career_option_1" class="block mt-1 w-full" type="text" name="career_option_1" :value="old('career_option_1')" autocomplete="off" />
                     <x-input-error :messages="$errors->get('career_option_1')" class="mt-2" />
                 </div>
 
                 <div>
-                    <x-input-label for="career_option_2" :value="__('2nd Career Choice')" />
+                    <x-input-label for="career_option_2" :value="__('2nd Career/Course Option')" />
                     <x-text-input id="career_option_2" class="block mt-1 w-full" type="text" name="career_option_2" :value="old('career_option_2')" autocomplete="off" />
                     <x-input-error :messages="$errors->get('career_option_2')" class="mt-2" />
                 </div>
 
                 <div>
-                    <x-input-label for="career_option_3" :value="__('3rd Career Choice')" />
+                    <x-input-label for="career_option_3" :value="__('3rd Career/Course Option')" />
                     <x-text-input id="career_option_3" class="block mt-1 w-full" type="text" name="career_option_3" :value="old('career_option_3')" autocomplete="off" />
                     <x-input-error :messages="$errors->get('career_option_3')" class="mt-2" />
                 </div>
@@ -599,6 +712,11 @@
                         <option value="others" {{ old('course_choice_by') == 'others' ? 'selected' : '' }}>Others</option>
                     </select>
                     <x-input-error :messages="$errors->get('course_choice_by')" class="mt-2" />
+                </div>
+                <div id="course_choice_other_container" class="{{ old('course_choice_by') == 'others' ? '' : 'hidden' }}">
+                    <x-input-label for="course_choice_other" :value="__('Please specify the course choice')" />
+                    <x-text-input id="course_choice_other" class="block mt-1 w-full" type="text" name="course_choice_other" :value="old('course_choice_other')" placeholder="Please specify" />
+                    <x-input-error :messages="$errors->get('course_choice_other')" class="mt-2" />
                 </div>
 
                 <!-- Course Choice Reason -->
@@ -649,15 +767,23 @@
 
                 <!-- Future Career Plans -->
                 <div class="md:col-span-2">
-                    <x-input-label for="future_career_plans" :value="__('Future Career Plans')" />
+                    <x-input-label for="future_career_plans" :value="__('What career do you see yourself pursuing after college education?')" />
                     <textarea id="future_career_plans" name="future_career_plans" class="block mt-1 w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">{{ old('future_career_plans') }}</textarea>
                     <x-input-error :messages="$errors->get('future_career_plans')" class="mt-2" />
                 </div>
             </div>
+            <div class="mt-6 flex items-center justify-between">
+                <button type="button" class="step-back inline-flex items-center px-4 py-2 bg-white border border-gray-300 rounded-md font-semibold text-xs text-gray-700 uppercase tracking-widest hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
+                    Back
+                </button>
+                <button type="button" class="step-next inline-flex items-center px-4 py-2 bg-indigo-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
+                    Next: Learning Resources
+                </button>
+            </div>
         </div>
 
         <!-- Distance Learning Resources Section -->
-        <div class="mb-8 p-6 border border-gray-200 rounded-lg">
+        <div class="registration-step mb-8 p-6 border border-gray-200 rounded-lg" data-title="Learning Resources">
             <h2 class="text-xl font-bold mb-4 text-gray-800">Distance Learning Resources</h2>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -775,10 +901,18 @@
                     <x-input-error :messages="$errors->get('learning_space_description')" class="mt-2" />
                 </div>
             </div>
+            <div class="mt-6 flex items-center justify-between">
+                <button type="button" class="step-back inline-flex items-center px-4 py-2 bg-white border border-gray-300 rounded-md font-semibold text-xs text-gray-700 uppercase tracking-widest hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
+                    Back
+                </button>
+                <button type="button" class="step-next inline-flex items-center px-4 py-2 bg-indigo-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
+                    Next: Psychosocial
+                </button>
+            </div>
         </div>
 
         <!-- Psychosocial Well-being Section -->
-        <div class="mb-8 p-6 border border-gray-200 rounded-lg">
+        <div class="registration-step mb-8 p-6 border border-gray-200 rounded-lg" data-title="Psychosocial Well-being">
             <h2 class="text-xl font-bold mb-4 text-gray-800">Psychosocial Well-being</h2>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -891,10 +1025,18 @@
                     <x-input-error :messages="$errors->get('future_counseling_concerns')" class="mt-2" />
                 </div>
             </div>
+            <div class="mt-6 flex items-center justify-between">
+                <button type="button" class="step-back inline-flex items-center px-4 py-2 bg-white border border-gray-300 rounded-md font-semibold text-xs text-gray-700 uppercase tracking-widest hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
+                    Back
+                </button>
+                <button type="button" class="step-next inline-flex items-center px-4 py-2 bg-indigo-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
+                    Next: Needs Assessment
+                </button>
+            </div>
         </div>
 
         <!-- Needs Assessment Section -->
-        <div class="mb-8 p-6 border border-gray-200 rounded-lg">
+        <div class="registration-step mb-8 p-6 border border-gray-200 rounded-lg" data-title="Needs Assessment">
             <h2 class="text-xl font-bold mb-4 text-gray-800">Needs Assessment</h2>
 
             <!-- Improvement Needs -->
@@ -923,6 +1065,9 @@
                         </label>
                     @endforeach
                 </div>
+                <div id="improvement_needs_other_container" class="{{ in_array('Others', old('improvement_needs', [])) ? '' : 'hidden' }}">
+                    <x-text-input id="improvement_needs_other" class="block mt-1 w-full md:w-1/2" type="text" name="improvement_needs_other" :value="old('improvement_needs_other')" placeholder="Please specify" />
+                </div>
                 <x-input-error :messages="$errors->get('improvement_needs')" class="mt-2" />
             </div>
 
@@ -944,6 +1089,9 @@
                             <span class="ms-2 text-sm text-gray-600">{{ $need }}</span>
                         </label>
                     @endforeach
+                </div>
+                <div id="financial_assistance_needs_other_container" class="{{ in_array('Others', old('financial_assistance_needs', [])) ? '' : 'hidden' }}">
+                    <x-text-input id="financial_assistance_needs_other" class="block mt-1 w-full md:w-1/2" type="text" name="financial_assistance_needs_other" :value="old('financial_assistance_needs_other')" placeholder="Please specify" />
                 </div>
                 <x-input-error :messages="$errors->get('financial_assistance_needs')" class="mt-2" />
             </div>
@@ -980,6 +1128,9 @@
                             <span class="ms-2 text-sm text-gray-600">{{ $need }}</span>
                         </label>
                     @endforeach
+                </div>
+                <div id="personal_social_needs_other_container" class="{{ in_array('Others', old('personal_social_needs', [])) ? '' : 'hidden' }}">
+                    <x-text-input id="personal_social_needs_other" class="block mt-1 w-full md:w-1/2" type="text" name="personal_social_needs_other" :value="old('personal_social_needs_other')" placeholder="Please specify" />
                 </div>
                 <x-input-error :messages="$errors->get('personal_social_needs')" class="mt-2" />
             </div>
@@ -1035,6 +1186,9 @@
                         </label>
                     @endforeach
                 </div>
+                <div id="stress_responses_other_container" class="{{ in_array('Others', old('stress_responses', [])) ? '' : 'hidden' }}">
+                    <x-text-input id="stress_responses_other" class="block mt-1 w-full md:w-1/2" type="text" name="stress_responses_other" :value="old('stress_responses_other')" placeholder="Please specify" />
+                </div>
                 <x-input-error :messages="$errors->get('stress_responses')" class="mt-2" />
             </div>
 
@@ -1060,24 +1214,27 @@
                         </label>
                     @endforeach
                 </div>
+                <div id="easy_discussion_other_container" class="{{ old('easy_discussion_target') == 'others' ? '' : 'hidden' }}">
+                    <x-text-input id="easy_discussion_other" class="block mt-1 w-full md:w-1/2" type="text" name="easy_discussion_other" :value="old('easy_discussion_other')" placeholder="Please specify" />
+                </div>
                 <x-input-error :messages="$errors->get('easy_discussion_target')" class="mt-2" />
             </div>
 
             <!-- Counseling Perceptions -->
             <div class="mb-6">
                 <x-input-label value="How often did you experience or perceive the following?" />
-                <div class="mt-4 overflow-x-auto">
-                    <table class="min-w-full divide-y divide-gray-200">
+                <div class="mt-4 overflow-x-auto rounded-lg border border-gray-200 bg-white">
+                    <table class="min-w-[860px] w-full table-fixed divide-y divide-gray-200">
                         <thead class="bg-gray-50">
                             <tr>
-                                <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Statement</th>
-                                <th class="px-4 py-2 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Always</th>
-                                <th class="px-4 py-2 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Oftentimes</th>
-                                <th class="px-4 py-2 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Sometimes</th>
-                                <th class="px-4 py-2 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Never</th>
+                                <th class="w-1/2 px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Statement</th>
+                                <th class="w-1/12 px-4 py-3 text-center text-xs font-semibold text-gray-600 uppercase tracking-wider whitespace-nowrap">Always</th>
+                                <th class="w-1/12 px-4 py-3 text-center text-xs font-semibold text-gray-600 uppercase tracking-wider whitespace-nowrap">Oftentimes</th>
+                                <th class="w-1/12 px-4 py-3 text-center text-xs font-semibold text-gray-600 uppercase tracking-wider whitespace-nowrap">Sometimes</th>
+                                <th class="w-1/12 px-4 py-3 text-center text-xs font-semibold text-gray-600 uppercase tracking-wider whitespace-nowrap">Never</th>
                             </tr>
                         </thead>
-                        <tbody class="bg-white divide-y divide-gray-200">
+                        <tbody class="divide-y divide-gray-200">
                             @php
                                 $counselingStatements = [
                                     'I willfully came for counseling when I had a problem.',
@@ -1089,10 +1246,10 @@
                                 $frequencyOptions = ['always', 'oftentimes', 'sometimes', 'never'];
                             @endphp
                             @foreach($counselingStatements as $index => $statement)
-                                <tr>
-                                    <td class="px-4 py-2 text-sm text-gray-900">{{ $statement }}</td>
+                                <tr class="odd:bg-white even:bg-gray-50">
+                                    <td class="px-4 py-3 text-sm text-gray-700">{{ $statement }}</td>
                                     @foreach($frequencyOptions as $frequency)
-                                        <td class="px-4 py-2 text-center">
+                                        <td class="px-4 py-3 text-center">
                                             <input type="radio" name="counseling_perceptions[{{ $index }}]" value="{{ $frequency }}" {{ old("counseling_perceptions.{$index}") == $frequency ? 'checked' : '' }} class="rounded border-gray-300 text-indigo-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
                                         </td>
                                     @endforeach
@@ -1103,10 +1260,18 @@
                 </div>
                 <x-input-error :messages="$errors->get('counseling_perceptions')" class="mt-2" />
             </div>
+            <div class="mt-6 flex items-center justify-between">
+                <button type="button" class="step-back inline-flex items-center px-4 py-2 bg-white border border-gray-300 rounded-md font-semibold text-xs text-gray-700 uppercase tracking-widest hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
+                    Back
+                </button>
+                <button type="button" class="step-next inline-flex items-center px-4 py-2 bg-indigo-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
+                    Next: Account Security
+                </button>
+            </div>
         </div>
 
         <!-- Account Security Section -->
-        <div class="mb-8 p-6 border border-gray-200 rounded-lg">
+        <div class="registration-step mb-8 p-6 border border-gray-200 rounded-lg" data-title="Account Security">
             <h2 class="text-xl font-bold mb-4 text-gray-800">Account Security</h2>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -1124,26 +1289,31 @@
                     <x-input-error :messages="$errors->get('password_confirmation')" class="mt-2" />
                 </div>
             </div>
+            <!-- Hidden role field (always student) -->
+            <input type="hidden" name="role" value="student">
+            <div class="mt-6 flex items-center justify-between">
+                <button type="button" class="step-back inline-flex items-center px-4 py-2 bg-white border border-gray-300 rounded-md font-semibold text-xs text-gray-700 uppercase tracking-widest hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
+                    Back
+                </button>
+                <div class="flex items-center gap-4">
+                    <a class="underline text-sm text-gray-600 hover:text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" href="{{ route('login') }}">
+                        {{ __('Already registered?') }}
+                    </a>
+                    <x-primary-button>
+                        {{ __('Register') }}
+                    </x-primary-button>
+                </div>
+            </div>
         </div>
+        </form>
 
-        <!-- Hidden role field (always student) -->
-        <input type="hidden" name="role" value="student">
-
-        <div class="flex items-center justify-between mt-4">
-            <a class="underline text-sm text-gray-600 hover:text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" href="{{ route('login') }}">
-                {{ __('Already registered?') }}
-            </a>
-
-            <x-primary-button class="ms-4">
-                {{ __('Register') }}
-            </x-primary-button>
-        </div>
-    </form>
-
-    <script>
+        <script>
         document.addEventListener('DOMContentLoaded', function () {
             const birthdateInput = document.getElementById('birthdate');
             const ageInput = document.getElementById('age');
+            const yearLevelSelect = document.getElementById('year_level');
+            const initialInterviewWrapper = document.getElementById('initialInterviewCompletedWrapper');
+            const initialInterviewSelect = document.getElementById('initial_interview_completed');
 
             // Calculate age from birthdate
             function calculateAge() {
@@ -1165,6 +1335,23 @@
 
             birthdateInput.addEventListener('change', calculateAge);
 
+            function toggleInitialInterviewField() {
+                if (!yearLevelSelect || !initialInterviewWrapper || !initialInterviewSelect) {
+                    return;
+                }
+                const isSecondYear = yearLevelSelect.value === '2nd Year';
+                initialInterviewWrapper.classList.toggle('hidden', !isSecondYear);
+                initialInterviewSelect.required = isSecondYear;
+                if (!isSecondYear) {
+                    initialInterviewSelect.value = '';
+                }
+            }
+
+            if (yearLevelSelect) {
+                yearLevelSelect.addEventListener('change', toggleInitialInterviewField);
+                toggleInitialInterviewField();
+            }
+
             // Handle conditional fields
             const isScholarCheckbox = document.querySelector('input[name="is_scholar"]');
             const scholarshipTypeInput = document.getElementById('scholarship_type');
@@ -1182,62 +1369,176 @@
                 isScholarCheckbox.addEventListener('change', toggleScholarField);
                 toggleScholarField(); // Initial state
             }
+
+            const stepPanels = Array.from(document.querySelectorAll('.registration-step'));
+            if (stepPanels.length) {
+                const indicatorContainer = document.getElementById('registrationStepIndicators');
+                const progressBar = document.getElementById('registrationProgress');
+                const totalSteps = stepPanels.length;
+                let currentStep = 0;
+
+                const updateIndicators = () => {
+                    if (!indicatorContainer) {
+                        return;
+                    }
+                    indicatorContainer.innerHTML = '';
+                    stepPanels.forEach((panel, index) => {
+                        const label = panel.dataset.title || `Step ${index + 1}`;
+                        const pill = document.createElement('span');
+                        const isActive = index === currentStep;
+                        const isComplete = index < currentStep;
+                        pill.className = [
+                            'px-3',
+                            'py-1',
+                            'rounded-full',
+                            'text-xs',
+                            'font-semibold',
+                            'border',
+                            isActive
+                                ? 'bg-indigo-600 text-white border-indigo-600'
+                                : isComplete
+                                    ? 'bg-indigo-50 text-indigo-700 border-indigo-200'
+                                    : 'bg-white text-gray-600 border-gray-200'
+                        ].join(' ');
+                        pill.textContent = `${index + 1}. ${label}`;
+                        indicatorContainer.appendChild(pill);
+                    });
+                };
+
+                const updateProgress = () => {
+                    if (progressBar) {
+                        const percent = ((currentStep + 1) / totalSteps) * 100;
+                        progressBar.style.width = `${percent}%`;
+                    }
+                };
+
+                const updateButtons = () => {
+                    stepPanels.forEach((panel, index) => {
+                        const backButton = panel.querySelector('.step-back');
+                        const nextButton = panel.querySelector('.step-next');
+                        if (backButton) {
+                            backButton.classList.toggle('invisible', index === 0);
+                        }
+                        if (nextButton) {
+                            nextButton.classList.toggle('hidden', index === totalSteps - 1);
+                        }
+                    });
+                };
+
+                const validateStep = (panel) => {
+                    const requiredFields = Array.from(panel.querySelectorAll('[required]'));
+                    for (const field of requiredFields) {
+                        if (!field.checkValidity()) {
+                            field.reportValidity();
+                            return false;
+                        }
+                    }
+                    return true;
+                };
+
+                const showStep = (index) => {
+                    currentStep = index;
+                    stepPanels.forEach((panel, panelIndex) => {
+                        panel.classList.toggle('hidden', panelIndex !== currentStep);
+                    });
+                    updateIndicators();
+                    updateProgress();
+                    updateButtons();
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                };
+
+                stepPanels.forEach((panel, index) => {
+                    const nextButton = panel.querySelector('.step-next');
+                    const backButton = panel.querySelector('.step-back');
+
+                    if (nextButton) {
+                        nextButton.addEventListener('click', () => {
+                            if (!validateStep(panel)) {
+                                return;
+                            }
+                            showStep(Math.min(index + 1, totalSteps - 1));
+                        });
+                    }
+
+                    if (backButton) {
+                        backButton.addEventListener('click', () => {
+                            showStep(Math.max(index - 1, 0));
+                        });
+                    }
+                });
+
+                showStep(0);
+            }
         });
 
 
 
-           // Handle medical condition fields
+           // Handle medical condition fields (legacy radio support)
     const medicalConditionRadios = document.querySelectorAll('input[name="serious_medical_condition"]');
     const medicalSpecifyContainer = document.getElementById('serious_medical_specify_container');
+    if (medicalConditionRadios.length && medicalSpecifyContainer) {
+        function toggleMedicalConditionFields() {
+            const selectedValue = document.querySelector('input[name="serious_medical_condition"]:checked')?.value;
 
-    function toggleMedicalConditionFields() {
-        const selectedValue = document.querySelector('input[name="serious_medical_condition"]:checked')?.value;
-
-        if (selectedValue === 'specify') {
-            medicalSpecifyContainer.classList.remove('hidden');
-        } else {
-            medicalSpecifyContainer.classList.add('hidden');
+            if (selectedValue === 'specify') {
+                medicalSpecifyContainer.classList.remove('hidden');
+            } else {
+                medicalSpecifyContainer.classList.add('hidden');
+            }
         }
+
+        medicalConditionRadios.forEach(radio => {
+            radio.addEventListener('change', toggleMedicalConditionFields);
+        });
+        toggleMedicalConditionFields(); // Initial state
     }
 
-    medicalConditionRadios.forEach(radio => {
-        radio.addEventListener('change', toggleMedicalConditionFields);
-    });
-    toggleMedicalConditionFields(); // Initial state
-
-    // Handle physical disability fields
+    // Handle physical disability fields (legacy radio support)
     const disabilityRadios = document.querySelectorAll('input[name="physical_disability"]');
     const disabilitySpecifyContainer = document.getElementById('physical_disability_specify_container');
+    if (disabilityRadios.length && disabilitySpecifyContainer) {
+        function toggleDisabilityFields() {
+            const selectedValue = document.querySelector('input[name="physical_disability"]:checked')?.value;
 
-    function toggleDisabilityFields() {
-        const selectedValue = document.querySelector('input[name="physical_disability"]:checked')?.value;
-
-        if (selectedValue === 'specify') {
-            disabilitySpecifyContainer.classList.remove('hidden');
-        } else {
-            disabilitySpecifyContainer.classList.add('hidden');
+            if (selectedValue === 'specify') {
+                disabilitySpecifyContainer.classList.remove('hidden');
+            } else {
+                disabilitySpecifyContainer.classList.add('hidden');
+            }
         }
+
+        disabilityRadios.forEach(radio => {
+            radio.addEventListener('change', toggleDisabilityFields);
+        });
+        toggleDisabilityFields(); // Initial state
     }
 
-    disabilityRadios.forEach(radio => {
-        radio.addEventListener('change', toggleDisabilityFields);
-    });
-    toggleDisabilityFields(); // Initial state
-
     // Handle "others" checkboxes
-    function setupOthersCheckbox(checkboxName, containerId) {
+    function setupOthersCheckbox(checkboxName, containerId, otherValue = 'Others') {
         const checkboxes = document.querySelectorAll(`input[name="${checkboxName}[]"]`);
         const otherContainer = document.getElementById(containerId);
+        if (!otherContainer) {
+            return;
+        }
+        const otherInput = otherContainer ? otherContainer.querySelector('input, textarea') : null;
 
         function toggleOtherField() {
             const othersChecked = Array.from(checkboxes).some(cb =>
-                cb.value === 'Others' && cb.checked
+                cb.value === otherValue && cb.checked
             );
 
             if (othersChecked) {
                 otherContainer.classList.remove('hidden');
+                if (otherInput) {
+                    otherInput.required = true;
+                    otherInput.focus();
+                }
             } else {
                 otherContainer.classList.add('hidden');
+                if (otherInput) {
+                    otherInput.required = false;
+                    otherInput.value = '';
+                }
             }
         }
 
@@ -1249,7 +1550,7 @@
 
     // Set up all "others" checkboxes
     setupOthersCheckbox('msu_choice_reasons', 'msu_choice_other_container');
-    setupOthersCheckbox('technology_gadgets', 'technology_gadgets_other_container');
+    setupOthersCheckbox('technology_gadgets', 'technology_gadgets_other_container', 'Other');
     setupOthersCheckbox('internet_connectivity', 'internet_connectivity_other_container');
     setupOthersCheckbox('problem_sharing_targets', 'problem_sharing_other_container');
 
@@ -1258,6 +1559,63 @@
     setupOthersCheckbox('financial_assistance_needs', 'financial_assistance_needs_other_container');
     setupOthersCheckbox('personal_social_needs', 'personal_social_needs_other_container');
     setupOthersCheckbox('stress_responses', 'stress_responses_other_container');
+
+    const courseChoiceSelect = document.getElementById('course_choice_by');
+    const courseChoiceOtherContainer = document.getElementById('course_choice_other_container');
+    const courseChoiceOtherInput = document.getElementById('course_choice_other');
+    if (courseChoiceSelect && courseChoiceOtherContainer && courseChoiceOtherInput) {
+        const toggleCourseChoiceOther = () => {
+            if (courseChoiceSelect.value === 'others') {
+                courseChoiceOtherContainer.classList.remove('hidden');
+                courseChoiceOtherInput.required = true;
+            } else {
+                courseChoiceOtherContainer.classList.add('hidden');
+                courseChoiceOtherInput.required = false;
+                courseChoiceOtherInput.value = '';
+            }
+        };
+        courseChoiceSelect.addEventListener('change', toggleCourseChoiceOther);
+        toggleCourseChoiceOther();
+    }
+
+    const civilStatusSelect = document.getElementById('civil_status');
+    const civilStatusOtherContainer = document.getElementById('civil_status_other_container');
+    const civilStatusOtherInput = document.getElementById('civil_status_other');
+    if (civilStatusSelect && civilStatusOtherContainer && civilStatusOtherInput) {
+        const toggleCivilStatusOther = () => {
+            if (civilStatusSelect.value === 'others') {
+                civilStatusOtherContainer.classList.remove('hidden');
+                civilStatusOtherInput.required = true;
+            } else {
+                civilStatusOtherContainer.classList.add('hidden');
+                civilStatusOtherInput.required = false;
+                civilStatusOtherInput.value = '';
+            }
+        };
+        civilStatusSelect.addEventListener('change', toggleCivilStatusOther);
+        toggleCivilStatusOther();
+    }
+
+    const easyDiscussionRadios = document.querySelectorAll('input[name="easy_discussion_target"]');
+    const easyDiscussionOtherContainer = document.getElementById('easy_discussion_other_container');
+    const easyDiscussionOtherInput = document.getElementById('easy_discussion_other');
+    if (easyDiscussionRadios.length && easyDiscussionOtherContainer && easyDiscussionOtherInput) {
+        const toggleEasyDiscussionOther = () => {
+            const selectedValue = document.querySelector('input[name="easy_discussion_target"]:checked')?.value;
+            if (selectedValue === 'others') {
+                easyDiscussionOtherContainer.classList.remove('hidden');
+                easyDiscussionOtherInput.required = true;
+            } else {
+                easyDiscussionOtherContainer.classList.add('hidden');
+                easyDiscussionOtherInput.required = false;
+                easyDiscussionOtherInput.value = '';
+            }
+        };
+        easyDiscussionRadios.forEach(radio => {
+            radio.addEventListener('change', toggleEasyDiscussionOther);
+        });
+        toggleEasyDiscussionOther();
+    }
 
     // Existing scholar field handling
     const isScholarCheckbox = document.querySelector('input[name="is_scholar"]');
@@ -1277,6 +1635,7 @@
         toggleScholarField(); // Initial state
     }
 
-    </script>
+        </script>
+    @endif
 
 </x-guest-layout>
