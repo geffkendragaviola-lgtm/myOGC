@@ -406,32 +406,48 @@
             @php
                 $services = \App\Models\Service::active()->ordered()->get();
             @endphp
+            
+@if(in_array(Auth::user()->role, ['student', 'counselor', 'admin']))
 
-            @if(Auth::user()->role === 'student')
-                @if($services->isNotEmpty())
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
-                        @foreach($services as $service)
-                            <div class="dashboard-card bg-white rounded-xl shadow-md overflow-hidden">
-                                <img src="{{ $service->image_url }}" alt="{{ $service->title }}" class="w-full h-48 object-cover">
-                                <div class="p-6">
-                                    <h3 class="text-xl font-bold text-gray-800 mb-3">{{ $service->title }}</h3>
-                                    <p class="text-gray-600 mb-4">{{ $service->description }}</p>
+    @if($services->isNotEmpty())
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+            @foreach($services as $service)
+                <div class="dashboard-card bg-white rounded-xl shadow-md overflow-hidden">
+                    
+                    <img src="{{ $service->image_url }}" 
+                         alt="{{ $service->title }}" 
+                         class="w-full h-48 object-cover">
 
-                                    @if($service->route_name)
-                                        <a href="{{ route($service->route_name) }}" class="dashboard-btn bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition inline-block">
-                                            See more
-                                        </a>
-                                    @else
-                                        <button class="dashboard-btn bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition">
-                                            See more
-                                        </button>
-                                    @endif
-                                </div>
-                            </div>
-                        @endforeach
+                    <div class="p-6">
+                        <h3 class="text-xl font-bold text-gray-800 mb-3">
+                            {{ $service->title }}
+                        </h3>
+
+                        <p class="text-gray-600 mb-4">
+                            {{ $service->description }}
+                        </p>
+
+                        {{-- Only Student Can See Button --}}
+                        @if(Auth::user()->role === 'student')
+                            @if($service->route_name)
+                                <a href="{{ route($service->route_name) }}" 
+                                   class="dashboard-btn bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition inline-block">
+                                    See more
+                                </a>
+                            @else
+                                <button class="dashboard-btn bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition">
+                                    See more
+                                </button>
+                            @endif
+                        @endif
+
                     </div>
-                @endif
-            @endif
+                </div>
+            @endforeach
+        </div>
+    @endif
+
+@endif
 
      <!-- Announcements Section -->
 <section class="mb-12">

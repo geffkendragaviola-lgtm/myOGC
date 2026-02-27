@@ -7,7 +7,6 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
 use App\Models\User;
 use App\Models\Student;
-use App\Models\Appointment;
 use App\Models\StudentPersonalData;
 use App\Models\StudentFamilyData;
 use App\Models\StudentAcademicData;
@@ -22,36 +21,6 @@ class StudentSeeder extends Seeder
      */
     public function run(): void
     {
-        $seedInitialInterview = function (Student $student, string $status): void {
-            $counselorId = DB::table('counselors')
-                ->where('college_id', $student->college_id)
-                ->value('id');
-
-            if (!$counselorId) {
-                $counselorId = DB::table('counselors')->value('id');
-            }
-
-            if (!$counselorId) {
-                return;
-            }
-
-            Appointment::create([
-                'student_id' => $student->id,
-                'counselor_id' => $counselorId,
-                'appointment_date' => now()->toDateString(),
-                'start_time' => '09:00:00',
-                'end_time' => '10:00:00',
-                'booking_type' => 'Initial Interview',
-                'status' => $status,
-                'concern' => null,
-                'notes' => null,
-            ]);
-
-            if ($status === 'completed' && $student->initial_interview_completed !== true) {
-                $student->update(['initial_interview_completed' => true]);
-            }
-        };
-
         // 🧍 1st Student (CCS)
         $user1 = User::create([
             'first_name' => 'Geff Kendra',
@@ -82,8 +51,6 @@ class StudentSeeder extends Seeder
             'academic_year' => '2024-2025',
             'student_status' => 'new',
         ]);
-
-        $seedInitialInterview($student1, 'completed');
 
         // Personal Data for Student 1
         StudentPersonalData::create([
@@ -212,8 +179,6 @@ class StudentSeeder extends Seeder
             'student_status' => 'new',
         ]);
 
-        $seedInitialInterview($student2, 'pending');
-
         StudentPersonalData::create([
             'student_id' => $student2->id,
             'nickname' => 'Mari',
@@ -258,8 +223,6 @@ class StudentSeeder extends Seeder
             'academic_year' => '2024-2025',
             'student_status' => 'new',
         ]);
-
-        $seedInitialInterview($student3, 'completed');
 
         StudentPersonalData::create([
             'student_id' => $student3->id,
@@ -306,8 +269,6 @@ class StudentSeeder extends Seeder
             'student_status' => 'returnee',
         ]);
 
-        $seedInitialInterview($student4, 'completed');
-
         StudentPersonalData::create([
             'student_id' => $student4->id,
             'nickname' => 'Caloy',
@@ -352,8 +313,6 @@ class StudentSeeder extends Seeder
             'academic_year' => '2024-2025',
             'student_status' => 'shiftee',
         ]);
-
-        $seedInitialInterview($student5, 'pending');
 
         StudentPersonalData::create([
             'student_id' => $student5->id,
@@ -400,8 +359,6 @@ class StudentSeeder extends Seeder
             'student_status' => 'transferee',
         ]);
 
-        $seedInitialInterview($student6, 'pending');
-
         StudentPersonalData::create([
             'student_id' => $student6->id,
             'nickname' => 'Sophie',
@@ -446,8 +403,6 @@ class StudentSeeder extends Seeder
             'academic_year' => '2024-2025',
             'student_status' => 'new',
         ]);
-
-        $seedInitialInterview($student7, 'completed');
 
         StudentPersonalData::create([
             'student_id' => $student7->id,
@@ -494,8 +449,6 @@ class StudentSeeder extends Seeder
             'student_status' => 'new',
         ]);
 
-        $seedInitialInterview($student8, 'completed');
-
         StudentPersonalData::create([
             'student_id' => $student8->id,
             'nickname' => 'Lena',
@@ -541,8 +494,6 @@ class StudentSeeder extends Seeder
             'student_status' => 'new',
         ]);
 
-        $seedInitialInterview($student9, 'completed');
-
         StudentPersonalData::create([
             'student_id' => $student9->id,
             'nickname' => 'Jim',
@@ -586,8 +537,6 @@ class StudentSeeder extends Seeder
             'academic_year' => '2024-2025',
             'student_status' => 'new',
         ]);
-
-        $seedInitialInterview($student10, 'completed');
 
         StudentPersonalData::create([
             'student_id' => $student10->id,

@@ -11,81 +11,88 @@ class EventSeeder extends Seeder
 {
     public function run(): void
     {
-        // Get admin user ID to associate with events
-        $adminId = DB::table('users')->where('role', 'admin')->value('id');
+        $ccsCollegeId = DB::table('colleges')->where('name', 'College of Computer Studies')->value('id');
+        $chsCollegeId = DB::table('colleges')->where('name', 'College of Health Sciences')->value('id');
+        $cassCollegeId = DB::table('colleges')->where('name', 'College of Arts and Social Sciences')->value('id');
 
-        if (!$adminId) {
-            // If no admin exists, get any user
-            $adminId = DB::table('users')->value('id');
-        }
+        $ccsCounselorUserId = DB::table('users')->where('email', 'geffkendra.gaviola@g.msuiit.edu.ph')->value('id');
+        $cassCounselorUserId = DB::table('users')->where('email', 'ouano@g.msuiit.edu.ph')->value('id');
 
-        if (!$adminId) {
-            // If no users exist at all, create a basic user
-            $adminId = DB::table('users')->insertGetId([
-                'first_name' => 'System',
-                'last_name' => 'Administrator',
-                'email' => 'admin@g.msuiit.edu.ph',
-                'password' => bcrypt('password123'),
-                'role' => 'admin',
-                'created_at' => now(),
-                'updated_at' => now(),
-            ]);
-        }
+        $fallbackUserId = DB::table('users')->where('role', 'counselor')->value('id')
+            ?? DB::table('users')->where('role', 'admin')->value('id')
+            ?? DB::table('users')->value('id');
 
-        $collegeIds = DB::table('colleges')->pluck('id')->all();
-        $collegeId1 = $collegeIds[0] ?? null;
-        $collegeId2 = $collegeIds[1] ?? null;
+        $ccsCounselorUserId = $ccsCounselorUserId ?: $fallbackUserId;
+        $cassCounselorUserId = $cassCounselorUserId ?: $fallbackUserId;
 
         $events = [
             [
-                'user_id' => $adminId,
-                'title' => 'Managing Anxiety in College',
-                'description' => 'Learn practical strategies to manage anxiety and stress during your college years from our expert counselors.',
-                'type' => 'webinar',
-                'event_start_date' => Carbon::now()->addDays(22)->format('Y-m-d'),
-                'event_end_date'   => Carbon::now()->addDays(24)->format('Y-m-d'), // 3-day event
-                'start_time' => '14:00:00',
-                'end_time' => '16:00:00',
-                'location' => 'Online (Zoom)',
-                'max_attendees' => 100,
-                'is_active' => true,
-                'is_required' => false,
-                'for_all_colleges' => true,
-                'image' => null,
-                'created_at' => now(),
-                'updated_at' => now(),
-            ],
-            [
-                'user_id' => $adminId,
-                'title' => 'Art Therapy Session with Mx. Guidance Counselor',
-                'description' => 'Express yourself through art in this guided therapeutic session. Materials provided. Limited slots available.',
-                'type' => 'activity',
-                'event_start_date' => Carbon::now()->addDays(25)->format('Y-m-d'),
-                'event_end_date'   => Carbon::now()->addDays(27)->format('Y-m-d'), // 3-day event
-                'start_time' => '10:00:00',
-                'end_time' => '12:00:00',
-                'location' => 'OGC Activity Room',
-                'max_attendees' => 20,
-                'is_active' => true,
-                'is_required' => false,
-                'for_all_colleges' => true,
-                'image' => null,
-                'created_at' => now(),
-                'updated_at' => now(),
-            ],
-            [
-                'user_id' => $adminId,
-                'title' => 'Building Resilience in Challenging Times',
-                'description' => 'Discover techniques to build emotional resilience and cope with academic and personal challenges.',
+                'user_id' => $ccsCounselorUserId,
+                'title' => 'CCS Career Wellness Talk',
+                'description' => 'A wellness and career readiness talk for CCS students.',
                 'type' => 'seminar',
-                'event_start_date' => Carbon::now()->addDays(28)->format('Y-m-d'),
-                'event_end_date'   => Carbon::now()->addDays(30)->format('Y-m-d'), // 3-day event
+                'event_start_date' => Carbon::now()->addDays(10)->format('Y-m-d'),
+                'event_end_date'   => Carbon::now()->addDays(10)->format('Y-m-d'),
+                'start_time' => '09:00:00',
+                'end_time' => '11:00:00',
+                'location' => 'CCS AVR',
+                'max_attendees' => 80,
+                'is_active' => true,
+                'is_required' => false,
+                'for_all_colleges' => false,
+                'image' => null,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'user_id' => $ccsCounselorUserId,
+                'title' => 'CHS Stress Management Workshop',
+                'description' => 'A stress management workshop intended for CHS students.',
+                'type' => 'workshop',
+                'event_start_date' => Carbon::now()->addDays(14)->format('Y-m-d'),
+                'event_end_date'   => Carbon::now()->addDays(14)->format('Y-m-d'),
                 'start_time' => '13:00:00',
                 'end_time' => '15:00:00',
-                'location' => 'University Auditorium',
-                'max_attendees' => 50,
+                'location' => 'CHS Lecture Room',
+                'max_attendees' => 60,
                 'is_active' => true,
-                'is_required' => true,
+                'is_required' => false,
+                'for_all_colleges' => false,
+                'image' => null,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'user_id' => $cassCounselorUserId,
+                'title' => 'University Mental Health Webinar',
+                'description' => 'A university-wide webinar on mental health and wellness.',
+                'type' => 'webinar',
+                'event_start_date' => Carbon::now()->addDays(18)->format('Y-m-d'),
+                'event_end_date'   => Carbon::now()->addDays(18)->format('Y-m-d'),
+                'start_time' => '15:00:00',
+                'end_time' => '17:00:00',
+                'location' => 'Online (Zoom)',
+                'max_attendees' => 150,
+                'is_active' => true,
+                'is_required' => false,
+                'for_all_colleges' => true,
+                'image' => null,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'user_id' => $cassCounselorUserId,
+                'title' => 'CASS Student Support Session',
+                'description' => 'A student support and coping session for CASS students.',
+                'type' => 'activity',
+                'event_start_date' => Carbon::now()->addDays(21)->format('Y-m-d'),
+                'event_end_date'   => Carbon::now()->addDays(21)->format('Y-m-d'),
+                'start_time' => '10:00:00',
+                'end_time' => '12:00:00',
+                'location' => 'CASS Session Room',
+                'max_attendees' => 40,
+                'is_active' => true,
+                'is_required' => false,
                 'for_all_colleges' => false,
                 'image' => null,
                 'created_at' => now(),
@@ -102,7 +109,14 @@ class EventSeeder extends Seeder
             if ($event->for_all_colleges) {
                 $event->colleges()->sync([]);
             } else {
-                $targetColleges = array_values(array_filter([$collegeId1, $collegeId2]));
+                $targetsByTitle = [
+                    'CCS Career Wellness Talk' => [$ccsCollegeId],
+                    'CHS Stress Management Workshop' => [$chsCollegeId],
+                    'CASS Student Support Session' => [$cassCollegeId],
+                ];
+
+                $targetColleges = $targetsByTitle[$event->title] ?? [];
+                $targetColleges = array_values(array_filter($targetColleges));
                 $event->colleges()->sync($targetColleges);
             }
 

@@ -90,18 +90,7 @@
                 </div>
             </a>
 
-            <a href="{{ route('counselor.appointments') }}?{{ http_build_query(request()->except('page', 'status')) }}&status=referred"
-               class="bg-white rounded-xl shadow-sm p-6 block hover:shadow-md transition">
-                <div class="flex items-center">
-                    <div class="p-3 bg-purple-100 rounded-lg">
-                        <i class="fas fa-exchange-alt text-purple-600 text-xl"></i>
-                    </div>
-                    <div class="ml-4">
-                        <p class="text-sm text-gray-600">Referred</p>
-                        <p class="text-2xl font-bold text-gray-800">{{ $stats['referred'] ?? $appointments->where('status', 'referred')->count() }}</p>
-                    </div>
-                </div>
-            </a>
+           
 
             <a href="{{ route('counselor.appointments') }}?{{ http_build_query(request()->except('page', 'referral_direction')) }}&referral_direction={{ ($referralDirection ?? request('referral_direction')) === 'in' ? '' : 'in' }}"
                class="bg-white rounded-xl shadow-sm p-6 block hover:shadow-md transition">
@@ -244,10 +233,7 @@
                 class="px-4 py-2 rounded-lg {{ $status === 'reschedule_rejected' ? 'bg-rose-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200' }} transition">
                     Rejected by Student
                 </a>
-                <a href="{{ route('counselor.appointments') }}?{{ http_build_query(request()->except('status', 'page')) }}&status=referred"
-                class="px-4 py-2 rounded-lg {{ $status === 'referred' ? 'bg-purple-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200' }} transition">
-                    Referred
-                </a>
+               
                 <a href="{{ route('counselor.appointments') }}?{{ http_build_query(request()->except('status', 'page')) }}&status=rejected"
                 class="px-4 py-2 rounded-lg {{ $status === 'rejected' ? 'bg-red-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200' }} transition">
                     Rejected
