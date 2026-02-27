@@ -16,8 +16,10 @@ class SessionNote extends Model
         'student_id',
         'notes',
         'follow_up_actions',
+        'root_causes',
         'session_date',
         'session_type',
+        'appointment_type',
         'mood_level',
         'requires_follow_up',
         'next_session_date'
@@ -27,6 +29,7 @@ class SessionNote extends Model
         'session_date' => 'date',
         'next_session_date' => 'date',
         'requires_follow_up' => 'boolean',
+        'root_causes' => 'array',
     ];
 
     public function appointment(): BelongsTo

@@ -5,6 +5,7 @@ namespace Database\Seeders;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
+use App\Models\Event;
 
 class EventSeeder extends Seeder
 {
@@ -31,12 +32,16 @@ class EventSeeder extends Seeder
             ]);
         }
 
+        $collegeIds = DB::table('colleges')->pluck('id')->all();
+        $collegeId1 = $collegeIds[0] ?? null;
+        $collegeId2 = $collegeIds[1] ?? null;
+
         $events = [
             [
                 'user_id' => $adminId,
                 'title' => 'Managing Anxiety in College',
                 'description' => 'Learn practical strategies to manage anxiety and stress during your college years from our expert counselors.',
-                'type' => 'Webinar',
+                'type' => 'webinar',
                 'event_start_date' => Carbon::now()->addDays(22)->format('Y-m-d'),
                 'event_end_date'   => Carbon::now()->addDays(24)->format('Y-m-d'), // 3-day event
                 'start_time' => '14:00:00',
@@ -44,6 +49,9 @@ class EventSeeder extends Seeder
                 'location' => 'Online (Zoom)',
                 'max_attendees' => 100,
                 'is_active' => true,
+                'is_required' => false,
+                'for_all_colleges' => true,
+                'image' => null,
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
@@ -51,7 +59,7 @@ class EventSeeder extends Seeder
                 'user_id' => $adminId,
                 'title' => 'Art Therapy Session with Mx. Guidance Counselor',
                 'description' => 'Express yourself through art in this guided therapeutic session. Materials provided. Limited slots available.',
-                'type' => 'Activity',
+                'type' => 'activity',
                 'event_start_date' => Carbon::now()->addDays(25)->format('Y-m-d'),
                 'event_end_date'   => Carbon::now()->addDays(27)->format('Y-m-d'), // 3-day event
                 'start_time' => '10:00:00',
@@ -59,6 +67,9 @@ class EventSeeder extends Seeder
                 'location' => 'OGC Activity Room',
                 'max_attendees' => 20,
                 'is_active' => true,
+                'is_required' => false,
+                'for_all_colleges' => true,
+                'image' => null,
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
@@ -66,7 +77,7 @@ class EventSeeder extends Seeder
                 'user_id' => $adminId,
                 'title' => 'Building Resilience in Challenging Times',
                 'description' => 'Discover techniques to build emotional resilience and cope with academic and personal challenges.',
-                'type' => 'Seminar',
+                'type' => 'seminar',
                 'event_start_date' => Carbon::now()->addDays(28)->format('Y-m-d'),
                 'event_end_date'   => Carbon::now()->addDays(30)->format('Y-m-d'), // 3-day event
                 'start_time' => '13:00:00',
@@ -74,11 +85,30 @@ class EventSeeder extends Seeder
                 'location' => 'University Auditorium',
                 'max_attendees' => 50,
                 'is_active' => true,
+                'is_required' => true,
+                'for_all_colleges' => false,
+                'image' => null,
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
         ];
 
-        DB::table('events')->insert($events);
+        foreach ($events as $eventData) {
+            $event = Event::updateOrCreate(
+                ['title' => $eventData['title']],
+                $eventData
+            );
+
+            if ($event->for_all_colleges) {
+                $event->colleges()->sync([]);
+            } else {
+                $targetColleges = array_values(array_filter([$collegeId1, $collegeId2]));
+                $event->colleges()->sync($targetColleges);
+            }
+
+            if ($event->is_required) {
+                $event->registerRequiredStudents();
+            }
+        }
     }
 }

@@ -13,7 +13,24 @@ class Appointment extends Model
 {
     use HasFactory;
 
+    protected static function booted(): void
+    {
+        static::created(function (self $appointment) {
+            if ($appointment->case_number) {
+                return;
+            }
+
+            $year = $appointment->appointment_date
+                ? $appointment->appointment_date->format('Y')
+                : now()->format('Y');
+
+            $appointment->case_number = 'CASE-' . $year . '-' . str_pad((string) $appointment->id, 6, '0', STR_PAD_LEFT);
+            $appointment->saveQuietly();
+        });
+    }
+
     protected $fillable = [
+        'case_number',
         'student_id',
         'counselor_id',
         'appointment_date',
@@ -28,6 +45,9 @@ class Appointment extends Model
         'referral_reason',
         'referral_previous_status',
         'referral_requested_at',
+        'referral_outcome',
+        'referral_resolved_at',
+        'referral_resolved_by_counselor_id',
         'original_counselor_id',
         'google_calendar_event_id',
         'proposed_date',
@@ -42,6 +62,7 @@ class Appointment extends Model
         'proposed_date' => 'date',
         'reschedule_requested_at' => 'datetime',
         'referral_requested_at' => 'datetime',
+        'referral_resolved_at' => 'datetime',
     ];
 
     // Add this method to get all valid statuses
@@ -94,6 +115,38 @@ class Appointment extends Model
         return $this->belongsTo(Counselor::class, 'original_counselor_id');
     }
 
+    public function referralResolvedByCounselor(): BelongsTo
+    {
+        return $this->belongsTo(Counselor::class, 'referral_resolved_by_counselor_id');
+    }
+
+    public function getReferralBadgeForCounselor(int $counselorId): ?string
+    {
+        if (!$this->is_referred) {
+            return null;
+        }
+
+        $suffix = $this->referral_outcome === 'rejected' ? ' (Rejected)' : '';
+
+        if ((int) $this->original_counselor_id === (int) $counselorId) {
+            $referredCounselorName = $this->referredCounselor && $this->referredCounselor->user
+                ? $this->referredCounselor->user->first_name . ' ' . $this->referredCounselor->user->last_name
+                : 'Unknown Counselor';
+
+            return "Referred to {$referredCounselorName}{$suffix}";
+        }
+
+        if ((int) $this->referred_to_counselor_id === (int) $counselorId) {
+            $originalCounselorName = $this->originalCounselor && $this->originalCounselor->user
+                ? $this->originalCounselor->user->first_name . ' ' . $this->originalCounselor->user->last_name
+                : 'Unknown Counselor';
+
+            return "Referred from {$originalCounselorName}{$suffix}";
+        }
+
+        return null;
+    }
+
     // Helper method to check if appointment has session notes
     public function getHasSessionNotesAttribute(): bool
     {
@@ -115,23 +168,25 @@ class Appointment extends Model
     // Helper method to check if appointment was referred to current counselor
     public function isReferredToMe($counselorId): bool
     {
-        return $this->status === 'referred' && $this->referred_to_counselor_id == $counselorId;
+        return $this->is_referred && (int) $this->referred_to_counselor_id === (int) $counselorId;
     }
 
     // Helper method to check if appointment was referred from another counselor
     public function isReferredFromAnother($counselorId): bool
     {
-        return $this->status === 'referred' && $this->original_counselor_id != $counselorId && $this->counselor_id == $counselorId;
+        return $this->is_referred && (int) $this->original_counselor_id !== (int) $counselorId && (int) $this->counselor_id === (int) $counselorId;
     }
 
     // Helper method to get referral display text for referring counselor
     public function getReferralDisplayForReferringCounselor(): string
     {
-        if ($this->status === 'referred' && $this->is_referred) {
+        if ($this->is_referred) {
             $referredCounselorName = $this->referredCounselor ?
                 $this->referredCounselor->user->first_name . ' ' . $this->referredCounselor->user->last_name :
                 'Unknown Counselor';
-            return "Referred to {$referredCounselorName}";
+
+            $suffix = $this->referral_outcome === 'rejected' ? ' (Rejected)' : '';
+            return "Referred to {$referredCounselorName}{$suffix}";
         }
         return ucfirst($this->status);
     }
@@ -139,11 +194,13 @@ class Appointment extends Model
     // Helper method to get referral display text for receiving counselor
     public function getReferralDisplayForReceivingCounselor(): string
     {
-        if ($this->status === 'referred' && $this->is_referred && $this->original_counselor_id) {
+        if ($this->is_referred && $this->original_counselor_id) {
             $originalCounselorName = $this->originalCounselor ?
                 $this->originalCounselor->user->first_name . ' ' . $this->originalCounselor->user->last_name :
                 'Unknown Counselor';
-            return "Referred from {$originalCounselorName}";
+
+            $suffix = $this->referral_outcome === 'rejected' ? ' (Rejected)' : '';
+            return "Referred from {$originalCounselorName}{$suffix}";
         }
         return ucfirst($this->status);
     }
@@ -157,12 +214,11 @@ class Appointment extends Model
             'rescheduled' => 'Scheduled (Rescheduled)',
         ];
 
-        if ($this->status === 'referred') {
-            if ($this->original_counselor_id == $counselorId) {
-                // This is the referring counselor
+        if ($this->is_referred) {
+            if ((int) $this->original_counselor_id === (int) $counselorId) {
                 return $this->getReferralDisplayForReferringCounselor();
-            } elseif ($this->referred_to_counselor_id == $counselorId) {
-                // This is the receiving counselor
+            }
+            if ((int) $this->referred_to_counselor_id === (int) $counselorId) {
                 return $this->getReferralDisplayForReceivingCounselor();
             }
         }
@@ -200,6 +256,23 @@ public function canBeManagedBy($counselorId): bool
 
     // If the counselor is the original counselor of a referred appointment
     if ($this->status === 'referred' && $this->original_counselor_id == $counselorId) {
+        return true;
+    }
+
+    return false;
+}
+
+public function canBeViewedBy($counselorId): bool
+{
+    if ($this->counselor_id == $counselorId) {
+        return true;
+    }
+
+    if ($this->is_referred && $this->referred_to_counselor_id == $counselorId) {
+        return true;
+    }
+
+    if ($this->is_referred && $this->original_counselor_id == $counselorId) {
         return true;
     }
 

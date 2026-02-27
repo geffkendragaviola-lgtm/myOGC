@@ -35,13 +35,10 @@
             'approved' => $appointments->where('status', 'approved')->count(),
             'completed' => $appointments->where('status', 'completed')->count(),
             'referred' => $appointments->where('status', 'referred')->count(),
-            'with_assignments' => $appointments->where('status', 'completed')->filter(function($appointment) {
-                return $appointment->latestSessionNote && $appointment->latestSessionNote->follow_up_actions;
-            })->count()
         ];
     @endphp
 
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mb-8">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
         {{-- Total Appointments --}}
         <div class="bg-white rounded-xl shadow-md p-6 border-l-4 border-blue-500">
             <div class="flex items-center">
@@ -93,19 +90,6 @@
                 </div>
             </div>
         </div>
-
-        {{-- With Assignments --}}
-        <div class="bg-white rounded-xl shadow-md p-6 border-l-4 border-indigo-500">
-            <div class="flex items-center">
-                <div class="p-3 bg-indigo-100 rounded-lg mr-4">
-                    <i class="fas fa-tasks text-indigo-600 text-xl"></i>
-                </div>
-                <div>
-                    <p class="text-sm text-gray-600">With Assignments</p>
-                    <p class="text-2xl font-bold text-gray-800">{{ $stats['with_assignments'] }}</p>
-                </div>
-            </div>
-        </div>
     </div>
 
     {{-- Search and Filters Section --}}
@@ -141,18 +125,6 @@
                 </select>
             </div>
 
-            {{-- Assignment Filter --}}
-            <div>
-                <label for="has_assignment" class="block text-sm font-medium text-gray-700 mb-2">Assignment Filter</label>
-                <select name="has_assignment"
-                        id="has_assignment"
-                        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                    <option value="">All Appointments</option>
-                    <option value="yes" {{ request('has_assignment') == 'yes' ? 'selected' : '' }}>With Assignments</option>
-                    <option value="no" {{ request('has_assignment') == 'no' ? 'selected' : '' }}>Without Assignments</option>
-                </select>
-            </div>
-
             {{-- Action Buttons --}}
             <div class="flex items-end space-x-2">
                 <button type="submit"
@@ -167,7 +139,7 @@
         </form>
 
         {{-- Active Filters Display --}}
-        @if(request()->anyFilled(['search_date', 'status', 'has_assignment']))
+        @if(request()->anyFilled(['search_date', 'status']))
         <div class="mt-4 pt-4 border-t border-gray-200">
             <div class="flex items-center justify-between">
                 <div class="flex items-center space-x-2 text-sm">
@@ -195,14 +167,6 @@
                             </a>
                         </span>
                     @endif
-                    @if(request('has_assignment'))
-                        <span class="bg-purple-100 text-purple-800 px-2 py-1 rounded-full flex items-center">
-                            Assignments: {{ request('has_assignment') == 'yes' ? 'With Assignments' : 'Without Assignments' }}
-                            <a href="{{ request()->fullUrlWithQuery(['has_assignment' => null]) }}" class="ml-1 text-purple-600 hover:text-purple-800">
-                                <i class="fas fa-times"></i>
-                            </a>
-                        </span>
-                    @endif
                 </div>
                 <span class="text-sm text-gray-500">
                     {{ $appointments->count() }} appointment(s) found
@@ -216,7 +180,7 @@
     <div class="bg-white rounded-xl shadow-sm p-6 mb-6">
         <div class="flex flex-wrap gap-2">
             <a href="{{ route('appointments.index') }}"
-               class="px-4 py-2 rounded-lg transition flex items-center {{ !request('status') && !request('has_assignment') && !request('search_date') ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300' }}">
+               class="px-4 py-2 rounded-lg transition flex items-center {{ !request('status') && !request('search_date') ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300' }}">
                 <i class="fas fa-list mr-2"></i> All Appointments
             </a>
             <a href="{{ route('appointments.index', ['status' => 'pending']) }}"
@@ -255,10 +219,6 @@
                class="px-4 py-2 rounded-lg transition flex items-center {{ request('status') == 'cancelled' ? 'bg-gray-600 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300' }}">
                 <i class="fas fa-ban mr-2"></i> Cancelled
             </a>
-            <a href="{{ route('appointments.index', ['has_assignment' => 'yes']) }}"
-               class="px-4 py-2 rounded-lg transition flex items-center {{ request('has_assignment') == 'yes' ? 'bg-indigo-600 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300' }}">
-                <i class="fas fa-tasks mr-2"></i> With Assignments
-            </a>
         </div>
     </div>
 
@@ -268,16 +228,15 @@
             <div class="text-center py-12">
                 <i class="fas fa-calendar-times text-4xl text-gray-400 mb-4"></i>
                 <p class="text-gray-500 text-lg">No appointments found.</p>
-                @if(request()->anyFilled(['search_date', 'status', 'has_assignment']))
+                @if(request()->anyFilled(['search_date', 'status']))
                     <p class="text-gray-400 text-sm mt-2">Try adjusting your filters</p>
                     <a href="{{ route('appointments.index') }}" class="text-blue-600 hover:text-blue-800 mt-2 inline-block">
                         Clear all filters
                     </a>
-                @else
-                    <a href="{{ route('appointments.create') }}" class="text-blue-600 hover:text-blue-800 mt-2 inline-block">
-                        Book your first appointment
-                    </a>
                 @endif
+                <a href="{{ route('appointments.create') }}" class="text-blue-600 hover:text-blue-800 mt-2 inline-block">
+                    Book your first appointment
+                </a>
             </div>
         @else
             <div class="overflow-x-auto">
@@ -289,7 +248,6 @@
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Concern</th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Referral Info</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Assignments</th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
                         </tr>
                     </thead>
@@ -402,27 +360,19 @@
                                         <span class="text-gray-400 text-sm">-</span>
                                     @endif
                                 </td>
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    @if($appointment->status === 'completed')
-                                        @if($appointment->latestSessionNote && $appointment->latestSessionNote->follow_up_actions)
-                                            <button type="button"
-                                                    onclick="showFollowUpActions('{{ addslashes($appointment->latestSessionNote->follow_up_actions) }}')"
-                                                    class="bg-green-100 text-green-800 text-xs px-3 py-2 rounded-full flex items-center hover:bg-green-200 transition cursor-pointer">
-                                                <i class="fas fa-tasks mr-2"></i>
-                                                <span>View Assignment</span>
-                                            </button>
-                                        @else
-                                            <span class="bg-gray-100 text-gray-600 text-xs px-3 py-2 rounded-full flex items-center">
-                                                <i class="fas fa-times-circle mr-2"></i>
-                                                <span>No Assignment</span>
-                                            </span>
-                                        @endif
-                                    @else
-                                        <span class="text-gray-400 text-sm">-</span>
-                                    @endif
-                                </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                    @if($appointment->status === 'reschedule_requested' && Auth::user()->role === 'student')
+                                    @if(in_array($appointment->status, ['pending', 'approved', 'reschedule_requested', 'rescheduled']) && Auth::user()->role === 'student')
+                                        <div class="flex items-center space-x-2">
+                                            <form action="{{ route('appointments.cancel', $appointment) }}" method="POST" class="inline">
+                                                @csrf
+                                                <button type="submit"
+                                                        class="text-red-600 hover:text-red-900 px-3 py-1 border border-red-300 rounded hover:bg-red-50 transition"
+                                                        onclick="return confirm('Are you sure you want to cancel this appointment? The time slot will become available for others.')">
+                                                    <i class="fas fa-times mr-1"></i>Cancel
+                                                </button>
+                                            </form>
+                                        </div>
+                                    @elseif($appointment->status === 'reschedule_requested' && Auth::user()->role === 'student')
                                         <div class="flex items-center space-x-2">
                                             <form action="{{ route('appointments.reschedule.accept', $appointment) }}" method="POST" class="inline">
                                                 @csrf
@@ -468,25 +418,6 @@
                                         @else
                                             <span class="text-purple-600 italic">Awaiting referral details</span>
                                         @endif
-                                    @elseif(in_array($appointment->status, ['pending', 'approved', 'rescheduled']) && Auth::user()->role === 'student')
-                                        <form action="{{ route('appointments.cancel', $appointment) }}" method="POST" class="inline">
-                                            @csrf
-                                            <button type="submit"
-                                                    class="text-red-600 hover:text-red-900 px-3 py-1 border border-red-300 rounded hover:bg-red-50 transition"
-                                                    onclick="return confirm('Are you sure you want to cancel this appointment? The time slot will become available for others.')">
-                                                <i class="fas fa-times mr-1"></i>Cancel
-                                            </button>
-                                        </form>
-                                    @elseif($appointment->status === 'reschedule_requested')
-                                        <span class="text-orange-600 italic">Awaiting your response</span>
-                                    @elseif($appointment->status === 'cancelled')
-                                        <span class="text-gray-500 italic">Cancelled</span>
-                                    @elseif($appointment->status === 'rejected')
-                                        <span class="text-red-500 italic">Rejected</span>
-                                    @elseif($appointment->status === 'reschedule_rejected')
-                                        <span class="text-rose-500 italic">Rejected by student</span>
-                                    @elseif($appointment->status === 'referred')
-                                        <span class="text-purple-500 italic">Referred</span>
                                     @endif
                                 </td>
                             </tr>
@@ -496,96 +427,56 @@
             </div>
         @endif
     </div>
-</div>
 
-{{-- Modal for Follow-up Actions --}}
-<div id="followUpModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden z-50">
-    <div class="relative top-20 mx-auto p-5 border w-11/12 md:w-2/3 lg:w-1/2 shadow-lg rounded-md bg-white">
-        <div class="mt-3">
-            <div class="flex justify-between items-center mb-4">
-                <h3 class="text-lg font-medium text-gray-900">
-                    <i class="fas fa-tasks mr-2 text-blue-600"></i>Your Assignments
-                </h3>
-                <button onclick="closeFollowUpModal()" class="text-gray-400 hover:text-gray-600 text-lg">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-            <div class="mt-2">
-                <p id="followUpContent" class="text-gray-700 whitespace-pre-line p-4 bg-gray-50 rounded-lg max-h-96 overflow-y-auto border border-gray-200"></p>
-            </div>
-            <div class="flex justify-end mt-4">
-                <button onclick="closeFollowUpModal()"
-                        class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition flex items-center">
-                    <i class="fas fa-times mr-2"></i> Close
-                </button>
-            </div>
-        </div>
-    </div>
-</div>
-
-{{-- Modal for Referral Reason --}}
-<div id="referralReasonModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden z-50">
-    <div class="relative top-20 mx-auto p-5 border w-11/12 md:w-2/3 lg:w-1/2 shadow-lg rounded-md bg-white">
-        <div class="mt-3">
-            <div class="flex justify-between items-center mb-4">
-                <h3 class="text-lg font-medium text-gray-900">
-                    <i class="fas fa-info-circle mr-2 text-purple-600"></i>Referral Reason
-                </h3>
-                <button onclick="closeReferralReasonModal()" class="text-gray-400 hover:text-gray-600 text-lg">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-            <div class="mt-2">
-                <div id="referralCounselorInfo" class="mb-3 p-3 bg-purple-50 rounded-lg border border-purple-200">
-                    <p class="text-sm text-purple-700" id="counselorInfoText"></p>
+    {{-- Modal for Referral Reason --}}
+    <div id="referralReasonModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden z-50">
+        <div class="relative top-20 mx-auto p-5 border w-11/12 md:w-2/3 lg:w-1/2 shadow-lg rounded-md bg-white">
+            <div class="mt-3">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-lg font-medium text-gray-900">
+                        <i class="fas fa-info-circle mr-2 text-purple-600"></i>Referral Reason
+                    </h3>
+                    <button onclick="closeReferralReasonModal()" class="text-gray-400 hover:text-gray-600 text-lg">
+                        <i class="fas fa-times"></i>
+                    </button>
                 </div>
-                <p id="referralReasonContent" class="text-gray-700 whitespace-pre-line p-4 bg-purple-50 rounded-lg max-h-96 overflow-y-auto border border-purple-200"></p>
-            </div>
-            <div class="flex justify-end mt-4">
-                <button onclick="closeReferralReasonModal()"
-                        class="bg-purple-600 text-white px-6 py-2 rounded-lg hover:bg-purple-700 transition flex items-center">
-                    <i class="fas fa-times mr-2"></i> Close
-                </button>
+                <div class="mt-2">
+                    <div id="referralCounselorInfo" class="mb-3 p-3 bg-purple-50 rounded-lg border border-purple-200">
+                        <p class="text-sm text-purple-700" id="counselorInfoText"></p>
+                    </div>
+                    <p id="referralReasonContent" class="text-gray-700 whitespace-pre-line p-4 bg-purple-50 rounded-lg max-h-96 overflow-y-auto border border-purple-200"></p>
+                </div>
+                <div class="flex justify-end mt-4">
+                    <button onclick="closeReferralReasonModal()"
+                            class="bg-purple-600 text-white px-6 py-2 rounded-lg hover:bg-purple-700 transition flex items-center">
+                        <i class="fas fa-times mr-2"></i> Close
+                    </button>
+                </div>
             </div>
         </div>
     </div>
-</div>
 
-<script>
-// Function to show follow-up actions modal
-function showFollowUpActions(followUpActions) {
-    // Set the follow-up actions content
-    document.getElementById('followUpContent').textContent = followUpActions || 'No assignments provided.';
+    <script>
+    // Function to show referral reason modal
+    function showReferralReason(reason, originalCounselorName = '', referredCounselorName = '', isDifferentCollege = false) {
+        // Set the referral reason content
+        document.getElementById('referralReasonContent').textContent = reason || 'No referral reason provided.';
 
-    // Show the modal
-    document.getElementById('followUpModal').classList.remove('hidden');
-}
+        // Build counselor info text
+        let counselorInfo = '';
+        if (originalCounselorName) {
+            counselorInfo += `Originally with: ${originalCounselorName}`;
+        }
+        if (referredCounselorName) {
+            counselorInfo += originalCounselorName ? ` → Referred to: ${referredCounselorName}` : `Referred to: ${referredCounselorName}`;
+        }
+        if (isDifferentCollege) {
+            counselorInfo += ' (Different College)';
+        }
 
-// Function to close follow-up actions modal
-function closeFollowUpModal() {
-    document.getElementById('followUpModal').classList.add('hidden');
-}
-
-// Function to show referral reason modal
-function showReferralReason(reason, originalCounselorName = '', referredCounselorName = '', isDifferentCollege = false) {
-    // Set the referral reason content
-    document.getElementById('referralReasonContent').textContent = reason || 'No referral reason provided.';
-
-    // Build counselor info text
-    let counselorInfo = '';
-    if (originalCounselorName) {
-        counselorInfo += `Originally with: ${originalCounselorName}`;
+        document.getElementById('counselorInfoText').textContent = counselorInfo || 'No counselor information available.';
+        document.getElementById('referralReasonModal').classList.remove('hidden');
     }
-    if (referredCounselorName) {
-        counselorInfo += originalCounselorName ? ` → Referred to: ${referredCounselorName}` : `Referred to: ${referredCounselorName}`;
-    }
-    if (isDifferentCollege) {
-        counselorInfo += ' (Different College)';
-    }
-
-    document.getElementById('counselorInfoText').textContent = counselorInfo || 'No counselor information available.';
-    document.getElementById('referralReasonModal').classList.remove('hidden');
-}
 
 // Function to close referral reason modal
 function closeReferralReasonModal() {
@@ -594,9 +485,6 @@ function closeReferralReasonModal() {
 
 // Close modals when clicking outside
 document.addEventListener('click', function(e) {
-    if (e.target.id === 'followUpModal') {
-        closeFollowUpModal();
-    }
     if (e.target.id === 'referralReasonModal') {
         closeReferralReasonModal();
     }
@@ -605,7 +493,6 @@ document.addEventListener('click', function(e) {
 // Close modals with Escape key
 document.addEventListener('keydown', function(e) {
     if (e.key === 'Escape') {
-        closeFollowUpModal();
         closeReferralReasonModal();
     }
 });

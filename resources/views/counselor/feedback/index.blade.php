@@ -157,10 +157,10 @@
             <thead class="bg-gray-50">
                 <tr>
                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Student & Service
+                        Student Info
                     </th>
                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Rating
+                        Service & Personnel
                     </th>
                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                         Comments
@@ -184,7 +184,7 @@
                                     </div>
                                     <div>
                                         <div class="text-sm font-medium text-gray-900">Anonymous</div>
-                                        <div class="text-sm text-gray-500">{{ $feedback->service_availed }}</div>
+                                        <div class="text-sm text-gray-500">{{ $feedback->user->student->college->name ?? 'N/A' }}</div>
                                     </div>
                                 @else
                                     <div class="bg-blue-100 p-2 rounded-full mr-3">
@@ -194,25 +194,25 @@
                                         <div class="text-sm font-medium text-gray-900">
                                             {{ $feedback->user->first_name }} {{ $feedback->user->last_name }}
                                         </div>
-                                        <div class="text-sm text-gray-500">{{ $feedback->service_availed }}</div>
+                                        <div class="text-sm text-gray-500">
+                                            {{ $feedback->user->student->college->name ?? 'N/A' }}
+                                            <span class="text-gray-400">|</span>
+                                            Sex at Birth: {{ $feedback->user->sex ?? 'N/A' }}
+                                            <span class="text-gray-400">|</span>
+                                            Age: {{ $feedback->user->age ?? 'N/A' }}
+                                            <span class="text-gray-400">|</span>
+                                            Region: {{ $feedback->user->region_of_residence ?? 'N/A' }}
+                                        </div>
                                     </div>
                                 @endif
                             </div>
                         </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <div class="flex items-center">
-                                <div class="text-yellow-400 mr-2">
-                                    @for($i = 1; $i <= 5; $i++)
-                                        <i class="fas fa-star{{ $i <= $feedback->satisfaction_rating ? '' : '-o' }}"></i>
-                                    @endfor
-                                </div>
-                                <span class="text-sm font-medium text-gray-900">
-                                    {{ $feedback->satisfaction_rating }}/5
-                                </span>
+                        <td class="px-6 py-4">
+                            <div class="text-sm font-medium text-gray-900">{{ $feedback->service_availed }}</div>
+                            <div class="text-sm text-gray-500">
+                                Personnel: {{ $feedback->personnel_name ?? 'N/A' }}
                             </div>
-                            <div class="text-xs text-gray-500 mt-1">
-                                {{ \App\Models\Feedback::getRatingLabel($feedback->satisfaction_rating) }}
-                            </div>
+                           
                         </td>
                         <td class="px-6 py-4">
                             <div class="text-sm text-gray-900 max-w-xs">

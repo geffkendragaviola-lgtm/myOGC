@@ -193,7 +193,7 @@
                 <!-- Phone Number -->
                 <div>
                     <x-input-label for="phone_number" :value="__('Phone Number')" />
-                    <x-text-input id="phone_number" class="block mt-1 w-full" type="text" name="phone_number" :value="old('phone_number')" autocomplete="tel" />
+                    <x-text-input id="phone_number" class="block mt-1 w-full" type="text" name="phone_number" :value="old('phone_number')" autocomplete="tel" required inputmode="numeric" maxlength="11" minlength="11" pattern="^09\d{9}$" title="Phone number must be 11 digits and start with 09 (e.g., 09123456789)" />
                     <x-input-error :messages="$errors->get('phone_number')" class="mt-2" />
                 </div>
 
@@ -251,7 +251,7 @@
                         <option value="yes" {{ old('initial_interview_completed') == 'yes' ? 'selected' : '' }}>Yes, I already completed it</option>
                         <option value="no" {{ old('initial_interview_completed') == 'no' ? 'selected' : '' }}>No, I have not completed it yet</option>
                     </select>
-                    <p class="mt-2 text-sm text-gray-500">Required for 2nd year students only.</p>
+                   
                     <x-input-error :messages="$errors->get('initial_interview_completed')" class="mt-2" />
                 </div>
 
@@ -337,6 +337,31 @@
                     <x-input-label for="home_address" :value="__('Home Address')" />
                     <textarea id="home_address" name="home_address" class="block mt-1 w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">{{ old('home_address') }}</textarea>
                     <x-input-error :messages="$errors->get('home_address')" class="mt-2" />
+                </div>
+
+                <div>
+                    <x-input-label for="region_of_residence" :value="__('Region of Residence')" />
+                    <select id="region_of_residence" name="region_of_residence" class="block mt-1 w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" autocomplete="off">
+                        <option value="">Select Region</option>
+                        <option value="National Capital Region (NCR) – Metro Manila" {{ old('region_of_residence') == 'National Capital Region (NCR) – Metro Manila' ? 'selected' : '' }}>National Capital Region (NCR) – Metro Manila</option>
+                        <option value="Region I – Ilocos Region" {{ old('region_of_residence') == 'Region I – Ilocos Region' ? 'selected' : '' }}>Region I – Ilocos Region</option>
+                        <option value="Region II – Cagayan Valley" {{ old('region_of_residence') == 'Region II – Cagayan Valley' ? 'selected' : '' }}>Region II – Cagayan Valley</option>
+                        <option value="Region III – Central Luzon" {{ old('region_of_residence') == 'Region III – Central Luzon' ? 'selected' : '' }}>Region III – Central Luzon</option>
+                        <option value="Region IV-A – CALABARZON" {{ old('region_of_residence') == 'Region IV-A – CALABARZON' ? 'selected' : '' }}>Region IV-A – CALABARZON</option>
+                        <option value="Region IV-B – MIMAROPA" {{ old('region_of_residence') == 'Region IV-B – MIMAROPA' ? 'selected' : '' }}>Region IV-B – MIMAROPA</option>
+                        <option value="Region V – Bicol Region" {{ old('region_of_residence') == 'Region V – Bicol Region' ? 'selected' : '' }}>Region V – Bicol Region</option>
+                        <option value="Cordillera Administrative Region (CAR)" {{ old('region_of_residence') == 'Cordillera Administrative Region (CAR)' ? 'selected' : '' }}>Cordillera Administrative Region (CAR)</option>
+                        <option value="Region VI – Western Visayas" {{ old('region_of_residence') == 'Region VI – Western Visayas' ? 'selected' : '' }}>Region VI – Western Visayas</option>
+                        <option value="Region VII – Central Visayas" {{ old('region_of_residence') == 'Region VII – Central Visayas' ? 'selected' : '' }}>Region VII – Central Visayas</option>
+                        <option value="Region VIII – Eastern Visayas" {{ old('region_of_residence') == 'Region VIII – Eastern Visayas' ? 'selected' : '' }}>Region VIII – Eastern Visayas</option>
+                        <option value="Region IX – Zamboanga Peninsula" {{ old('region_of_residence') == 'Region IX – Zamboanga Peninsula' ? 'selected' : '' }}>Region IX – Zamboanga Peninsula</option>
+                        <option value="Region X – Northern Mindanao" {{ old('region_of_residence') == 'Region X – Northern Mindanao' ? 'selected' : '' }}>Region X – Northern Mindanao</option>
+                        <option value="Region XI – Davao Region" {{ old('region_of_residence') == 'Region XI – Davao Region' ? 'selected' : '' }}>Region XI – Davao Region</option>
+                        <option value="Region XII – SOCCSKSARGEN" {{ old('region_of_residence') == 'Region XII – SOCCSKSARGEN' ? 'selected' : '' }}>Region XII – SOCCSKSARGEN</option>
+                        <option value="Region XIII – Caraga" {{ old('region_of_residence') == 'Region XIII – Caraga' ? 'selected' : '' }}>Region XIII – Caraga</option>
+                        <option value="Bangsamoro Autonomous Region in Muslim Mindanao (BARMM)." {{ old('region_of_residence') == 'Bangsamoro Autonomous Region in Muslim Mindanao (BARMM).' ? 'selected' : '' }}>Bangsamoro Autonomous Region in Muslim Mindanao (BARMM).</option>
+                    </select>
+                    <x-input-error :messages="$errors->get('region_of_residence')" class="mt-2" />
                 </div>
 
                 <!-- Stays With -->
@@ -1311,6 +1336,7 @@
         document.addEventListener('DOMContentLoaded', function () {
             const birthdateInput = document.getElementById('birthdate');
             const ageInput = document.getElementById('age');
+            const phoneNumberInput = document.getElementById('phone_number');
             const yearLevelSelect = document.getElementById('year_level');
             const initialInterviewWrapper = document.getElementById('initialInterviewCompletedWrapper');
             const initialInterviewSelect = document.getElementById('initial_interview_completed');
@@ -1335,14 +1361,37 @@
 
             birthdateInput.addEventListener('change', calculateAge);
 
+            if (phoneNumberInput) {
+                phoneNumberInput.addEventListener('input', function () {
+                    const cleaned = String(phoneNumberInput.value || '').replace(/\D+/g, '').slice(0, 11);
+                    if (phoneNumberInput.value !== cleaned) {
+                        phoneNumberInput.value = cleaned;
+                    }
+                    if (phoneNumberInput.value.length === 0) {
+                        phoneNumberInput.setCustomValidity('');
+                    } else if (!/^09\d{9}$/.test(phoneNumberInput.value)) {
+                        phoneNumberInput.setCustomValidity('Phone number must be 11 digits and start with 09 (e.g., 09123456789)');
+                    } else {
+                        phoneNumberInput.setCustomValidity('');
+                    }
+                });
+
+                phoneNumberInput.addEventListener('blur', function () {
+                    phoneNumberInput.reportValidity();
+                });
+            }
+
             function toggleInitialInterviewField() {
                 if (!yearLevelSelect || !initialInterviewWrapper || !initialInterviewSelect) {
                     return;
                 }
-                const isSecondYear = yearLevelSelect.value === '2nd Year';
-                initialInterviewWrapper.classList.toggle('hidden', !isSecondYear);
-                initialInterviewSelect.required = isSecondYear;
-                if (!isSecondYear) {
+                const isFirstOrSecondYear = ['1st Year', '2nd Year'].includes(yearLevelSelect.value);
+                const isThirdYearOrAbove = ['3rd Year', '4th Year', '5th Year'].includes(yearLevelSelect.value);
+                initialInterviewWrapper.classList.toggle('hidden', !isFirstOrSecondYear);
+                initialInterviewSelect.required = isFirstOrSecondYear;
+                if (isThirdYearOrAbove) {
+                    initialInterviewSelect.value = 'yes';
+                } else if (!isFirstOrSecondYear) {
                     initialInterviewSelect.value = '';
                 }
             }

@@ -13,14 +13,34 @@ class Feedback extends Model
 
     protected $fillable = [
         'user_id',
+        'target_counselor_id',
         'service_availed',
         'satisfaction_rating',
         'comments',
-        'is_anonymous'
+        'is_anonymous',
+        'share_mobile',
+        'personnel_name',
+        'cc1',
+        'cc2',
+        'cc3',
+        'sqd0',
+        'sqd1',
+        'sqd2',
+        'sqd3_1',
+        'sqd3_2',
+        'sqd4',
+        'sqd5',
+        'sqd6',
+        'sqd7_1',
+        'sqd7_2',
+        'sqd7_3',
+        'sqd8',
+        'sqd9',
     ];
 
     protected $casts = [
         'is_anonymous' => 'boolean',
+        'share_mobile' => 'boolean',
     ];
 
     /**
@@ -29,6 +49,11 @@ class Feedback extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function targetCounselor(): BelongsTo
+    {
+        return $this->belongsTo(Counselor::class, 'target_counselor_id');
     }
 
     /**

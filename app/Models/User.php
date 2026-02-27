@@ -33,6 +33,7 @@ class User extends Authenticatable
         'number_of_children',
         'citizenship',
         'address',
+        'region_of_residence',
         'phone_number',
         'email',
         'password',

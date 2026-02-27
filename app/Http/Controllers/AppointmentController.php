@@ -857,8 +857,9 @@ public function refer(Request $request, Appointment $appointment)
         'referral_reason' => 'nullable|string|max:500',
     ]);
 
-    $counselor = Counselor::where('user_id', Auth::id())->first();
-    if (!$counselor || $appointment->counselor_id !== $counselor->id) {
+    $counselorAssignments = Counselor::where('user_id', Auth::id())->get();
+    $counselor = $counselorAssignments->first();
+    if (!$counselor || !$counselorAssignments->pluck('id')->contains($appointment->counselor_id)) {
         return redirect()->back()->with('error', 'You can only refer your own appointments.');
     }
 
@@ -937,6 +938,9 @@ public function refer(Request $request, Appointment $appointment)
         'referral_reason' => $request->input('referral_reason'),
         'referral_previous_status' => $appointment->status,
         'referral_requested_at' => now(),
+        'referral_outcome' => null,
+        'referral_resolved_at' => null,
+        'referral_resolved_by_counselor_id' => null,
         'original_counselor_id' => $appointment->counselor_id,
         'proposed_date' => $date->toDateString(),
         'proposed_start_time' => $request->start_time,
@@ -1187,8 +1191,9 @@ public function acceptReferralByCounselor(Request $request, Appointment $appoint
             'proposed_date' => null,
             'proposed_start_time' => null,
             'proposed_end_time' => null,
-            'referral_previous_status' => null,
-            'referral_requested_at' => null,
+            'referral_outcome' => 'accepted',
+            'referral_resolved_at' => now(),
+            'referral_resolved_by_counselor_id' => $counselor->id,
         ]);
 
         if ($oldEventId && $originalCounselor && $originalCounselor->google_calendar_id) {
@@ -1230,11 +1235,9 @@ public function rejectReferralByCounselor(Request $request, Appointment $appoint
     $appointment->update([
         'status' => $previousStatus,
         'notes' => ($appointment->notes ? $appointment->notes . "\n\n" : '') . $rejectNote,
-        'referred_to_counselor_id' => null,
-        'referral_reason' => null,
-        'referral_previous_status' => null,
-        'referral_requested_at' => null,
-        'original_counselor_id' => null,
+        'referral_outcome' => 'rejected',
+        'referral_resolved_at' => now(),
+        'referral_resolved_by_counselor_id' => $counselor->id,
         'proposed_date' => null,
         'proposed_start_time' => null,
         'proposed_end_time' => null,
@@ -1532,9 +1535,17 @@ public function rejectReferral(Request $request, Appointment $appointment)
     {
         $dayAvailability = $this->getAvailabilityForDate($counselor, $date);
 
+        $timezone = $this->getCalendarTimezone();
+        $slotStart = Carbon::parse($date->toDateString() . ' ' . $startTime, $timezone);
+        $slotEnd = Carbon::parse($date->toDateString() . ' ' . $endTime, $timezone);
+
         foreach ($dayAvailability as $timeRange) {
             [$start, $end] = explode('-', $timeRange);
-            if ($startTime >= $start && $endTime <= $end) {
+
+            $rangeStart = Carbon::parse($date->toDateString() . ' ' . trim($start), $timezone);
+            $rangeEnd = Carbon::parse($date->toDateString() . ' ' . trim($end), $timezone);
+
+            if ($slotStart->greaterThanOrEqualTo($rangeStart) && $slotEnd->lessThanOrEqualTo($rangeEnd)) {
                 return true;
             }
         }

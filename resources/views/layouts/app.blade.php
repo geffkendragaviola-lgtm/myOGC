@@ -108,19 +108,6 @@
             <!-- Centered Navigation Items -->
             <div class="flex items-center space-x-8 absolute left-1/2 transform -translate-x-1/2">
                 <a href="{{ route('dashboard') }}" class="text-white font-semibold hover:text-yellow-300 transition">Home</a>
-
-                <!-- Services Dropdown -->
-                <div class="relative" id="services-dropdown">
-                    <button class="text-white font-semibold hover:text-yellow-300 transition flex items-center" id="services-dropdown-btn">
-                        Services <i class="fas fa-chevron-down ml-1 text-sm"></i>
-                    </button>
-                    <div class="absolute hidden bg-white rounded-md shadow-lg py-2 mt-1 w-48 z-50" id="services-dropdown-menu">
-                        <a href="{{ route('bap') }}" class="block px-4 py-2 text-gray-800 hover:bg-blue-100">Book an Appointment</a>
-                        <a href="{{ route('mhc') }}" class="block px-4 py-2 text-gray-800 hover:bg-blue-100">Mental Health Corner</a>
-                    </div>
-                </div>
-
-                <a href="{{ route('feedback') }}" class="text-white font-semibold hover:text-yellow-300 transition">Feedback</a>
             </div>
 
             <div class="flex items-center space-x-4 ml-auto">
@@ -174,7 +161,6 @@
 
                 <div class="mt-6 space-y-1 px-3">
                     <a href="{{ route('counselor.dashboard') }}"><i class="fas fa-tachometer-alt mr-3"></i> Dashboard</a>
-                    <a href="{{ route('counselor.session-notes.dashboard') }}"><i class="fas fa-sticky-note mr-3"></i> Session Notes</a>
                     <a href="{{ route('counselor.resources.index') }}"><i class="fas fa-box-open mr-3"></i> Resources</a>
                     <a href="{{ route('counselor.announcements.index') }}"><i class="fas fa-bullhorn mr-3"></i> Announcements</a>
                     <a href="{{ route('counselor.events.index') }}"><i class="fas fa-calendar-alt mr-3"></i> Events</a>

@@ -44,18 +44,53 @@
                         @endif
                     </div>
                     <div class="text-right">
-                        <div class="text-white text-3xl font-bold mb-1">
-                            {{ $feedback->satisfaction_rating }}/5
-                        </div>
-                        <div class="text-blue-100">
-                            {{ \App\Models\Feedback::getRatingLabel($feedback->satisfaction_rating) }}
-                        </div>
+                        <div class="text-white text-sm font-semibold">Submitted</div>
+                        <div class="text-blue-100">{{ $feedback->created_at->format('F j, Y \a\t g:i A') }}</div>
                     </div>
                 </div>
             </div>
 
             <!-- Content Section -->
             <div class="p-6">
+                <!-- Allowed Student Information -->
+                <div class="mb-6">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-2">Student Information (Limited View)</h3>
+                    <div class="bg-gray-50 rounded-lg p-4">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-600">College</label>
+                                <p class="mt-1 text-gray-900 font-semibold">{{ $feedback->user->student->college->name ?? 'N/A' }}</p>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-600">Sex at Birth</label>
+                                <p class="mt-1 text-gray-900 font-semibold">{{ $feedback->user->sex ?? 'N/A' }}</p>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-600">Age (in years)</label>
+                                <p class="mt-1 text-gray-900 font-semibold">{{ $feedback->user->age ?? 'N/A' }}</p>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-600">Region of Residence</label>
+                                <p class="mt-1 text-gray-900 font-semibold">{{ $feedback->user->region_of_residence ?? 'N/A' }}</p>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-600">Email Address</label>
+                                <p class="mt-1 text-gray-900 font-semibold">{{ $feedback->user->email ?? 'N/A' }}</p>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-600">Mobile Number (optional)</label>
+                                <p class="mt-1 text-gray-900 font-semibold">
+                                    @if($feedback->share_mobile)
+                                        {{ $feedback->user->phone_number ?? 'N/A' }}
+                                    @else
+                                        Not shared
+                                    @endif
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- Service Information -->
                 <div class="mb-6">
                     <h3 class="text-lg font-semibold text-gray-800 mb-2">Service Information</h3>
@@ -66,38 +101,79 @@
                                 <p class="mt-1 text-lg font-semibold text-gray-900">{{ $feedback->service_availed }}</p>
                             </div>
                             <div>
-                                <label class="block text-sm font-medium text-gray-600">Submission Date</label>
-                                <p class="mt-1 text-lg font-semibold text-gray-900">
-                                    {{ $feedback->created_at->format('F j, Y \a\t g:i A') }}
-                                </p>
+                                <label class="block text-sm font-medium text-gray-600">Personnel you transacted with</label>
+                                <p class="mt-1 text-lg font-semibold text-gray-900">{{ $feedback->personnel_name ?? 'N/A' }}</p>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Rating Display -->
+                <!-- Citizen's Charter -->
                 <div class="mb-6">
-                    <h3 class="text-lg font-semibold text-gray-800 mb-2">Satisfaction Rating</h3>
-                    <div class="flex items-center justify-center bg-yellow-50 rounded-lg p-6">
-                        <div class="text-center">
-                            <div class="text-yellow-400 text-4xl mb-2">
-                                @for($i = 1; $i <= 5; $i++)
-                                    <i class="fas fa-star{{ $i <= $feedback->satisfaction_rating ? '' : '-o' }} mx-1"></i>
-                                @endfor
-                            </div>
-                            <div class="text-2xl font-bold text-gray-800">
-                                {{ $feedback->satisfaction_rating }} out of 5 stars
-                            </div>
-                            <div class="text-lg text-gray-600 mt-1">
-                                {{ \App\Models\Feedback::getRatingLabel($feedback->satisfaction_rating) }}
-                            </div>
+                    <h3 class="text-lg font-semibold text-gray-800 mb-2">Citizen's Charter (CC)</h3>
+                    <div class="bg-gray-50 rounded-lg p-4 space-y-3">
+                        <div>
+                            <div class="text-sm font-medium text-gray-600">CC1</div>
+                            @php
+                                $cc1Map = [
+                                    'A' => 'I know what a CC is and I saw this office\'s CC.',
+                                    'B' => 'I know what a CC is but I did NOT see this office\'s CC.',
+                                    'C' => 'I learned of the CC only when I saw this office\'s CC.',
+                                    'D' => 'I do not know what a CC is and I did not see one in this office.',
+                                ];
+
+                                $cc1Value = $feedback->cc1;
+                                $cc1Display = $cc1Map[$cc1Value] ?? ($cc1Value ?? 'N/A');
+                            @endphp
+                            <div class="text-gray-900">{{ $cc1Display }}</div>
+                        </div>
+                        <div>
+                            <div class="text-sm font-medium text-gray-600">CC2</div>
+                            <div class="text-gray-900">{{ $feedback->cc2 ?? 'N/A' }}</div>
+                        </div>
+                        <div>
+                            <div class="text-sm font-medium text-gray-600">CC3</div>
+                            <div class="text-gray-900">{{ $feedback->cc3 ?? 'N/A' }}</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Service Quality Dimensions -->
+                <div class="mb-6">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-2">Service Quality Dimensions (SQD)</h3>
+                    <div class="bg-gray-50 rounded-lg p-4">
+                        @php
+                            $sqdQuestions = [
+                                'sqd0' => 'SQD0. I am satisfied with the service that I availed.',
+                                'sqd1' => 'SQD1. I spent a reasonable amount of time for my transaction.',
+                                'sqd2' => "SQD2. The office followed the transaction's requirements and steps based on the information provided.",
+                                'sqd3_1' => 'SQD3-1. The steps (including payment) I needed to do for my transaction were easy and simple.',
+                                'sqd3_2' => 'SQD3-2. The receiving/ waiting/ processing/ working area, office facilities, etc. has visual appeal and comfiness.',
+                                'sqd4' => 'SQD4. I easily found information about my transaction from the office or its website.',
+                                'sqd5' => 'SQD5. I paid a reasonable amount of fees for my transaction.',
+                                'sqd6' => 'SQD6. I feel the office was fair to everyone, or "walang palakasan", during my transaction.',
+                                'sqd7_1' => 'SQD7-1. I was treated courteously by the staff, and (if asked for help) the staff was helpful.',
+                                'sqd7_2' => 'SQD7-2. The staff is knowledgeable of the functions and/or operations of the office.',
+                                'sqd7_3' => 'SQD7-3. The staff has the ability to complete the transaction.',
+                                'sqd8' => 'SQD8. I got what I needed from the government office, or (if denied) denial of request was sufficiently explained to me.',
+                                'sqd9' => 'SQD9. The staff shows professionalism, politeness, and willingness to help.',
+                            ];
+                        @endphp
+
+                        <div class="grid grid-cols-1 gap-3">
+                            @foreach($sqdQuestions as $key => $label)
+                                <div class="flex justify-between items-start border-b border-gray-200 pb-2">
+                                    <div class="pr-4 text-gray-800">{{ $label }}</div>
+                                    <div class="font-semibold text-gray-900">{{ $feedback->{$key} ?? 'N/A' }}</div>
+                                </div>
+                            @endforeach
                         </div>
                     </div>
                 </div>
 
                 <!-- Comments -->
                 <div class="mb-6">
-                    <h3 class="text-lg font-semibold text-gray-800 mb-2">Student Comments</h3>
+                    <h3 class="text-lg font-semibold text-gray-800 mb-2">Comments/Suggestions</h3>
                     <div class="bg-gray-50 rounded-lg p-4">
                         @if($feedback->comments)
                             <p class="text-gray-700 leading-relaxed whitespace-pre-wrap">{{ $feedback->comments }}</p>
@@ -133,18 +209,16 @@
                             <span class="font-medium text-gray-600">Last Updated:</span>
                             <span class="ml-2 text-gray-900">{{ $feedback->updated_at->format('M j, Y \a\t g:i A') }}</span>
                         </div>
-                        @if(!$feedback->is_anonymous)
                         <div>
-                            <span class="font-medium text-gray-600">Student ID:</span>
+                            <span class="font-medium text-gray-600">Visible To:</span>
                             <span class="ml-2 text-gray-900">
-                                @if($feedback->user->student)
-                                    {{ $feedback->user->student->student_id ?? 'N/A' }}
+                                @if(is_null($feedback->target_counselor_id))
+                                    All Counselors
                                 @else
-                                    N/A
+                                    Selected Counselor
                                 @endif
                             </span>
                         </div>
-                        @endif
                     </div>
                 </div>
             </div>
@@ -156,12 +230,6 @@
                class="bg-gray-600 text-white px-6 py-2 rounded-lg hover:bg-gray-700 transition flex items-center">
                 <i class="fas fa-list mr-2"></i> Back to List
             </a>
-            @if(!$feedback->is_anonymous && $feedback->user->student)
-            <a href="{{ route('counselor.students.profile', $feedback->user->student) }}"
-               class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition flex items-center">
-                <i class="fas fa-user-graduate mr-2"></i> View Student Profile
-            </a>
-            @endif
         </div>
     </div>
 </div>

@@ -29,7 +29,7 @@ class CounselorSeeder extends Seeder
                 'citizenship' => 'Filipino',
                 'address' => 'Iligan City, Lanao del Norte',
                 'phone_number' => '09123456789',
-                'email' => 'jullianephilip.ouano@g.msuiit.edu.ph',
+                'email' => 'ouano@g.msuiit.edu.ph',
                 'password' => Hash::make('1234567890'),
                 'role' => 'counselor',
                 'created_at' => now(),

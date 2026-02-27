@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Feedback;
+use App\Models\Counselor;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
@@ -21,21 +22,25 @@ class FeedbackController extends Controller
         $isAdmin = \App\Models\Admin::where('user_id', $userId)->exists();
 
         if (!$isCounselor && !$isAdmin) {
-            // If user is student, only show their own feedback
-            if (Auth::user()->role === 'student') {
-                $feedbacks = Feedback::where('user_id', $userId)
-                    ->orderBy('created_at', 'desc')
-                    ->paginate(10);
-
-                return view('student.feedback.index', compact('feedbacks'));
-            }
-
             abort(403, 'Access denied. Counselor or Admin access required.');
         }
 
-        // For counselors and admins - show all feedback
-        $query = Feedback::with('user')
+        // For counselors and admins
+        $query = Feedback::with(['user.student.college', 'targetCounselor.user'])
             ->orderBy('created_at', 'desc');
+
+        if ($isCounselor && !$isAdmin) {
+            $counselorAssignments = Counselor::where('user_id', $userId)->get(['id', 'is_head']);
+            $counselorIds = $counselorAssignments->pluck('id');
+            $isHead = (bool) $counselorAssignments->firstWhere('is_head', true);
+
+            if (!$isHead) {
+                $query->where(function ($q) use ($counselorIds) {
+                    $q->whereNull('target_counselor_id')
+                        ->orWhereIn('target_counselor_id', $counselorIds);
+                });
+            }
+        }
 
         // Search functionality
         if ($request->has('search') && $request->search) {
@@ -50,7 +55,7 @@ class FeedbackController extends Controller
             });
         }
 
-        // Rating filter
+        // Rating filter (legacy)
         if ($request->has('rating') && $request->rating) {
             $query->where('satisfaction_rating', $request->rating);
         }
@@ -92,12 +97,15 @@ class FeedbackController extends Controller
         // Get unique service types for filter dropdown
         $serviceTypes = Feedback::distinct()->pluck('service_availed')->sort();
 
-        // Calculate statistics
+        // Calculate statistics based on the same visibility scope
+        $statsQuery = (clone $query);
         $stats = [
-            'total' => Feedback::count(),
-            'average_rating' => round(Feedback::avg('satisfaction_rating') ?? 0, 1),
-            'anonymous_count' => Feedback::where('is_anonymous', true)->count(),
-            'rating_distribution' => Feedback::selectRaw('satisfaction_rating, COUNT(*) as count')
+            'total' => (clone $statsQuery)->count(),
+            'average_rating' => round((clone $statsQuery)->avg('satisfaction_rating') ?? 0, 1),
+            'anonymous_count' => (clone $statsQuery)->where('is_anonymous', true)->count(),
+            'rating_distribution' => (clone $statsQuery)
+                ->reorder()
+                ->selectRaw('satisfaction_rating, COUNT(*) as count')
                 ->groupBy('satisfaction_rating')
                 ->orderBy('satisfaction_rating', 'desc')
                 ->get()
@@ -117,8 +125,17 @@ class FeedbackController extends Controller
      */
     public function create()
     {
-        // Use the existing feedback view for students
-        return view('feedback');
+        $counselors = Counselor::with('user')
+            ->whereHas('user', function ($q) {
+                $q->where('role', 'counselor');
+            })
+            ->get()
+            ->sortBy(function ($c) {
+                return strtolower(trim(($c->user->last_name ?? '') . ' ' . ($c->user->first_name ?? '')));
+            })
+            ->values();
+
+        return view('feedback', compact('counselors'));
     }
 
     /**
@@ -127,7 +144,7 @@ class FeedbackController extends Controller
      */
     public function showForm()
     {
-        return view('feedback');
+        return $this->create();
     }
 
     /**
@@ -135,25 +152,57 @@ class FeedbackController extends Controller
      */
     public function store(Request $request)
     {
-        // Handle both form field names - 'feedback' and 'comments'
-        $validated = $request->validate([
-            'service_availed' => 'required|string|in:counseling,mental_health_corner,consultation,other',
-            'satisfaction_rating' => 'required|integer|between:1,5',
+        $sqdKeys = [
+            'sqd0', 'sqd1', 'sqd2', 'sqd3_1', 'sqd3_2', 'sqd4', 'sqd5', 'sqd6',
+            'sqd7_1', 'sqd7_2', 'sqd7_3', 'sqd8', 'sqd9',
+        ];
+
+        $validated = $request->validate(array_merge([
+            'service_availed' => 'required|string|in:COUNSELING SERVICES,TESTING-TEST ADMINISTRATION,TESTING - TEST INTERPRETATION,REQUEST FOR ISSUANCE OF CERTIFICATION AND REQUEST FOR ISSUANCE OF RECOMMENDATION LETTER,INITIAL INTERVIEW FOR FRESHMEN,REFERRAL SERVICE',
+            'target_counselor_id' => 'required|string',
+            'share_mobile' => 'sometimes|boolean',
+            'cc1' => 'required|string|max:50',
+            'cc2' => 'nullable|string|max:50',
+            'cc3' => 'nullable|string|max:50',
             'comments' => 'nullable|string|max:1000',
-            'feedback' => 'nullable|string|max:1000', // For form compatibility
-            'is_anonymous' => 'boolean'
-        ]);
+            'is_anonymous' => 'sometimes|boolean',
+        ], collect($sqdKeys)->mapWithKeys(fn ($k) => [$k => 'required|integer|between:1,5'])->all()));
 
-        // Use 'comments' if provided, otherwise use 'feedback' from form
-        $comments = $validated['comments'] ?? ($validated['feedback'] ?? null);
+        $targetCounselorId = $validated['target_counselor_id'] === 'unidentified'
+            ? null
+            : (int) $validated['target_counselor_id'];
 
-        Feedback::create([
-            'user_id' => Auth::id(),
-            'service_availed' => $validated['service_availed'],
-            'satisfaction_rating' => $validated['satisfaction_rating'],
-            'comments' => $comments,
-            'is_anonymous' => $validated['is_anonymous'] ?? false
-        ]);
+        if (!is_null($targetCounselorId)) {
+            $request->validate([
+                'target_counselor_id' => 'exists:counselors,id',
+            ]);
+        }
+
+        $personnelName = "I can't identify";
+        if (!is_null($targetCounselorId)) {
+            $counselor = Counselor::with('user')->find($targetCounselorId);
+            if ($counselor && $counselor->user) {
+                $personnelName = trim($counselor->user->first_name . ' ' . $counselor->user->last_name);
+            }
+        }
+
+        Feedback::create(array_merge(
+            [
+                'user_id' => Auth::id(),
+                'target_counselor_id' => $targetCounselorId,
+                'service_availed' => $validated['service_availed'],
+                'personnel_name' => $personnelName,
+                'comments' => $validated['comments'] ?? null,
+                'is_anonymous' => (bool) ($validated['is_anonymous'] ?? false),
+                'share_mobile' => (bool) ($validated['share_mobile'] ?? false),
+                'cc1' => $validated['cc1'],
+                'cc2' => $validated['cc2'] ?? null,
+                'cc3' => $validated['cc3'] ?? null,
+                // Keep legacy satisfaction_rating for existing screens/statistics
+                'satisfaction_rating' => (int) ($validated['sqd0'] ?? 0),
+            ],
+            collect($sqdKeys)->mapWithKeys(fn ($k) => [$k => (int) $validated[$k]])->all(),
+        ));
 
         return redirect()->route('feedback')
             ->with('success', 'Thank you for your feedback! Your input helps us improve our services.');
@@ -175,7 +224,20 @@ class FeedbackController extends Controller
             abort(403, 'Access denied.');
         }
 
-        $feedback->load('user');
+        if ($isCounselor && !$isAdmin) {
+            $counselorAssignments = Counselor::where('user_id', $userId)->get(['id', 'is_head']);
+            $counselorIds = $counselorAssignments->pluck('id');
+            $isHead = (bool) $counselorAssignments->firstWhere('is_head', true);
+            $isAllowed = $isHead
+                || is_null($feedback->target_counselor_id)
+                || $counselorIds->contains((int) $feedback->target_counselor_id);
+
+            if (!$isAllowed) {
+                abort(403, 'Access denied.');
+            }
+        }
+
+        $feedback->load(['user.student.college', 'targetCounselor.user']);
 
         // Use appropriate view based on user role
         if ($isCounselor) {

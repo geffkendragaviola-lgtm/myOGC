@@ -54,9 +54,17 @@ class SessionNoteController extends Controller
     {
         $dayAvailability = $this->getAvailabilityForDate($counselor, $date);
 
+        $timezone = config('app.timezone') ?: 'Asia/Manila';
+        $slotStart = Carbon::parse($date->toDateString() . ' ' . $startTime, $timezone);
+        $slotEnd = Carbon::parse($date->toDateString() . ' ' . $endTime, $timezone);
+
         foreach ($dayAvailability as $timeRange) {
             [$start, $end] = explode('-', $timeRange);
-            if ($startTime >= $start && $endTime <= $end) {
+
+            $rangeStart = Carbon::parse($date->toDateString() . ' ' . trim($start), $timezone);
+            $rangeEnd = Carbon::parse($date->toDateString() . ' ' . trim($end), $timezone);
+
+            if ($slotStart->greaterThanOrEqualTo($rangeStart) && $slotEnd->lessThanOrEqualTo($rangeEnd)) {
                 return true;
             }
         }

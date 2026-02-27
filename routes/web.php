@@ -48,17 +48,12 @@ Route::middleware('auth')->group(function () {
         return view('mhc'); // Your MHC blade file
     })->name('mhc');
 
-    Route::get('/feedback', function () {
-        return view('feedback'); // Your BAP blade file
-    })->name('feedback');
-
     Route::get('/book-appointment', function () {
         return view('bap'); // Your BAP blade file
     })->name('bap');
 
     // Feedback routes
-    Route::get('/feedback', [FeedbackController::class, 'create'])->name('feedback.create');
-    Route::get('/feedback', [FeedbackController::class, 'create'])->name('feedback'); // Add this line
+    Route::get('/feedback', [FeedbackController::class, 'create'])->name('feedback');
     Route::post('/feedback', [FeedbackController::class, 'store'])->name('feedback.store');
 
     // Admin feedback management - REMOVED role:admin middleware
@@ -95,12 +90,14 @@ Route::middleware('auth')->group(function () {
         Route::get('/appointments', [CounselorController::class, 'appointments'])->name('counselor.appointments');
         Route::patch('/appointments/{appointment}/status', [CounselorController::class, 'updateAppointmentStatus'])->name('counselor.appointments.update-status');
         Route::get('/appointments/{appointment}/details', [CounselorController::class, 'getAppointmentDetails'])->name('counselor.appointments.details');
+        Route::get('/appointments/{appointment}/session', [CounselorController::class, 'showAppointmentSession'])
+            ->name('counselor.appointments.session');
+        Route::post('/appointments/{appointment}/session', [CounselorController::class, 'storeAppointmentSession'])
+            ->name('counselor.appointments.session.store');
         Route::patch('/appointments/{appointment}/update-status', [AppointmentController::class, 'updateStatus'])
             ->name('counselor.appointments.update-status');
     Route::patch('/appointments/{appointment}/reschedule', [AppointmentController::class, 'reschedule'])
         ->name('counselor.appointments.reschedule');
- Route::get('/session-notes/dashboard', [SessionNoteController::class, 'dashboard'])->name('counselor.session-notes.dashboard');
-    Route::get('/session-notes/{sessionNote}/details', [SessionNoteController::class, 'getSessionNoteDetails'])->name('counselor.session-notes.details');
         // Feedback management routes
         Route::get('/feedback', [FeedbackController::class, 'index'])->name('counselor.feedback.index');
         Route::get('/feedback/{feedback}', [FeedbackController::class, 'show'])->name('counselor.feedback.show');
@@ -130,25 +127,8 @@ Route::middleware('auth')->group(function () {
         Route::delete('/resources/{resource}', [ResourceController::class, 'destroy'])->name('counselor.resources.destroy');
         Route::patch('/resources/{resource}/status', [ResourceController::class, 'updateStatus'])->name('counselor.resources.update-status');
 
-        // Session Notes Routes
-        Route::get('/session-notes/dashboard', [SessionNoteController::class, 'dashboard'])->name('counselor.session-notes.dashboard');
-        Route::get('/students/{student}/session-notes', [SessionNoteController::class, 'index'])->name('counselor.session-notes.index');
-        Route::get('/students/{student}/session-notes/create', [SessionNoteController::class, 'create'])->name('counselor.session-notes.create');
-        Route::get('/appointments/{appointment}/session-notes/create', [SessionNoteController::class, 'createFromAppointment'])->name('counselor.session-notes.create-from-appointment');
-        Route::post('/students/{student}/session-notes', [SessionNoteController::class, 'store'])->name('counselor.session-notes.store');
-        Route::get('/students/{student}/session-notes/json', [SessionNoteController::class, 'getStudentNotes'])->name('counselor.session-notes.json');
-
-        // Follow-up appointment routes
-        Route::get('/session-notes/{sessionNote}/follow-up-slots', [SessionNoteController::class, 'getFollowUpSlots'])->name('counselor.session-notes.follow-up-slots');
-        Route::post('/session-notes/{sessionNote}/follow-up-appointment', [SessionNoteController::class, 'createFollowUpAppointment'])->name('counselor.session-notes.follow-up-appointment');
-
         // Follow-up appointment slots
         Route::get('/appointments/followup-available-slots', [AppointmentController::class, 'getFollowupAvailableSlots'])->name('counselor.appointments.followup-available-slots');
-
-        // Individual session note routes
-        Route::get('/session-notes/{sessionNote}', [SessionNoteController::class, 'show'])->name('counselor.session-notes.show');
-        Route::get('/session-notes/{sessionNote}/edit', [SessionNoteController::class, 'edit'])->name('counselor.session-notes.edit');
-        Route::patch('/session-notes/{sessionNote}', [SessionNoteController::class, 'update'])->name('counselor.session-notes.update');
 
         // Student profile route
         Route::get('/students/{student}/profile', [CounselorController::class, 'showStudentProfile'])

@@ -207,10 +207,6 @@
             <i class="fas fa-tachometer-alt mr-2"></i> Dashboard
         </a>
 
-        <a href="{{ route('counselor.session-notes.dashboard') }}" class="block px-4 py-2 text-gray-800 hover:bg-blue-100">
-            <i class="fas fa-sticky-note mr-2"></i> Session Notes
-        </a>
-
         <a href="{{ route('counselor.resources.index') }}" class="block px-4 py-2 text-gray-800 hover:bg-blue-100">
             <i class="fas fa-box-open mr-2"></i> Resources
         </a>
@@ -300,18 +296,20 @@
 @endif
                         <a href="#" class="text-white font-semibold hover:text-yellow-300 transition">Home</a>
 
-                        <!-- Services Dropdown -->
-                        <div class="relative" id="services-dropdown">
-                            <button class="text-white font-semibold hover:text-yellow-300 transition flex items-center" id="services-dropdown-btn">
-                                Services <i class="fas fa-chevron-down ml-1 text-sm"></i>
-                            </button>
-                            <div class="absolute hidden bg-white rounded-md shadow-lg py-2 mt-1 w-48 z-50" id="services-dropdown-menu">
-                                <a href="{{ route('bap') }}" class="block px-4 py-2 text-gray-800 hover:bg-blue-100">Book an Appointment</a>
-                                <a href="{{ route('mhc') }}" class="block px-4 py-2 text-gray-800 hover:bg-blue-100">Mental Health Corner</a>
+                        @if(Auth::user()->role === 'student')
+                            <!-- Services Dropdown -->
+                            <div class="relative" id="services-dropdown">
+                                <button class="text-white font-semibold hover:text-yellow-300 transition flex items-center" id="services-dropdown-btn">
+                                    Services <i class="fas fa-chevron-down ml-1 text-sm"></i>
+                                </button>
+                                <div class="absolute hidden bg-white rounded-md shadow-lg py-2 mt-1 w-48 z-50" id="services-dropdown-menu">
+                                    <a href="{{ route('bap') }}" class="block px-4 py-2 text-gray-800 hover:bg-blue-100">Book an Appointment</a>
+                                    <a href="{{ route('mhc') }}" class="block px-4 py-2 text-gray-800 hover:bg-blue-100">Mental Health Corner</a>
+                                </div>
                             </div>
-                        </div>
 
-                        <a href="{{ route('feedback') }}" class="text-white font-semibold hover:text-yellow-300 transition">Feedback</a>
+                            <a href="{{ route('feedback') }}" class="text-white font-semibold hover:text-yellow-300 transition">Feedback</a>
+                        @endif
                     </div>
                 </div>
 
@@ -409,28 +407,30 @@
                 $services = \App\Models\Service::active()->ordered()->get();
             @endphp
 
-            @if($services->isNotEmpty())
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
-                    @foreach($services as $service)
-                        <div class="dashboard-card bg-white rounded-xl shadow-md overflow-hidden">
-                            <img src="{{ $service->image_url }}" alt="{{ $service->title }}" class="w-full h-48 object-cover">
-                            <div class="p-6">
-                                <h3 class="text-xl font-bold text-gray-800 mb-3">{{ $service->title }}</h3>
-                                <p class="text-gray-600 mb-4">{{ $service->description }}</p>
+            @if(Auth::user()->role === 'student')
+                @if($services->isNotEmpty())
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+                        @foreach($services as $service)
+                            <div class="dashboard-card bg-white rounded-xl shadow-md overflow-hidden">
+                                <img src="{{ $service->image_url }}" alt="{{ $service->title }}" class="w-full h-48 object-cover">
+                                <div class="p-6">
+                                    <h3 class="text-xl font-bold text-gray-800 mb-3">{{ $service->title }}</h3>
+                                    <p class="text-gray-600 mb-4">{{ $service->description }}</p>
 
-                                @if($service->route_name)
-                                    <a href="{{ route($service->route_name) }}" class="dashboard-btn bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition inline-block">
-                                        See more
-                                    </a>
-                                @else
-                                    <button class="dashboard-btn bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition">
-                                        See more
-                                    </button>
-                                @endif
+                                    @if($service->route_name)
+                                        <a href="{{ route($service->route_name) }}" class="dashboard-btn bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition inline-block">
+                                            See more
+                                        </a>
+                                    @else
+                                        <button class="dashboard-btn bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition">
+                                            See more
+                                        </button>
+                                    @endif
+                                </div>
                             </div>
-                        </div>
-                    @endforeach
-                </div>
+                        @endforeach
+                    </div>
+                @endif
             @endif
 
      <!-- Announcements Section -->

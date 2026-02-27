@@ -170,7 +170,8 @@ class RegisteredUserController extends Controller
             'number_of_children' => ['nullable', 'integer', 'min:0'],
             'citizenship' => ['nullable', 'string', 'max:50'],
             'address' => ['nullable', 'string', 'max:500'],
-            'phone_number' => ['nullable', 'string', 'max:20'],
+            'region_of_residence' => ['nullable', 'string', 'in:National Capital Region (NCR) – Metro Manila,Region I – Ilocos Region,Region II – Cagayan Valley,Region III – Central Luzon,Region IV-A – CALABARZON,Region IV-B – MIMAROPA,Region V – Bicol Region,Cordillera Administrative Region (CAR),Region VI – Western Visayas,Region VII – Central Visayas,Region VIII – Eastern Visayas,Region IX – Zamboanga Peninsula,Region X – Northern Mindanao,Region XI – Davao Region,Region XII – SOCCSKSARGEN,Region XIII – Caraga,Bangsamoro Autonomous Region in Muslim Mindanao (BARMM).'],
+            'phone_number' => ['required', 'string', 'regex:/^09\d{9}$/', 'unique:users,phone_number'],
             'email' => [
                 'required',
                 'string',
@@ -189,7 +190,7 @@ class RegisteredUserController extends Controller
             // School Data
             $rules['student_id'] = ['required', 'string', 'max:50', 'unique:students'];
             $rules['year_level'] = ['required', 'string', 'max:50'];
-            $rules['initial_interview_completed'] = ['required_if:year_level,2nd Year', 'in:yes,no'];
+            $rules['initial_interview_completed'] = ['exclude_unless:year_level,1st Year,2nd Year', 'required', 'in:yes,no'];
             $rules['course'] = ['required', 'string', 'max:100'];
             $rules['college_id'] = ['required', 'exists:colleges,id'];
             $rules['msu_sase_score'] = ['nullable', 'numeric', 'min:0', 'max:180'];
@@ -434,6 +435,7 @@ class RegisteredUserController extends Controller
                 'number_of_children' => $request->number_of_children ?? 0,
                 'citizenship' => $request->citizenship ? strip_tags($request->citizenship) : null,
                 'address' => $request->address ? strip_tags($request->address) : null,
+                'region_of_residence' => $request->region_of_residence ? strip_tags($request->region_of_residence) : null,
                 'phone_number' => $request->phone_number,
                 'email' => strtolower(trim($request->email)),
                 'password' => Hash::make($request->password),
@@ -444,10 +446,10 @@ class RegisteredUserController extends Controller
             switch ($request->role) {
                 case 'student':
                     $initialInterviewCompleted = null;
-                    if ($request->year_level === '1st Year') {
-                        $initialInterviewCompleted = false;
-                    } elseif ($request->year_level === '2nd Year') {
+                    if (in_array($request->year_level, ['1st Year', '2nd Year'], true)) {
                         $initialInterviewCompleted = $request->initial_interview_completed === 'yes';
+                    } elseif (in_array($request->year_level, ['3rd Year', '4th Year', '5th Year'], true)) {
+                        $initialInterviewCompleted = true;
                     }
 
                     // Create main student record

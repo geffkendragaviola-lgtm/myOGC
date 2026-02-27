@@ -37,73 +37,97 @@
         </div>
 
         <!-- Quick Stats -->
-        <div class="grid grid-cols-1 md:grid-cols-6 gap-6 mb-6">
-            <div class="bg-white rounded-xl shadow-sm p-6">
+        <div class="grid grid-cols-1 md:grid-cols-7 gap-6 mb-6">
+            <a href="{{ route('counselor.appointments') }}?{{ http_build_query(request()->except('page', 'status', 'referral_direction')) }}&status=all"
+               class="bg-white rounded-xl shadow-sm p-6 block hover:shadow-md transition">
                 <div class="flex items-center">
                     <div class="p-3 bg-blue-100 rounded-lg">
                         <i class="fas fa-calendar-check text-blue-600 text-xl"></i>
                     </div>
                     <div class="ml-4">
                         <p class="text-sm text-gray-600">Total Appointments</p>
-                        <p class="text-2xl font-bold text-gray-800">{{ $appointments->total() }}</p>
+                        <p class="text-2xl font-bold text-gray-800">{{ $stats['total'] ?? $appointments->total() }}</p>
                     </div>
                 </div>
-            </div>
-            <div class="bg-white rounded-xl shadow-sm p-6">
+            </a>
+
+            <a href="{{ route('counselor.appointments') }}?{{ http_build_query(request()->except('page', 'status')) }}&status=pending"
+               class="bg-white rounded-xl shadow-sm p-6 block hover:shadow-md transition">
                 <div class="flex items-center">
                     <div class="p-3 bg-yellow-100 rounded-lg">
                         <i class="fas fa-clock text-yellow-600 text-xl"></i>
                     </div>
                     <div class="ml-4">
                         <p class="text-sm text-gray-600">Pending</p>
-                        <p class="text-2xl font-bold text-gray-800">{{ $appointments->where('status', 'pending')->count() }}</p>
+                        <p class="text-2xl font-bold text-gray-800">{{ $stats['pending'] ?? $appointments->where('status', 'pending')->count() }}</p>
                     </div>
                 </div>
-            </div>
-            <div class="bg-white rounded-xl shadow-sm p-6">
+            </a>
+
+            <a href="{{ route('counselor.appointments') }}?{{ http_build_query(request()->except('page', 'status')) }}&status=approved"
+               class="bg-white rounded-xl shadow-sm p-6 block hover:shadow-md transition">
                 <div class="flex items-center">
                     <div class="p-3 bg-green-100 rounded-lg">
                         <i class="fas fa-check-circle text-green-600 text-xl"></i>
                     </div>
                     <div class="ml-4">
                         <p class="text-sm text-gray-600">Approved</p>
-                        <p class="text-2xl font-bold text-gray-800">{{ $appointments->where('status', 'approved')->count() }}</p>
+                        <p class="text-2xl font-bold text-gray-800">{{ $stats['approved'] ?? $appointments->where('status', 'approved')->count() }}</p>
                     </div>
                 </div>
-            </div>
-            <div class="bg-white rounded-xl shadow-sm p-6">
+            </a>
+
+            <a href="{{ route('counselor.appointments') }}?{{ http_build_query(request()->except('page', 'status')) }}&status=completed"
+               class="bg-white rounded-xl shadow-sm p-6 block hover:shadow-md transition">
                 <div class="flex items-center">
                     <div class="p-3 bg-blue-100 rounded-lg">
                         <i class="fas fa-flag-checkered text-blue-600 text-xl"></i>
                     </div>
                     <div class="ml-4">
                         <p class="text-sm text-gray-600">Completed</p>
-                        <p class="text-2xl font-bold text-gray-800">{{ $appointments->where('status', 'completed')->count() }}</p>
+                        <p class="text-2xl font-bold text-gray-800">{{ $stats['completed'] ?? $appointments->where('status', 'completed')->count() }}</p>
                     </div>
                 </div>
-            </div>
-            <div class="bg-white rounded-xl shadow-sm p-6">
+            </a>
+
+            <a href="{{ route('counselor.appointments') }}?{{ http_build_query(request()->except('page', 'status')) }}&status=referred"
+               class="bg-white rounded-xl shadow-sm p-6 block hover:shadow-md transition">
                 <div class="flex items-center">
                     <div class="p-3 bg-purple-100 rounded-lg">
                         <i class="fas fa-exchange-alt text-purple-600 text-xl"></i>
                     </div>
                     <div class="ml-4">
                         <p class="text-sm text-gray-600">Referred</p>
-                        <p class="text-2xl font-bold text-gray-800">{{ $appointments->where('status', 'referred')->count() }}</p>
+                        <p class="text-2xl font-bold text-gray-800">{{ $stats['referred'] ?? $appointments->where('status', 'referred')->count() }}</p>
                     </div>
                 </div>
-            </div>
-            <div class="bg-white rounded-xl shadow-sm p-6">
+            </a>
+
+            <a href="{{ route('counselor.appointments') }}?{{ http_build_query(request()->except('page', 'referral_direction')) }}&referral_direction={{ ($referralDirection ?? request('referral_direction')) === 'in' ? '' : 'in' }}"
+               class="bg-white rounded-xl shadow-sm p-6 block hover:shadow-md transition">
                 <div class="flex items-center">
                     <div class="p-3 bg-indigo-100 rounded-lg">
-                        <i class="fas fa-clipboard-list text-indigo-600 text-xl"></i>
+                        <i class="fas fa-reply text-indigo-600 text-xl"></i>
                     </div>
                     <div class="ml-4">
-                        <p class="text-sm text-gray-600">With Notes</p>
-                        <p class="text-2xl font-bold text-gray-800">{{ $appointments->where('has_session_notes', true)->count() }}</p>
+                        <p class="text-sm text-gray-600">Referred In</p>
+                        <p class="text-2xl font-bold text-gray-800">{{ $stats['referred_in'] ?? 0 }}</p>
                     </div>
                 </div>
-            </div>
+            </a>
+
+            <a href="{{ route('counselor.appointments') }}?{{ http_build_query(request()->except('page', 'referral_direction')) }}&referral_direction={{ ($referralDirection ?? request('referral_direction')) === 'out' ? '' : 'out' }}"
+               class="bg-white rounded-xl shadow-sm p-6 block hover:shadow-md transition">
+                <div class="flex items-center">
+                    <div class="p-3 bg-violet-100 rounded-lg">
+                        <i class="fas fa-share text-violet-600 text-xl"></i>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-sm text-gray-600">Referred Out</p>
+                        <p class="text-2xl font-bold text-gray-800">{{ $stats['referred_out'] ?? 0 }}</p>
+                    </div>
+                </div>
+            </a>
         </div>
 
         <!-- Search and Filters Section -->
@@ -184,6 +208,14 @@
         <!-- Status Filter -->
         <div class="bg-white rounded-xl shadow-md p-6 mb-6">
             <div class="flex flex-wrap gap-2">
+                <a href="{{ route('counselor.appointments') }}?{{ http_build_query(request()->except('referral_direction', 'page')) }}&referral_direction=in"
+                class="px-4 py-2 rounded-lg {{ ($referralDirection ?? request('referral_direction')) === 'in' ? 'bg-indigo-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200' }} transition">
+                    Referred In
+                </a>
+                <a href="{{ route('counselor.appointments') }}?{{ http_build_query(request()->except('referral_direction', 'page')) }}&referral_direction=out"
+                class="px-4 py-2 rounded-lg {{ ($referralDirection ?? request('referral_direction')) === 'out' ? 'bg-violet-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200' }} transition">
+                    Referred Out
+                </a>
                 <a href="{{ route('counselor.appointments') }}?{{ http_build_query(request()->except('status', 'page')) }}&status=all"
                 class="px-4 py-2 rounded-lg {{ ($status === 'all' || !request('status')) ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200' }} transition">
                     All Appointments
@@ -279,8 +311,8 @@
                                     // Safe status color lookup with fallback
                                     $statusColor = $statusColors[$appointment->status] ?? 'bg-gray-100 text-gray-800';
 
-                                    // Use the new referral context method
                                     $statusText = $appointment->display_status;
+                                    $referralBadgeText = $appointment->referral_badge;
 
                                     // Add special styling for referred appointments
                                     $rowClass = 'hover:bg-gray-50 transition fade-in';
@@ -374,31 +406,35 @@
 
                                     <!-- Status Column -->
                                     <td class="px-6 py-4 whitespace-nowrap">
-                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full {{ $statusColor }}">
-                                            {{ $statusText }}
-                                        </span>
+                                        <div class="flex flex-col gap-1">
+                                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full {{ $statusColor }}">
+                                                {{ $statusText }}
+                                            </span>
+                                            @if($referralBadgeText)
+                                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-purple-100 text-purple-800">
+                                                    {{ $referralBadgeText }}
+                                                </span>
+                                            @endif
+                                        </div>
                                     </td>
 
                                     <!-- Actions Column -->
                                     <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                         <div class="flex space-x-2">
+                                            <a href="{{ route('counselor.appointments.session', $appointment) }}"
+                                               class="text-purple-600 hover:text-purple-900 transition"
+                                               title="Open Appointment Session">
+                                                <i class="fas fa-clipboard"></i>
+                                            </a>
+
                                             <button onclick="showAppointmentDetails({{ $appointment->id }})"
                                                     class="text-blue-600 hover:text-blue-900 transition"
                                                     title="View Details">
                                                 <i class="fas fa-eye"></i>
                                             </button>
 
-                                            <!-- Session Notes Actions -->
-                                            @if($appointment->status === 'completed' || $appointment->has_session_notes)
-                                                <button onclick="showSessionNotes({{ $appointment->student->id }}, {{ $appointment->id }})"
-                                                        class="text-purple-600 hover:text-purple-900 transition"
-                                                        title="View Session Notes">
-                                                    <i class="fas fa-clipboard-list"></i>
-                                                </button>
-                                            @endif
-
                                             <!-- Status Management Actions - Available for current counselor AND referred-to counselor -->
-                                            @if(in_array($appointment->getEffectiveCounselorId(), $counselorIds, true))
+                                            @if(in_array($appointment->getEffectiveCounselorId(), $counselorIdList, true))
                                                 @if($appointment->status === 'pending')
                                                     <!-- Approve button -->
                                                     <form action="{{ route('counselor.appointments.update-status', $appointment) }}" method="POST" class="inline">
@@ -443,7 +479,7 @@
                                                             <i class="fas fa-ban"></i>
                                                         </button>
                                                     </form>
-                                                @elseif($appointment->status === 'referred' && in_array($appointment->referred_to_counselor_id, $counselorIds, true))
+                                                @elseif($appointment->status === 'referred' && in_array($appointment->referred_to_counselor_id, $counselorIdList, true))
                                                     <!-- Special actions for referred appointments where this counselor is the receiver -->
                                                     <form action="{{ route('counselor.appointments.referral.accept', $appointment) }}" method="POST" class="inline">
                                                         @csrf
@@ -469,14 +505,14 @@
                                             @endif
 
                                             <!-- Quick Student Profile Link -->
-                                            <a href="{{ route('counselor.session-notes.index', $appointment->student) }}"
+                                            <a href="{{ route('counselor.students.profile', $appointment->student) }}"
                                             class="text-indigo-600 hover:text-indigo-900 transition"
-                                            title="View Student Profile & Notes">
+                                            title="View Student Profile">
                                                 <i class="fas fa-user-circle"></i>
                                             </a>
 
                                             <!-- Reschedule option for effective counselor -->
-                                            @if(in_array($appointment->getEffectiveCounselorId(), $counselorIds, true) && in_array($appointment->status, ['pending', 'approved', 'referred', 'rescheduled', 'reschedule_rejected', 'rejected']))
+                                            @if(in_array($appointment->getEffectiveCounselorId(), $counselorIdList, true) && in_array($appointment->status, ['pending', 'approved', 'referred', 'rescheduled', 'reschedule_rejected', 'rejected']))
                                                 <button onclick="showRescheduleModal({{ $appointment->id }}, {{ $appointment->getEffectiveCounselorId() }}, '{{ $appointment->appointment_date->format('Y-m-d') }}')"
                                                         class="text-orange-600 hover:text-orange-900 transition"
                                                         title="Reschedule Appointment">
@@ -485,7 +521,7 @@
                                             @endif
 
                                             <!-- Referral option for current counselor -->
-                                            @if(in_array($appointment->counselor_id, $counselorIds, true) && in_array($appointment->status, ['pending', 'approved', 'rescheduled', 'reschedule_rejected'], true))
+                                            @if(in_array($appointment->counselor_id, $counselorIdList, true) && in_array($appointment->status, ['pending', 'approved', 'rescheduled', 'reschedule_rejected'], true))
                                                 <button onclick="showReferralModal({{ $appointment->id }}, '{{ $appointment->appointment_date->format('Y-m-d') }}', {{ $appointment->student_id }}, {{ $appointment->counselor_id }})"
                                                         class="text-purple-600 hover:text-purple-900 transition"
                                                         title="Refer to Another Counselor">
@@ -520,23 +556,6 @@
                     </div>
                 </div>
                 <div id="appointmentDetails" class="p-6">
-                    <!-- Content will be loaded via AJAX -->
-                </div>
-            </div>
-        </div>
-
-        <!-- Session Notes Modal -->
-        <div id="sessionNotesModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50">
-            <div class="bg-white rounded-xl shadow-2xl max-w-4xl w-full mx-4 max-h-[90vh] overflow-y-auto">
-                <div class="p-6 border-b border-gray-200">
-                    <div class="flex justify-between items-center">
-                        <h3 class="text-xl font-bold text-gray-800">Session Notes</h3>
-                        <button onclick="closeSessionNotesModal()" class="text-gray-500 hover:text-gray-700 transition">
-                            <i class="fas fa-times text-xl"></i>
-                        </button>
-                    </div>
-                </div>
-                <div id="sessionNotesContent" class="p-6">
                     <!-- Content will be loaded via AJAX -->
                 </div>
             </div>
@@ -1514,17 +1533,40 @@
                                 </div>
                                 ` : ''}
 
-    <div>
-        <label class="block text-sm font-medium text-gray-700">Status</label>
-        <span class="mt-1 inline-flex px-2 py-1 text-xs font-semibold rounded-full
-            ${data.appointment.status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
-            data.appointment.status === 'approved' ? 'bg-green-100 text-green-800' :
-            data.appointment.status === 'rejected' ? 'bg-red-100 text-red-800' :
-            data.appointment.status === 'referred' ? 'bg-purple-100 text-purple-800' :
-            'bg-gray-100 text-gray-800'}">
-            ${data.appointment.status_display || (data.appointment.status.charAt(0).toUpperCase() + data.appointment.status.slice(1))}
-        </span>
-    </div>
+                                ${(data.appointment.is_referred || data.appointment.referral_reason || data.referral?.referred_to_name || data.referral?.referred_from_name) ? `
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700">Referral Details</label>
+                                    <div class="mt-1 p-3 rounded-lg border border-purple-200 bg-purple-50 space-y-1">
+                                        ${data.referral?.referred_from_name ? `
+                                        <p class="text-sm text-purple-900"><span class="font-medium">Referred from:</span> ${data.referral.referred_from_name}</p>
+                                        ` : ''}
+                                        ${data.referral?.referred_to_name ? `
+                                        <p class="text-sm text-purple-900"><span class="font-medium">Referred to:</span> ${data.referral.referred_to_name}</p>
+                                        ` : ''}
+                                        ${data.formatted_referral_date ? `
+                                        <p class="text-sm text-purple-900"><span class="font-medium">Referral date:</span> ${data.formatted_referral_date}</p>
+                                        ` : ''}
+                                        ${data.appointment.referral_reason ? `
+                                        <div class="pt-2">
+                                            <p class="text-xs font-medium text-purple-800">Reason:</p>
+                                            <p class="text-sm text-purple-900 whitespace-pre-line">${data.appointment.referral_reason}</p>
+                                        </div>
+                                        ` : ''}
+                                    </div>
+                                </div>
+                                ` : ''}
+
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700">Status</label>
+                                    <span class="mt-1 inline-flex px-2 py-1 text-xs font-semibold rounded-full
+                                        ${data.appointment.status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
+                                        data.appointment.status === 'approved' ? 'bg-green-100 text-green-800' :
+                                        data.appointment.status === 'rejected' ? 'bg-red-100 text-red-800' :
+                                        data.appointment.status === 'referred' ? 'bg-purple-100 text-purple-800' :
+                                        'bg-gray-100 text-gray-800'}">
+                                        ${data.appointment.status_display || (data.appointment.status.charAt(0).toUpperCase() + data.appointment.status.slice(1))}
+                                    </span>
+                                </div>
 
                                 ${data.appointment.has_session_notes ? `
                                 <div class="border-t pt-4 mt-4">
@@ -1562,7 +1604,7 @@
 
                                 ${data.appointment.status === 'completed' && !data.appointment.has_session_notes ? `
                                 <div class="border-t pt-4 mt-4">
-                                    <a href="/counselor/students/${data.student.id}/session-notes/create?appointment_id=${data.appointment.id}"
+                                    <a href="/counselor/appointments/${data.appointment.id}/session"
                                     class="inline-flex items-center text-blue-600 hover:text-blue-800 text-sm">
                                         <i class="fas fa-plus mr-1"></i> Add Session Notes
                                     </a>
@@ -1598,104 +1640,6 @@
                 document.getElementById('appointmentModal').classList.add('hidden');
             }
 
-            // Session Notes Modal
-            function showSessionNotes(studentId, appointmentId = null) {
-                let url = `/counselor/students/${studentId}/session-notes/json`;
-                if (appointmentId) {
-                    url += `?appointment_id=${appointmentId}`;
-                }
-
-                fetch(url)
-                    .then(response => {
-                        if (!response.ok) {
-                            throw new Error('Network response was not ok');
-                        }
-                        return response.json();
-                    })
-                    .then(notes => {
-                        console.log('Received notes:', notes);
-                        const modal = document.getElementById('sessionNotesModal');
-                        const content = document.getElementById('sessionNotesContent');
-
-                        if (notes.length === 0) {
-                            content.innerHTML = `
-                                <div class="text-center py-8">
-                                    <i class="fas fa-clipboard-list text-4xl text-gray-300 mb-4"></i>
-                                    <p class="text-gray-500">No session notes found.</p>
-                                    <a href="/counselor/students/${studentId}/session-notes/create${appointmentId ? `?appointment_id=${appointmentId}` : ''}"
-                                    class="inline-block mt-4 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition">
-                                        Create First Session Note
-                                    </a>
-                                </div>
-                            `;
-                        } else {
-                            content.innerHTML = `
-                                <div class="flex justify-between items-center mb-4">
-                                    <h4 class="text-lg font-semibold text-gray-800">Session History</h4>
-                                    <a href="/counselor/students/${studentId}/session-notes/create${appointmentId ? `?appointment_id=${appointmentId}` : ''}"
-                                    class="bg-blue-600 text-white px-3 py-1 rounded-lg hover:bg-blue-700 transition text-sm">
-                                        <i class="fas fa-plus mr-1"></i> Add Note
-                                    </a>
-                                </div>
-                                <div class="space-y-4">
-                                    ${notes.map(note => `
-                                        <div class="bg-gray-50 rounded-lg p-4 border-l-4 ${getSessionNoteBorderColor(note.session_type)}">
-                                            <div class="flex justify-between items-start mb-2">
-                                                <div>
-                                                    <h5 class="font-semibold text-gray-800">${note.session_type_label || note.session_type}</h5>
-                                                    <p class="text-sm text-gray-600">${note.session_date || 'No date'} • Created: ${new Date(note.created_at).toLocaleDateString()}</p>
-                                                </div>
-                                                ${note.mood_level ? `
-                                                <span class="text-xs px-2 py-1 rounded-full ${getMoodLevelColor(note.mood_level)}">
-                                                    ${note.mood_level_label || note.mood_level}
-                                                </span>
-                                                ` : ''}
-                                            </div>
-                                            <div class="mb-3">
-                                                <p class="text-sm text-gray-700 whitespace-pre-line">${note.notes || 'No notes provided'}</p>
-                                            </div>
-                                            ${note.follow_up_actions ? `
-                                            <div class="bg-white rounded p-3 mb-3">
-                                                <h6 class="text-xs font-medium text-gray-600 mb-1">Follow-up Actions:</h6>
-                                                <p class="text-sm text-gray-700 whitespace-pre-line">${note.follow_up_actions}</p>
-                                            </div>
-                                            ` : ''}
-                                            ${note.requires_follow_up && note.next_session_date ? `
-                                            <div class="bg-yellow-50 border border-yellow-200 rounded p-3">
-                                                <div class="flex items-center">
-                                                    <i class="fas fa-calendar-check text-yellow-600 mr-2"></i>
-                                                    <span class="text-sm text-yellow-800">
-                                                        Next session: ${note.next_session_date}
-                                                    </span>
-                                                </div>
-                                            </div>
-                                            ` : ''}
-                                        </div>
-                                    `).join('')}
-                                </div>
-                            `;
-                        }
-
-                        modal.classList.remove('hidden');
-                    })
-                    .catch(error => {
-                        console.error('Error fetching session notes:', error);
-                        const modal = document.getElementById('sessionNotesModal');
-                        const content = document.getElementById('sessionNotesContent');
-                        content.innerHTML = `
-                            <div class="text-center py-8">
-                                <i class="fas fa-exclamation-triangle text-4xl text-red-300 mb-4"></i>
-                                <p class="text-red-500">Error loading session notes. Please try again.</p>
-                            </div>
-                        `;
-                        modal.classList.remove('hidden');
-                    });
-            }
-
-            function closeSessionNotesModal() {
-                document.getElementById('sessionNotesModal').classList.add('hidden');
-            }
-
             // Helper functions for styling
             function getSessionNoteBorderColor(sessionType) {
                 const colors = {
@@ -1722,9 +1666,6 @@
             document.addEventListener('click', function(e) {
                 if (e.target.id === 'appointmentModal') {
                     closeAppointmentModal();
-                }
-                if (e.target.id === 'sessionNotesModal') {
-                    closeSessionNotesModal();
                 }
                 if (e.target.id === 'rejectionModal') {
                     closeRejectionModal();
