@@ -6,15 +6,20 @@
 
         <!-- Main Content -->
         <div class="container mx-auto px-6 py-8">
-            <div class="flex justify-between items-center mb-6">
-                <div>
-                    <h1 class="text-3xl font-bold text-gray-800">Manage Announcements</h1>
-                    <p class="text-gray-600 mt-2">Create and manage your announcements for students</p>
+            <!-- Header -->
+            <div class="bg-white rounded-xl shadow-sm p-6 mb-6">
+                <div class="flex flex-col md:flex-row md:items-center md:justify-between">
+                    <div>
+                        <h1 class="text-3xl font-bold text-gray-800">Manage Announcements</h1>
+                        <p class="text-gray-600 mt-2">Create and manage your announcements for students</p>
+                    </div>
+                    <div class="mt-4 md:mt-0">
+                        <a href="{{ route('counselor.announcements.create') }}"
+                           class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition flex items-center">
+                            <i class="fas fa-plus mr-2"></i> Create Announcement
+                        </a>
+                    </div>
                 </div>
-                <a href="{{ route('counselor.announcements.create') }}"
-                   class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition flex items-center">
-                    <i class="fas fa-plus mr-2"></i> Create Announcement
-                </a>
             </div>
 
             @if(session('success'))

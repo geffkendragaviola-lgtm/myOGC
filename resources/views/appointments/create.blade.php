@@ -49,7 +49,7 @@
                     <select name="booking_type" id="bookingType"
                             class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" required>
                         <option value="">Choose a booking type</option>
-                        <option value="Initial Interview" id="bookingTypeInitial">Initial Interview</option>
+                        <option value="Initial Interview" id="bookingTypeInitial" {{ ($hasInitialInterviewAppointment ?? false) ? 'disabled hidden' : '' }}>Initial Interview</option>
                         <option value="Counseling">Counseling</option>
                         <option value="Consultation">Consultation</option>
                     </select>
@@ -108,130 +108,140 @@
                     <label class="block text-gray-700 font-semibold mb-2">Presenting Problem</label>
                     <textarea name="concern" rows="4"
                               class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                              placeholder=" Reason for booking for appointment " required></textarea>
+                              placeholder="Reason for booking for appointment" required></textarea>
                 </div>
 
-                <!-- Informed Consent -->
-                <div class="mb-6">
-                    <label class="block text-gray-700 font-semibold mb-2">
-                        Informed Consent for Counseling (Terms and Agreement)
-                    </label>
-                    <div class="flex items-center gap-3">
-                        <button type="button" id="openConsentModal"
-                                class="px-4 py-2 bg-blue-50 text-blue-700 rounded-lg hover:bg-blue-100 transition border border-blue-200">
-                            Read Informed Consent
-                        </button>
-                    </div>
-                    <p id="consentHint" class="mt-2 text-sm text-gray-500">
-                        Please read the informed consent to enable the checkbox.
-                    </p>
-                </div>
-
-                <!-- Informed Consent Modal -->
-                <div id="consentModal" class="fixed inset-0 z-50 hidden">
-                    <div class="absolute inset-0 bg-gray-900/60" data-consent-close></div>
-                    <div class="relative mx-auto mt-10 w-11/12 max-w-3xl bg-white rounded-xl shadow-lg">
-                        <div class="flex items-center justify-between px-6 py-4 border-b border-gray-200">
-                            <h2 class="text-xl font-semibold text-gray-800">INFORMED CONSENT FOR COUNSELING</h2>
-                            <button type="button" class="text-gray-500 hover:text-gray-700" data-consent-close>
-                                ✕
-                            </button>
-                        </div>
-                        <div id="consentContent" class="px-6 py-4 max-h-[70vh] overflow-y-auto text-gray-700 space-y-4">
-                            <p>
-                                COUNSELING is a confidential process designed to help you address your concerns, come to a better understanding
-                                of yourself, and learn effective personal and interpersonal coping strategies. It involves a relationship between
-                                you and a trained Counselor who has the desire and willingness to help you accomplish your individual goals.
-                            </p>
-                            <p>
-                                Counseling involves sharing sensitive, personal, and private information that may at times be distressing. During
-                                the course of counseling, there may be periods of increased anxiety or confusion. The outcome of counseling is
-                                often positive; however, the level of satisfaction for any individual is not predictable. Your counselor is
-                                available to support you throughout the counseling process.
-                            </p>
-                            <h3 class="text-lg font-semibold text-gray-800">CONFIDENTIALITY</h3>
-                            <p>
-                                All interactions with the counseling services of the Office of Guidance and Counseling (OGC), including scheduling
-                                of or attendance at appointments, content of your sessions, progress in counseling, and your records are confidential.
-                                No record of counseling is contained in any academic, educational or job placement file. You may request in writing
-                                that the counselor releases specific information about your counseling to persons you designate.
-                            </p>
-                            <h3 class="text-lg font-semibold text-gray-800">EXCEPTIONS TO CONFIDENTIALITY</h3>
-                            <p>Under the following circumstances can only there be a breach in confidentiality:</p>
-                            <ol class="list-decimal list-inside space-y-2">
-                                <li>
-                                    The counseling staff works as a team. Your counselor may consult with other counselors to provide the best possible
-                                    care. These case consultation/case conferences are for professional training purposes; and do not usually include
-                                    any identifiers of the client.
-                                </li>
-                                <li>
-                                    If there is evidence of clear and imminent danger or harm to yourself and/or others, a Counselor is legally required
-                                    to report this information to the authorities responsible for ensuring safety.
-                                </li>
-                                <li>
-                                    The staff of the Office of Guidance and Counseling who learn of, or strongly suspect physical or sexual abuse or neglect
-                                    of a person under 18 years of age, must report this information to local authorities for child protection services (RA 7610).
-                                </li>
-                                <li>
-                                    A court order, issued by a competent judge, may require the counselor to release information contained in records and/or
-                                    require a counselor to testify in court hearing.
-                                </li>
-                            </ol>
-                            <h3 class="text-lg font-semibold text-gray-800">CLIENT'S ROLES</h3>
-                            <ol class="list-decimal list-inside space-y-2">
-                                <li>
-                                    The client further agrees to willingly cooperate in attending scheduled/booked counseling sessions, follow-up and/or
-                                    tutorial sessions, and accomplish assigned homework/s as agreed by both parties.
-                                </li>
-                                <li>
-                                    The client understands that as he/she seeks professional help, the counseling relationship established shall come to a
-                                    termination or closure after careful evaluation and discretion of the attending counselor. There is NO FEE for counseling
-                                    services availed by students within the Institute.
-                                </li>
-                            </ol>
-                            <h3 class="text-lg font-semibold text-gray-800">REFERRAL TO EXPERTS</h3>
-                            <p>
-                                If you are referred off campus to health, mental health or substance abuse professionals, you are responsible for their charges,
-                                except when referred to clinicians who have memorandum of understanding/MOU with the Institute.
-                            </p>
-                        </div>
-                        <div class="px-6 py-4 border-t border-gray-200 flex items-center justify-between gap-4">
-                            <label class="inline-flex items-center text-gray-700">
-                                <input type="checkbox" name="consent_acknowledged" id="consentAcknowledged"
-                                       class="text-blue-600 focus:ring-blue-500" required disabled>
-                                <span class="ml-2">I have read and understood the Informed Consent for Counseling.</span>
-                            </label>
-                            <button type="button" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
-                                    data-consent-close>
-                                Close
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Submit Button -->
+                <!-- Submit Button - Now triggers consent modal -->
                 <div class="flex justify-end space-x-4">
                     <a href="{{ route('appointments.index') }}"
                        class="px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition">
                         Cancel
                     </a>
-                    <button type="submit"
-                            id="submitAppointment"
-                            class="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
-                            disabled>
-                        Book Appointment
+                    <button type="button"
+                            id="openConsentModal"
+                            class="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">
+                        Book Now
                     </button>
                 </div>
-                <p id="submitHint" class="mt-2 text-sm text-right text-gray-500">
-                    Please read and acknowledge the informed consent to enable booking.
-                </p>
             </form>
+        </div>
+    </div>
+</div>
+
+<!-- Informed Consent Modal -->
+<div id="consentModal" class="fixed inset-0 z-50 hidden overflow-y-auto">
+    <div class="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
+        <!-- Background overlay -->
+        <div class="fixed inset-0 bg-gray-900/60 transition-opacity" data-consent-close></div>
+
+        <!-- Modal panel -->
+        <div class="inline-block align-bottom bg-white rounded-xl text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-3xl sm:w-full">
+            <div class="flex items-center justify-between px-6 py-4 border-b border-gray-200">
+                <h2 class="text-xl font-semibold text-gray-800">INFORMED CONSENT FOR COUNSELING</h2>
+                <button type="button" class="text-gray-500 hover:text-gray-700 transition" data-consent-close>
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
+            
+            <div id="consentContent" class="px-6 py-4 max-h-[60vh] overflow-y-auto text-gray-700 space-y-4">
+                <p>
+                    COUNSELING is a confidential process designed to help you address your concerns, come to a better understanding
+                    of yourself, and learn effective personal and interpersonal coping strategies. It involves a relationship between
+                    you and a trained Counselor who has the desire and willingness to help you accomplish your individual goals.
+                </p>
+                <p>
+                    Counseling involves sharing sensitive, personal, and private information that may at times be distressing. During
+                    the course of counseling, there may be periods of increased anxiety or confusion. The outcome of counseling is
+                    often positive; however, the level of satisfaction for any individual is not predictable. Your counselor is
+                    available to support you throughout the counseling process.
+                </p>
+                <h3 class="text-lg font-semibold text-gray-800">CONFIDENTIALITY</h3>
+                <p>
+                    All interactions with the counseling services of the Office of Guidance and Counseling (OGC), including scheduling
+                    of or attendance at appointments, content of your sessions, progress in counseling, and your records are confidential.
+                    No record of counseling is contained in any academic, educational or job placement file. You may request in writing
+                    that the counselor releases specific information about your counseling to persons you designate.
+                </p>
+                <h3 class="text-lg font-semibold text-gray-800">EXCEPTIONS TO CONFIDENTIALITY</h3>
+                <p>Under the following circumstances can only there be a breach in confidentiality:</p>
+                <ol class="list-decimal list-inside space-y-2">
+                    <li>
+                        The counseling staff works as a team. Your counselor may consult with other counselors to provide the best possible
+                        care. These case consultation/case conferences are for professional training purposes; and do not usually include
+                        any identifiers of the client.
+                    </li>
+                    <li>
+                        If there is evidence of clear and imminent danger or harm to yourself and/or others, a Counselor is legally required
+                        to report this information to the authorities responsible for ensuring safety.
+                    </li>
+                    <li>
+                        The staff of the Office of Guidance and Counseling who learn of, or strongly suspect physical or sexual abuse or neglect
+                        of a person under 18 years of age, must report this information to local authorities for child protection services (RA 7610).
+                    </li>
+                    <li>
+                        A court order, issued by a competent judge, may require the counselor to release information contained in records and/or
+                        require a counselor to testify in court hearing.
+                    </li>
+                </ol>
+                <h3 class="text-lg font-semibold text-gray-800">CLIENT'S ROLES</h3>
+                <ol class="list-decimal list-inside space-y-2">
+                    <li>
+                        The client further agrees to willingly cooperate in attending scheduled/booked counseling sessions, follow-up and/or
+                        tutorial sessions, and accomplish assigned homework/s as agreed by both parties.
+                    </li>
+                    <li>
+                        The client understands that as he/she seeks professional help, the counseling relationship established shall come to a
+                        termination or closure after careful evaluation and discretion of the attending counselor. There is NO FEE for counseling
+                        services availed by students within the Institute.
+                    </li>
+                </ol>
+                <h3 class="text-lg font-semibold text-gray-800">REFERRAL TO EXPERTS</h3>
+                <p>
+                    If you are referred off campus to health, mental health or substance abuse professionals, you are responsible for their charges,
+                    except when referred to clinicians who have memorandum of understanding/MOU with the Institute.
+                </p>
+                
+                <!-- Scroll indicator -->
+                <div id="scrollIndicator" class="sticky bottom-0 py-2 text-center bg-blue-50 text-blue-700 rounded-lg border border-blue-200">
+                    ↓ Scroll to bottom to enable confirmation ↓
+                </div>
+            </div>
+            
+            <div class="px-6 py-4 border-t border-gray-200 bg-gray-50">
+                <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
+                    <label class="inline-flex items-center text-gray-700">
+                        <input type="checkbox" id="consentAcknowledged"
+                               class="text-blue-600 focus:ring-blue-500 rounded" disabled>
+                        <span class="ml-2">I have read and understood the Informed Consent for Counseling.</span>
+                    </label>
+                    
+                    <div class="flex space-x-3">
+                        <button type="button" 
+                                class="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition"
+                                data-consent-close>
+                            Cancel
+                        </button>
+                        <button type="button"
+                                id="confirmBooking"
+                                class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
+                                disabled>
+                            Confirm Booking
+                        </button>
+                    </div>
+                </div>
+                <p id="consentHint" class="mt-2 text-sm text-gray-500 text-center sm:text-left">
+                    Please scroll through the entire document to enable the checkbox.
+                </p>
+            </div>
         </div>
     </div>
 </div>
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+    // Original form functionality variables
     const counselorTypeRadios = document.querySelectorAll('.counselor-type-radio');
     const counselorSelect = document.getElementById('counselorSelect');
     const counselorTypeWrapper = document.getElementById('counselorTypeWrapper');
@@ -251,8 +261,20 @@ document.addEventListener('DOMContentLoaded', function() {
     const bookingTypeHelp = document.getElementById('bookingTypeHelp');
     const referredCounselorOption = document.getElementById('referredCounselorOption');
 
+    // Consent modal variables
+    const openConsentModal = document.getElementById('openConsentModal');
+    const consentModal = document.getElementById('consentModal');
+    const consentContent = document.getElementById('consentContent');
+    const consentCheckbox = document.getElementById('consentAcknowledged');
+    const confirmBooking = document.getElementById('confirmBooking');
+    const consentHint = document.getElementById('consentHint');
+    const scrollIndicator = document.getElementById('scrollIndicator');
+    const consentCloseButtons = document.querySelectorAll('[data-consent-close]');
+    const appointmentForm = document.getElementById('appointmentForm');
+
     const studentYearLevel = {!! json_encode(optional(auth()->user()->student)->year_level) !!};
     const studentInitialInterviewCompleted = {!! json_encode(optional(auth()->user()->student)->initial_interview_completed) !!};
+    const hasInitialInterviewAppointment = {!! json_encode($hasInitialInterviewAppointment ?? false) !!};
     const allowAllCounselors = {!! json_encode($allowAllCounselors ?? false) !!};
 
     let currentSelectedSlot = null;
@@ -274,6 +296,127 @@ document.addEventListener('DOMContentLoaded', function() {
         ];
     })) !!};
 
+    // Form validation function
+    function validateForm() {
+        const counselorId = getActiveCounselorId();
+        const bookingType = bookingTypeSelect.value;
+        const date = dateSelect.value;
+        const time = selectedTime.value;
+        const concern = document.querySelector('textarea[name="concern"]').value.trim();
+
+        if (!counselorId) {
+            alert('Please select a counselor');
+            return false;
+        }
+        if (!bookingType) {
+            alert('Please select a booking type');
+            return false;
+        }
+        if (!date) {
+            alert('Please select a date');
+            return false;
+        }
+        if (!time) {
+            alert('Please select a time slot');
+            return false;
+        }
+        if (!concern) {
+            alert('Please describe your presenting problem');
+            return false;
+        }
+        return true;
+    }
+
+    // Consent modal functions
+    function openModal() {
+        if (!validateForm()) {
+            return;
+        }
+        
+        consentModal?.classList.remove('hidden');
+        document.body.classList.add('overflow-hidden');
+        if (consentContent) {
+            consentContent.scrollTop = 0;
+        }
+        
+        // Reset modal state
+        consentCheckbox.checked = false;
+        consentCheckbox.disabled = true;
+        confirmBooking.disabled = true;
+        
+        if (scrollIndicator) {
+            scrollIndicator.style.display = 'block';
+        }
+        
+        consentHint.textContent = 'Please scroll through the entire document to enable the checkbox.';
+        consentHint.classList.remove('text-green-600', 'text-red-600');
+        consentHint.classList.add('text-gray-500');
+    }
+
+    function closeModal() {
+        consentModal?.classList.add('hidden');
+        document.body.classList.remove('overflow-hidden');
+    }
+
+    // Scroll handler for consent content
+    consentContent?.addEventListener('scroll', function() {
+        const scrollThreshold = this.scrollHeight - this.clientHeight - 10;
+        const isAtBottom = this.scrollTop >= scrollThreshold;
+        
+        if (isAtBottom) {
+            consentCheckbox.disabled = false;
+            if (scrollIndicator) {
+                scrollIndicator.style.display = 'none';
+            }
+            consentHint.textContent = 'You can now acknowledge and confirm your booking.';
+            consentHint.classList.remove('text-gray-500', 'text-red-600');
+            consentHint.classList.add('text-green-600');
+        }
+    });
+
+    // Checkbox change handler
+    consentCheckbox?.addEventListener('change', function() {
+        confirmBooking.disabled = !this.checked;
+    });
+
+    // Confirm booking handler
+    confirmBooking?.addEventListener('click', function() {
+        if (consentCheckbox.checked) {
+            // Create hidden consent field and submit form
+            const consentInput = document.createElement('input');
+            consentInput.type = 'hidden';
+            consentInput.name = 'consent_acknowledged';
+            consentInput.value = '1';
+            appointmentForm.appendChild(consentInput);
+            
+            // Submit the form
+            appointmentForm.submit();
+        }
+    });
+
+    // Open modal when Book Now is clicked
+    openConsentModal?.addEventListener('click', openModal);
+
+    // Close modal handlers
+    consentCloseButtons.forEach(button => {
+        button.addEventListener('click', closeModal);
+    });
+
+    // Close modal on escape key
+    document.addEventListener('keydown', function(event) {
+        if (event.key === 'Escape' && !consentModal?.classList.contains('hidden')) {
+            closeModal();
+        }
+    });
+
+    // Close modal when clicking outside
+    consentModal?.addEventListener('click', function(event) {
+        if (event.target.classList.contains('bg-gray-900/60')) {
+            closeModal();
+        }
+    });
+
+    // Original form functions remain the same
     function formatDateValue(date) {
         const year = date.getFullYear();
         const month = String(date.getMonth() + 1).padStart(2, '0');
@@ -297,9 +440,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function setCalendarStatus(message, tone = 'muted') {
-        if (!calendarStatus) {
-            return;
-        }
+        if (!calendarStatus) return;
         calendarStatus.textContent = message;
         calendarStatus.classList.remove('text-gray-500', 'text-green-600', 'text-red-600');
         if (tone === 'success') {
@@ -312,9 +453,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function renderCalendar() {
-        if (!calendarGrid || !calendarMonthLabel) {
-            return;
-        }
+        if (!calendarGrid || !calendarMonthLabel) return;
 
         calendarMonthLabel.textContent = formatMonthLabel(currentMonth);
         calendarGrid.innerHTML = '';
@@ -355,9 +494,7 @@ document.addEventListener('DOMContentLoaded', function() {
             }
 
             button.addEventListener('click', () => {
-                if (button.disabled) {
-                    return;
-                }
+                if (button.disabled) return;
                 selectedDate = date;
                 dateSelect.value = formatDateValue(date);
                 selectedTime.value = '';
@@ -388,22 +525,16 @@ document.addEventListener('DOMContentLoaded', function() {
         try {
             const response = await fetch(`/appointments/available-dates?counselor_id=${counselorId}&month=${monthValue}`);
             const data = await response.json();
-            if (requestId !== availabilityRequestId) {
-                return;
-            }
+            if (requestId !== availabilityRequestId) return;
             const availability = data.availability || {};
             Object.keys(availability).forEach(dateValue => {
                 availabilityByDate.set(dateValue, availability[dateValue] === true);
             });
         } catch (error) {
-            if (requestId !== availabilityRequestId) {
-                return;
-            }
+            if (requestId !== availabilityRequestId) return;
         }
 
-        if (requestId !== availabilityRequestId) {
-            return;
-        }
+        if (requestId !== availabilityRequestId) return;
 
         const hasAnyAvailability = Array.from(availabilityByDate.values()).some(value => value);
         if (!hasAnyAvailability) {
@@ -421,17 +552,14 @@ document.addEventListener('DOMContentLoaded', function() {
         renderCalendar();
     }
 
-    // Load counselors based on type selection
     function loadCounselors(type) {
         counselorSelect.innerHTML = '<option value="">Choose a counselor</option>';
         counselorLoading.classList.remove('hidden');
 
         if (type === 'college') {
-            // Use pre-loaded college counselors
             populateCounselorSelect(collegeCounselors);
             counselorLoading.classList.add('hidden');
         } else {
-            // Load referred counselors via AJAX
             fetch('/appointments/referred-counselors')
                 .then(response => response.json())
                 .then(data => {
@@ -490,6 +618,19 @@ document.addEventListener('DOMContentLoaded', function() {
         const isSecondYear = studentYearLevel === '2nd Year';
         const isUpperYear = !isFirstYear && !isSecondYear;
         const hasCompletedInitialInterview = studentInitialInterviewCompleted === true;
+
+        if (hasInitialInterviewAppointment) {
+            if (bookingTypeSelect.value === 'Initial Interview') {
+                bookingTypeSelect.value = '';
+            }
+            bookingTypeInitial.disabled = true;
+            bookingTypeInitial.hidden = true;
+            bookingTypeSelect.querySelectorAll('option').forEach(option => {
+                option.disabled = false;
+            });
+            bookingTypeHelp.textContent = 'Initial Interview is already booked.';
+            return;
+        }
 
         if (hasCompletedInitialInterview) {
             if (bookingTypeSelect.value === 'Initial Interview') {
@@ -555,12 +696,9 @@ document.addEventListener('DOMContentLoaded', function() {
                     counselorTypeWrapper?.classList.remove('hidden');
                 }
             })
-            .catch(() => {
-                // Keep the default college counselor flow if the request fails.
-            });
+            .catch(() => {});
     }
 
-    // Load time slots function
     function loadAvailableSlots() {
         const counselorId = getActiveCounselorId();
         const date = dateSelect.value;
@@ -582,7 +720,6 @@ document.addEventListener('DOMContentLoaded', function() {
                     return;
                 }
 
-                // ... existing time slot loading logic ...
                 if (data.available_slots.length === 0 && data.booked_slots.length === 0) {
                     timeSlots.innerHTML = '<div class="text-red-500 text-center p-4 border-2 border-dashed border-red-300 rounded-lg">No working hours for this date. Please choose another date.</div>';
                     selectedTime.value = '';
@@ -604,7 +741,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 availableSlots.forEach(slot => {
                     const slotElement = document.createElement('button');
                     slotElement.type = 'button';
-
                     slotElement.className = 'time-slot p-4 border-2 border-gray-200 rounded-lg text-center hover:border-blue-500 hover:bg-blue-50 transition cursor-pointer';
                     slotElement.textContent = slot.display;
 
@@ -626,7 +762,6 @@ document.addEventListener('DOMContentLoaded', function() {
                     slotElement.dataset.status = slot.status;
                     timeSlots.appendChild(slotElement);
                 });
-
             })
             .catch(error => {
                 console.error('Error:', error);
@@ -639,7 +774,6 @@ document.addEventListener('DOMContentLoaded', function() {
         radio.addEventListener('change', function() {
             if (this.checked) {
                 loadCounselors(this.value);
-                // Reset time slots when counselor type changes
                 timeSlots.innerHTML = '<div class="text-gray-500 text-center p-4 border-2 border-dashed border-gray-300 rounded-lg">Select a counselor and date to see available time slots</div>';
                 selectedTime.value = '';
                 selectedDate = null;
@@ -661,9 +795,8 @@ document.addEventListener('DOMContentLoaded', function() {
         counselorTypeWrapper?.classList.add('hidden');
     }
 
-    // Load initial counselors
+    // Initial load
     loadCounselors('college');
-
     updateBookingTypeOptions();
     checkReferredCounselorsAvailability();
     renderCalendar();
@@ -671,9 +804,7 @@ document.addEventListener('DOMContentLoaded', function() {
     calendarPrev?.addEventListener('click', function() {
         const prevMonth = new Date(currentMonth.getFullYear(), currentMonth.getMonth() - 1, 1);
         const minMonth = new Date(minDate.getFullYear(), minDate.getMonth(), 1);
-        if (prevMonth < minMonth) {
-            return;
-        }
+        if (prevMonth < minMonth) return;
         currentMonth = prevMonth;
         loadMonthAvailability();
     });
@@ -681,107 +812,6 @@ document.addEventListener('DOMContentLoaded', function() {
     calendarNext?.addEventListener('click', function() {
         currentMonth = new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1, 1);
         loadMonthAvailability();
-    });
-});
-</script>
-
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    const appointmentForm = document.getElementById('appointmentForm');
-    const submitAppointment = document.getElementById('submitAppointment');
-    const submitHint = document.getElementById('submitHint');
-    const consentModal = document.getElementById('consentModal');
-    const openConsentModal = document.getElementById('openConsentModal');
-    const consentCloseButtons = consentModal?.querySelectorAll('[data-consent-close]') || [];
-    const consentContent = document.getElementById('consentContent');
-    const consentCheckbox = document.getElementById('consentAcknowledged');
-    const consentHint = document.getElementById('consentHint');
-    let consentScrolledToBottom = false;
-
-    function openModal() {
-        consentModal?.classList.remove('hidden');
-        document.body.classList.add('overflow-hidden');
-        if (consentContent) {
-            consentContent.scrollTop = 0;
-        }
-        consentScrolledToBottom = false;
-        if (consentCheckbox) {
-            consentCheckbox.checked = false;
-            consentCheckbox.disabled = true;
-        }
-        if (submitAppointment) {
-            submitAppointment.disabled = true;
-        }
-        if (submitHint) {
-            submitHint.textContent = 'Please read and acknowledge the informed consent to enable booking.';
-            submitHint.classList.remove('text-green-600');
-            submitHint.classList.add('text-gray-500');
-        }
-        if (consentHint) {
-            consentHint.textContent = 'Scroll to the bottom to enable the checkbox.';
-            consentHint.classList.remove('text-green-600');
-            consentHint.classList.add('text-gray-500');
-        }
-    }
-
-    function closeModal() {
-        consentModal?.classList.add('hidden');
-        document.body.classList.remove('overflow-hidden');
-    }
-
-    openConsentModal?.addEventListener('click', openModal);
-    consentCloseButtons.forEach(button => button.addEventListener('click', closeModal));
-    consentContent?.addEventListener('scroll', function() {
-        if (consentScrolledToBottom) {
-            return;
-        }
-        const nearBottom = consentContent.scrollTop + consentContent.clientHeight >= consentContent.scrollHeight - 5;
-        if (nearBottom) {
-            consentScrolledToBottom = true;
-            if (consentCheckbox) {
-                consentCheckbox.disabled = false;
-            }
-            if (consentHint) {
-                consentHint.textContent = 'You can now acknowledge after reading.';
-                consentHint.classList.remove('text-gray-500');
-                consentHint.classList.add('text-green-600');
-            }
-        }
-    });
-
-    consentCheckbox?.addEventListener('change', function() {
-        if (submitAppointment) {
-            submitAppointment.disabled = !this.checked;
-        }
-        if (submitHint) {
-            if (this.checked) {
-                submitHint.textContent = 'Booking enabled.';
-                submitHint.classList.remove('text-gray-500');
-                submitHint.classList.add('text-green-600');
-            } else {
-                submitHint.textContent = 'Please read and acknowledge the informed consent to enable booking.';
-                submitHint.classList.remove('text-green-600');
-                submitHint.classList.add('text-gray-500');
-            }
-        }
-    });
-
-    document.addEventListener('keydown', function(event) {
-        if (event.key === 'Escape' && !consentModal?.classList.contains('hidden')) {
-            closeModal();
-        }
-    });
-
-    appointmentForm?.addEventListener('submit', function(event) {
-        if (!consentCheckbox || !consentCheckbox.checked) {
-            event.preventDefault();
-            consentCheckbox?.focus();
-            if (consentHint) {
-                consentHint.textContent = 'You must read and acknowledge the informed consent to continue.';
-                consentHint.classList.remove('text-green-600');
-                consentHint.classList.add('text-red-600');
-            }
-        }
     });
 });
 </script>

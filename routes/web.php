@@ -88,10 +88,14 @@ Route::middleware('auth')->group(function () {
         Route::get('/dashboard', [CounselorController::class, 'dashboard'])->name('counselor.dashboard');
         Route::get('/calendar', [CounselorController::class, 'calendar'])->name('counselor.calendar');
         Route::get('/appointments', [CounselorController::class, 'appointments'])->name('counselor.appointments');
+        Route::get('/appointment-sessions', [CounselorController::class, 'appointmentSessionsDashboard'])
+            ->name('counselor.appointment-sessions.dashboard');
         Route::patch('/appointments/{appointment}/status', [CounselorController::class, 'updateAppointmentStatus'])->name('counselor.appointments.update-status');
         Route::get('/appointments/{appointment}/details', [CounselorController::class, 'getAppointmentDetails'])->name('counselor.appointments.details');
         Route::get('/appointments/{appointment}/session', [CounselorController::class, 'showAppointmentSession'])
             ->name('counselor.appointments.session');
+        Route::get('/appointments/{appointment}/session/view', [CounselorController::class, 'viewAppointmentSession'])
+            ->name('counselor.appointments.session.view');
         Route::post('/appointments/{appointment}/session', [CounselorController::class, 'storeAppointmentSession'])
             ->name('counselor.appointments.session.store');
         Route::patch('/appointments/{appointment}/update-status', [AppointmentController::class, 'updateStatus'])

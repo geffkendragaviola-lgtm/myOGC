@@ -34,7 +34,10 @@
             'pending' => $appointments->where('status', 'pending')->count(),
             'approved' => $appointments->where('status', 'approved')->count(),
             'completed' => $appointments->where('status', 'completed')->count(),
-            'referred' => $appointments->where('status', 'referred')->count(),
+            'referred' => $appointments->filter(function ($appointment) {
+                return !is_null($appointment->original_counselor_id)
+                    || !is_null($appointment->referred_to_counselor_id);
+            })->count(),
         ];
     @endphp
 
@@ -361,65 +364,73 @@
                                     @endif
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                    @if(in_array($appointment->status, ['pending', 'approved', 'reschedule_requested', 'rescheduled']) && Auth::user()->role === 'student')
-                                        <div class="flex items-center space-x-2">
-                                            <form action="{{ route('appointments.cancel', $appointment) }}" method="POST" class="inline">
-                                                @csrf
-                                                <button type="submit"
-                                                        class="text-red-600 hover:text-red-900 px-3 py-1 border border-red-300 rounded hover:bg-red-50 transition"
-                                                        onclick="return confirm('Are you sure you want to cancel this appointment? The time slot will become available for others.')">
-                                                    <i class="fas fa-times mr-1"></i>Cancel
-                                                </button>
-                                            </form>
-                                        </div>
-                                    @elseif($appointment->status === 'reschedule_requested' && Auth::user()->role === 'student')
-                                        <div class="flex items-center space-x-2">
-                                            <form action="{{ route('appointments.reschedule.accept', $appointment) }}" method="POST" class="inline">
-                                                @csrf
-                                                @method('PATCH')
-                                                <button type="submit"
-                                                        class="text-green-700 hover:text-green-900 px-3 py-1 border border-green-300 rounded hover:bg-green-50 transition"
-                                                        onclick="return confirm('Accept the new appointment time?')">
-                                                    <i class="fas fa-check mr-1"></i>Accept
-                                                </button>
-                                            </form>
-                                            <form action="{{ route('appointments.reschedule.reject', $appointment) }}" method="POST" class="inline">
-                                                @csrf
-                                                @method('PATCH')
-                                                <button type="submit"
-                                                        class="text-red-600 hover:text-red-900 px-3 py-1 border border-red-300 rounded hover:bg-red-50 transition"
-                                                        onclick="return confirm('Reject the proposed time and keep the original schedule?')">
-                                                    <i class="fas fa-times mr-1"></i>Reject
-                                                </button>
-                                            </form>
-                                        </div>
-                                    @elseif($appointment->status === 'referred' && Auth::user()->role === 'student')
-                                        @if($appointment->proposed_date && $appointment->proposed_start_time && $appointment->proposed_end_time)
-                                            <div class="flex items-center space-x-2">
-                                                <form action="{{ route('appointments.referral.accept', $appointment) }}" method="POST" class="inline">
-                                                    @csrf
-                                                    @method('PATCH')
-                                                    <button type="submit"
-                                                            class="text-green-700 hover:text-green-900 px-3 py-1 border border-green-300 rounded hover:bg-green-50 transition"
-                                                            onclick="return confirm('Accept the referral schedule with the new counselor?')">
-                                                        <i class="fas fa-check mr-1"></i>Accept
-                                                    </button>
-                                                </form>
-                                                <form action="{{ route('appointments.referral.reject', $appointment) }}" method="POST" class="inline">
-                                                    @csrf
-                                                    @method('PATCH')
-                                                    <button type="submit"
-                                                            class="text-red-600 hover:text-red-900 px-3 py-1 border border-red-300 rounded hover:bg-red-50 transition"
-                                                            onclick="return confirm('Cancel this referral and keep your original counselor?')">
-                                                        <i class="fas fa-times mr-1"></i>Cancel
-                                                    </button>
-                                                </form>
-                                            </div>
-                                        @else
-                                            <span class="text-purple-600 italic">Awaiting referral details</span>
-                                        @endif
-                                    @endif
-                                </td>
+                                     @if($appointment->status === 'reschedule_requested' && Auth::user()->role === 'student')
+                                         <div class="flex items-center space-x-2">
+                                             <form action="{{ route('appointments.reschedule.accept', $appointment) }}" method="POST" class="inline">
+                                                 @csrf
+                                                 @method('PATCH')
+                                                 <button type="submit"
+                                                         class="text-green-700 hover:text-green-900 px-3 py-1 border border-green-300 rounded hover:bg-green-50 transition"
+                                                         onclick="return confirm('Accept the new appointment time?')">
+                                                     <i class="fas fa-check mr-1"></i>Accept
+                                                 </button>
+                                             </form>
+                                             <form action="{{ route('appointments.reschedule.reject', $appointment) }}" method="POST" class="inline">
+                                                 @csrf
+                                                 @method('PATCH')
+                                                 <button type="submit"
+                                                         class="text-red-600 hover:text-red-900 px-3 py-1 border border-red-300 rounded hover:bg-red-50 transition"
+                                                         onclick="return confirm('Reject the proposed time and keep the original schedule?')">
+                                                     <i class="fas fa-times mr-1"></i>Reject
+                                                 </button>
+                                             </form>
+                                             <form action="{{ route('appointments.cancel', $appointment) }}" method="POST" class="inline">
+                                                 @csrf
+                                                 <button type="submit"
+                                                         class="text-red-600 hover:text-red-900 px-3 py-1 border border-red-300 rounded hover:bg-red-50 transition"
+                                                         onclick="return confirm('Are you sure you want to cancel this appointment? The time slot will become available for others.')">
+                                                     <i class="fas fa-times mr-1"></i>Cancel
+                                                 </button>
+                                             </form>
+                                         </div>
+                                     @elseif(in_array($appointment->status, ['pending', 'approved', 'rescheduled'], true) && Auth::user()->role === 'student')
+                                         <div class="flex items-center space-x-2">
+                                             <form action="{{ route('appointments.cancel', $appointment) }}" method="POST" class="inline">
+                                                 @csrf
+                                                 <button type="submit"
+                                                         class="text-red-600 hover:text-red-900 px-3 py-1 border border-red-300 rounded hover:bg-red-50 transition"
+                                                         onclick="return confirm('Are you sure you want to cancel this appointment? The time slot will become available for others.')">
+                                                     <i class="fas fa-times mr-1"></i>Cancel
+                                                 </button>
+                                             </form>
+                                         </div>
+                                     @elseif($appointment->status === 'referred' && Auth::user()->role === 'student')
+                                         @if($appointment->proposed_date && $appointment->proposed_start_time && $appointment->proposed_end_time)
+                                             <div class="flex items-center space-x-2">
+                                                 <form action="{{ route('appointments.referral.accept', $appointment) }}" method="POST" class="inline">
+                                                     @csrf
+                                                     @method('PATCH')
+                                                     <button type="submit"
+                                                             class="text-green-700 hover:text-green-900 px-3 py-1 border border-green-300 rounded hover:bg-green-50 transition"
+                                                             onclick="return confirm('Accept the referral schedule with the new counselor?')">
+                                                         <i class="fas fa-check mr-1"></i>Accept
+                                                     </button>
+                                                 </form>
+                                                 <form action="{{ route('appointments.referral.reject', $appointment) }}" method="POST" class="inline">
+                                                     @csrf
+                                                     @method('PATCH')
+                                                     <button type="submit"
+                                                             class="text-red-600 hover:text-red-900 px-3 py-1 border border-red-300 rounded hover:bg-red-50 transition"
+                                                             onclick="return confirm('Cancel this referral and keep your original counselor?')">
+                                                         <i class="fas fa-times mr-1"></i>Cancel
+                                                     </button>
+                                                 </form>
+                                             </div>
+                                         @else
+                                             <span class="text-purple-600 italic">Awaiting referral details</span>
+                                         @endif
+                                     @endif
+                                 </td>
                             </tr>
                         @endforeach
                     </tbody>

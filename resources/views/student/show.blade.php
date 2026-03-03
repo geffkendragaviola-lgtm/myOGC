@@ -1,4 +1,4 @@
-@extends('layouts.student')
+@extends(Auth::check() && Auth::user()->role === 'counselor' ? 'layouts.app' : 'layouts.student')
 
 @section('title', 'Student Details')
 

@@ -381,7 +381,7 @@
         <div class="container mx-auto px-6 py-8">
             <div class="bg-white rounded-lg shadow-sm p-6 mb-8">
                 <h2 class="text-2xl font-bold text-gray-800 mb-2">Welcome, {{ Auth::user()->first_name }}!</h2>
-                <p class="text-gray-600">You're logged in as: <span class="font-semibold capitalize text-blue-600">{{ Auth::user()->role }}</span></p>
+             
 
                 <!-- Role-specific content -->
                 @if(Auth::user()->role === 'student')

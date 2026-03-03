@@ -4,6 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@yield('title', 'Office of Guidance and Counseling')</title>
+ 
+     <!-- Bootstrap 5 CSS -->
+     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
 
@@ -161,11 +164,14 @@
 
                 <div class="mt-6 space-y-1 px-3">
                     <a href="{{ route('counselor.dashboard') }}"><i class="fas fa-tachometer-alt mr-3"></i> Dashboard</a>
-                    <a href="{{ route('counselor.resources.index') }}"><i class="fas fa-box-open mr-3"></i> Resources</a>
-                    <a href="{{ route('counselor.announcements.index') }}"><i class="fas fa-bullhorn mr-3"></i> Announcements</a>
-                    <a href="{{ route('counselor.events.index') }}"><i class="fas fa-calendar-alt mr-3"></i> Events</a>
                     <a href="{{ route('counselor.calendar') }}"><i class="fas fa-calendar mr-3"></i> Calendar</a>
                     <a href="{{ route('counselor.appointments') }}"><i class="fas fa-list mr-3"></i> Appointments</a>
+                    <a href="{{ route('counselor.appointment-sessions.dashboard') }}"><i class="fas fa-clipboard-list mr-3"></i> Appointment Session</a>
+ <a href="{{ route('counselor.events.index') }}"><i class="fas fa-calendar-alt mr-3"></i> Events</a>
+                    <a href="{{ route('counselor.announcements.index') }}"><i class="fas fa-bullhorn mr-3"></i> Announcements</a>
+                   
+                    <a href="{{ route('counselor.resources.index') }}"><i class="fas fa-box-open mr-3"></i> Resources</a>
+
                     <!-- ADDED FEEDBACK LINK -->
                     <a href="{{ route('counselor.feedback.index') }}"><i class="fas fa-comments mr-3"></i> Feedback</a>
                     <a href="{{ route('counselor.availability.edit') }}"><i class="fas fa-calendar-check mr-3"></i> Availability &amp; Booking Limits</a>
@@ -199,6 +205,9 @@
 
     {{-- ✅ Reusable Footer --}}
    {{--   @include('partials.footer')--}}
+ 
+     <!-- Bootstrap 5 JavaScript with Popper -->
+     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     @stack('scripts')
 
     <script>

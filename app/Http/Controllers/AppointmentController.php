@@ -21,7 +21,13 @@ class AppointmentController extends Controller
 
         if ($user->role === 'student') {
             $student = Student::where('user_id', $user->id)->first();
-            $query = Appointment::with(['counselor.user', 'counselor.college', 'referredCounselor.user', 'sessionNotes'])
+            $query = Appointment::with([
+                    'counselor.user',
+                    'counselor.college',
+                    'referredCounselor.user',
+                    'originalCounselor.user',
+                    'sessionNotes'
+                ])
                 ->where('student_id', $student->id);
 
             // Date filter
@@ -31,7 +37,14 @@ class AppointmentController extends Controller
 
             // Status filter
             if ($request->has('status') && $request->status) {
-                $query->where('status', $request->status);
+                if ($request->status === 'referred') {
+                    $query->where(function ($q) {
+                        $q->whereNotNull('original_counselor_id')
+                          ->orWhereNotNull('referred_to_counselor_id');
+                    });
+                } else {
+                    $query->where('status', $request->status);
+                }
             }
 
             // Assignment filter
@@ -100,7 +113,12 @@ public function create()
             ->unique('id'); // Remove duplicates
     }
 
-    return view('appointments.create', compact('counselors', 'student', 'allowAllCounselors'));
+    $hasInitialInterviewAppointment = Appointment::where('student_id', $student->id)
+        ->where('booking_type', 'Initial Interview')
+        ->whereNotIn('status', ['cancelled', 'rejected'])
+        ->exists();
+
+    return view('appointments.create', compact('counselors', 'student', 'allowAllCounselors', 'hasInitialInterviewAppointment'));
 }
 /**
  * Get referred counselors for a student (cross-college allowed)
@@ -547,6 +565,17 @@ public function store(Request $request)
 
     if (!$student) {
         return redirect()->back()->with('error', 'Student profile not found.');
+    }
+
+    if ($request->booking_type === 'Initial Interview') {
+        $hasInitialInterviewAppointment = Appointment::where('student_id', $student->id)
+            ->where('booking_type', 'Initial Interview')
+            ->whereNotIn('status', ['cancelled', 'rejected'])
+            ->exists();
+
+        if ($hasInitialInterviewAppointment) {
+            return redirect()->back()->with('error', 'You already have an Initial Interview appointment booked. Only one Initial Interview is allowed.');
+        }
     }
 
     if ($this->isDateClosed($counselor, $date)) {

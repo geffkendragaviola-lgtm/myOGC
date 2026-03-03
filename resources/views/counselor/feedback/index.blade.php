@@ -3,17 +3,19 @@
 @section('title', 'Feedback Management - OGC')
 
 @section('content')
-<div class="container-fluid px-4">
-    <div class="flex justify-between items-center mb-6">
-        <div>
-            <h1 class="text-3xl font-bold text-gray-800">Student Feedback</h1>
-            <p class="text-gray-600 mt-2">View and manage all student feedback submissions</p>
-        </div>
-        <div class="flex space-x-3">
-            <a href="{{ route('counselor.feedback.export', request()->query()) }}"
-               class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition flex items-center">
-                <i class="fas fa-file-export mr-2"></i> Export CSV
-            </a>
+<div class="container mx-auto px-6 py-8">
+    <div class="bg-white rounded-xl shadow-sm p-6 mb-6">
+        <div class="flex flex-col md:flex-row md:items-center md:justify-between">
+            <div>
+                <h1 class="text-3xl font-bold text-gray-800">Student Feedback</h1>
+                <p class="text-gray-600 mt-2">View and manage all student feedback submissions</p>
+            </div>
+            <div class="mt-4 md:mt-0">
+                <a href="{{ route('counselor.feedback.export', request()->query()) }}"
+                   class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition flex items-center">
+                    <i class="fas fa-file-export mr-2"></i> Export CSV
+                </a>
+            </div>
         </div>
     </div>
 

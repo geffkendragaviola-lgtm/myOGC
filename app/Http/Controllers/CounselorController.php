@@ -12,6 +12,7 @@ use App\Models\College;
 use App\Services\GoogleCalendarService;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\DB;
 
 class CounselorController extends Controller
 {
@@ -91,6 +92,116 @@ public function dashboard()
         'appointmentStats'
     ));
 }
+
+public function appointmentSessionsDashboard(Request $request)
+{
+    $userId = Auth::id();
+    $counselorAssignments = Counselor::where('user_id', $userId)->get();
+    $counselorIds = $counselorAssignments->pluck('id');
+
+    if ($counselorIds->isEmpty()) {
+        abort(404, 'Counselor profile not found.');
+    }
+
+    $query = Appointment::with(['student.user', 'student.college', 'sessionNotes'])
+        ->select('appointments.*')
+        ->selectSub(function ($sub) {
+            $sub->from('appointments as a2')
+                ->selectRaw('COUNT(*)')
+                ->whereColumn('a2.student_id', 'appointments.student_id')
+                ->where(function ($q) {
+                    $q->whereNull('a2.booking_type')
+                        ->orWhere('a2.booking_type', '!=', 'Initial Interview');
+                })
+                ->where(function ($q) {
+                    $q->where('a2.appointment_date', '<', DB::raw('appointments.appointment_date'))
+                        ->orWhere(function ($q) {
+                            $q->where('a2.appointment_date', '=', DB::raw('appointments.appointment_date'))
+                                ->where('a2.start_time', '<', DB::raw('appointments.start_time'));
+                        });
+                });
+        }, 'non_initial_session_index')
+        ->whereHas('sessionNotes')
+        ->where(function ($q) use ($counselorIds) {
+            $q->whereIn('counselor_id', $counselorIds)
+                ->orWhereIn('referred_to_counselor_id', $counselorIds)
+                ->orWhereIn('original_counselor_id', $counselorIds);
+        });
+
+    if ($request->filled('status') && $request->input('status') !== 'all') {
+        $query->where('status', $request->input('status'));
+    }
+
+    if ($request->filled('date_range')) {
+        $now = Carbon::now();
+        switch ($request->input('date_range')) {
+            case 'today':
+                $query->whereDate('appointment_date', $now->toDateString());
+                break;
+            case 'week':
+                $query->whereBetween('appointment_date', [
+                    $now->copy()->startOfWeek()->toDateString(),
+                    $now->copy()->endOfWeek()->toDateString(),
+                ]);
+                break;
+            case 'month':
+                $query->whereBetween('appointment_date', [
+                    $now->copy()->startOfMonth()->toDateString(),
+                    $now->copy()->endOfMonth()->toDateString(),
+                ]);
+                break;
+            case 'upcoming':
+                $query->where('appointment_date', '>=', $now->toDateString());
+                break;
+            case 'past':
+                $query->where('appointment_date', '<', $now->toDateString());
+                break;
+        }
+    }
+
+    if ($request->filled('search')) {
+        $search = strtolower($request->input('search'));
+        $query->where(function ($q) use ($search) {
+            $q->whereHas('student.user', function ($q) use ($search) {
+                $q->whereRaw('LOWER(first_name) LIKE ?', ["%{$search}%"])
+                    ->orWhereRaw('LOWER(last_name) LIKE ?', ["%{$search}%"]);
+            })
+            ->orWhereHas('student', function ($q) use ($search) {
+                $q->whereRaw('LOWER(student_id) LIKE ?', ["%{$search}%"]);
+            })
+            ->orWhereRaw('LOWER(concern) LIKE ?', ["%{$search}%"]);
+        });
+    }
+
+    $appointments = $query
+        ->orderBy('appointment_date', 'desc')
+        ->orderBy('start_time', 'desc')
+        ->paginate(15)
+        ->appends($request->query());
+
+    $appointments->getCollection()->transform(function ($appointment) {
+        $ordinal = function (int $number): string {
+            $suffixes = ['th', 'st', 'nd', 'rd'];
+            $value = $number % 100;
+            if ($value >= 11 && $value <= 13) {
+                return $number . 'th';
+            }
+            return $number . ($suffixes[$number % 10] ?? 'th');
+        };
+
+        if ($appointment->booking_type === 'Initial Interview') {
+            $appointment->session_sequence_label = 'Initial Interview';
+        } else {
+            $index = ((int) ($appointment->non_initial_session_index ?? 0)) + 1;
+            $appointment->session_sequence_label = $ordinal($index) . ' Session';
+        }
+
+        return $appointment;
+    });
+
+    return view('counselor.appointments.session-dashboard', compact('appointments'));
+}
+
 public function appointments(Request $request)
 {
     $userId = Auth::id();
@@ -242,10 +353,17 @@ public function appointments(Request $request)
             'rescheduled' => 'Scheduled (Rescheduled)',
         ];
 
-        $appointment->display_status = $statusLabels[$appointment->status] ?? ucfirst($appointment->status);
-        $appointment->referral_badge = $contextCounselorId
-            ? $appointment->getReferralBadgeForCounselor((int) $contextCounselorId)
-            : null;
+        if ($appointment->status === 'referred') {
+            $appointment->display_status = $contextCounselorId
+                ? ($appointment->getReferralBadgeForCounselor((int) $contextCounselorId) ?? 'Referred')
+                : 'Referred';
+            $appointment->referral_badge = null;
+        } else {
+            $appointment->display_status = $statusLabels[$appointment->status] ?? ucfirst($appointment->status);
+            $appointment->referral_badge = $contextCounselorId
+                ? $appointment->getReferralBadgeForCounselor((int) $contextCounselorId)
+                : null;
+        }
 
         // Add a flag to identify if this is a referred appointment where current counselor is the original
         $appointment->is_referred_out = (bool) $appointment->is_referred &&
@@ -290,7 +408,13 @@ public function calendar(Request $request)
         ? Carbon::parse($request->input('date'))
         : Carbon::today();
 
-    $appointments = Appointment::with(['student.user'])
+    $appointments = Appointment::with([
+            'student.user',
+            'student.college',
+            'referredCounselor.user',
+            'originalCounselor.user',
+            'counselor.user'
+        ])
         ->where(function ($query) use ($counselorIds) {
             $query->whereIn('counselor_id', $counselorIds)
                 ->orWhereIn('referred_to_counselor_id', $counselorIds)
@@ -300,8 +424,41 @@ public function calendar(Request $request)
         ->whereIn('status', ['pending', 'approved', 'completed', 'referred', 'rescheduled', 'reschedule_requested', 'reschedule_rejected'])
         ->orderBy('start_time')
         ->get()
-        ->map(function ($appointment) {
+        ->map(function ($appointment) use ($counselorIds) {
             $appointment->formatted_start_time = Carbon::parse($appointment->start_time)->format('H:i');
+
+            $contextCounselorId = $counselorIds->first(function ($counselorId) use ($appointment) {
+                return (int) $appointment->counselor_id === (int) $counselorId
+                    || (int) $appointment->referred_to_counselor_id === (int) $counselorId
+                    || (int) $appointment->original_counselor_id === (int) $counselorId;
+            });
+
+            $contextCounselorId = $contextCounselorId ?? $counselorIds->first();
+
+            $statusLabels = [
+                'reschedule_requested' => 'Reschedule Requested (Pending Student Approval)',
+                'reschedule_rejected' => 'Rejected by Student',
+                'rescheduled' => 'Scheduled (Rescheduled)',
+            ];
+
+            if ($appointment->status === 'referred') {
+                $appointment->display_status = $contextCounselorId
+                    ? ($appointment->getReferralBadgeForCounselor((int) $contextCounselorId) ?? 'Referred')
+                    : 'Referred';
+                $appointment->referral_badge = null;
+            } else {
+                $appointment->display_status = $statusLabels[$appointment->status] ?? ucfirst($appointment->status);
+                $appointment->referral_badge = $contextCounselorId
+                    ? $appointment->getReferralBadgeForCounselor((int) $contextCounselorId)
+                    : null;
+            }
+
+            $counselorIdList = $counselorIds->map(fn ($id) => (int) $id)->all();
+            $appointment->is_referred_out = (bool) $appointment->is_referred &&
+                                          in_array((int) $appointment->original_counselor_id, $counselorIdList, true);
+            $appointment->is_referred_in = (bool) $appointment->is_referred &&
+                                         in_array((int) $appointment->referred_to_counselor_id, $counselorIdList, true);
+
             return $appointment;
         });
 
@@ -641,6 +798,29 @@ public function showAppointmentSession(Appointment $appointment)
     ));
 }
 
+public function viewAppointmentSession(Appointment $appointment)
+{
+    $userId = Auth::id();
+    $counselorIds = Counselor::where('user_id', $userId)->pluck('id');
+
+    $canView = $counselorIds->contains(function ($counselorId) use ($appointment) {
+        return $appointment->canBeViewedBy($counselorId);
+    });
+
+    if (!$canView) {
+        abort(403);
+    }
+
+    $appointment->load(['student.user', 'student.college', 'referredCounselor.user', 'originalCounselor.user', 'sessionNotes']);
+
+    $latestSessionNote = $appointment->sessionNotes
+        ->sortByDesc('session_date')
+        ->sortByDesc('created_at')
+        ->first();
+
+    return view('counselor.appointments.session-view', compact('appointment', 'latestSessionNote'));
+}
+
 public function storeAppointmentSession(Request $request, Appointment $appointment)
 {
     $userId = Auth::id();
@@ -675,6 +855,17 @@ public function storeAppointmentSession(Request $request, Appointment $appointme
         'session_type' => 'regular',
         'appointment_type' => $validated['appointment_type'],
     ]);
+
+    if ($appointment->status !== 'cancelled') {
+        $appointment->update(['status' => 'completed']);
+
+        if ($appointment->booking_type === 'Initial Interview') {
+            $appointment->loadMissing('student');
+            if ($appointment->student && $appointment->student->initial_interview_completed !== true) {
+                $appointment->student->update(['initial_interview_completed' => true]);
+            }
+        }
+    }
 
     return redirect()
         ->route('counselor.appointments.session', $appointment)

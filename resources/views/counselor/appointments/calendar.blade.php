@@ -4,8 +4,6 @@
 
 @section('content')
 
-<body class="bg-gray-50">
-
     <div class="container mx-auto px-6 py-8">
         @php
             $googleCalendarId = $googleCalendarId
@@ -14,30 +12,36 @@
                 ? 'https://calendar.google.com/calendar/u/0/r?cid=' . urlencode($googleCalendarId)
                 : null;
         @endphp
-        <div class="flex justify-between items-center mb-6">
-            <h1 class="text-2xl font-bold text-gray-800">Appointment Calendar</h1>
-            <div class="flex space-x-4">
-                <a href="{{ route('counselor.dashboard') }}"
-                   class="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition">
-                    <i class="fas fa-arrow-left mr-2"></i>Back to Dashboard
-                </a>
-                <a href="{{ route('counselor.appointments') }}"
-                   class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">
-                    <i class="fas fa-list mr-2"></i>View All Appointments
-                </a>
-                @if($googleCalendarUrl)
-                    <a href="{{ $googleCalendarUrl }}"
-                       target="_blank"
-                       rel="noopener"
-                       class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition">
-                        <i class="fab fa-google mr-2"></i>Open Google Calendar
+
+        <div class="bg-white rounded-xl shadow-sm p-6 mb-6">
+            <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                <div>
+                    <h1 class="text-3xl font-bold text-gray-800">Appointment Calendar</h1>
+                    <p class="text-gray-600 mt-2">View your schedule and manage booked time slots</p>
+                </div>
+                <div class="flex flex-col sm:flex-row gap-3">
+                    <a href="{{ route('counselor.dashboard') }}"
+                       class="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition">
+                        <i class="fas fa-arrow-left mr-2"></i>Back to Dashboard
                     </a>
-                @else
-                    <a href="{{ route('profile.edit') }}"
-                       class="px-4 py-2 border border-yellow-300 text-yellow-700 rounded-lg hover:bg-yellow-50 transition">
-                        <i class="fas fa-link mr-2"></i>Add Calendar ID
+                    <a href="{{ route('counselor.appointments') }}"
+                       class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">
+                        <i class="fas fa-list mr-2"></i>View All Appointments
                     </a>
-                @endif
+                    @if($googleCalendarUrl)
+                        <a href="{{ $googleCalendarUrl }}"
+                           target="_blank"
+                           rel="noopener"
+                           class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition">
+                            <i class="fab fa-google mr-2"></i>Open Google Calendar
+                        </a>
+                    @else
+                        <a href="{{ route('profile.edit') }}"
+                           class="px-4 py-2 border border-yellow-300 text-yellow-700 rounded-lg hover:bg-yellow-50 transition">
+                            <i class="fas fa-link mr-2"></i>Add Calendar ID
+                        </a>
+                    @endif
+                </div>
             </div>
         </div>
 
@@ -167,6 +171,10 @@
                             @if($appointment)
                                 @if($appointment->status === 'pending') bg-yellow-50 border-yellow-200
                                 @elseif($appointment->status === 'approved') bg-green-50 border-green-200
+                                @elseif($appointment->status === 'rescheduled') bg-indigo-50 border-indigo-200
+                                @elseif($appointment->status === 'reschedule_requested') bg-orange-50 border-orange-200
+                                @elseif($appointment->status === 'reschedule_rejected') bg-rose-50 border-rose-200
+                                @elseif($appointment->status === 'referred') bg-purple-50 border-purple-200
                                 @elseif($appointment->status === 'completed') bg-blue-50 border-blue-200
                                 @elseif($appointment->status === 'rejected') bg-red-50 border-red-200
                                 @elseif($appointment->status === 'cancelled') bg-gray-50 border-gray-200
@@ -183,11 +191,15 @@
                                     <span class="px-2 py-1 text-xs rounded-full
                                         @if($appointment->status === 'pending') bg-yellow-100 text-yellow-800
                                         @elseif($appointment->status === 'approved') bg-green-100 text-green-800
+                                        @elseif($appointment->status === 'rescheduled') bg-indigo-100 text-indigo-800
+                                        @elseif($appointment->status === 'reschedule_requested') bg-orange-100 text-orange-800
+                                        @elseif($appointment->status === 'reschedule_rejected') bg-rose-100 text-rose-800
+                                        @elseif($appointment->status === 'referred') bg-purple-100 text-purple-800
                                         @elseif($appointment->status === 'completed') bg-blue-100 text-blue-800
                                         @elseif($appointment->status === 'rejected') bg-red-100 text-red-800
                                         @elseif($appointment->status === 'cancelled') bg-gray-100 text-gray-800
                                         @else bg-gray-100 text-gray-800 @endif">
-                                        {{ ucfirst($appointment->status) }}
+                                        {{ $appointment->display_status ?? ucfirst($appointment->status) }}
                                     </span>
                                 @elseif($isBusy)
                                     <span class="text-xs text-purple-700">Google Calendar</span>
@@ -228,13 +240,22 @@
                                                 Reject
                                             </button>
                                         </form>
-                                    @elseif($appointment->status === 'approved')
+                                    @elseif(in_array($appointment->status, ['approved', 'rescheduled'], true))
                                         <form action="{{ route('counselor.appointments.update-status', $appointment) }}" method="POST" class="inline">
                                             @csrf
                                             @method('PATCH')
                                             <input type="hidden" name="status" value="completed">
                                             <button type="submit" class="text-xs bg-blue-600 text-white px-2 py-1 rounded hover:bg-blue-700 transition">
                                                 Complete
+                                            </button>
+                                        </form>
+
+                                        <form action="{{ route('counselor.appointments.update-status', $appointment) }}" method="POST" class="inline">
+                                            @csrf
+                                            @method('PATCH')
+                                            <input type="hidden" name="status" value="cancelled">
+                                            <button type="submit" class="text-xs bg-orange-600 text-white px-2 py-1 rounded hover:bg-orange-700 transition">
+                                                Cancel
                                             </button>
                                         </form>
                                     @endif
@@ -279,6 +300,10 @@
                             @if($appointment)
                                 @if($appointment->status === 'pending') bg-yellow-50 border-yellow-200
                                 @elseif($appointment->status === 'approved') bg-green-50 border-green-200
+                                @elseif($appointment->status === 'rescheduled') bg-indigo-50 border-indigo-200
+                                @elseif($appointment->status === 'reschedule_requested') bg-orange-50 border-orange-200
+                                @elseif($appointment->status === 'reschedule_rejected') bg-rose-50 border-rose-200
+                                @elseif($appointment->status === 'referred') bg-purple-50 border-purple-200
                                 @elseif($appointment->status === 'completed') bg-blue-50 border-blue-200
                                 @elseif($appointment->status === 'rejected') bg-red-50 border-red-200
                                 @elseif($appointment->status === 'cancelled') bg-gray-50 border-gray-200
@@ -295,11 +320,15 @@
                                     <span class="px-2 py-1 text-xs rounded-full
                                         @if($appointment->status === 'pending') bg-yellow-100 text-yellow-800
                                         @elseif($appointment->status === 'approved') bg-green-100 text-green-800
+                                        @elseif($appointment->status === 'rescheduled') bg-indigo-100 text-indigo-800
+                                        @elseif($appointment->status === 'reschedule_requested') bg-orange-100 text-orange-800
+                                        @elseif($appointment->status === 'reschedule_rejected') bg-rose-100 text-rose-800
+                                        @elseif($appointment->status === 'referred') bg-purple-100 text-purple-800
                                         @elseif($appointment->status === 'completed') bg-blue-100 text-blue-800
                                         @elseif($appointment->status === 'rejected') bg-red-100 text-red-800
                                         @elseif($appointment->status === 'cancelled') bg-gray-100 text-gray-800
                                         @else bg-gray-100 text-gray-800 @endif">
-                                        {{ ucfirst($appointment->status) }}
+                                        {{ $appointment->display_status ?? ucfirst($appointment->status) }}
                                     </span>
                                 @elseif($isBusy)
                                     <span class="text-xs text-purple-700">Google Calendar</span>
@@ -340,13 +369,22 @@
                                                 Reject
                                             </button>
                                         </form>
-                                    @elseif($appointment->status === 'approved')
+                                    @elseif(in_array($appointment->status, ['approved', 'rescheduled'], true))
                                         <form action="{{ route('counselor.appointments.update-status', $appointment) }}" method="POST" class="inline">
                                             @csrf
                                             @method('PATCH')
                                             <input type="hidden" name="status" value="completed">
                                             <button type="submit" class="text-xs bg-blue-600 text-white px-2 py-1 rounded hover:bg-blue-700 transition">
                                                 Complete
+                                            </button>
+                                        </form>
+
+                                        <form action="{{ route('counselor.appointments.update-status', $appointment) }}" method="POST" class="inline">
+                                            @csrf
+                                            @method('PATCH')
+                                            <input type="hidden" name="status" value="cancelled">
+                                            <button type="submit" class="text-xs bg-orange-600 text-white px-2 py-1 rounded hover:bg-orange-700 transition">
+                                                Cancel
                                             </button>
                                         </form>
                                     @endif
