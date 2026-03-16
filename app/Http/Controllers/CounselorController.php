@@ -226,6 +226,23 @@ public function appointments(Request $request)
             'originalCounselor.user',
             'counselor.user'
         ])
+        ->select('appointments.*')
+        ->selectSub(function ($sub) {
+            $sub->from('appointments as a2')
+                ->selectRaw('COUNT(*)')
+                ->whereColumn('a2.student_id', 'appointments.student_id')
+                ->where(function ($q) {
+                    $q->whereNull('a2.booking_type')
+                        ->orWhere('a2.booking_type', '!=', 'Initial Interview');
+                })
+                ->where(function ($q) {
+                    $q->where('a2.appointment_date', '<', DB::raw('appointments.appointment_date'))
+                        ->orWhere(function ($q) {
+                            $q->where('a2.appointment_date', '=', DB::raw('appointments.appointment_date'))
+                                ->where('a2.start_time', '<', DB::raw('appointments.start_time'));
+                        });
+                });
+        }, 'non_initial_session_index')
         ->where(function($q) use ($counselorIds) {
             // Appointments where this counselor is the CURRENT counselor
             $q->whereIn('counselor_id', $counselorIds)
@@ -322,6 +339,8 @@ public function appointments(Request $request)
         'total' => (clone $statsQuery)->count(),
         'pending' => (clone $statsQuery)->where('status', 'pending')->count(),
         'approved' => (clone $statsQuery)->where('status', 'approved')->count(),
+        'rejected' => (clone $statsQuery)->where('status', 'rejected')->count(),
+        'cancelled' => (clone $statsQuery)->where('status', 'cancelled')->count(),
         'completed' => (clone $statsQuery)->where('status', 'completed')->count(),
         'referred' => (clone $statsQuery)->where('status', 'referred')->count(),
         'referred_in' => (clone $statsQuery)
@@ -346,6 +365,22 @@ public function appointments(Request $request)
 
         $appointment->has_session_notes = $appointment->sessionNotes->isNotEmpty();
         $appointment->session_notes_count = $appointment->sessionNotes->count();
+
+        $ordinal = function (int $number): string {
+            $suffixes = ['th', 'st', 'nd', 'rd'];
+            $value = $number % 100;
+            if ($value >= 11 && $value <= 13) {
+                return $number . 'th';
+            }
+            return $number . ($suffixes[$number % 10] ?? 'th');
+        };
+
+        if ($appointment->booking_type === 'Initial Interview') {
+            $appointment->session_sequence_label = 'Initial Interview';
+        } else {
+            $index = ((int) ($appointment->non_initial_session_index ?? 0)) + 1;
+            $appointment->session_sequence_label = $ordinal($index) . ' Session';
+        }
 
         $statusLabels = [
             'reschedule_requested' => 'Reschedule Requested (Pending Student Approval)',
@@ -633,6 +668,10 @@ public function updateAppointmentStatus(Request $request, Appointment $appointme
         'notes' => 'nullable|string|max:500'
     ]);
 
+    if (in_array($appointment->status, ['rejected', 'cancelled'], true)) {
+        return redirect()->back()->with('error', 'This appointment is closed and can no longer be updated.');
+    }
+
     // Check if the counselor can manage this appointment
     $userId = Auth::id();
     $counselor = Counselor::where('user_id', $userId)->first();
@@ -671,6 +710,13 @@ public function getAppointmentDetails(Appointment $appointment)
     }
 
     $appointment->load(['student.user', 'student.college', 'sessionNotes', 'referredCounselor.user', 'originalCounselor.user']);
+
+    $sessionUrl = null;
+    if (in_array($appointment->status, ['approved', 'rescheduled', 'completed'], true) && empty($appointment->is_referred_out)) {
+        $sessionUrl = $appointment->sessionNotes->isNotEmpty()
+            ? route('counselor.appointments.session.view', $appointment)
+            : route('counselor.appointments.session', $appointment);
+    }
 
     $sessionNotes = $appointment->sessionNotes->map(function ($note) {
         return [
@@ -715,6 +761,10 @@ public function getAppointmentDetails(Appointment $appointment)
             'appointment_date' => $appointment->appointment_date->format('Y-m-d'),
             'start_time' => $appointment->start_time,
             'end_time' => $appointment->end_time,
+            'proposed_date' => $appointment->proposed_date?->format('Y-m-d'),
+            'proposed_start_time' => $appointment->proposed_start_time,
+            'proposed_end_time' => $appointment->proposed_end_time,
+            'session_url' => $sessionUrl,
             'has_session_notes' => $appointment->sessionNotes->isNotEmpty(),
             'session_notes_count' => $appointment->sessionNotes->count(),
         ],
@@ -753,6 +803,10 @@ public function getAppointmentDetails(Appointment $appointment)
         'formatted_date' => $appointment->appointment_date->format('F j, Y'),
         'formatted_time' => \Carbon\Carbon::parse($appointment->start_time)->format('g:i A') . ' - ' . \Carbon\Carbon::parse($appointment->end_time)->format('g:i A'),
         'formatted_referral_date' => $appointment->referral_requested_at?->format('F j, Y g:i A'),
+        'formatted_proposed_date' => $appointment->proposed_date?->format('F j, Y'),
+        'formatted_proposed_time' => ($appointment->proposed_start_time && $appointment->proposed_end_time)
+            ? (\Carbon\Carbon::parse($appointment->proposed_start_time)->format('g:i A') . ' - ' . \Carbon\Carbon::parse($appointment->proposed_end_time)->format('g:i A'))
+            : null,
         'session_notes' => $sessionNotes,
     ]);
 }
@@ -771,6 +825,12 @@ public function showAppointmentSession(Appointment $appointment)
     }
 
     $appointment->load(['student.user', 'student.college', 'referredCounselor.user', 'originalCounselor.user']);
+
+    $followupAppointment = Appointment::where('student_id', $appointment->student_id)
+        ->where('notes', 'like', '%Follow-up appointment booked by counselor for appointment #' . $appointment->id . '%')
+        ->orderByDesc('appointment_date')
+        ->orderByDesc('start_time')
+        ->first();
 
     $latestSessionNote = SessionNote::where('appointment_id', $appointment->id)
         ->where('counselor_id', $effectiveCounselorId)
@@ -792,6 +852,8 @@ public function showAppointmentSession(Appointment $appointment)
 
     return view('counselor.appointments.session', compact(
         'appointment',
+        'effectiveCounselorId',
+        'followupAppointment',
         'latestSessionNote',
         'rootCauseOptions',
         'appointmentTypeOptions'

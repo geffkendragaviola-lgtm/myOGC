@@ -2,30 +2,33 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Admin;
 use App\Models\Resource;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 
-class ResourceController extends Controller
+class AdminResourceController extends Controller
 {
-    /**
-     * Display a listing of the resources.
-     */
     public function index()
     {
-        $resources = Resource::with('user')
-            ->ordered()
-            ->get();
+        $user = Auth::user();
+        if (!$user || $user->role !== 'admin') {
+            return redirect()->route('login');
+        }
 
-        return view('counselor.resources.index', compact('resources'));
+        $resources = Resource::with('user')->ordered()->get();
+
+        return view('admin.resources.index', compact('resources'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
     public function create()
     {
+        $user = Auth::user();
+        if (!$user || $user->role !== 'admin') {
+            return redirect()->route('login');
+        }
+
         $categories = Resource::getCategories();
         $icons = [
             'fab fa-youtube',
@@ -42,14 +45,16 @@ class ResourceController extends Controller
             'fas fa-graduation-cap',
         ];
 
-        return view('counselor.resources.create', compact('categories', 'icons'));
+        return view('admin.resources.create', compact('categories', 'icons'));
     }
 
-    /**
-     * Store a newly created resource.
-     */
     public function store(Request $request)
     {
+        $user = Auth::user();
+        if (!$user || $user->role !== 'admin') {
+            return redirect()->route('login');
+        }
+
         $validated = $request->validate([
             'title' => 'required|string|max:255',
             'description' => 'required|string',
@@ -62,6 +67,7 @@ class ResourceController extends Controller
             'is_active' => 'boolean',
             'show_disclaimer' => 'boolean',
             'disclaimer_text' => 'nullable|string|max:1000',
+            'order' => 'nullable|integer|min:0',
         ]);
 
         $validated['user_id'] = Auth::id();
@@ -69,22 +75,22 @@ class ResourceController extends Controller
         $validated['use_yt_thumbnail'] = $request->has('use_yt_thumbnail');
         $validated['show_disclaimer'] = $request->has('show_disclaimer');
 
-        // Handle image upload
         if ($request->hasFile('image')) {
             $validated['image_path'] = $request->file('image')->store('resources', 'public');
         }
 
         Resource::create($validated);
 
-        return redirect()->route('counselor.resources.index')
-            ->with('success', 'Resource created successfully!');
+        return redirect()->route('admin.resources.index')->with('success', 'Resource created successfully!');
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
     public function edit(Resource $resource)
     {
+        $user = Auth::user();
+        if (!$user || $user->role !== 'admin') {
+            return redirect()->route('login');
+        }
+
         $categories = Resource::getCategories();
         $icons = [
             'fab fa-youtube',
@@ -101,14 +107,16 @@ class ResourceController extends Controller
             'fas fa-graduation-cap',
         ];
 
-        return view('counselor.resources.edit', compact('resource', 'categories', 'icons'));
+        return view('admin.resources.edit', compact('resource', 'categories', 'icons'));
     }
 
-    /**
-     * Update the specified resource.
-     */
     public function update(Request $request, Resource $resource)
     {
+        $user = Auth::user();
+        if (!$user || $user->role !== 'admin') {
+            return redirect()->route('login');
+        }
+
         $validated = $request->validate([
             'title' => 'required|string|max:255',
             'description' => 'required|string',
@@ -121,22 +129,20 @@ class ResourceController extends Controller
             'is_active' => 'boolean',
             'show_disclaimer' => 'boolean',
             'disclaimer_text' => 'nullable|string|max:1000',
+            'order' => 'nullable|integer|min:0',
         ]);
 
         $validated['is_active'] = $request->has('is_active');
         $validated['use_yt_thumbnail'] = $request->has('use_yt_thumbnail');
         $validated['show_disclaimer'] = $request->has('show_disclaimer');
 
-        // Handle image upload
         if ($request->hasFile('image')) {
-            // Delete old image if exists
             if ($resource->image_path) {
                 Storage::disk('public')->delete($resource->image_path);
             }
             $validated['image_path'] = $request->file('image')->store('resources', 'public');
         }
 
-        // If use_yt_thumbnail is checked, remove custom image
         if ($validated['use_yt_thumbnail'] && $resource->image_path) {
             Storage::disk('public')->delete($resource->image_path);
             $validated['image_path'] = null;
@@ -144,50 +150,32 @@ class ResourceController extends Controller
 
         $resource->update($validated);
 
-        return redirect()->route('counselor.resources.index')
-            ->with('success', 'Resource updated successfully!');
+        return redirect()->route('admin.resources.index')->with('success', 'Resource updated successfully!');
     }
 
-    /**
-     * Remove the specified resource.
-     */
     public function destroy(Resource $resource)
     {
-        // Delete associated image
+        $user = Auth::user();
+        if (!$user || $user->role !== 'admin') {
+            return redirect()->route('login');
+        }
+
         if ($resource->image_path) {
             Storage::disk('public')->delete($resource->image_path);
         }
 
         $resource->delete();
 
-        return redirect()->route('counselor.resources.index')
-            ->with('success', 'Resource deleted successfully!');
+        return redirect()->route('admin.resources.index')->with('success', 'Resource deleted successfully!');
     }
 
-    /**
-     * Display resources by category for students
-     */
-    public function showCategory($category)
-    {
-        $categories = Resource::getCategories();
-
-        if (!array_key_exists($category, $categories)) {
-            abort(404);
-        }
-
-        $resources = Resource::byCategory($category)
-            ->active()
-            ->ordered()
-            ->get();
-
-        return view('student.resources.category', compact('resources', 'category', 'categories'));
-    }
-
-    /**
-     * Update resource status
-     */
     public function updateStatus(Request $request, Resource $resource)
     {
+        $user = Auth::user();
+        if (!$user || $user->role !== 'admin') {
+            abort(403);
+        }
+
         $request->validate([
             'is_active' => 'required|boolean'
         ]);

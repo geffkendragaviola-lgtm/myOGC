@@ -121,6 +121,9 @@
                         <a href="{{ route('admin.users.create') }}" class="block px-4 py-2 text-gray-800 hover:bg-blue-100">
                             <i class="fas fa-user-plus mr-2"></i> Add User
                         </a>
+                        <a href="{{ route('admin.appointments') }}" class="block px-4 py-2 text-gray-800 hover:bg-blue-100">
+                            <i class="fas fa-calendar-check mr-2"></i> View Appointments
+                        </a>
                         <a href="{{ route('admin.events') }}" class="block px-4 py-2 text-gray-800 hover:bg-blue-100">
                             <i class="fas fa-calendar-alt mr-2"></i> Manage Events
                         </a>
@@ -196,6 +199,10 @@
                     <a href="{{ route('admin.users') }}"><i class="fas fa-users mr-3"></i> All Users</a>
                     <a href="{{ route('admin.students') }}"><i class="fas fa-user-graduate mr-3"></i> Students</a>
                     <a href="{{ route('admin.counselors') }}"><i class="fas fa-user-tie mr-3"></i> Counselors</a>
+                    <a href="{{ route('admin.appointments') }}"><i class="fas fa-calendar-check mr-3"></i> Appointments</a>
+                    <a href="{{ route('admin.appointment-sessions.dashboard') }}"><i class="fas fa-clipboard-list mr-3"></i> Appointment Sessions</a>
+                    <a href="{{ route('admin.resources.index') }}"><i class="fas fa-folder-open mr-3"></i> Resources</a>
+                    <a href="{{ route('admin.faqs.index') }}"><i class="fas fa-question-circle mr-3"></i> FAQs</a>
                     <a href="{{ route('admin.events') }}"><i class="fas fa-calendar-alt mr-3"></i> Events</a>
                     <!-- ADDED FEEDBACK LINK -->
                     <a href="{{ route('admin.feedback.index') }}"><i class="fas fa-comments mr-3"></i> Feedback</a>

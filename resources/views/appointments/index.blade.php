@@ -33,6 +33,8 @@
             'total' => $appointments->count(),
             'pending' => $appointments->where('status', 'pending')->count(),
             'approved' => $appointments->where('status', 'approved')->count(),
+            'rejected' => $appointments->where('status', 'rejected')->count(),
+            'cancelled' => $appointments->where('status', 'cancelled')->count(),
             'completed' => $appointments->where('status', 'completed')->count(),
             'referred' => $appointments->filter(function ($appointment) {
                 return !is_null($appointment->original_counselor_id)
@@ -41,7 +43,7 @@
         ];
     @endphp
 
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-6 mb-8">
         {{-- Total Appointments --}}
         <div class="bg-white rounded-xl shadow-md p-6 border-l-4 border-blue-500">
             <div class="flex items-center">
@@ -51,6 +53,32 @@
                 <div>
                     <p class="text-sm text-gray-600">Total Appointments</p>
                     <p class="text-2xl font-bold text-gray-800">{{ $stats['total'] }}</p>
+                </div>
+            </div>
+        </div>
+
+        {{-- Rejected --}}
+        <div class="bg-white rounded-xl shadow-md p-6 border-l-4 border-red-500">
+            <div class="flex items-center">
+                <div class="p-3 bg-red-100 rounded-lg mr-4">
+                    <i class="fas fa-times-circle text-red-600 text-xl"></i>
+                </div>
+                <div>
+                    <p class="text-sm text-gray-600">Rejected</p>
+                    <p class="text-2xl font-bold text-gray-800">{{ $stats['rejected'] }}</p>
+                </div>
+            </div>
+        </div>
+
+        {{-- Cancelled --}}
+        <div class="bg-white rounded-xl shadow-md p-6 border-l-4 border-gray-500">
+            <div class="flex items-center">
+                <div class="p-3 bg-gray-100 rounded-lg mr-4">
+                    <i class="fas fa-ban text-gray-600 text-xl"></i>
+                </div>
+                <div>
+                    <p class="text-sm text-gray-600">Cancelled</p>
+                    <p class="text-2xl font-bold text-gray-800">{{ $stats['cancelled'] }}</p>
                 </div>
             </div>
         </div>
@@ -328,7 +356,10 @@
                                         ];
                                     @endphp
                                     <span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full {{ $statusColors[$appointment->status] }}">
-                                        {{ $appointment->status_with_referral ?? ($statusLabels[$appointment->status] ?? ucwords(str_replace('_', ' ', $appointment->status))) }}
+                                        {{ $appointment->status === 'referred'
+                                            ? ($appointment->getStatusWithReferralContext((int) $appointment->counselor_id))
+                                            : ($appointment->status_with_referral ?? ($statusLabels[$appointment->status] ?? ucwords(str_replace('_', ' ', $appointment->status))))
+                                        }}
                                     </span>
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap">
@@ -384,14 +415,6 @@
                                                      <i class="fas fa-times mr-1"></i>Reject
                                                  </button>
                                              </form>
-                                             <form action="{{ route('appointments.cancel', $appointment) }}" method="POST" class="inline">
-                                                 @csrf
-                                                 <button type="submit"
-                                                         class="text-red-600 hover:text-red-900 px-3 py-1 border border-red-300 rounded hover:bg-red-50 transition"
-                                                         onclick="return confirm('Are you sure you want to cancel this appointment? The time slot will become available for others.')">
-                                                     <i class="fas fa-times mr-1"></i>Cancel
-                                                 </button>
-                                             </form>
                                          </div>
                                      @elseif(in_array($appointment->status, ['pending', 'approved', 'rescheduled'], true) && Auth::user()->role === 'student')
                                          <div class="flex items-center space-x-2">
@@ -421,8 +444,8 @@
                                                      @method('PATCH')
                                                      <button type="submit"
                                                              class="text-red-600 hover:text-red-900 px-3 py-1 border border-red-300 rounded hover:bg-red-50 transition"
-                                                             onclick="return confirm('Cancel this referral and keep your original counselor?')">
-                                                         <i class="fas fa-times mr-1"></i>Cancel
+                                                             onclick="return confirm('Reject this referral? This appointment will be closed and you will need to create a new request if you still want counseling.')">
+                                                         <i class="fas fa-times mr-1"></i>Reject
                                                      </button>
                                                  </form>
                                              </div>
@@ -430,7 +453,7 @@
                                              <span class="text-purple-600 italic">Awaiting referral details</span>
                                          @endif
                                      @endif
-                                 </td>
+                                </td>
                             </tr>
                         @endforeach
                     </tbody>

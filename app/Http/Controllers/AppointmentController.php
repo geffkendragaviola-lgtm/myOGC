@@ -78,6 +78,142 @@ class AppointmentController extends Controller
         return view('appointments.index', compact('appointments'));
     }
 
+    public function storeFollowupByCounselor(Request $request, Appointment $appointment)
+    {
+        $request->validate([
+            'counselor_id' => 'nullable|integer|exists:counselors,id',
+            'appointment_date' => 'required|date|after:yesterday',
+            'start_time' => 'required|date_format:H:i',
+            'booking_type' => 'required|in:Counseling,Consultation',
+            'concern' => 'required|string|max:500',
+            'auto_approve' => 'nullable|boolean',
+        ]);
+
+        if (!in_array($appointment->status, ['approved', 'rescheduled', 'completed'], true)) {
+            return redirect()->back()->with('error', 'Follow-up appointments can only be booked for approved appointments.');
+        }
+
+        $user = Auth::user();
+        if ($user->role !== 'counselor') {
+            abort(403);
+        }
+
+        $counselorId = $request->input('counselor_id', $appointment->getEffectiveCounselorId());
+        $counselor = Counselor::where('user_id', $user->id)->where('id', $counselorId)->first();
+        if (!$counselor) {
+            abort(403);
+        }
+
+        $counselorIds = $this->getCounselorAssignmentIds($counselor);
+        $date = Carbon::parse($request->appointment_date);
+
+        if ($this->isDateClosed($counselor, $date)) {
+            return redirect()->back()->with('error', 'This counselor is not available on the selected date.');
+        }
+
+        if ($this->getCounselorBookingsForDate($counselorIds, $date) >= $this->getDailyBookingLimit($counselor)) {
+            return redirect()->back()->with('error', 'Daily booking limit reached for the selected counselor.');
+        }
+
+        $startTime = Carbon::parse($request->start_time);
+        $endTime = $startTime->copy()->addHour();
+        $endTimeFormatted = $endTime->format('H:i');
+
+        if (!$this->isSlotWithinAvailability($counselor, $date, $request->start_time, $endTimeFormatted)) {
+            return redirect()->back()->with('error', 'Selected time is outside the counselor availability.');
+        }
+
+        $existingAppointment = Appointment::whereIn('counselor_id', $counselorIds)
+            ->where('appointment_date', $request->appointment_date)
+            ->where('start_time', $request->start_time)
+            ->whereIn('status', $this->getDbSlotBlockingStatuses())
+            ->exists();
+
+        if ($existingAppointment) {
+            return redirect()->back()->with('error', 'This time slot has already been booked. Please choose another time.');
+        }
+
+        $calendarIds = $this->getCounselorCalendarIds($counselorIds);
+        if (empty($calendarIds)) {
+            return redirect()->back()->with('error', 'Counselor calendar is not configured.');
+        }
+
+        $calendarService = new GoogleCalendarService();
+        $timezone = $this->getCalendarTimezone();
+        $slotStartDateTime = Carbon::createFromFormat('Y-m-d H:i', $date->toDateString() . ' ' . $request->start_time, $timezone);
+        $slotEndDateTime = Carbon::createFromFormat('Y-m-d H:i', $date->toDateString() . ' ' . $endTimeFormatted, $timezone);
+
+        try {
+            foreach ($calendarIds as $calendarId) {
+                if (!$calendarService->isSlotAvailable($calendarId, $slotStartDateTime, $slotEndDateTime)) {
+                    return redirect()->back()->with('error', 'Selected time is no longer available. Please choose another slot.');
+                }
+            }
+        } catch (\Throwable $exception) {
+            Log::error('Failed to check Google Calendar availability for counselor follow-up booking', [
+                'appointment_id' => $appointment->id,
+                'counselor_id' => $counselor->id,
+                'calendar_ids' => $calendarIds,
+                'error' => $exception->getMessage(),
+            ]);
+
+            return redirect()->back()->with('error', 'Unable to verify counselor availability. Please try again later.');
+        }
+
+        $student = $appointment->student()->with('user')->first();
+        if (!$student) {
+            return redirect()->back()->with('error', 'Student profile not found.');
+        }
+
+        DB::beginTransaction();
+        try {
+            $originalAppointmentDateLabel = $appointment->appointment_date
+                ? $appointment->appointment_date->format('F j, Y')
+                : null;
+
+            $followupNote = 'Follow-up appointment booked by counselor for appointment #' . $appointment->id;
+            if ($originalAppointmentDateLabel) {
+                $followupNote .= ' ' . $originalAppointmentDateLabel;
+            }
+
+            $followupAppointment = Appointment::create([
+                'student_id' => $appointment->student_id,
+                'counselor_id' => $counselor->id,
+                'appointment_date' => $request->appointment_date,
+                'start_time' => $request->start_time,
+                'end_time' => $endTimeFormatted,
+                'booking_type' => $request->booking_type,
+                'concern' => $request->concern,
+                'status' => $request->boolean('auto_approve', true) ? 'approved' : 'pending',
+                'notes' => $followupNote,
+            ]);
+
+            $eventData = [
+                'name' => 'Counseling Follow-up - ' . $student->user->first_name . ' ' . $student->user->last_name,
+                'description' => "Student ID: {$student->student_id}\nConcern: {$request->concern}\nFollow-up for Appointment: {$appointment->id}",
+                'startDateTime' => $slotStartDateTime,
+                'endDateTime' => $slotEndDateTime,
+            ];
+
+            $event = $calendarService->createAppointmentEvent($eventData, $counselor->google_calendar_id);
+            $followupAppointment->update(['google_calendar_event_id' => $event->id]);
+
+            DB::commit();
+        } catch (\Throwable $exception) {
+            DB::rollBack();
+            Log::error('Failed to create counselor follow-up appointment with Google Calendar event', [
+                'appointment_id' => $appointment->id,
+                'counselor_id' => $counselor->id,
+                'student_id' => $appointment->student_id,
+                'error' => $exception->getMessage(),
+            ]);
+
+            return redirect()->back()->with('error', 'Failed to book follow-up appointment. Please try again.');
+        }
+
+        return redirect()->back()->with('success', 'Follow-up appointment booked successfully!');
+    }
+
 public function create()
 {
     $student = Student::with('college')->where('user_id', Auth::id())->first();
@@ -119,6 +255,202 @@ public function create()
         ->exists();
 
     return view('appointments.create', compact('counselors', 'student', 'allowAllCounselors', 'hasInitialInterviewAppointment'));
+}
+
+public function createByCounselor(Request $request)
+{
+    $user = Auth::user();
+    if (!$user || $user->role !== 'counselor') {
+        abort(403);
+    }
+
+    $counselorAssignments = Counselor::with('college')
+        ->where('user_id', $user->id)
+        ->get();
+
+    if ($counselorAssignments->isEmpty()) {
+        abort(404, 'Counselor profile not found.');
+    }
+
+    $collegeIds = $counselorAssignments->pluck('college_id')->filter()->unique()->values();
+    if ($collegeIds->isEmpty()) {
+        abort(403, 'Counselor college assignment is missing.');
+    }
+
+    $selectedCounselorId = (int) $request->input('counselor_id', $counselorAssignments->first()->id);
+    $selectedCounselor = $counselorAssignments->firstWhere('id', $selectedCounselorId) ?? $counselorAssignments->first();
+
+    $students = Student::with('user', 'college')
+        ->whereIn('college_id', $collegeIds->all())
+        ->orderBy('student_id')
+        ->get();
+
+    $initialInterviewBookedStudentIds = Appointment::whereIn('student_id', $students->pluck('id')->all())
+        ->where('booking_type', 'Initial Interview')
+        ->whereNotIn('status', ['cancelled', 'rejected'])
+        ->pluck('student_id')
+        ->unique()
+        ->values()
+        ->all();
+
+    $initialInterviewInProgressStudentIds = Appointment::whereIn('student_id', $students->pluck('id')->all())
+        ->where('booking_type', 'Initial Interview')
+        ->whereIn('status', ['pending', 'approved', 'rescheduled', 'reschedule_requested', 'reschedule_rejected'])
+        ->pluck('student_id')
+        ->unique()
+        ->values()
+        ->all();
+
+    return view('counselor.appointments.create', [
+        'counselorAssignments' => $counselorAssignments,
+        'selectedCounselor' => $selectedCounselor,
+        'students' => $students,
+        'initialInterviewBookedStudentIds' => $initialInterviewBookedStudentIds,
+        'initialInterviewInProgressStudentIds' => $initialInterviewInProgressStudentIds,
+    ]);
+}
+
+public function storeByCounselor(Request $request)
+{
+    $user = Auth::user();
+    if (!$user || $user->role !== 'counselor') {
+        abort(403);
+    }
+
+    $request->validate([
+        'counselor_id' => 'required|exists:counselors,id',
+        'student_id' => 'required|exists:students,id',
+        'appointment_date' => 'required|date|after:yesterday',
+        'start_time' => 'required|date_format:H:i',
+        'booking_type' => 'required|in:Initial Interview,Counseling,Consultation',
+        'concern' => 'required|string|max:500',
+    ]);
+
+    $counselor = Counselor::where('user_id', $user->id)
+        ->where('id', $request->counselor_id)
+        ->first();
+    if (!$counselor) {
+        abort(403);
+    }
+
+    $counselorAssignments = Counselor::where('user_id', $user->id)->get();
+    $allowedCollegeIds = $counselorAssignments->pluck('college_id')->filter()->unique()->values();
+
+    $student = Student::with('user', 'college')->findOrFail($request->student_id);
+    if (!$allowedCollegeIds->contains((int) $student->college_id)) {
+        abort(403);
+    }
+
+    $studentNeedsInitialInterview = in_array($student->year_level, ['1st Year', '2nd Year'], true);
+    if ($studentNeedsInitialInterview && $request->booking_type !== 'Initial Interview' && $student->initial_interview_completed !== true) {
+        return redirect()->back()->with('error', 'This student must complete the Initial Interview first before booking Counseling or Consultation appointments.');
+    }
+
+    if ($request->booking_type === 'Initial Interview') {
+        $hasInitialInterviewAppointment = Appointment::where('student_id', $student->id)
+            ->where('booking_type', 'Initial Interview')
+            ->whereNotIn('status', ['cancelled', 'rejected'])
+            ->exists();
+
+        if ($hasInitialInterviewAppointment) {
+            return redirect()->back()->with('error', 'This student already has an Initial Interview appointment booked.');
+        }
+    }
+
+    $counselorIds = $this->getCounselorAssignmentIds($counselor);
+    $date = Carbon::parse($request->appointment_date);
+
+    if ($this->isDateClosed($counselor, $date)) {
+        return redirect()->back()->with('error', 'This counselor is not available on the selected date.');
+    }
+
+    if ($this->getCounselorBookingsForDate($counselorIds, $date) >= $this->getDailyBookingLimit($counselor)) {
+        return redirect()->back()->with('error', 'Daily booking limit reached for the selected counselor.');
+    }
+
+    $startTime = Carbon::parse($request->start_time);
+    $endTime = $startTime->copy()->addHour();
+    $endTimeFormatted = $endTime->format('H:i');
+
+    if (!$this->isSlotWithinAvailability($counselor, $date, $request->start_time, $endTimeFormatted)) {
+        return redirect()->back()->with('error', 'Selected time is outside the counselor availability.');
+    }
+
+    $existingAppointment = Appointment::whereIn('counselor_id', $counselorIds)
+        ->where('appointment_date', $request->appointment_date)
+        ->where('start_time', $request->start_time)
+        ->whereIn('status', $this->getDbSlotBlockingStatuses())
+        ->exists();
+
+    if ($existingAppointment) {
+        return redirect()->back()->with('error', 'This time slot has already been booked. Please choose another time.');
+    }
+
+    $calendarIds = $this->getCounselorCalendarIds($counselorIds);
+    if (empty($calendarIds)) {
+        return redirect()->back()->with('error', 'Counselor calendar is not configured.');
+    }
+
+    $calendarService = new GoogleCalendarService();
+    $timezone = $this->getCalendarTimezone();
+    $slotStartDateTime = Carbon::createFromFormat('Y-m-d H:i', $date->toDateString() . ' ' . $request->start_time, $timezone);
+    $slotEndDateTime = Carbon::createFromFormat('Y-m-d H:i', $date->toDateString() . ' ' . $endTimeFormatted, $timezone);
+
+    try {
+        foreach ($calendarIds as $calendarId) {
+            if (!$calendarService->isSlotAvailable($calendarId, $slotStartDateTime, $slotEndDateTime)) {
+                return redirect()->back()->with('error', 'Selected time is no longer available. Please choose another slot.');
+            }
+        }
+    } catch (\Throwable $exception) {
+        Log::error('Failed to check Google Calendar availability for counselor booking', [
+            'counselor_id' => $counselor->id,
+            'student_id' => $student->id,
+            'calendar_ids' => $calendarIds,
+            'error' => $exception->getMessage(),
+        ]);
+
+        return redirect()->back()->with('error', 'Unable to verify counselor availability. Please try again later.');
+    }
+
+    DB::beginTransaction();
+    try {
+        $appointment = Appointment::create([
+            'student_id' => $student->id,
+            'counselor_id' => $counselor->id,
+            'appointment_date' => $request->appointment_date,
+            'start_time' => $request->start_time,
+            'end_time' => $endTimeFormatted,
+            'booking_type' => $request->booking_type,
+            'concern' => $request->concern,
+            'status' => 'approved',
+            'notes' => 'Booked by counselor on ' . now()->toDateTimeString(),
+        ]);
+
+        $eventData = [
+            'name' => 'Counseling Appointment - ' . $student->user->first_name . ' ' . $student->user->last_name,
+            'description' => "Student ID: {$student->student_id}\nConcern: {$request->concern}",
+            'startDateTime' => $slotStartDateTime,
+            'endDateTime' => $slotEndDateTime,
+        ];
+
+        $event = $calendarService->createAppointmentEvent($eventData, $counselor->google_calendar_id);
+        $appointment->update(['google_calendar_event_id' => $event->id]);
+
+        DB::commit();
+    } catch (\Throwable $exception) {
+        DB::rollBack();
+        Log::error('Failed to create counselor-booked appointment with Google Calendar event', [
+            'counselor_id' => $counselor->id,
+            'student_id' => $student->id,
+            'error' => $exception->getMessage(),
+        ]);
+
+        return redirect()->back()->with('error', 'Failed to book appointment. Please try again.');
+    }
+
+    return redirect()->route('counselor.appointments')
+        ->with('success', 'Appointment booked successfully! It is approved immediately.');
 }
 /**
  * Get referred counselors for a student (cross-college allowed)
@@ -202,10 +534,10 @@ public function getFollowupAvailableSlots(Request $request)
         ]);
     }
 
-    // Get booked appointments for that date - INCLUDE completed, pending, approved, and referred statuses
+    // Get booked appointments for that date - DB slot blocking statuses only
     $bookedAppointments = Appointment::whereIn('counselor_id', $counselorIds)
         ->where('appointment_date', $date->toDateString())
-        ->whereIn('status', $this->getBookingStatuses())
+        ->whereIn('status', $this->getDbSlotBlockingStatuses())
         ->get(['start_time', 'end_time', 'status']);
 
     $calendarIds = $this->getCounselorCalendarIds($counselorIds);
@@ -330,10 +662,10 @@ public function getAvailableSlots(Request $request)
         ]);
     }
 
-    // Get booked appointments for that date - INCLUDE completed, pending, approved, and referred statuses
+    // Get booked appointments for that date - DB slot blocking statuses only
     $bookedAppointments = Appointment::whereIn('counselor_id', $counselorIds)
         ->where('appointment_date', $date->toDateString())
-        ->whereIn('status', $this->getBookingStatuses())
+        ->whereIn('status', $this->getDbSlotBlockingStatuses())
         ->get(['start_time', 'end_time', 'status']);
 
     $calendarIds = $this->getCounselorCalendarIds($counselorIds);
@@ -447,7 +779,7 @@ public function getAvailableDates(Request $request)
 
     $bookedAppointments = Appointment::whereIn('counselor_id', $counselorIds)
         ->whereBetween('appointment_date', [$monthStart->toDateString(), $monthEnd->toDateString()])
-        ->whereIn('status', $this->getBookingStatuses())
+        ->whereIn('status', $this->getDbSlotBlockingStatuses())
         ->get(['appointment_date', 'start_time', 'end_time']);
 
     $appointmentsByDate = $bookedAppointments->groupBy('appointment_date');
@@ -567,6 +899,11 @@ public function store(Request $request)
         return redirect()->back()->with('error', 'Student profile not found.');
     }
 
+    $studentNeedsInitialInterview = in_array($student->year_level, ['1st Year', '2nd Year'], true);
+    if ($studentNeedsInitialInterview && $request->booking_type !== 'Initial Interview' && $student->initial_interview_completed !== true) {
+        return redirect()->back()->with('error', 'You must complete the Initial Interview first before booking Counseling or Consultation appointments.');
+    }
+
     if ($request->booking_type === 'Initial Interview') {
         $hasInitialInterviewAppointment = Appointment::where('student_id', $student->id)
             ->where('booking_type', 'Initial Interview')
@@ -595,11 +932,11 @@ public function store(Request $request)
         return redirect()->back()->with('error', 'Selected time is outside the counselor availability.');
     }
 
-    // Check if slot is still available - INCLUDE completed and referred statuses
+    // Check if slot is still available
     $existingAppointment = Appointment::whereIn('counselor_id', $counselorIds)
         ->where('appointment_date', $request->appointment_date)
         ->where('start_time', $request->start_time)
-        ->whereIn('status', $this->getBookingStatuses())
+        ->whereIn('status', $this->getDbSlotBlockingStatuses())
         ->exists();
 
     if ($existingAppointment) {
@@ -806,7 +1143,7 @@ public function reschedule(Request $request, Appointment $appointment)
     $counselorIds = $this->getCounselorAssignmentIds($counselor);
     $dailyBookings = Appointment::whereIn('counselor_id', $counselorIds)
         ->where('appointment_date', $date->toDateString())
-        ->whereIn('status', $this->getBookingStatuses())
+        ->whereIn('status', $this->getDbSlotBlockingStatuses())
         ->where('id', '!=', $appointment->id)
         ->count();
 
@@ -821,7 +1158,7 @@ public function reschedule(Request $request, Appointment $appointment)
     $existingAppointment = Appointment::whereIn('counselor_id', $counselorIds)
         ->where('appointment_date', $date->toDateString())
         ->where('start_time', $request->start_time)
-        ->whereIn('status', $this->getBookingStatuses())
+        ->whereIn('status', $this->getDbSlotBlockingStatuses())
         ->where('id', '!=', $appointment->id)
         ->exists();
 
@@ -864,15 +1201,53 @@ public function reschedule(Request $request, Appointment $appointment)
         $rescheduleNote .= "\nReason: " . $request->input('reason');
     }
 
-    $appointment->update([
-        'status' => 'reschedule_requested',
-        'proposed_date' => $date->toDateString(),
-        'proposed_start_time' => $request->start_time,
-        'proposed_end_time' => $endTime,
-        'reschedule_reason' => $request->input('reason'),
-        'reschedule_requested_at' => now(),
-        'notes' => ($appointment->notes ? $appointment->notes . "\n\n" : '') . $rescheduleNote,
-    ]);
+    DB::beginTransaction();
+
+    $newEvent = null;
+
+    try {
+        $oldEventId = $appointment->google_calendar_event_id;
+
+        $eventData = [
+            'name' => 'Counseling Appointment - ' . $appointment->student->user->first_name . ' ' . $appointment->student->user->last_name,
+            'description' => "Student ID: {$appointment->student->student_id}\nConcern: {$appointment->concern}",
+            'startDateTime' => $slotStartDateTime,
+            'endDateTime' => $slotEndDateTime,
+        ];
+
+        $newEvent = $calendarService->createAppointmentEvent($eventData, $counselor->google_calendar_id);
+
+        if ($oldEventId) {
+            $calendarService->deleteEvent($oldEventId, $counselor->google_calendar_id);
+        }
+
+        $appointment->update([
+            'status' => 'reschedule_requested',
+            'proposed_date' => $date->toDateString(),
+            'proposed_start_time' => $request->start_time,
+            'proposed_end_time' => $endTime,
+            'reschedule_reason' => $request->input('reason'),
+            'reschedule_requested_at' => now(),
+            'notes' => ($appointment->notes ? $appointment->notes . "\n\n" : '') . $rescheduleNote,
+            'google_calendar_event_id' => $newEvent->id,
+        ]);
+
+        DB::commit();
+    } catch (\Throwable $exception) {
+        DB::rollBack();
+
+        if ($newEvent && $counselor->google_calendar_id) {
+            $calendarService->deleteEvent($newEvent->id, $counselor->google_calendar_id);
+        }
+
+        Log::error('Failed to update Google Calendar event for reschedule request', [
+            'counselor_id' => $counselor->id,
+            'appointment_id' => $appointment->id,
+            'error' => $exception->getMessage(),
+        ]);
+
+        return redirect()->back()->with('error', 'Failed to update schedule on Google Calendar. Please try again.');
+    }
 
     return redirect()->back()->with('success', 'Reschedule request sent to the student.');
 }
@@ -921,7 +1296,7 @@ public function refer(Request $request, Appointment $appointment)
     $existingAppointment = Appointment::whereIn('counselor_id', $referredCounselorIds)
         ->where('appointment_date', $date->toDateString())
         ->where('start_time', $request->start_time)
-        ->whereIn('status', $this->getBookingStatuses())
+        ->whereIn('status', $this->getDbSlotBlockingStatuses())
         ->exists();
 
     if ($existingAppointment) {
@@ -961,21 +1336,59 @@ public function refer(Request $request, Appointment $appointment)
         $referralNote .= "\nReason: " . $request->input('referral_reason');
     }
 
-    $appointment->update([
-        'status' => 'referred',
-        'referred_to_counselor_id' => $referredCounselor->id,
-        'referral_reason' => $request->input('referral_reason'),
-        'referral_previous_status' => $appointment->status,
-        'referral_requested_at' => now(),
-        'referral_outcome' => null,
-        'referral_resolved_at' => null,
-        'referral_resolved_by_counselor_id' => null,
-        'original_counselor_id' => $appointment->counselor_id,
-        'proposed_date' => $date->toDateString(),
-        'proposed_start_time' => $request->start_time,
-        'proposed_end_time' => $endTime,
-        'notes' => ($appointment->notes ? $appointment->notes . "\n\n" : '') . $referralNote,
-    ]);
+    DB::beginTransaction();
+
+    $newEvent = null;
+
+    try {
+        $oldEventId = $appointment->google_calendar_event_id;
+
+        $eventData = [
+            'name' => 'Counseling Appointment - ' . $appointment->student->user->first_name . ' ' . $appointment->student->user->last_name,
+            'description' => "Student ID: {$appointment->student->student_id}\nConcern: {$appointment->concern}",
+            'startDateTime' => $slotStartDateTime,
+            'endDateTime' => $slotEndDateTime,
+        ];
+
+        $newEvent = $calendarService->createAppointmentEvent($eventData, $referredCounselor->google_calendar_id);
+
+        if ($oldEventId && $appointment->counselor && $appointment->counselor->google_calendar_id) {
+            $calendarService->deleteEvent($oldEventId, $appointment->counselor->google_calendar_id);
+        }
+
+        $appointment->update([
+            'status' => 'referred',
+            'referred_to_counselor_id' => $referredCounselor->id,
+            'referral_reason' => $request->input('referral_reason'),
+            'referral_previous_status' => $appointment->status,
+            'referral_requested_at' => now(),
+            'referral_outcome' => null,
+            'referral_resolved_at' => null,
+            'referral_resolved_by_counselor_id' => null,
+            'original_counselor_id' => $appointment->counselor_id,
+            'proposed_date' => $date->toDateString(),
+            'proposed_start_time' => $request->start_time,
+            'proposed_end_time' => $endTime,
+            'notes' => ($appointment->notes ? $appointment->notes . "\n\n" : '') . $referralNote,
+            'google_calendar_event_id' => $newEvent->id,
+        ]);
+
+        DB::commit();
+    } catch (\Throwable $exception) {
+        DB::rollBack();
+
+        if ($newEvent && $referredCounselor->google_calendar_id) {
+            $calendarService->deleteEvent($newEvent->id, $referredCounselor->google_calendar_id);
+        }
+
+        Log::error('Failed to update Google Calendar event for referral request', [
+            'counselor_id' => $counselor->id,
+            'appointment_id' => $appointment->id,
+            'error' => $exception->getMessage(),
+        ]);
+
+        return redirect()->back()->with('error', 'Failed to update schedule on Google Calendar. Please try again.');
+    }
 
     return redirect()->back()->with('success', 'Referral request sent to the student.');
 }
@@ -1008,7 +1421,7 @@ public function acceptReschedule(Request $request, Appointment $appointment)
     $existingAppointment = Appointment::whereIn('counselor_id', $counselorIds)
         ->where('appointment_date', $date->toDateString())
         ->where('start_time', $startTime)
-        ->whereIn('status', $this->getBookingStatuses())
+        ->whereIn('status', $this->getDbSlotBlockingStatuses())
         ->where('id', '!=', $appointment->id)
         ->exists();
 
@@ -1040,56 +1453,21 @@ public function acceptReschedule(Request $request, Appointment $appointment)
         return redirect()->back()->with('error', 'Unable to verify counselor availability. Please try again later.');
     }
 
-    DB::beginTransaction();
+    $acceptNote = "RESCHEDULE ACCEPTED by student on " . now()->toDateTimeString() .
+        "\nNew schedule: " . $date->format('Y-m-d') . " {$startTime} - {$endTime}";
 
-    $newEvent = null;
-
-    try {
-        $oldEventId = $appointment->google_calendar_event_id;
-        $eventData = [
-            'name' => 'Counseling Appointment - ' . $appointment->student->user->first_name . ' ' . $appointment->student->user->last_name,
-            'description' => "Student ID: {$appointment->student->student_id}\nConcern: {$appointment->concern}",
-            'startDateTime' => $slotStartDateTime,
-            'endDateTime' => $slotEndDateTime,
-        ];
-
-        $newEvent = $calendarService->createAppointmentEvent($eventData, $counselor->google_calendar_id);
-
-        $acceptNote = "RESCHEDULE ACCEPTED by student on " . now()->toDateTimeString() .
-            "\nNew schedule: " . $date->format('Y-m-d') . " {$startTime} - {$endTime}";
-
-        $appointment->update([
-            'appointment_date' => $date->toDateString(),
-            'start_time' => $startTime,
-            'end_time' => $endTime,
-            'status' => 'rescheduled',
-            'notes' => ($appointment->notes ? $appointment->notes . "\n\n" : '') . $acceptNote,
-            'google_calendar_event_id' => $newEvent->id,
-            'proposed_date' => null,
-            'proposed_start_time' => null,
-            'proposed_end_time' => null,
-            'reschedule_reason' => null,
-            'reschedule_requested_at' => null,
-        ]);
-
-        if ($oldEventId) {
-            $calendarService->deleteEvent($oldEventId, $counselor->google_calendar_id);
-        }
-
-        DB::commit();
-    } catch (\Throwable $exception) {
-        DB::rollBack();
-        if ($newEvent && $counselor->google_calendar_id) {
-            $calendarService->deleteEvent($newEvent->id, $counselor->google_calendar_id);
-        }
-        Log::error('Failed to accept reschedule', [
-            'counselor_id' => $counselor->id,
-            'appointment_id' => $appointment->id,
-            'error' => $exception->getMessage(),
-        ]);
-
-        return redirect()->back()->with('error', 'Failed to accept reschedule. Please try again.');
-    }
+    $appointment->update([
+        'appointment_date' => $date->toDateString(),
+        'start_time' => $startTime,
+        'end_time' => $endTime,
+        'status' => 'rescheduled',
+        'notes' => ($appointment->notes ? $appointment->notes . "\n\n" : '') . $acceptNote,
+        'proposed_date' => null,
+        'proposed_start_time' => null,
+        'proposed_end_time' => null,
+        'reschedule_reason' => null,
+        'reschedule_requested_at' => null,
+    ]);
 
     return redirect()->back()->with('success', 'Reschedule accepted. Your appointment has been updated.');
 }
@@ -1105,11 +1483,26 @@ public function rejectReschedule(Request $request, Appointment $appointment)
         return redirect()->back()->with('error', 'This appointment does not have a pending reschedule request.');
     }
 
+    if ($appointment->google_calendar_event_id && $appointment->counselor && $appointment->counselor->google_calendar_id) {
+        try {
+            $calendarService = new GoogleCalendarService();
+            $calendarService->deleteEvent($appointment->google_calendar_event_id, $appointment->counselor->google_calendar_id);
+        } catch (\Throwable $exception) {
+            Log::warning('Failed to delete Google Calendar event on reschedule rejection', [
+                'appointment_id' => $appointment->id,
+                'counselor_id' => $appointment->counselor_id,
+                'event_id' => $appointment->google_calendar_event_id,
+                'error' => $exception->getMessage(),
+            ]);
+        }
+    }
+
     $rejectNote = "RESCHEDULE REJECTED by student on " . now()->toDateTimeString();
 
     $appointment->update([
         'status' => 'rejected',
         'notes' => ($appointment->notes ? $appointment->notes . "\n\n" : '') . $rejectNote,
+        'google_calendar_event_id' => null,
         'proposed_date' => null,
         'proposed_start_time' => null,
         'proposed_end_time' => null,
@@ -1175,7 +1568,8 @@ public function acceptReferralByCounselor(Request $request, Appointment $appoint
         if (!$calendarService->isSlotAvailable(
             $counselor->google_calendar_id,
             $slotStartDateTime,
-            $slotEndDateTime
+            $slotEndDateTime,
+            $appointment->google_calendar_event_id
         )) {
             return redirect()->back()->with('error', 'Selected time is no longer available.');
         }
@@ -1315,7 +1709,7 @@ public function acceptReferral(Request $request, Appointment $appointment)
     $existingAppointment = Appointment::whereIn('counselor_id', $referredCounselorIds)
         ->where('appointment_date', $date->toDateString())
         ->where('start_time', $startTime)
-        ->whereIn('status', $this->getBookingStatuses())
+        ->whereIn('status', $this->getDbSlotBlockingStatuses())
         ->where('id', '!=', $appointment->id)
         ->exists();
 
@@ -1332,7 +1726,8 @@ public function acceptReferral(Request $request, Appointment $appointment)
         if (!$calendarService->isSlotAvailable(
             $referredCounselor->google_calendar_id,
             $slotStartDateTime,
-            $slotEndDateTime
+            $slotEndDateTime,
+            $appointment->google_calendar_event_id
         )) {
             return redirect()->back()->with('error', 'The proposed time is no longer available.');
         }
@@ -1346,58 +1741,22 @@ public function acceptReferral(Request $request, Appointment $appointment)
         return redirect()->back()->with('error', 'Unable to verify counselor availability. Please try again later.');
     }
 
-    DB::beginTransaction();
+    $acceptNote = "REFERRAL ACCEPTED by student on " . now()->toDateTimeString() .
+        "\nNew schedule: " . $date->format('Y-m-d') . " {$startTime} - {$endTime}";
 
-    $newEvent = null;
-
-    try {
-        $oldEventId = $appointment->google_calendar_event_id;
-        $originalCounselor = $appointment->counselor;
-        $eventData = [
-            'name' => 'Counseling Appointment - ' . $appointment->student->user->first_name . ' ' . $appointment->student->user->last_name,
-            'description' => "Student ID: {$appointment->student->student_id}\nConcern: {$appointment->concern}",
-            'startDateTime' => $slotStartDateTime,
-            'endDateTime' => $slotEndDateTime,
-        ];
-
-        $newEvent = $calendarService->createAppointmentEvent($eventData, $referredCounselor->google_calendar_id);
-
-        $acceptNote = "REFERRAL ACCEPTED by student on " . now()->toDateTimeString() .
-            "\nNew schedule: " . $date->format('Y-m-d') . " {$startTime} - {$endTime}";
-
-        $appointment->update([
-            'counselor_id' => $referredCounselor->id,
-            'appointment_date' => $date->toDateString(),
-            'start_time' => $startTime,
-            'end_time' => $endTime,
-            'status' => 'pending',
-            'notes' => ($appointment->notes ? $appointment->notes . "\n\n" : '') . $acceptNote,
-            'google_calendar_event_id' => $newEvent->id,
-            'proposed_date' => null,
-            'proposed_start_time' => null,
-            'proposed_end_time' => null,
-            'referral_previous_status' => null,
-            'referral_requested_at' => null,
-        ]);
-
-        if ($oldEventId && $originalCounselor && $originalCounselor->google_calendar_id) {
-            $calendarService->deleteEvent($oldEventId, $originalCounselor->google_calendar_id);
-        }
-
-        DB::commit();
-    } catch (\Throwable $exception) {
-        DB::rollBack();
-        if ($newEvent && $referredCounselor->google_calendar_id) {
-            $calendarService->deleteEvent($newEvent->id, $referredCounselor->google_calendar_id);
-        }
-        Log::error('Failed to accept referral', [
-            'counselor_id' => $referredCounselor->id,
-            'appointment_id' => $appointment->id,
-            'error' => $exception->getMessage(),
-        ]);
-
-        return redirect()->back()->with('error', 'Failed to accept referral. Please try again.');
-    }
+    $appointment->update([
+        'counselor_id' => $referredCounselor->id,
+        'appointment_date' => $date->toDateString(),
+        'start_time' => $startTime,
+        'end_time' => $endTime,
+        'status' => 'pending',
+        'notes' => ($appointment->notes ? $appointment->notes . "\n\n" : '') . $acceptNote,
+        'proposed_date' => null,
+        'proposed_start_time' => null,
+        'proposed_end_time' => null,
+        'referral_previous_status' => null,
+        'referral_requested_at' => null,
+    ]);
 
     return redirect()->back()->with('success', 'Referral accepted. Your appointment has been updated.');
 }
@@ -1413,11 +1772,35 @@ public function rejectReferral(Request $request, Appointment $appointment)
         return redirect()->back()->with('error', 'This appointment does not have a pending referral request.');
     }
 
+    $calendarId = null;
+    if ($appointment->referredCounselor && $appointment->referredCounselor->google_calendar_id) {
+        $calendarId = $appointment->referredCounselor->google_calendar_id;
+    } elseif ($appointment->counselor && $appointment->counselor->google_calendar_id) {
+        $calendarId = $appointment->counselor->google_calendar_id;
+    }
+
+    if ($appointment->google_calendar_event_id && $calendarId) {
+        try {
+            $calendarService = new GoogleCalendarService();
+            $calendarService->deleteEvent($appointment->google_calendar_event_id, $calendarId);
+        } catch (\Throwable $exception) {
+            Log::warning('Failed to delete Google Calendar event on referral rejection', [
+                'appointment_id' => $appointment->id,
+                'counselor_id' => $appointment->counselor_id,
+                'referred_to_counselor_id' => $appointment->referred_to_counselor_id,
+                'event_id' => $appointment->google_calendar_event_id,
+                'calendar_id' => $calendarId,
+                'error' => $exception->getMessage(),
+            ]);
+        }
+    }
+
     $rejectNote = "REFERRAL CANCELLED by student on " . now()->toDateTimeString();
 
     $appointment->update([
-        'status' => 'cancelled',
+        'status' => 'rejected',
         'notes' => ($appointment->notes ? $appointment->notes . "\n\n" : '') . $rejectNote,
+        'google_calendar_event_id' => null,
         'referred_to_counselor_id' => null,
         'referral_reason' => null,
         'referral_previous_status' => null,
@@ -1428,7 +1811,7 @@ public function rejectReferral(Request $request, Appointment $appointment)
         'proposed_end_time' => null,
     ]);
 
-    return redirect()->back()->with('success', 'Referral cancelled. Appointment has been cancelled.');
+    return redirect()->back()->with('success', 'Referral rejected. Appointment has been closed.');
 }
     /**
      * Get available counselors for referral
@@ -1450,20 +1833,29 @@ public function rejectReferral(Request $request, Appointment $appointment)
             })
             ->where('user_id', '!=', $currentCounselor->user_id)
             ->get()
-            ->map(function($counselor) use ($student) {
-                $isSameCollege = $counselor->college_id == $student->college_id;
-                $collegeName = $counselor->college->name ?? 'N/A';
+            ->groupBy('user_id')
+            ->map(function($assignments) use ($student) {
+                $first = $assignments->first();
+                $collegeNames = $assignments
+                    ->map(fn ($c) => $c->college->name ?? null)
+                    ->filter()
+                    ->unique()
+                    ->values();
+
+                $collegeLabel = $collegeNames->isEmpty() ? 'N/A' : $collegeNames->implode('/');
+                $isSameCollege = $assignments->pluck('college_id')->contains($student->college_id);
+
                 return [
-                    'id' => $counselor->id,
-                    'name' => $counselor->user->first_name . ' ' . $counselor->user->last_name,
-                    'position' => $counselor->position,
-                    'college' => $collegeName,
+                    'id' => $first->id,
+                    'name' => $first->user->first_name . ' ' . $first->user->last_name,
+                    'position' => $first->position,
+                    'college' => $collegeLabel,
                     'same_college' => $isSameCollege,
-                    'display_text' => $counselor->user->first_name . ' ' . $counselor->user->last_name .
-                        ' - ' . $counselor->position . ' (' . $collegeName . ')' .
-                        ($isSameCollege ? ' - Same College' : ' - Different College')
+                    'display_text' => $first->user->first_name . ' ' . $first->user->last_name .
+                        ' - ' . $first->position . ' (' . $collegeLabel . ')'
                 ];
-            });
+            })
+            ->values();
 
         return response()->json($counselors);
     }
@@ -1482,11 +1874,22 @@ public function rejectReferral(Request $request, Appointment $appointment)
         ];
     }
 
+    private function getDbSlotBlockingStatuses(): array
+    {
+        return [
+            'pending',
+            'approved',
+            'completed',
+            'rescheduled',
+            'reschedule_rejected'
+        ];
+    }
+
     private function getCounselorBookingsForDate(array $counselorIds, Carbon $date): int
     {
         return Appointment::whereIn('counselor_id', $counselorIds)
             ->where('appointment_date', $date->toDateString())
-            ->whereIn('status', $this->getBookingStatuses())
+            ->whereIn('status', $this->getDbSlotBlockingStatuses())
             ->count();
     }
 

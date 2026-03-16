@@ -196,7 +196,7 @@ class RegisteredUserController extends Controller
             $rules['msu_sase_score'] = ['nullable', 'numeric', 'min:0', 'max:180'];
             $rules['academic_year'] = ['nullable', 'string', 'max:20'];
             $rules['student_status'] = ['required', 'string', 'in:new,transferee,returnee,shiftee'];
-            $rules['profile_picture'] = ['nullable', 'image', 'max:2048'];
+            $rules['profile_picture'] = ['nullable', 'image', 'max:10240'];
 
             // Personal Data
             $rules['nickname'] = ['nullable', 'string', 'max:100'];

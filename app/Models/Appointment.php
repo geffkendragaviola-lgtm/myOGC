@@ -126,7 +126,13 @@ class Appointment extends Model
             return null;
         }
 
-        $suffix = $this->referral_outcome === 'rejected' ? ' (Rejected)' : '';
+        $suffix = '';
+        if ($this->referral_previous_status === 'rescheduled') {
+            $suffix .= ' (Rescheduled)';
+        }
+        if ($this->referral_outcome === 'rejected') {
+            $suffix .= ' (Rejected)';
+        }
 
         if ((int) $this->original_counselor_id === (int) $counselorId) {
             $referredCounselorName = $this->referredCounselor && $this->referredCounselor->user
@@ -185,7 +191,13 @@ class Appointment extends Model
                 $this->referredCounselor->user->first_name . ' ' . $this->referredCounselor->user->last_name :
                 'Unknown Counselor';
 
-            $suffix = $this->referral_outcome === 'rejected' ? ' (Rejected)' : '';
+            $suffix = '';
+            if ($this->referral_previous_status === 'rescheduled') {
+                $suffix .= ' (Rescheduled)';
+            }
+            if ($this->referral_outcome === 'rejected') {
+                $suffix .= ' (Rejected)';
+            }
             return "Referred to {$referredCounselorName}{$suffix}";
         }
         return ucfirst($this->status);
@@ -199,7 +211,13 @@ class Appointment extends Model
                 $this->originalCounselor->user->first_name . ' ' . $this->originalCounselor->user->last_name :
                 'Unknown Counselor';
 
-            $suffix = $this->referral_outcome === 'rejected' ? ' (Rejected)' : '';
+            $suffix = '';
+            if ($this->referral_previous_status === 'rescheduled') {
+                $suffix .= ' (Rescheduled)';
+            }
+            if ($this->referral_outcome === 'rejected') {
+                $suffix .= ' (Rejected)';
+            }
             return "Referred from {$originalCounselorName}{$suffix}";
         }
         return ucfirst($this->status);

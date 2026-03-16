@@ -19,6 +19,7 @@ class Resource extends Model
         'button_text',
         'link',
         'category',
+        'order',
         'image_path',
         'use_yt_thumbnail',
         'is_active',
@@ -53,7 +54,7 @@ class Resource extends Model
      */
     public function scopeOrdered($query)
     {
-        return $query->orderBy('created_at', 'desc');
+        return $query->orderBy('order')->orderBy('created_at', 'desc');
     }
 
     /**

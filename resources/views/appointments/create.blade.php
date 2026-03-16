@@ -272,8 +272,8 @@ document.addEventListener('DOMContentLoaded', function() {
     const consentCloseButtons = document.querySelectorAll('[data-consent-close]');
     const appointmentForm = document.getElementById('appointmentForm');
 
-    const studentYearLevel = {!! json_encode(optional(auth()->user()->student)->year_level) !!};
-    const studentInitialInterviewCompleted = {!! json_encode(optional(auth()->user()->student)->initial_interview_completed) !!};
+    const studentYearLevel = {!! json_encode(optional($student)->year_level) !!};
+    const studentInitialInterviewCompleted = {!! json_encode(optional($student)->initial_interview_completed) !!};
     const hasInitialInterviewAppointment = {!! json_encode($hasInitialInterviewAppointment ?? false) !!};
     const allowAllCounselors = {!! json_encode($allowAllCounselors ?? false) !!};
 
@@ -618,19 +618,10 @@ document.addEventListener('DOMContentLoaded', function() {
         const isSecondYear = studentYearLevel === '2nd Year';
         const isUpperYear = !isFirstYear && !isSecondYear;
         const hasCompletedInitialInterview = studentInitialInterviewCompleted === true;
+        const needsInitialInterview = isFirstYear || isSecondYear;
 
-        if (hasInitialInterviewAppointment) {
-            if (bookingTypeSelect.value === 'Initial Interview') {
-                bookingTypeSelect.value = '';
-            }
-            bookingTypeInitial.disabled = true;
-            bookingTypeInitial.hidden = true;
-            bookingTypeSelect.querySelectorAll('option').forEach(option => {
-                option.disabled = false;
-            });
-            bookingTypeHelp.textContent = 'Initial Interview is already booked.';
-            return;
-        }
+        const counselingOption = bookingTypeSelect.querySelector('option[value="Counseling"]');
+        const consultationOption = bookingTypeSelect.querySelector('option[value="Consultation"]');
 
         if (hasCompletedInitialInterview) {
             if (bookingTypeSelect.value === 'Initial Interview') {
@@ -643,6 +634,45 @@ document.addEventListener('DOMContentLoaded', function() {
             });
             bookingTypeHelp.textContent = 'Initial Interview is already completed.';
             return;
+        }
+
+        if (hasInitialInterviewAppointment) {
+            if (bookingTypeSelect.value === 'Initial Interview') {
+                bookingTypeSelect.value = '';
+            }
+            bookingTypeInitial.disabled = true;
+            bookingTypeInitial.hidden = true;
+            bookingTypeSelect.querySelectorAll('option').forEach(option => {
+                option.disabled = false;
+            });
+
+            if (needsInitialInterview) {
+                counselingOption && (counselingOption.disabled = true);
+                consultationOption && (consultationOption.disabled = true);
+                if (bookingTypeSelect.value === 'Counseling' || bookingTypeSelect.value === 'Consultation') {
+                    bookingTypeSelect.value = '';
+                }
+                bookingTypeHelp.textContent = 'You can book Counseling or Consultation only after your Initial Interview is completed.';
+                return;
+            }
+
+            bookingTypeHelp.textContent = 'Initial Interview is already booked.';
+            return;
+        }
+
+        if (needsInitialInterview && !hasCompletedInitialInterview) {
+            counselingOption && (counselingOption.disabled = true);
+            consultationOption && (consultationOption.disabled = true);
+            if (bookingTypeSelect.value === 'Counseling' || bookingTypeSelect.value === 'Consultation') {
+                bookingTypeSelect.value = '';
+            }
+
+            if (!isFirstYear) {
+                bookingTypeInitial.disabled = false;
+                bookingTypeInitial.hidden = false;
+                bookingTypeHelp.textContent = 'You can book Counseling or Consultation only after your Initial Interview is completed.';
+                return;
+            }
         }
 
         if (isFirstYear) {

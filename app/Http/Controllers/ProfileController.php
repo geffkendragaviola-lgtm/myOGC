@@ -53,6 +53,12 @@ class ProfileController extends Controller
     public function update(Request $request)
     {
         try {
+            $user = $request->user();
+
+            if (in_array($user->role, ['student', 'counselor'], true)) {
+                return back()->withErrors(['error' => 'You can only change your password on this page.']);
+            }
+
             $request->validate([
                 'first_name' => ['required', 'string', 'max:255'],
                 'middle_name' => ['nullable', 'string', 'max:255'],
@@ -61,8 +67,6 @@ class ProfileController extends Controller
                 'phone' => ['nullable', 'string', 'max:20'],
                 'address' => ['nullable', 'string', 'max:500'],
             ]);
-
-            $user = $request->user();
 
             $user->fill($request->all());
 
@@ -109,6 +113,8 @@ class ProfileController extends Controller
     public function updateStudent(Request $request)
     {
         try {
+            return back()->withErrors(['error' => 'You can only change your password on this page.']);
+
             $request->validate([
                 'student_id' => ['required', 'string', 'max:50'],
                 'year_level' => ['required', 'string', 'in:1st Year,2nd Year,3rd Year,4th Year,5th Year,Graduate'],
@@ -146,10 +152,6 @@ class ProfileController extends Controller
     {
         try {
             $request->validate([
-                'position' => ['required', 'string', 'max:255'],
-                'credentials' => ['required', 'string', 'max:255'],
-                'specialization' => ['nullable', 'string', 'max:500'],
-                'college_id' => ['required', 'exists:colleges,id'],
                 'google_calendar_id' => ['nullable', 'string', 'max:255'],
             ]);
 
@@ -159,25 +161,14 @@ class ProfileController extends Controller
                 return back()->withErrors(['error' => 'Unauthorized action.']);
             }
 
-            $counselorProfile = Counselor::where('user_id', $user->id)->first();
-
-            $updateData = [
-                'position' => $request->input('position'),
-                'credentials' => $request->input('credentials'),
-                'specialization' => $request->input('specialization'),
-                'college_id' => $request->input('college_id'),
-                'google_calendar_id' => $request->input('google_calendar_id'),
-                'is_head' => $request->boolean('is_head'),
-            ];
-
-            if ($counselorProfile) {
-                $counselorProfile->update($updateData);
-            } else {
-                Counselor::create(array_merge(
-                    ['user_id' => $user->id],
-                    $updateData
-                ));
+            $counselorProfiles = Counselor::where('user_id', $user->id)->get();
+            if ($counselorProfiles->isEmpty()) {
+                return back()->withErrors(['error' => 'Counselor profile not found.']);
             }
+
+            Counselor::where('user_id', $user->id)->update([
+                'google_calendar_id' => $request->input('google_calendar_id'),
+            ]);
 
             return Redirect::route('profile.edit')->with('status', 'counselor-profile-updated');
         } catch (\Exception $e) {

@@ -15,6 +15,8 @@ use App\Http\Controllers\CounselorAnnouncementController;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\StudentController;
+use App\Http\Controllers\AdminResourceController;
+use App\Http\Controllers\AdminFAQController;
 
 Route::get('/', function () {
     return redirect()->route('login');
@@ -88,6 +90,8 @@ Route::middleware('auth')->group(function () {
         Route::get('/dashboard', [CounselorController::class, 'dashboard'])->name('counselor.dashboard');
         Route::get('/calendar', [CounselorController::class, 'calendar'])->name('counselor.calendar');
         Route::get('/appointments', [CounselorController::class, 'appointments'])->name('counselor.appointments');
+        Route::get('/appointments/create', [AppointmentController::class, 'createByCounselor'])->name('counselor.appointments.create');
+        Route::post('/appointments', [AppointmentController::class, 'storeByCounselor'])->name('counselor.appointments.store');
         Route::get('/appointment-sessions', [CounselorController::class, 'appointmentSessionsDashboard'])
             ->name('counselor.appointment-sessions.dashboard');
         Route::patch('/appointments/{appointment}/status', [CounselorController::class, 'updateAppointmentStatus'])->name('counselor.appointments.update-status');
@@ -98,6 +102,8 @@ Route::middleware('auth')->group(function () {
             ->name('counselor.appointments.session.view');
         Route::post('/appointments/{appointment}/session', [CounselorController::class, 'storeAppointmentSession'])
             ->name('counselor.appointments.session.store');
+        Route::post('/appointments/{appointment}/followup', [AppointmentController::class, 'storeFollowupByCounselor'])
+            ->name('counselor.appointments.followup.store');
         Route::patch('/appointments/{appointment}/update-status', [AppointmentController::class, 'updateStatus'])
             ->name('counselor.appointments.update-status');
     Route::patch('/appointments/{appointment}/reschedule', [AppointmentController::class, 'reschedule'])
@@ -198,7 +204,29 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
     Route::delete('/users/{user}', [AdminController::class, 'deleteUser'])->name('users.delete');
 
     Route::get('/students', [AdminController::class, 'students'])->name('students');
+    Route::get('/students/{student}/edit', [AdminController::class, 'editStudent'])->name('students.edit');
+    Route::patch('/students/{student}', [AdminController::class, 'updateStudent'])->name('students.update');
     Route::get('/counselors', [AdminController::class, 'counselors'])->name('counselors');
+
+    Route::get('/appointments', [AdminController::class, 'appointments'])->name('appointments');
+    Route::get('/appointments/{appointment}/details', [AdminController::class, 'getAppointmentDetails'])->name('appointments.details');
+    Route::get('/appointments/{appointment}/session-notes', [AdminController::class, 'viewAppointmentSessionNotes'])->name('appointments.session-notes');
+    Route::get('/appointment-sessions', [AdminController::class, 'appointmentSessionsDashboard'])->name('appointment-sessions.dashboard');
+
+    Route::get('/resources', [AdminResourceController::class, 'index'])->name('resources.index');
+    Route::get('/resources/create', [AdminResourceController::class, 'create'])->name('resources.create');
+    Route::post('/resources', [AdminResourceController::class, 'store'])->name('resources.store');
+    Route::get('/resources/{resource}/edit', [AdminResourceController::class, 'edit'])->name('resources.edit');
+    Route::patch('/resources/{resource}', [AdminResourceController::class, 'update'])->name('resources.update');
+    Route::delete('/resources/{resource}', [AdminResourceController::class, 'destroy'])->name('resources.destroy');
+    Route::patch('/resources/{resource}/status', [AdminResourceController::class, 'updateStatus'])->name('resources.update-status');
+
+    Route::get('/faqs', [AdminFAQController::class, 'index'])->name('faqs.index');
+    Route::get('/faqs/create', [AdminFAQController::class, 'create'])->name('faqs.create');
+    Route::post('/faqs', [AdminFAQController::class, 'store'])->name('faqs.store');
+    Route::get('/faqs/{faq}/edit', [AdminFAQController::class, 'edit'])->name('faqs.edit');
+    Route::patch('/faqs/{faq}', [AdminFAQController::class, 'update'])->name('faqs.update');
+    Route::delete('/faqs/{faq}', [AdminFAQController::class, 'destroy'])->name('faqs.destroy');
 
     // Admin Event Management Routes
     Route::get('/events', [AdminController::class, 'events'])->name('events');

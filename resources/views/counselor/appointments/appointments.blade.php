@@ -28,6 +28,10 @@
                     class="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition">
                         <i class="fas fa-arrow-left mr-2"></i>Dashboard
                     </a>
+                    <a href="{{ route('counselor.appointments.create') }}"
+                    class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition">
+                        <i class="fas fa-plus mr-2"></i>Book New Appointment
+                    </a>
                     <a href="{{ route('counselor.calendar') }}"
                     class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">
                         <i class="fas fa-calendar-alt mr-2"></i>View Calendar
@@ -37,7 +41,7 @@
         </div>
 
         <!-- Quick Stats -->
-        <div class="grid grid-cols-1 md:grid-cols-7 gap-6 mb-6">
+        <div class="grid grid-cols-1 md:grid-cols-9 gap-6 mb-6">
             <a href="{{ route('counselor.appointments') }}?{{ http_build_query(request()->except('page', 'status', 'referral_direction')) }}&status=all"
                class="bg-white rounded-xl shadow-sm p-6 block hover:shadow-md transition">
                 <div class="flex items-center">
@@ -47,6 +51,32 @@
                     <div class="ml-4">
                         <p class="text-sm text-gray-600">Total Appointments</p>
                         <p class="text-2xl font-bold text-gray-800">{{ $stats['total'] ?? $appointments->total() }}</p>
+                    </div>
+                </div>
+            </a>
+
+            <a href="{{ route('counselor.appointments') }}?{{ http_build_query(request()->except('page', 'status')) }}&status=rejected"
+               class="bg-white rounded-xl shadow-sm p-6 block hover:shadow-md transition">
+                <div class="flex items-center">
+                    <div class="p-3 bg-red-100 rounded-lg">
+                        <i class="fas fa-times-circle text-red-600 text-xl"></i>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-sm text-gray-600">Rejected</p>
+                        <p class="text-2xl font-bold text-gray-800">{{ $stats['rejected'] ?? $appointments->where('status', 'rejected')->count() }}</p>
+                    </div>
+                </div>
+            </a>
+
+            <a href="{{ route('counselor.appointments') }}?{{ http_build_query(request()->except('page', 'status')) }}&status=cancelled"
+               class="bg-white rounded-xl shadow-sm p-6 block hover:shadow-md transition">
+                <div class="flex items-center">
+                    <div class="p-3 bg-gray-100 rounded-lg">
+                        <i class="fas fa-ban text-gray-600 text-xl"></i>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-sm text-gray-600">Cancelled</p>
+                        <p class="text-2xl font-bold text-gray-800">{{ $stats['cancelled'] ?? $appointments->where('status', 'cancelled')->count() }}</p>
                     </div>
                 </div>
             </a>
@@ -185,10 +215,7 @@
                                 class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">
                             <i class="fas fa-filter mr-2"></i>Apply Filters
                         </button>
-                        <button type="button" onclick="exportAllAppointmentsToExcel()"
-                                class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition">
-                            <i class="fas fa-file-export mr-2"></i>Export to Excel
-                        </button>
+                        
                     </div>
                 </div>
             </form>
@@ -335,9 +362,7 @@
                                                 </div>
                                                 <div class="text-xs text-gray-400">
                                                     Year {{ $appointment->student->year_level }}
-                                                    @if($appointment->is_referred_in)
-                                                        • {{ $appointment->student->college->name ?? 'N/A' }}
-                                                    @endif
+                                                   
                                                 </div>
                                             </div>
                                         </div>
@@ -353,6 +378,25 @@
                                                 {{ \Carbon\Carbon::parse($appointment->proposed_date)->format('M j, Y') }}
                                             </div>
                                             <div class="text-sm text-orange-700">
+                                                {{ \Carbon\Carbon::parse($appointment->proposed_start_time)->format('g:i A') }} -
+                                                {{ \Carbon\Carbon::parse($appointment->proposed_end_time)->format('g:i A') }}
+                                            </div>
+                                            <div class="text-xs font-semibold text-gray-500 uppercase tracking-wide mt-2">
+                                                Old (Current)
+                                            </div>
+                                            <div class="text-xs text-gray-500 mt-1">
+                                                {{ \Carbon\Carbon::parse($appointment->appointment_date)->format('M j, Y') }}
+                                                {{ \Carbon\Carbon::parse($appointment->start_time)->format('g:i A') }} -
+                                                {{ \Carbon\Carbon::parse($appointment->end_time)->format('g:i A') }}
+                                            </div>
+                                        @elseif($appointment->status === 'referred' && $appointment->proposed_date)
+                                            <div class="text-xs font-semibold text-purple-700 uppercase tracking-wide">
+                                                New (Proposed)
+                                            </div>
+                                            <div class="text-sm text-purple-700 font-semibold">
+                                                {{ \Carbon\Carbon::parse($appointment->proposed_date)->format('M j, Y') }}
+                                            </div>
+                                            <div class="text-sm text-purple-700">
                                                 {{ \Carbon\Carbon::parse($appointment->proposed_start_time)->format('g:i A') }} -
                                                 {{ \Carbon\Carbon::parse($appointment->proposed_end_time)->format('g:i A') }}
                                             </div>
@@ -385,9 +429,14 @@
 
                                     <!-- Booking Type Column -->
                                     <td class="px-6 py-4 whitespace-nowrap">
-                                        <span class="text-sm text-gray-900">
-                                            {{ $appointment->booking_type ? ucwords(str_replace('_', ' ', $appointment->booking_type)) : '—' }}
-                                        </span>
+                                        <div class="flex flex-col">
+                                            <span class="text-sm text-gray-900">
+                                                {{ $appointment->booking_type ? ucwords(str_replace('_', ' ', $appointment->booking_type)) : '—' }}{{ $appointment->notes && str_contains(strtolower($appointment->notes), 'follow-up appointment') ? ' - Follow up' : '' }}
+                                            </span>
+                                            <span class="text-xs text-gray-500">
+                                                {{ $appointment->session_sequence_label ?? '' }}
+                                            </span>
+                                        </div>
                                     </td>
 
                                     <!-- Status Column -->
@@ -406,14 +455,8 @@
 
                                     <!-- Actions Column -->
                                     <td class="px-6 py-4 whitespace-nowrap text-sm font-medium" onclick="event.stopPropagation();">
-                                        @if($appointment->status !== 'cancelled')
+                                        @if(!in_array($appointment->status, ['cancelled', 'rejected'], true))
                                             <div class="flex space-x-2">
-                                                    <a href="{{ route('counselor.appointments.session.view', $appointment) }}"
-                                                   class="text-purple-600 hover:text-purple-900 transition"
-                                                   title="Open Appointment Session">
-                                                    <i class="fas fa-clipboard"></i>
-                                                </a>
-
                                                 <!-- Status Management Actions - Available for current counselor AND referred-to counselor -->
                                                 @if(in_array($appointment->getEffectiveCounselorId(), $counselorIdList, true))
                                                     @if($appointment->status === 'pending')
@@ -486,7 +529,7 @@
                                                 @endif
 
                                                 <!-- Reschedule option for effective counselor -->
-                                                @if(in_array($appointment->getEffectiveCounselorId(), $counselorIdList, true) && in_array($appointment->status, ['pending', 'approved', 'referred', 'rescheduled', 'reschedule_rejected', 'rejected']))
+                                                @if(in_array($appointment->getEffectiveCounselorId(), $counselorIdList, true) && in_array($appointment->status, ['pending', 'approved', 'referred', 'rescheduled', 'reschedule_rejected'], true))
                                                     <button onclick="showRescheduleModal({{ $appointment->id }}, {{ $appointment->getEffectiveCounselorId() }}, '{{ $appointment->appointment_date->format('Y-m-d') }}')"
                                                             class="text-orange-600 hover:text-orange-900 transition"
                                                             title="Reschedule Appointment">
@@ -494,7 +537,7 @@
                                                     </button>
                                                 @endif
                                                 <!-- Referral option for current counselor -->
-                                                @if(in_array($appointment->counselor_id, $counselorIdList, true) && in_array($appointment->status, ['pending', 'approved', 'rescheduled', 'reschedule_rejected'], true))
+                                                @if(in_array($appointment->counselor_id, $counselorIdList, true) && in_array($appointment->status, ['pending', 'approved', 'rescheduled', 'reschedule_rejected'], true) && !(isset($referralBadgeText) && $referralBadgeText && \Illuminate\Support\Str::startsWith($referralBadgeText, 'Referred from')))
                                                     <button onclick="showReferralModal({{ $appointment->id }}, '{{ $appointment->appointment_date->format('Y-m-d') }}', {{ $appointment->student_id }}, {{ $appointment->counselor_id }})"
                                                             class="text-purple-600 hover:text-purple-900 transition"
                                                             title="Refer to Another Counselor">
@@ -1474,12 +1517,7 @@
                                         <p class="mt-1 text-sm text-gray-900">${data.student.year_level}</p>
                                     </div>
                                 </div>
-                            <div class="grid grid-cols-2 gap-4">
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700">Initial Interview Completed</label>
-                                    <p class="mt-1 text-sm text-gray-900">${data.student.initial_interview_completed_label}</p>
-                                </div>
-                            </div>
+                            
 
                                 <div class="grid grid-cols-2 gap-4">
                                     <div>
@@ -1491,6 +1529,19 @@
                                         <p class="mt-1 text-sm text-gray-900">${data.formatted_time}</p>
                                     </div>
                                 </div>
+
+                                ${(data.appointment.status === 'referred' && data.formatted_proposed_date && data.formatted_proposed_time) ? `
+                                <div class="grid grid-cols-2 gap-4">
+                                    <div>
+                                        <label class="block text-sm font-medium text-purple-700">Proposed Date</label>
+                                        <p class="mt-1 text-sm text-purple-900">${data.formatted_proposed_date}</p>
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-purple-700">Proposed Time</label>
+                                        <p class="mt-1 text-sm text-purple-900">${data.formatted_proposed_time}</p>
+                                    </div>
+                                </div>
+                                ` : ''}
                             <div>
                                 <label class="block text-sm font-medium text-gray-700">Type of Booking</label>
                                 <p class="mt-1 text-sm text-gray-900">${data.appointment.booking_type || 'N/A'}</p>
@@ -1587,10 +1638,18 @@
                                 ` : ''}
 
                                 <div class="border-t pt-4 mt-4 flex justify-end">
-                                    <a href="${data.student.profile_url}"
-                                       class="inline-flex items-center px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition text-sm">
-                                        <i class="fas fa-user mr-2"></i> View Student Profile
-                                    </a>
+                                    <div class="flex gap-2">
+                                        ${data.appointment.session_url ? `
+                                        <a href="${data.appointment.session_url}"
+                                           class="inline-flex items-center px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition text-sm">
+                                            <i class="fas fa-clipboard mr-2"></i> Open Appointment Session
+                                        </a>
+                                        ` : ''}
+                                        <a href="${data.student.profile_url}"
+                                           class="inline-flex items-center px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition text-sm">
+                                            <i class="fas fa-user mr-2"></i> View Student Profile
+                                        </a>
+                                    </div>
                                 </div>
                             </div>
                         `;
