@@ -12,8 +12,8 @@
 
             <div class="bg-white rounded-lg shadow px-5 py-4">
                 <div class="flex items-center gap-3">
-                    <div class="p-3 bg-blue-100 rounded-lg">
-                        <i class="fas fa-calendar-check text-blue-600 text-xl"></i>
+                    <div class="p-3 bg-gray-100 rounded-lg">
+                        <i class="fas fa-calendar-check text-[#F00000] text-xl"></i>
                     </div>
                     <div>
                         <p class="text-sm font-medium text-gray-600">Total Appointments This Month</p>
@@ -27,8 +27,8 @@
             <a href="{{ route('admin.appointments') }}?{{ http_build_query(request()->except('page', 'status')) }}&status=all"
                class="bg-white rounded-lg shadow p-6 block hover:shadow-md transition">
                 <div class="flex items-center">
-                    <div class="p-3 bg-blue-100 rounded-lg">
-                        <i class="fas fa-calendar-check text-blue-600 text-xl"></i>
+                    <div class="p-3 bg-gray-100 rounded-lg">
+                        <i class="fas fa-calendar-check text-[#F00000] text-xl"></i>
                     </div>
                     <div class="ml-4">
                         <p class="text-sm font-medium text-gray-600">Total</p>
@@ -40,8 +40,8 @@
             <a href="{{ route('admin.appointments') }}?{{ http_build_query(request()->except('page', 'status')) }}&status=pending"
                class="bg-white rounded-lg shadow p-6 block hover:shadow-md transition">
                 <div class="flex items-center">
-                    <div class="p-3 bg-yellow-100 rounded-lg">
-                        <i class="fas fa-clock text-yellow-600 text-xl"></i>
+                    <div class="p-3 bg-[#FFF9E6] rounded-lg">
+                        <i class="fas fa-clock text-[#FFC917] text-xl"></i>
                     </div>
                     <div class="ml-4">
                         <p class="text-sm font-medium text-gray-600">Pending</p>
@@ -53,8 +53,8 @@
             <a href="{{ route('admin.appointments') }}?{{ http_build_query(request()->except('page', 'status')) }}&status=approved"
                class="bg-white rounded-lg shadow p-6 block hover:shadow-md transition">
                 <div class="flex items-center">
-                    <div class="p-3 bg-green-100 rounded-lg">
-                        <i class="fas fa-check-circle text-green-600 text-xl"></i>
+                    <div class="p-3 bg-[#FFF9E6] rounded-lg">
+                        <i class="fas fa-check-circle text-[#F8650C] text-xl"></i>
                     </div>
                     <div class="ml-4">
                         <p class="text-sm font-medium text-gray-600">Approved</p>
@@ -66,8 +66,8 @@
             <a href="{{ route('admin.appointments') }}?{{ http_build_query(request()->except('page', 'status')) }}&status=completed"
                class="bg-white rounded-lg shadow p-6 block hover:shadow-md transition">
                 <div class="flex items-center">
-                    <div class="p-3 bg-blue-100 rounded-lg">
-                        <i class="fas fa-flag-checkered text-blue-600 text-xl"></i>
+                    <div class="p-3 bg-gray-100 rounded-lg">
+                        <i class="fas fa-flag-checkered text-[#F00000] text-xl"></i>
                     </div>
                     <div class="ml-4">
                         <p class="text-sm font-medium text-gray-600">Completed</p>
@@ -79,8 +79,8 @@
             <a href="{{ route('admin.appointments') }}?{{ http_build_query(request()->except('page', 'status')) }}&status=rejected"
                class="bg-white rounded-lg shadow p-6 block hover:shadow-md transition">
                 <div class="flex items-center">
-                    <div class="p-3 bg-red-100 rounded-lg">
-                        <i class="fas fa-times-circle text-red-600 text-xl"></i>
+                    <div class="p-3 bg-[#FFF0F0] rounded-lg">
+                        <i class="fas fa-times-circle text-[#820000] text-xl"></i>
                     </div>
                     <div class="ml-4">
                         <p class="text-sm font-medium text-gray-600">Rejected</p>
@@ -99,12 +99,12 @@
                                name="search"
                                value="{{ $search }}"
                                placeholder="Case #, student, counselor, concern"
-                               class="mt-1 w-full rounded-lg border-gray-300 focus:border-blue-500 focus:ring-blue-500" />
+                               class="mt-1 w-full rounded-lg border-gray-300 focus:border-[#F00000] focus:ring-[#F00000]" />
                     </div>
 
                     <div>
                         <label class="block text-sm font-medium text-gray-700">Status</label>
-                        <select name="status" class="mt-1 w-full rounded-lg border-gray-300 focus:border-blue-500 focus:ring-blue-500">
+                        <select name="status" class="mt-1 w-full rounded-lg border-gray-300 focus:border-[#F00000] focus:ring-[#F00000]">
                             <option value="all" {{ $status === 'all' ? 'selected' : '' }}>All</option>
                             @foreach($statuses as $s)
                                 <option value="{{ $s }}" {{ $status === $s ? 'selected' : '' }}>{{ ucfirst(str_replace('_', ' ', $s)) }}</option>
@@ -113,7 +113,7 @@
                     </div>
 
                     <div class="flex items-end">
-                        <button type="submit" class="w-full md:w-auto px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">
+                        <button type="submit" class="w-full md:w-auto px-4 py-2 bg-[#F00000] text-white rounded-lg hover:bg-[#D40000] transition">
                             <i class="fas fa-search mr-2"></i>Filter
                         </button>
                     </div>
@@ -134,7 +134,7 @@
                     </thead>
                     <tbody class="bg-white divide-y divide-gray-200">
                         @forelse($appointments as $appointment)
-                            <tr class="hover:bg-blue-50 transition cursor-pointer" onclick="showAppointmentDetails({{ $appointment->id }})">
+                            <tr class="hover:bg-[#FFE100] transition cursor-pointer" onclick="showAppointmentDetails({{ $appointment->id }})">
                                 <td class="px-6 py-4 whitespace-nowrap">
                                     <div class="text-sm font-medium text-gray-900">{{ $appointment->case_number ?? ('#' . $appointment->id) }}</div>
                                 </td>
@@ -197,8 +197,8 @@
                                             {{ $appointment->status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
                                                ($appointment->status === 'approved' ? 'bg-green-100 text-green-800' :
                                                ($appointment->status === 'rejected' ? 'bg-red-100 text-red-800' :
-                                               ($appointment->status === 'completed' ? 'bg-blue-100 text-blue-800' :
-                                               ($appointment->status === 'referred' ? 'bg-purple-100 text-purple-800' :
+                                               ($appointment->status === 'completed' ? 'bg-gray-100 text-[#820000]' :
+                                               ($appointment->status === 'referred' ? 'bg-[#FFF9E6] text-[#820000]' :
                                                'bg-gray-100 text-gray-800')))) }}">
                                             {{ $statusDisplay }}
                                         </span>
@@ -305,12 +305,12 @@
                             ${(data.appointment?.status === 'referred' && data.formatted_proposed_date && data.formatted_proposed_time) ? `
                             <div class="grid grid-cols-2 gap-4">
                                 <div>
-                                    <label class="block text-sm font-medium text-purple-700">Proposed Date</label>
-                                    <p class="mt-1 text-sm text-purple-900">${data.formatted_proposed_date}</p>
+                                    <label class="block text-sm font-medium text-[#820000]">Proposed Date</label>
+                                    <p class="mt-1 text-sm text-[#820000]">${data.formatted_proposed_date}</p>
                                 </div>
                                 <div>
-                                    <label class="block text-sm font-medium text-purple-700">Proposed Time</label>
-                                    <p class="mt-1 text-sm text-purple-900">${data.formatted_proposed_time}</p>
+                                    <label class="block text-sm font-medium text-[#820000]">Proposed Time</label>
+                                    <p class="mt-1 text-sm text-[#820000]">${data.formatted_proposed_time}</p>
                                 </div>
                             </div>
                             ` : ''}
@@ -335,20 +335,20 @@
                             ${(data.appointment?.is_referred || data.appointment?.referral_reason || data.referral?.referred_to_name || data.referral?.referred_from_name) ? `
                             <div>
                                 <label class="block text-sm font-medium text-gray-700">Referral Details</label>
-                                <div class="mt-1 p-3 rounded-lg border border-purple-200 bg-purple-50 space-y-1">
+                                <div class="mt-1 p-3 rounded-lg border border-[#FFC917] bg-[#FFF9E6] space-y-1">
                                     ${data.referral?.referred_from_name ? `
-                                    <p class="text-sm text-purple-900"><span class="font-medium">Referred from:</span> ${data.referral.referred_from_name}</p>
+                                    <p class="text-sm text-[#820000]"><span class="font-medium">Referred from:</span> ${data.referral.referred_from_name}</p>
                                     ` : ''}
                                     ${data.referral?.referred_to_name ? `
-                                    <p class="text-sm text-purple-900"><span class="font-medium">Referred to:</span> ${data.referral.referred_to_name}</p>
+                                    <p class="text-sm text-[#820000]"><span class="font-medium">Referred to:</span> ${data.referral.referred_to_name}</p>
                                     ` : ''}
                                     ${data.formatted_referral_date ? `
-                                    <p class="text-sm text-purple-900"><span class="font-medium">Referral date:</span> ${data.formatted_referral_date}</p>
+                                    <p class="text-sm text-[#820000]"><span class="font-medium">Referral date:</span> ${data.formatted_referral_date}</p>
                                     ` : ''}
                                     ${data.appointment?.referral_reason ? `
                                     <div class="pt-2">
-                                        <p class="text-xs font-medium text-purple-800">Reason:</p>
-                                        <p class="text-sm text-purple-900 whitespace-pre-line">${data.appointment.referral_reason}</p>
+                                        <p class="text-xs font-medium text-[#820000]">Reason:</p>
+                                        <p class="text-sm text-[#820000] whitespace-pre-line">${data.appointment.referral_reason}</p>
                                     </div>
                                     ` : ''}
                                 </div>
@@ -362,8 +362,8 @@
                                         ${data.appointment?.status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
                                         data.appointment?.status === 'approved' ? 'bg-green-100 text-green-800' :
                                         data.appointment?.status === 'rejected' ? 'bg-red-100 text-red-800' :
-                                        data.appointment?.status === 'referred' ? 'bg-purple-100 text-purple-800' :
-                                        data.appointment?.status === 'completed' ? 'bg-blue-100 text-blue-800' :
+                                        data.appointment?.status === 'referred' ? 'bg-[#FFF9E6] text-[#820000]' :
+                                        data.appointment?.status === 'completed' ? 'bg-gray-100 text-[#820000]' :
                                         'bg-gray-100 text-gray-800'}">
                                         ${data.appointment?.status_display || 'N/A'}
                                     </span>
@@ -392,7 +392,7 @@
                                                 ${note.mood_level ? `
                                                 <span class="text-xs px-2 py-1 rounded-full
                                                     ${note.mood_level === 'very_good' ? 'bg-green-100 text-green-800' :
-                                                    note.mood_level === 'good' ? 'bg-blue-100 text-blue-800' :
+                                                    note.mood_level === 'good' ? 'bg-gray-100 text-[#820000]' :
                                                     note.mood_level === 'neutral' ? 'bg-yellow-100 text-yellow-800' :
                                                     note.mood_level === 'low' ? 'bg-orange-100 text-orange-800' :
                                                     'bg-red-100 text-red-800'}">
@@ -417,13 +417,13 @@
                                 <div class="flex gap-2">
                                     ${data.appointment?.session_notes_url && data.appointment?.has_session_notes ? `
                                     <a href="${data.appointment.session_notes_url}"
-                                       class="inline-flex items-center px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition text-sm">
+                                       class="inline-flex items-center px-4 py-2 bg-[#820000] text-white rounded-lg hover:bg-[#820000] transition text-sm">
                                         <i class="fas fa-clipboard mr-2"></i> View Session Notes
                                     </a>
                                     ` : ''}
                                     ${data.student?.profile_url ? `
                                     <a href="${data.student.profile_url}"
-                                       class="inline-flex items-center px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition text-sm">
+                                       class="inline-flex items-center px-4 py-2 bg-[#F00000] text-white rounded-lg hover:bg-[#D40000] transition text-sm">
                                         <i class="fas fa-user mr-2"></i> View Student Details
                                     </a>
                                     ` : ''}

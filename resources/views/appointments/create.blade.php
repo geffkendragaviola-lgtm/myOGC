@@ -19,18 +19,18 @@
                     <div class="mb-4" id="counselorTypeWrapper">
                         <label class="inline-flex items-center">
                             <input type="radio" name="counselor_type" value="college" checked
-                                   class="counselor-type-radio text-blue-600 focus:ring-blue-500">
+                                   class="counselor-type-radio text-[#F00000] focus:ring-[#F00000]">
                             <span class="ml-2">{{ ($allowAllCounselors ?? false) ? 'Counselors from all colleges' : 'Counselors from my college' }}</span>
                         </label>
                         <label class="inline-flex items-center ml-6" id="referredCounselorOption">
                             <input type="radio" name="counselor_type" value="referred"
-                                   class="counselor-type-radio text-blue-600 focus:ring-blue-500">
+                                   class="counselor-type-radio text-[#F00000] focus:ring-[#F00000]">
                             <span class="ml-2">Previously referred counselors</span>
                         </label>
                     </div>
 
                     <select name="counselor_id" id="counselorSelect"
-                            class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" required>
+                            class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#F00000] focus:border-[#F00000]" required>
                         <option value="">Choose a counselor</option>
                         <!-- Options will be populated by JavaScript -->
                     </select>
@@ -38,7 +38,7 @@
                     <p id="counselorAutoAssigned" class="hidden mt-2 text-sm text-gray-600"></p>
 
                     <!-- Loading indicator -->
-                    <div id="counselorLoading" class="hidden mt-2 text-blue-600">
+                    <div id="counselorLoading" class="hidden mt-2 text-[#F00000]">
                         Loading counselors...
                     </div>
                 </div>
@@ -47,7 +47,7 @@
                 <div class="mb-6">
                     <label class="block text-gray-700 font-semibold mb-2">Type of Booking</label>
                     <select name="booking_type" id="bookingType"
-                            class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" required>
+                            class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#F00000] focus:border-[#F00000]" required>
                         <option value="">Choose a booking type</option>
                         <option value="Initial Interview" id="bookingTypeInitial" {{ ($hasInitialInterviewAppointment ?? false) ? 'disabled hidden' : '' }}>Initial Interview</option>
                         <option value="Counseling">Counseling</option>
@@ -107,7 +107,7 @@
                 <div class="mb-6">
                     <label class="block text-gray-700 font-semibold mb-2">Presenting Problem</label>
                     <textarea name="concern" rows="4"
-                              class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                              class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#F00000] focus:border-[#F00000]"
                               placeholder="Reason for booking for appointment" required></textarea>
                 </div>
 
@@ -119,7 +119,7 @@
                     </a>
                     <button type="button"
                             id="openConsentModal"
-                            class="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">
+                            class="px-6 py-3 bg-[#F00000] text-white rounded-lg hover:bg-[#D40000] transition">
                         Book Now
                     </button>
                 </div>
@@ -204,7 +204,7 @@
                 </p>
                 
                 <!-- Scroll indicator -->
-                <div id="scrollIndicator" class="sticky bottom-0 py-2 text-center bg-blue-50 text-blue-700 rounded-lg border border-blue-200">
+                <div id="scrollIndicator" class="sticky bottom-0 py-2 text-center bg-[#FFF9E6] text-[#D40000] rounded-lg border border-[#FFE100]">
                     ↓ Scroll to bottom to enable confirmation ↓
                 </div>
             </div>
@@ -213,7 +213,7 @@
                 <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
                     <label class="inline-flex items-center text-gray-700">
                         <input type="checkbox" id="consentAcknowledged"
-                               class="text-blue-600 focus:ring-blue-500 rounded" disabled>
+                               class="text-[#F00000] focus:ring-[#F00000] rounded" disabled>
                         <span class="ml-2">I have read and understood the Informed Consent for Counseling.</span>
                     </label>
                     
@@ -225,7 +225,7 @@
                         </button>
                         <button type="button"
                                 id="confirmBooking"
-                                class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
+                                class="px-6 py-2 bg-[#F00000] text-white rounded-lg hover:bg-[#D40000] transition disabled:opacity-50 disabled:cursor-not-allowed"
                                 disabled>
                             Confirm Booking
                         </button>
@@ -485,12 +485,12 @@ document.addEventListener('DOMContentLoaded', function() {
             if (isDisabled) {
                 button.classList.add('border-transparent', 'text-gray-300', 'cursor-not-allowed');
             } else {
-                button.classList.add('border-[#7c1d2a]/30', 'text-[#7c1d2a]', 'hover:bg-[#7c1d2a]/10');
+                button.classList.add('border-[#F00000]/30', 'text-[#F00000]', 'hover:bg-[#F00000]/10');
             }
 
             if (selectedDate && isSameDay(selectedDate, date)) {
-                button.classList.remove('border-[#7c1d2a]/30', 'text-[#7c1d2a]', 'hover:bg-[#7c1d2a]/10');
-                button.classList.add('bg-[#7c1d2a]', 'text-white', 'border-[#7c1d2a]');
+                button.classList.remove('border-[#F00000]/30', 'text-[#F00000]', 'hover:bg-[#F00000]/10');
+                button.classList.add('bg-[#F00000]', 'text-white', 'border-[#F00000]');
             }
 
             button.addEventListener('click', () => {
@@ -771,17 +771,17 @@ document.addEventListener('DOMContentLoaded', function() {
                 availableSlots.forEach(slot => {
                     const slotElement = document.createElement('button');
                     slotElement.type = 'button';
-                    slotElement.className = 'time-slot p-4 border-2 border-gray-200 rounded-lg text-center hover:border-blue-500 hover:bg-blue-50 transition cursor-pointer';
+                    slotElement.className = 'time-slot p-4 border-2 border-gray-200 rounded-lg text-center hover:border-[#F00000] hover:bg-[#FFE100] transition cursor-pointer';
                     slotElement.textContent = slot.display;
 
                     slotElement.addEventListener('click', function() {
                         document.querySelectorAll('.time-slot').forEach(s => {
-                            s.classList.remove('border-blue-500', 'bg-blue-100', 'text-blue-700');
+                            s.classList.remove('border-[#F00000]', 'bg-gray-100', 'text-[#D40000]');
                             s.classList.add('border-gray-200', 'text-gray-700');
                         });
 
                         this.classList.remove('border-gray-200', 'text-gray-700');
-                        this.classList.add('border-blue-500', 'bg-blue-100', 'text-blue-700');
+                        this.classList.add('border-[#F00000]', 'bg-gray-100', 'text-[#D40000]');
 
                         selectedTime.value = slot.start;
                         currentSelectedSlot = slot.start;

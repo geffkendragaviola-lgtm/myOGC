@@ -12,15 +12,15 @@
         }
 
         .dashboard-navbar {
-            background: linear-gradient(90deg, #1e40af 0%, #3b82f6 100%);
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            background: linear-gradient(90deg, #820000 0%, #5a0000 100%);
+            box-shadow: 0 4px 12px rgba(196, 30, 58, 0.2);
         }
 
         .dashboard-hero {
-            background: linear-gradient(rgba(30, 64, 175, 0.8), rgba(30, 64, 175, 0.8)), url('https://images.unsplash.com/photo-1523050854058-8df90110c9f1?ixlib=rb-4.0.3');
+            background: linear-gradient(135deg, rgba(196, 30, 58, 0.9), rgba(160, 24, 48, 0.9)), url('https://images.unsplash.com/photo-1523050854058-8df90110c9f1?ixlib=rb-4.0.3');
             background-size: cover;
             background-position: center;
-            height: 300px;
+            height: 350px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -33,30 +33,49 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background: rgba(0, 0, 0, 0.4);
+            background: rgba(0, 0, 0, 0.3);
         }
 
         .dashboard-hero-title {
-            font-size: 2.5rem;
+            font-size: 3rem;
             font-weight: bold;
             color: white;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+            text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.6);
             position: relative;
             z-index: 10;
+            letter-spacing: 0.5px;
         }
 
         .dashboard-quote-section {
-            background-color: #fbbf24;
-            padding: 2rem 0;
+            background: linear-gradient(135deg, #4A4A4A 0%, #2D2D2D 100%);
+            padding: 3rem 0;
             text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .dashboard-quote-section::before {
+            content: '"';
+            position: absolute;
+            top: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 120px;
+            color: rgba(196, 30, 58, 0.2);
+            font-family: Georgia, serif;
+            z-index: 0;
         }
 
         .dashboard-quote-text {
             font-size: 1.5rem;
             font-style: italic;
-            color: #78350f;
-            max-width: 800px;
+            color: #ffffff;
+            max-width: 900px;
             margin: 0 auto;
+            position: relative;
+            z-index: 1;
+            line-height: 1.8;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
         }
 
         .dashboard-card {
@@ -203,27 +222,27 @@
         class="absolute hidden bg-white rounded-md shadow-lg mt-1 w-48 z-50"
         id="counselor-dropdown-menu"
     >
-        <a href="{{ route('counselor.dashboard') }}" class="block px-4 py-2 text-gray-800 hover:bg-blue-100">
+        <a href="{{ route('counselor.dashboard') }}" class="block px-4 py-2 text-gray-800 hover:bg-gray-100">
             <i class="fas fa-tachometer-alt mr-2"></i> Dashboard
         </a>
 
-        <a href="{{ route('counselor.resources.index') }}" class="block px-4 py-2 text-gray-800 hover:bg-blue-100">
+        <a href="{{ route('counselor.resources.index') }}" class="block px-4 py-2 text-gray-800 hover:bg-gray-100">
             <i class="fas fa-box-open mr-2"></i> Resources
         </a>
 
-        <a href="{{ route('counselor.announcements.index') }}" class="block px-4 py-2 text-gray-800 hover:bg-blue-100">
+        <a href="{{ route('counselor.announcements.index') }}" class="block px-4 py-2 text-gray-800 hover:bg-gray-100">
             <i class="fas fa-bullhorn mr-2"></i> Manage Announcements
         </a>
 
-        <a href="{{ route('counselor.events.index') }}" class="block px-4 py-2 text-gray-800 hover:bg-blue-100">
+        <a href="{{ route('counselor.events.index') }}" class="block px-4 py-2 text-gray-800 hover:bg-gray-100">
             <i class="fas fa-calendar-alt mr-2"></i> Manage Events
         </a>
 
-        <a href="{{ route('counselor.calendar') }}" class="block px-4 py-2 text-gray-800 hover:bg-blue-100">
+        <a href="{{ route('counselor.calendar') }}" class="block px-4 py-2 text-gray-800 hover:bg-gray-100">
             <i class="fas fa-calendar mr-2"></i> Calendar
         </a>
 
-        <a href="{{ route('counselor.appointments') }}" class="block px-4 py-2 text-gray-800 hover:bg-blue-100">
+        <a href="{{ route('counselor.appointments') }}" class="block px-4 py-2 text-gray-800 hover:bg-gray-100">
             <i class="fas fa-list mr-2"></i> Appointments
         </a>
     </div>
@@ -245,31 +264,31 @@
         class="absolute hidden bg-white rounded-md shadow-lg mt-1 w-48 z-50"
         id="admin-dropdown-menu"
     >
-        <a href="{{ route('admin.dashboard') }}" class="block px-4 py-2 text-gray-800 hover:bg-blue-100">
+        <a href="{{ route('admin.dashboard') }}" class="block px-4 py-2 text-gray-800 hover:bg-gray-100">
             <i class="fas fa-tachometer-alt mr-2"></i> Dashboard
         </a>
 
-        <a href="{{ route('admin.users') }}" class="block px-4 py-2 text-gray-800 hover:bg-blue-100">
+        <a href="{{ route('admin.users') }}" class="block px-4 py-2 text-gray-800 hover:bg-gray-100">
             <i class="fas fa-users mr-2"></i> Manage Users
         </a>
 
-<a href="{{ route('admin.events') }}" class="block px-4 py-2 text-gray-800 hover:bg-blue-100">
+<a href="{{ route('admin.events') }}" class="block px-4 py-2 text-gray-800 hover:bg-gray-100">
             <i class="fas fa-calendar-alt mr-2"></i> Manage Events
         </a>
-        <a href="{{ route('admin.users.create') }}" class="block px-4 py-2 text-gray-800 hover:bg-blue-100">
+        <a href="{{ route('admin.users.create') }}" class="block px-4 py-2 text-gray-800 hover:bg-gray-100">
             <i class="fas fa-user-plus mr-2"></i> Create User
         </a>
 
-        <a href="{{ route('admin.students') }}" class="block px-4 py-2 text-gray-800 hover:bg-blue-100">
+        <a href="{{ route('admin.students') }}" class="block px-4 py-2 text-gray-800 hover:bg-gray-100">
             <i class="fas fa-user-graduate mr-2"></i> Students
         </a>
 
-        <a href="{{ route('admin.counselors') }}" class="block px-4 py-2 text-gray-800 hover:bg-blue-100">
+        <a href="{{ route('admin.counselors') }}" class="block px-4 py-2 text-gray-800 hover:bg-gray-100">
             <i class="fas fa-user-md mr-2"></i> Counselors
         </a>
 
         <!-- Remove or update the feedback route since it wasn't defined -->
-        <!-- <a href="{{ route('admin.feedback.index') }}" class="block px-4 py-2 text-gray-800 hover:bg-blue-100">
+        <!-- <a href="{{ route('admin.feedback.index') }}" class="block px-4 py-2 text-gray-800 hover:bg-gray-100">
             <i class="fas fa-comments mr-2"></i> Feedback
         </a> -->
     </div>
@@ -282,13 +301,13 @@
         Student <i class="fas fa-chevron-down ml-1 text-sm"></i>
     </button>
     <div class="absolute hidden bg-white rounded-md shadow-lg py-2 mt-1 w-48 z-50" id="student-dropdown-menu">
-        <a href="{{ route('student.show', Auth::user()->student->id) }}" class="block px-4 py-2 text-gray-800 hover:bg-blue-100">
+        <a href="{{ route('student.show', Auth::user()->student->id) }}" class="block px-4 py-2 text-gray-800 hover:bg-gray-100">
             <i class="fas fa-user mr-2"></i>My Profile
         </a>
-        <a href="{{ route('appointments.index') }}" class="block px-4 py-2 text-gray-800 hover:bg-blue-100">
+        <a href="{{ route('appointments.index') }}" class="block px-4 py-2 text-gray-800 hover:bg-gray-100">
             <i class="fas fa-calendar-plus mr-2"></i>My Appointments
         </a>
-        <a href="{{ route('student.events.my-registrations') }}" class="block px-4 py-2 text-gray-800 hover:bg-blue-100">
+        <a href="{{ route('student.events.my-registrations') }}" class="block px-4 py-2 text-gray-800 hover:bg-gray-100">
             <i class="fas fa-list-check mr-2"></i>My Registrations
         </a>
     </div>
@@ -303,8 +322,8 @@
                                     Services <i class="fas fa-chevron-down ml-1 text-sm"></i>
                                 </button>
                                 <div class="absolute hidden bg-white rounded-md shadow-lg py-2 mt-1 w-48 z-50" id="services-dropdown-menu">
-                                    <a href="{{ route('bap') }}" class="block px-4 py-2 text-gray-800 hover:bg-blue-100">Book an Appointment</a>
-                                    <a href="{{ route('mhc') }}" class="block px-4 py-2 text-gray-800 hover:bg-blue-100">Mental Health Corner</a>
+                                    <a href="{{ route('bap') }}" class="block px-4 py-2 text-gray-800 hover:bg-gray-100">Book an Appointment</a>
+                                    <a href="{{ route('mhc') }}" class="block px-4 py-2 text-gray-800 hover:bg-gray-100">Mental Health Corner</a>
                                 </div>
                             </div>
 
@@ -317,12 +336,12 @@
 <div class="flex items-center space-x-4">
     @if(Auth::user()->role === 'student')
         <a href="{{ route('appointments.index') }}"
-           class="bg-white text-blue-700 font-semibold py-2 px-4 rounded-lg flex items-center hover:bg-blue-50 transition">
+           class="bg-white text-[#820000] font-semibold py-2 px-4 rounded-lg flex items-center hover:bg-gray-100 transition">
             <i class="fas fa-calendar-check mr-2"></i> My Appointment
         </a>
     @elseif(Auth::user()->role === 'counselor')
         <a href="{{ route('counselor.appointments') }}"
-           class="bg-white text-blue-700 font-semibold py-2 px-4 rounded-lg flex items-center hover:bg-blue-50 transition">
+           class="bg-white text-[#820000] font-semibold py-2 px-4 rounded-lg flex items-center hover:bg-gray-100 transition">
             <i class="fas fa-calendar-check mr-2"></i> My Appointment
         </a>
     @endif
@@ -330,27 +349,27 @@
 
 
 
-                    <button class="text-white p-2 rounded-full hover:bg-blue-700 transition">
+                    <button class="text-white p-2 rounded-full hover:bg-white hover:bg-opacity-20 transition">
                         <i class="fas fa-bell"></i>
                     </button>
 
                     <!-- Profile Dropdown -->
                     <div class="dashboard-profile-dropdown">
-                        <button class="text-white p-2 rounded-full hover:bg-blue-700 transition" id="profile-dropdown-btn">
+                        <button class="text-white p-2 rounded-full hover:bg-white hover:bg-opacity-20 transition" id="profile-dropdown-btn">
                             <i class="fas fa-user"></i>
                         </button>
                         <div class="dashboard-profile-dropdown-content hidden" id="profile-dropdown-menu">
                             <div class="mb-3 border-b pb-2">
                                 <div class="font-semibold text-gray-800">{{ Auth::user()->first_name }} {{ Auth::user()->last_name }}</div>
                                 <div class="text-sm text-gray-600">{{ Auth::user()->email }}</div>
-                                <div class="text-xs text-blue-600 capitalize">Role: {{ Auth::user()->role }}</div>
+                                <div class="text-xs text-[#820000] capitalize">Role: {{ Auth::user()->role }}</div>
                             </div>
-                            <a href="{{ route('profile.edit') }}" class="block py-2 text-gray-700 hover:text-blue-600">
+                            <a href="{{ route('profile.edit') }}" class="block py-2 text-gray-700 hover:text-[#820000]">
                                 <i class="fas fa-user-circle mr-2"></i> Profile
                             </a>
                             <form method="POST" action="{{ route('logout') }}" class="inline">
                                 @csrf
-                                <button type="submit" class="w-full text-left block py-2 text-gray-700 hover:text-blue-600">
+                                <button type="submit" class="w-full text-left block py-2 text-gray-700 hover:text-[#820000]">
                                     <i class="fas fa-sign-out-alt mr-2"></i> Logout
                                 </button>
                             </form>
@@ -372,86 +391,128 @@
         <section class="dashboard-quote-section">
             <div class="container mx-auto px-6">
                 <blockquote class="dashboard-quote-text">
-                    "Make it a daily practice to purposefully look for joy — and when you find it, take a moment, inhale it, treasure it, and take it with you."
+                    <i class="fas fa-quote-left text-[#820000] mr-3"></i>
+                    Make it a daily practice to purposefully look for joy — and when you find it, take a moment, inhale it, treasure it, and take it with you.
+                    <i class="fas fa-quote-right text-[#820000] ml-3"></i>
                 </blockquote>
+                <p class="text-gray-400 mt-4 text-sm">— Office of Guidance and Counseling</p>
             </div>
         </section>
 
         <!-- Dashboard Content -->
-        <div class="container mx-auto px-6 py-8">
-            <div class="bg-white rounded-lg shadow-sm p-6 mb-8">
-                <h2 class="text-2xl font-bold text-gray-800 mb-2">Welcome, {{ Auth::user()->first_name }}!</h2>
-             
+        <div class="min-h-screen bg-gray-50">
+            <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
+                
+                {{-- Welcome Section --}}
+                <div class="bg-gradient-to-r from-[#820000] to-[#5a0000] rounded-xl shadow-lg p-8 mb-8 text-white">
+                    <h2 class="text-3xl font-bold mb-2">Welcome back, {{ Auth::user()->first_name }}!</h2>
+                    <p class="text-red-100 text-lg">
+                        @if(Auth::user()->role === 'student')
+                            Your mental health and well-being matter. We're here to support you.
+                        @elseif(Auth::user()->role === 'counselor')
+                            Ready to make a difference in students' lives today.
+                        @elseif(Auth::user()->role === 'admin')
+                            Manage and oversee the guidance and counseling system.
+                        @endif
+                    </p>
+                </div>
 
-                <!-- Role-specific content -->
+                {{-- Quick Actions for Students --}}
                 @if(Auth::user()->role === 'student')
-                <div class="mt-6 p-4 bg-blue-50 rounded-lg">
-                    <h3 class="text-lg font-semibold text-blue-800">Student Dashboard</h3>
-                    <p class="mt-2 text-blue-600">Welcome to your student portal! Here you can book appointments, access resources, and more.</p>
-                </div>
-                @elseif(Auth::user()->role === 'counselor')
-                <div class="mt-6 p-4 bg-green-50 rounded-lg">
-                    <h3 class="text-lg font-semibold text-green-800">Counselor Dashboard</h3>
-                    <p class="mt-2 text-green-600">Welcome to your counseling portal! Manage appointments and access counselor resources.</p>
-                </div>
-                @elseif(Auth::user()->role === 'admin')
-                <div class="mt-6 p-4 bg-purple-50 rounded-lg">
-                    <h3 class="text-lg font-semibold text-purple-800">Admin Dashboard</h3>
-                    <p class="mt-2 text-purple-600">Welcome to the administration panel! Manage users, appointments, and system settings.</p>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                    <a href="{{ route('appointments.create') }}" class="bg-white rounded-lg shadow-sm hover:shadow-lg transition transform hover:-translate-y-1 p-6 border-t-4 border-[#820000]">
+                        <div class="flex items-center gap-4">
+                            <div class="p-4 bg-gradient-to-br from-[#820000] to-[#5a0000] rounded-lg">
+                                <i class="fas fa-calendar-plus text-white text-3xl"></i>
+                            </div>
+                            <div>
+                                <h3 class="font-bold text-gray-900 text-lg">Book Appointment</h3>
+                                <p class="text-sm text-gray-600">Schedule a counseling session</p>
+                            </div>
+                        </div>
+                    </a>
+
+                    <a href="{{ route('appointments.index') }}" class="bg-white rounded-lg shadow-sm hover:shadow-lg transition transform hover:-translate-y-1 p-6 border-t-4 border-[#F8650C]">
+                        <div class="flex items-center gap-4">
+                            <div class="p-4 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg">
+                                <i class="fas fa-calendar-check text-white text-3xl"></i>
+                            </div>
+                            <div>
+                                <h3 class="font-bold text-gray-900 text-lg">My Appointments</h3>
+                                <p class="text-sm text-gray-600">View your scheduled sessions</p>
+                            </div>
+                        </div>
+                    </a>
+
+                    <a href="{{ route('feedback') }}" class="bg-white rounded-lg shadow-sm hover:shadow-lg transition transform hover:-translate-y-1 p-6 border-t-4 border-green-500">
+                        <div class="flex items-center gap-4">
+                            <div class="p-4 bg-gradient-to-br from-green-500 to-green-600 rounded-lg">
+                                <i class="fas fa-comment-dots text-white text-3xl"></i>
+                            </div>
+                            <div>
+                                <h3 class="font-bold text-gray-900 text-lg">Give Feedback</h3>
+                                <p class="text-sm text-gray-600">Share your experience</p>
+                            </div>
+                        </div>
+                    </a>
                 </div>
                 @endif
-            </div>
 
             <!-- Services Cards -->
             @php
                 $services = \App\Models\Service::active()->ordered()->get();
             @endphp
             
-@if(in_array(Auth::user()->role, ['student', 'counselor', 'admin']))
-
-    @if($services->isNotEmpty())
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
-            @foreach($services as $service)
-                <div class="dashboard-card bg-white rounded-xl shadow-md overflow-hidden">
-                    
-                    <img src="{{ $service->image_url }}" 
-                         alt="{{ $service->title }}" 
-                         class="w-full h-48 object-cover">
-
-                    <div class="p-6">
-                        <h3 class="text-xl font-bold text-gray-800 mb-3">
-                            {{ $service->title }}
+            @if(in_array(Auth::user()->role, ['student', 'counselor', 'admin']))
+                @if($services->isNotEmpty())
+                    <div class="mb-8">
+                        <h3 class="text-2xl font-bold text-gray-900 mb-6 flex items-center">
+                            <i class="fas fa-hands-helping text-[#820000] mr-3"></i>Our Services
                         </h3>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                            @foreach($services as $service)
+                                <div class="bg-white rounded-xl shadow-sm hover:shadow-lg transition transform hover:-translate-y-1 overflow-hidden border-t-4 border-[#820000]">
+                                    
+                                    <img src="{{ $service->image_url }}" 
+                                         alt="{{ $service->title }}" 
+                                         class="w-full h-48 object-cover">
 
-                        <p class="text-gray-600 mb-4">
-                            {{ $service->description }}
-                        </p>
+                                    <div class="p-6">
+                                        <h3 class="text-xl font-bold text-gray-900 mb-3">
+                                            {{ $service->title }}
+                                        </h3>
 
-                        {{-- Only Student Can See Button --}}
-                        @if(Auth::user()->role === 'student')
-                            @if($service->route_name)
-                                <a href="{{ route($service->route_name) }}" 
-                                   class="dashboard-btn bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition inline-block">
-                                    See more
-                                </a>
-                            @else
-                                <button class="dashboard-btn bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition">
-                                    See more
-                                </button>
-                            @endif
-                        @endif
+                                        <p class="text-gray-600 mb-4 line-clamp-3">
+                                            {{ $service->description }}
+                                        </p>
 
+                                        {{-- Only Student Can See Button --}}
+                                        @if(Auth::user()->role === 'student')
+                                            @if($service->route_name)
+                                                <a href="{{ route($service->route_name) }}" 
+                                                   class="inline-flex items-center px-4 py-2 bg-gradient-to-r from-[#820000] to-[#5a0000] text-white font-medium rounded-lg hover:shadow-md transition">
+                                                    Learn More <i class="fas fa-arrow-right ml-2"></i>
+                                                </a>
+                                            @else
+                                                <button class="inline-flex items-center px-4 py-2 bg-gradient-to-r from-[#820000] to-[#5a0000] text-white font-medium rounded-lg hover:shadow-md transition">
+                                                    Learn More <i class="fas fa-arrow-right ml-2"></i>
+                                                </button>
+                                            @endif
+                                        @endif
+
+                                    </div>
+                                </div>
+                            @endforeach
+                        </div>
                     </div>
-                </div>
-            @endforeach
-        </div>
-    @endif
-
-@endif
+                @endif
+            @endif
 
      <!-- Announcements Section -->
 <section class="mb-12">
-    <h2 class="text-2xl font-bold text-gray-800 mb-6">Announcements</h2>
+    <h2 class="text-2xl font-bold text-gray-800 mb-6 flex items-center">
+        <i class="fas fa-bullhorn text-[#820000] mr-3"></i>Announcements
+    </h2>
 
     @php
         use Carbon\Carbon;
@@ -466,11 +527,11 @@
             ->get();
     @endphp
 
-    <div class="bg-white rounded-xl shadow-md p-6">
+    <div class="bg-white rounded-xl shadow-lg p-6 border-t-4 border-[#820000]">
         @if($announcements->isEmpty())
-            <div class="text-center py-8">
-                <i class="fas fa-bullhorn text-4xl text-gray-300 mb-4"></i>
-                <p class="text-gray-500">No current announcements at this time.</p>
+            <div class="text-center py-12">
+                <i class="fas fa-bullhorn text-5xl text-gray-300 mb-4"></i>
+                <p class="text-gray-500 text-lg">No current announcements at this time.</p>
             </div>
         @else
             <div class="dashboard-announcements-container">
@@ -487,12 +548,12 @@
                                         </span>
                                     @else
                                         @foreach($announcement->colleges->take(3) as $college)
-                                            <span class="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full font-medium">
+                                            <span class="bg-gray-100 text-[#820000] text-xs px-2 py-1 rounded-full font-medium">
                                                 <i class="fas fa-university mr-1"></i> {{ $college->name }}
                                             </span>
                                         @endforeach
                                         @if($announcement->colleges->count() > 3)
-                                            <span class="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full font-medium">
+                                            <span class="bg-gray-100 text-[#820000] text-xs px-2 py-1 rounded-full font-medium">
                                                 +{{ $announcement->colleges->count() - 3 }} more
                                             </span>
                                         @endif
@@ -555,16 +616,16 @@
             @if($announcements->count() > 1)
                 <div class="flex justify-between items-center mt-6 pt-4 border-t border-gray-200">
                     <!-- Announcement Counter -->
-                    <div class="text-sm text-gray-500">
-                        Announcement <span id="current-announcement">1</span> of {{ $announcements->count() }}
+                    <div class="text-sm text-gray-600 font-medium">
+                        <i class="fas fa-list mr-2"></i>Announcement <span id="current-announcement">1</span> of {{ $announcements->count() }}
                     </div>
 
                     <!-- Navigation Buttons -->
                     <div class="flex space-x-2">
-                        <button class="dashboard-prev bg-blue-600 text-white p-3 rounded-full hover:bg-blue-700 transition shadow-md">
+                        <button class="dashboard-prev bg-gradient-to-r from-[#820000] to-[#5a0000] text-white p-3 rounded-full hover:shadow-lg transition transform hover:scale-110">
                             <i class="fas fa-chevron-left"></i>
                         </button>
-                        <button class="dashboard-next bg-blue-600 text-white p-3 rounded-full hover:bg-blue-700 transition shadow-md">
+                        <button class="dashboard-next bg-gradient-to-r from-[#820000] to-[#5a0000] text-white p-3 rounded-full hover:shadow-lg transition transform hover:scale-110">
                             <i class="fas fa-chevron-right"></i>
                         </button>
                     </div>
@@ -579,7 +640,9 @@
 
             <!-- Staff Directory Section -->
             <section class="mb-12">
-                <h2 class="text-2xl font-bold text-gray-800 mb-2">Office of Guidance and Counseling</h2>
+                <h2 class="text-2xl font-bold text-gray-800 mb-2 flex items-center">
+                    <i class="fas fa-users text-[#820000] mr-3"></i>Office of Guidance and Counseling
+                </h2>
                 <p class="text-gray-600 mb-6">Directory</p>
 
                 <!-- Head of Office -->
@@ -590,20 +653,24 @@
                 @endphp
 
                 @if($headCounselor)
-                <div class="bg-white rounded-xl shadow-md p-6 mb-8 flex flex-col md:flex-row items-center">
-                    <div class="w-32 h-32 bg-gray-200 rounded-full overflow-hidden mb-4 md:mb-0 md:mr-6">
+                <div class="bg-white rounded-xl shadow-lg p-8 mb-8 flex flex-col md:flex-row items-center border-t-4 border-[#820000] hover:shadow-xl transition">
+                    <div class="w-32 h-32 bg-gradient-to-br from-[#820000] to-[#5a0000] rounded-full overflow-hidden mb-4 md:mb-0 md:mr-6 shadow-lg">
                         <img src="https://images.unsplash.com/photo-1560250097-0b93528c311a?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80" alt="Head Counselor" class="w-full h-full object-cover">
                     </div>
                     <div>
-                        <h3 class="text-xl font-bold text-gray-800">
+                        <h3 class="text-2xl font-bold text-gray-800">
                             {{ $headCounselor->user->first_name }}
                             {{ $headCounselor->user->middle_name ? $headCounselor->user->middle_name . ' ' : '' }}
                             {{ $headCounselor->user->last_name }}
                         </h3>
-                        <p class="text-gray-600">Head of the Office of Guidance and Counseling</p>
+                        <p class="text-[#820000] font-semibold text-lg">Head of the Office of Guidance and Counseling</p>
                         <p class="text-gray-600">{{ $headCounselor->position }} • {{ $headCounselor->credentials }}</p>
-                        <p class="text-gray-600">{{ $headCounselor->college->name ?? 'N/A' }}</p>
+                        <p class="text-gray-600">
+                            <i class="fas fa-university mr-2"></i>{{ $headCounselor->college->name ?? 'N/A' }}
+                        </p>
                         <p class="text-gray-600 mt-2">
+                            <i class="fas fa-envelope mr-2"></i>{{ $headCounselor->user->email }}
+                        </p>
                             As the Head Counselor, {{ $headCounselor->user->first_name }} provides leadership and direction
                             for all guidance and counseling services. With credentials in {{ $headCounselor->credentials }},
                             {{ $headCounselor->user->first_name }} ensures the office delivers comprehensive support to students.

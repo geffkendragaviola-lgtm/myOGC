@@ -12,7 +12,7 @@
                 </div>
                 <div>
                     <a href="{{ route('admin.faqs.create') }}"
-                       class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition flex items-center">
+                       class="bg-[#F00000] text-white px-4 py-2 rounded-lg hover:bg-[#D40000] transition flex items-center">
                         <i class="fas fa-plus mr-2"></i> Add FAQ
                     </a>
                 </div>
@@ -27,7 +27,7 @@
                         <div class="relative">
                             <input type="text" id="search" name="search" value="{{ request('search') }}"
                                    placeholder="Search question, answer, or category..."
-                                   class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
+                                   class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#F00000] focus:border-[#F00000] transition">
                             <div class="absolute inset-y-0 left-0 pl-3 flex items-center">
                                 <i class="fas fa-search text-gray-400"></i>
                             </div>
@@ -37,7 +37,7 @@
                     <div>
                         <label for="status" class="block text-sm font-medium text-gray-700 mb-2">Status</label>
                         <select id="status" name="status"
-                                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
+                                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#F00000] focus:border-[#F00000] transition">
                             <option value="all" {{ request('status', 'all') === 'all' ? 'selected' : '' }}>All</option>
                             <option value="active" {{ request('status') === 'active' ? 'selected' : '' }}>Active</option>
                             <option value="inactive" {{ request('status') === 'inactive' ? 'selected' : '' }}>Inactive</option>
@@ -45,7 +45,7 @@
                     </div>
 
                     <div class="flex items-end">
-                        <button type="submit" class="w-full md:w-auto px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">
+                        <button type="submit" class="w-full md:w-auto px-4 py-2 bg-[#F00000] text-white rounded-lg hover:bg-[#D40000] transition">
                             <i class="fas fa-filter mr-2"></i>Filter
                         </button>
                     </div>
@@ -60,7 +60,7 @@
                     <h3 class="text-xl font-semibold text-gray-600 mb-2">No FAQs Yet</h3>
                     <p class="text-gray-500">Create your first FAQ to help users.</p>
                     <a href="{{ route('admin.faqs.create') }}"
-                       class="inline-block mt-4 bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition">
+                       class="inline-block mt-4 bg-[#F00000] text-white px-6 py-2 rounded-lg hover:bg-[#D40000] transition">
                         Create FAQ
                     </a>
                 </div>
@@ -94,7 +94,7 @@
                                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{{ $faq->order }}</td>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                         <div class="flex space-x-2">
-                                            <a href="{{ route('admin.faqs.edit', $faq) }}" class="text-blue-600 hover:text-blue-900 transition" title="Edit">
+                                            <a href="{{ route('admin.faqs.edit', $faq) }}" class="text-[#F00000] hover:text-[#820000] transition" title="Edit">
                                                 <i class="fas fa-edit"></i>
                                             </a>
                                             <form action="{{ route('admin.faqs.destroy', $faq) }}" method="POST" class="inline">

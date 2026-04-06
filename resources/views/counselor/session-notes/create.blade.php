@@ -23,12 +23,12 @@
     <input type="hidden" name="appointment_id" value="{{ $appointment->id }}">
 
     <!-- Add a visual indicator that this is for a specific appointment -->
-    <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+    <div class="bg-[#FFF9E6] border border-[#FFE100] rounded-lg p-4 mb-6">
         <div class="flex items-center">
-            <i class="fas fa-calendar-alt text-blue-500 mr-3"></i>
+            <i class="fas fa-calendar-alt text-[#F8650C] mr-3"></i>
             <div>
-                <h4 class="font-semibold text-blue-800">Creating notes for appointment on {{ $appointment->appointment_date->format('F j, Y') }}</h4>
-                <p class="text-blue-600 text-sm">Time: {{ \Carbon\Carbon::parse($appointment->start_time)->format('g:i A') }} - {{ \Carbon\Carbon::parse($appointment->end_time)->format('g:i A') }}</p>
+                <h4 class="font-semibold text-[#820000]">Creating notes for appointment on {{ $appointment->appointment_date->format('F j, Y') }}</h4>
+                <p class="text-[#F00000] text-sm">Time: {{ \Carbon\Carbon::parse($appointment->start_time)->format('g:i A') }} - {{ \Carbon\Carbon::parse($appointment->end_time)->format('g:i A') }}</p>
             </div>
         </div>
     </div>
@@ -58,7 +58,7 @@
                                    name="session_date"
                                    id="session_date"
                                    value="{{ old('session_date', $appointment ? $appointment->appointment_date->format('Y-m-d') : now()->format('Y-m-d')) }}"
-                                   class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                   class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#F00000] focus:border-transparent"
                                    required>
                             @error('session_date')
                                 <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
@@ -70,7 +70,7 @@
                             <label for="session_type" class="block text-sm font-medium text-gray-700 mb-2">Session Type *</label>
                             <select name="session_type"
                                     id="session_type"
-                                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#F00000] focus:border-transparent"
                                     required>
                                 <option value="">Select session type</option>
                                 @foreach($sessionTypes as $value => $label)
@@ -89,7 +89,7 @@
                             <label for="mood_level" class="block text-sm font-medium text-gray-700 mb-2">Student's Mood Level</label>
                             <select name="mood_level"
                                     id="mood_level"
-                                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#F00000] focus:border-transparent">
                                 <option value="">Select mood level</option>
                                 @foreach($moodLevels as $value => $label)
                                     <option value="{{ $value }}" {{ old('mood_level') == $value ? 'selected' : '' }}>
@@ -109,7 +109,7 @@
                                    id="requires_follow_up"
                                    value="1"
                                    {{ old('requires_follow_up') ? 'checked' : '' }}
-                                   class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                                   class="h-4 w-4 text-[#F00000] focus:ring-[#F00000] border-gray-300 rounded">
                             <label for="requires_follow_up" class="ml-2 block text-sm text-gray-700">
                                 Schedule follow-up appointment
                             </label>
@@ -119,8 +119,8 @@
                     <!-- Follow-up Appointment Scheduling -->
 <!-- Follow-up Appointment Scheduling -->
 <div id="followup_appointment_container" class="mt-6 hidden">
-    <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
-        <h4 class="text-lg font-semibold text-blue-800 mb-3">
+    <div class="bg-[#FFF9E6] border border-[#FFE100] rounded-lg p-4">
+        <h4 class="text-lg font-semibold text-[#820000] mb-3">
             <i class="fas fa-calendar-plus mr-2"></i>Schedule Follow-up Appointment
         </h4>
  <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-3 mb-4">
@@ -138,24 +138,24 @@
 
         <!-- Counselor Selection (auto-filled) -->
         <div class="mb-4">
-            <label class="block text-sm font-medium text-blue-700 mb-2">Counselor</label>
-            <div class="p-3 bg-white border border-blue-300 rounded-lg">
-                <p class="text-blue-800 font-medium">
+            <label class="block text-sm font-medium text-[#D40000] mb-2">Counselor</label>
+            <div class="p-3 bg-white border border-[#FFE100] rounded-lg">
+                <p class="text-[#820000] font-medium">
                     {{ Auth::user()->counselor->user->first_name }} {{ Auth::user()->counselor->user->last_name }}
                 </p>
-                <p class="text-blue-600 text-sm">{{ Auth::user()->counselor->position }}</p>
+                <p class="text-[#F00000] text-sm">{{ Auth::user()->counselor->position }}</p>
             </div>
         </div>
 
                             <!-- Follow-up Date -->
                             <div class="mb-4">
-                                <label for="followup_appointment_date" class="block text-sm font-medium text-blue-700 mb-2">Follow-up Date *</label>
+                                <label for="followup_appointment_date" class="block text-sm font-medium text-[#D40000] mb-2">Follow-up Date *</label>
                                 <input type="date"
                                        name="followup_appointment_date"
                                        id="followup_appointment_date"
                                        value="{{ old('followup_appointment_date') }}"
                                        min="{{ date('Y-m-d', strtotime('+1 day')) }}"
-                                       class="w-full px-3 py-2 border border-blue-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                                       class="w-full px-3 py-2 border border-[#FFE100] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#F00000] focus:border-[#F00000]">
                                 @error('followup_appointment_date')
                                     <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                                 @enderror
@@ -163,26 +163,26 @@
 
                             <!-- Available Time Slots -->
                             <div class="mb-4">
-                                <label class="block text-sm font-medium text-blue-700 mb-2">Available Time Slots</label>
+                                <label class="block text-sm font-medium text-[#D40000] mb-2">Available Time Slots</label>
 
                                 <!-- Legend -->
                                 <div class="flex flex-wrap gap-3 mb-3 text-xs">
                                     <div class="flex items-center">
                                         <div class="w-3 h-3 bg-green-100 border-2 border-green-500 rounded mr-1"></div>
-                                        <span class="text-blue-600">Available</span>
+                                        <span class="text-[#F00000]">Available</span>
                                     </div>
                                     <div class="flex items-center">
                                         <div class="w-3 h-3 bg-gray-100 border-2 border-gray-400 rounded mr-1"></div>
-                                        <span class="text-blue-600">Booked</span>
+                                        <span class="text-[#F00000]">Booked</span>
                                     </div>
                                     <div class="flex items-center">
-                                        <div class="w-3 h-3 bg-blue-100 border-2 border-blue-500 rounded mr-1"></div>
-                                        <span class="text-blue-600">Selected</span>
+                                        <div class="w-3 h-3 bg-gray-100 border-2 border-[#F00000] rounded mr-1"></div>
+                                        <span class="text-[#F00000]">Selected</span>
                                     </div>
                                 </div>
 
-                                <div id="followup_time_slots" class="grid grid-cols-2 gap-2 max-h-40 overflow-y-auto p-2 bg-white border border-blue-300 rounded-lg">
-                                    <div class="col-span-2 text-center text-blue-500 text-sm py-4">
+                                <div id="followup_time_slots" class="grid grid-cols-2 gap-2 max-h-40 overflow-y-auto p-2 bg-white border border-[#FFE100] rounded-lg">
+                                    <div class="col-span-2 text-center text-[#F8650C] text-sm py-4">
                                         Select a follow-up date to see available time slots
                                     </div>
                                 </div>
@@ -194,11 +194,11 @@
 
                             <!-- Follow-up Concern (pre-filled from current session) -->
                             <div>
-                                <label for="followup_concern" class="block text-sm font-medium text-blue-700 mb-2">Follow-up Concern *</label>
+                                <label for="followup_concern" class="block text-sm font-medium text-[#D40000] mb-2">Follow-up Concern *</label>
                                 <textarea name="followup_concern"
                                           id="followup_concern"
                                           rows="3"
-                                          class="w-full px-3 py-2 border border-blue-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                          class="w-full px-3 py-2 border border-[#FFE100] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#F00000] focus:border-[#F00000]"
                                           placeholder="Brief description of what to discuss in the follow-up session...">{{ old('followup_concern', 'Follow-up session') }}</textarea>
                                 @error('followup_concern')
                                     <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
@@ -212,8 +212,8 @@
                                        id="auto_approve_followup"
                                        value="1"
                                        {{ old('auto_approve_followup', true) ? 'checked' : '' }}
-                                       class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-blue-300 rounded">
-                                <label for="auto_approve_followup" class="ml-2 block text-sm text-blue-700">
+                                       class="h-4 w-4 text-[#F00000] focus:ring-[#F00000] border-[#FFE100] rounded">
+                                <label for="auto_approve_followup" class="ml-2 block text-sm text-[#D40000]">
                                     Auto-approve this follow-up appointment
                                 </label>
                             </div>
@@ -226,7 +226,7 @@
                         <textarea name="notes"
                                   id="notes"
                                   rows="8"
-                                  class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                  class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#F00000] focus:border-transparent"
                                   placeholder="Document the session details, topics discussed, observations, and any important insights..."
                                   required>{{ old('notes') }}</textarea>
                         @error('notes')
@@ -241,7 +241,7 @@
                         <textarea name="follow_up_actions"
                                   id="follow_up_actions"
                                   rows="4"
-                                  class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                  class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#F00000] focus:border-transparent"
                                   placeholder="Any recommended actions, homework, or follow-up tasks for the student...">{{ old('follow_up_actions') }}</textarea>
                         @error('follow_up_actions')
                             <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
@@ -254,7 +254,7 @@
                             <h3 class="text-sm font-medium text-gray-700 mb-3">Recent Appointments with This Student</h3>
                             <div class="space-y-2 max-h-40 overflow-y-auto">
                                 @foreach($recentAppointments as $recentAppt)
-                                    <div class="text-xs text-gray-600 border-l-2 border-blue-500 pl-2">
+                                    <div class="text-xs text-gray-600 border-l-2 border-[#F00000] pl-2">
                                         <strong>{{ $recentAppt->appointment_date->format('M j, Y') }}</strong>:
                                         {{ Str::limit($recentAppt->concern, 80) }}
                                         @if($recentAppt->sessionNotes->isNotEmpty())
@@ -275,7 +275,7 @@
                             Cancel
                         </a>
                         <button type="submit"
-                                class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition flex items-center">
+                                class="bg-[#F00000] text-white px-6 py-2 rounded-lg hover:bg-[#D40000] transition flex items-center">
                             <i class="fas fa-save mr-2"></i>
                             Save Session Notes
                         </button>
@@ -322,14 +322,14 @@
                 const date = followupDateInput.value;
 
                 if (!date) {
-                    followupTimeSlots.innerHTML = '<div class="col-span-2 text-center text-blue-500 text-sm py-4">Select a follow-up date to see available time slots</div>';
+                    followupTimeSlots.innerHTML = '<div class="col-span-2 text-center text-[#F8650C] text-sm py-4">Select a follow-up date to see available time slots</div>';
                     followupSelectedTime.value = '';
                     currentFollowupSelectedSlot = null;
                     return;
                 }
 
                 // Show loading
-                followupTimeSlots.innerHTML = '<div class="col-span-2 text-center text-blue-500 text-sm py-4">Loading available slots...</div>';
+                followupTimeSlots.innerHTML = '<div class="col-span-2 text-center text-[#F8650C] text-sm py-4">Loading available slots...</div>';
                 followupSelectedTime.value = '';
                 currentFollowupSelectedSlot = null;
 
@@ -396,13 +396,13 @@
                                 slotElement.addEventListener('click', function() {
                                     // Remove selection from all available slots
                                     followupTimeSlots.querySelectorAll('.time-slot.available').forEach(s => {
-                                        s.classList.remove('selected', 'border-blue-500', 'bg-blue-100', 'text-blue-700');
+                                        s.classList.remove('selected', 'border-[#F00000]', 'bg-gray-100', 'text-[#D40000]');
                                         s.classList.add('border-green-500', 'bg-green-50', 'text-gray-700');
                                     });
 
                                     // Select this slot
                                     this.classList.remove('border-green-500', 'bg-green-50', 'text-gray-700');
-                                    this.classList.add('selected', 'border-blue-500', 'bg-blue-100', 'text-blue-700');
+                                    this.classList.add('selected', 'border-[#F00000]', 'bg-gray-100', 'text-[#D40000]');
 
                                     followupSelectedTime.value = slot.start;
                                     currentFollowupSelectedSlot = slot.start;

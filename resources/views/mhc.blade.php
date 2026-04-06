@@ -12,7 +12,7 @@
         }
 
         .mhc-navbar {
-            background: linear-gradient(90deg, #1e40af 0%, #3b82f6 100%);
+            background: linear-gradient(90deg, #F8650C 0%, #FFC917 100%);
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
         }
 
@@ -49,7 +49,7 @@
 
         .mhc-category-icon {
             font-size: 2rem;
-            color: #3b82f6;
+            color: #FFC917;
         }
 
         .mhc-faq-item {
@@ -149,34 +149,34 @@
                                 Services <i class="fas fa-chevron-down ml-1 text-sm"></i>
                             </button>
                             <div class="absolute hidden group-hover:block bg-white rounded-md shadow-lg py-2 mt-1 w-48 z-10">
-                                <a href="{{ route('bap') }}" class="block px-4 py-2 text-gray-800 hover:bg-blue-100">Book an Appointment</a>
-                                <a href="{{ route('mhc') }}" class="block px-4 py-2 text-blue-600 bg-blue-50 font-semibold">Mental Health Corner</a>
+                                <a href="{{ route('bap') }}" class="block px-4 py-2 text-gray-800 hover:bg-gray-100">Book an Appointment</a>
+                                <a href="{{ route('mhc') }}" class="block px-4 py-2 text-[#F00000] bg-[#FFF9E6] font-semibold">Mental Health Corner</a>
                             </div>
                         </div>
                     </div>
                 </div>
 
                 <div class="flex items-center space-x-4">
-                    <button class="text-white p-2 rounded-full hover:bg-blue-700 transition">
+                    <button class="text-white p-2 rounded-full hover:bg-[#D40000] transition">
                         <i class="fas fa-bell"></i>
                     </button>
 
                     <div class="mhc-profile-dropdown">
-                        <button class="text-white p-2 rounded-full hover:bg-blue-700 transition">
+                        <button class="text-white p-2 rounded-full hover:bg-[#D40000] transition">
                             <i class="fas fa-user"></i>
                         </button>
                         <div class="mhc-profile-dropdown-content hidden">
                             <div class="mb-3 border-b pb-2">
                                 <div class="font-semibold text-gray-800">{{ Auth::user()->first_name }} {{ Auth::user()->last_name }}</div>
                                 <div class="text-sm text-gray-600">{{ Auth::user()->email }}</div>
-                                <div class="text-xs text-blue-600 capitalize">Role: {{ Auth::user()->role }}</div>
+                                <div class="text-xs text-[#F00000] capitalize">Role: {{ Auth::user()->role }}</div>
                             </div>
-                            <a href="" class="block py-2 text-gray-700 hover:text-blue-600">
+                            <a href="" class="block py-2 text-gray-700 hover:text-[#F00000]">
                                 <i class="fas fa-user-circle mr-2"></i> Profile
                             </a>
                             <form method="POST" action="{{ route('logout') }}" class="border-t pt-2 mt-2">
                                 @csrf
-                                <button type="submit" class="w-full text-left block py-2 text-gray-700 hover:text-blue-600">
+                                <button type="submit" class="w-full text-left block py-2 text-gray-700 hover:text-[#F00000]">
                                     <i class="fas fa-sign-out-alt mr-2"></i> Logout
                                 </button>
                             </form>
@@ -201,7 +201,7 @@
                 <section class="mb-12">
                     <div class="flex justify-between items-center mb-6">
                         <h2 class="text-2xl font-bold text-gray-800">Upcoming Events</h2>
-                        <a href="{{ route('student.events.available') }}" class="text-blue-600 hover:text-blue-800 font-semibold">View All Events</a>
+                        <a href="{{ route('student.events.available') }}" class="text-[#F00000] hover:text-[#820000] font-semibold">View All Events</a>
                     </div>
 
                     @php
@@ -222,7 +222,7 @@
                     @if(!$student)
                         <div class="bg-white rounded-xl shadow-md p-8 text-center">
                             <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-4">
-                                <i class="fas fa-exclamation-triangle text-yellow-600 text-2xl mb-2"></i>
+                                <i class="fas fa-exclamation-triangle text-[#FFC917] text-2xl mb-2"></i>
                                 <p class="text-yellow-800 font-semibold">Complete Your Profile</p>
                                 <p class="text-yellow-700 text-sm mt-1">Please complete your student profile to view and register for events.</p>
                             </div>
@@ -250,7 +250,7 @@
                                     $isRequiredAutoRegister = $isRequiredEvent && !$isRegistered;
                                 @endphp
 
-                                <div class="mhc-event-card bg-white rounded-xl shadow-md overflow-hidden border-l-4 {{ $isRequiredEvent ? 'border-red-500' : 'border-blue-500' }}">
+                                <div class="mhc-event-card bg-white rounded-xl shadow-md overflow-hidden border-l-4 {{ $isRequiredEvent ? 'border-red-500' : 'border-[#F00000]' }}">
 
                                     <!-- Event Image Header -->
                                     <div class="relative h-48 bg-gray-200 overflow-hidden">
@@ -265,7 +265,7 @@
                                         <div class="absolute bottom-0 left-0 right-0 p-4 text-white">
                                             <div class="flex justify-between items-start mb-2">
                                                 <div class="flex flex-wrap gap-2">
-                                                    <span class="inline-block bg-blue-600/90 text-white text-xs px-2 py-1 rounded-full capitalize backdrop-blur-sm">
+                                                    <span class="inline-block bg-[#F00000]/90 text-white text-xs px-2 py-1 rounded-full capitalize backdrop-blur-sm">
                                                         {{ $event->type }}
                                                     </span>
                                                     @if($isRequiredEvent)
@@ -279,7 +279,7 @@
                                                         Registered
                                                     </span>
                                                 @elseif($isRequiredEvent)
-                                                    <span class="status-badge bg-blue-600/90 backdrop-blur-sm text-white">
+                                                    <span class="status-badge bg-[#F00000]/90 backdrop-blur-sm text-white">
                                                         Required
                                                     </span>
                                                 @else
@@ -299,14 +299,14 @@
                                                     <i class="fas fa-globe mr-1"></i> All Colleges
                                                 </span>
                                             @else
-                                                <span class="mhc-college-badge text-xs backdrop-blur-sm bg-blue-600/90">
+                                                <span class="mhc-college-badge text-xs backdrop-blur-sm bg-[#F00000]/90">
                                                     <i class="fas fa-university mr-1"></i> {{ $event->colleges->count() }} Colleges
                                                 </span>
                                             @endif
                                         </div>
 
                                         <!-- Date Badge -->
-                                        <div class="absolute top-3 left-3 bg-blue-600/90 text-white text-xs px-2 py-1 rounded-full backdrop-blur-sm">
+                                        <div class="absolute top-3 left-3 bg-[#F00000]/90 text-white text-xs px-2 py-1 rounded-full backdrop-blur-sm">
                                             {{ \Carbon\Carbon::parse($event->event_start_date)->format('M d') }} - {{ \Carbon\Carbon::parse($event->event_end_date)->format('M d') }}
                                         </div>
                                     </div>
@@ -325,13 +325,13 @@
                                             </div>
                                             @if($event->max_attendees)
                                                 <div class="flex items-center text-sm text-gray-600">
-                                                    <i class="far fa-users mr-2 text-purple-500"></i>
+                                                    <i class="far fa-users mr-2 text-[#820000]"></i>
                                                     <span>{{ $event->registered_count }}/{{ $event->max_attendees }} registered</span>
                                                 </div>
                                             @endif
                                             @if($registrationDate)
                                                 <div class="flex items-center text-sm text-gray-600">
-                                                    <i class="far fa-calendar-check mr-2 text-blue-500"></i>
+                                                    <i class="far fa-calendar-check mr-2 text-[#F8650C]"></i>
                                                     <span>Registered: {{ $registrationDate->format('M j, Y') }}</span>
                                                 </div>
                                             @endif
@@ -385,7 +385,7 @@
                                                 @endif
                                             @elseif($isRequiredEvent)
                                                 <!-- Required Event - Auto Register -->
-                                                <span class="flex-1 bg-blue-600 text-white text-sm px-3 py-2 rounded-lg flex items-center justify-center">
+                                                <span class="flex-1 bg-[#F00000] text-white text-sm px-3 py-2 rounded-lg flex items-center justify-center">
                                                     <i class="fas fa-user-check mr-1"></i>
                                                     <span class="hidden sm:inline">Required</span>
                                                 </span>
@@ -394,7 +394,7 @@
                                                 <form action="{{ route('student.events.register', $event) }}" method="POST" class="flex-1">
                                                     @csrf
                                                     <button type="submit"
-                                                            class="w-full bg-blue-600 text-white text-sm px-3 py-2 rounded-lg hover:bg-blue-700 transition flex items-center justify-center">
+                                                            class="w-full bg-[#F00000] text-white text-sm px-3 py-2 rounded-lg hover:bg-[#D40000] transition flex items-center justify-center">
                                                         <i class="fas fa-calendar-plus mr-1"></i>
                                                         <span class="hidden sm:inline">Register</span>
                                                     </button>
@@ -410,7 +410,7 @@
 
                                             <!-- View Details Button -->
                                             <button onclick="toggleDetails('mhc-details-{{ $event->id }}')"
-                                                    class="flex-1 bg-blue-100 text-blue-700 text-sm px-3 py-2 rounded-lg hover:bg-blue-200 transition flex items-center justify-center">
+                                                    class="flex-1 bg-gray-100 text-[#D40000] text-sm px-3 py-2 rounded-lg hover:bg-[#FFF9E6] transition flex items-center justify-center">
                                                 <i class="fas fa-info-circle mr-1"></i>
                                                 <span class="hidden sm:inline">Details</span>
                                             </button>
@@ -425,7 +425,7 @@
                                                 </div>
                                                 <div class="text-xs">
                                                     @if($isUpcoming)
-                                                        <span class="bg-blue-100 text-blue-800 px-2 py-1 rounded-full">
+                                                        <span class="bg-gray-100 text-[#820000] px-2 py-1 rounded-full">
                                                             <i class="fas fa-clock mr-1"></i> Upcoming
                                                         </span>
                                                     @else
@@ -522,7 +522,7 @@
                     </p>
 
                     <a href="{{ route('student.resources.category', $key) }}"
-                       class="inline-block bg-blue-100 text-blue-700 px-4 py-2 rounded-lg hover:bg-blue-200 transition font-semibold">
+                       class="inline-block bg-gray-100 text-[#D40000] px-4 py-2 rounded-lg hover:bg-[#FFF9E6] transition font-semibold">
                         @if($key === 'youtube') Explore Videos
                         @elseif($key === 'ebooks') Browse eBooks
                         @elseif($key === 'private') Access Content

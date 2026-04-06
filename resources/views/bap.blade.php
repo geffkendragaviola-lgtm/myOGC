@@ -70,7 +70,7 @@
                     <!-- Counselor Selection -->
                     <div class="mb-6">
                         <label class="block text-gray-700 font-semibold mb-2">Select Counselor</label>
-                        <select name="counselor_id" id="counselorSelect" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" required>
+                        <select name="counselor_id" id="counselorSelect" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#F00000] focus:border-[#F00000]" required>
                             <option value="">Choose a counselor</option>
                             @foreach($counselors as $counselor)
                                 <option value="{{ $counselor->id }}">
@@ -85,7 +85,7 @@
                         <label class="block text-gray-700 font-semibold mb-2">Select Date</label>
                         <input type="date" name="appointment_date" id="dateSelect"
                                min="{{ date('Y-m-d', strtotime('+1 day')) }}"
-                               class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" required>
+                               class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#F00000] focus:border-[#F00000]" required>
                     </div>
 
                     <!-- Time Slots -->
@@ -103,7 +103,7 @@
                                 <span class="text-gray-600">Booked</span>
                             </div>
                             <div class="flex items-center">
-                                <div class="w-4 h-4 bg-blue-100 border-2 border-blue-500 rounded mr-2"></div>
+                                <div class="w-4 h-4 bg-gray-100 border-2 border-[#F00000] rounded mr-2"></div>
                                 <span class="text-gray-600">Selected</span>
                             </div>
                         </div>
@@ -119,7 +119,7 @@
                     <!-- Concern -->
                     <div class="mb-6">
                         <label class="block text-gray-700 font-semibold mb-2">Presenting roblem</label>
-                        <textarea name="concern" rows="4" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="Reason for booking for appointment" required></textarea>
+                        <textarea name="concern" rows="4" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#F00000] focus:border-[#F00000]" placeholder="Reason for booking for appointment" required></textarea>
                     </div>
 
                     <!-- Submit Button -->
@@ -127,7 +127,7 @@
                         <a href="{{ route('appointments.index') }}" class="px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition">
                             Cancel
                         </a>
-                        <button type="submit" id="submitBtn" class="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">
+                        <button type="submit" id="submitBtn" class="px-6 py-3 bg-[#F00000] text-white rounded-lg hover:bg-[#D40000] transition">
                             Book Appointment
                         </button>
                     </div>
@@ -238,13 +238,13 @@
                             slotElement.addEventListener('click', function() {
                                 // Remove selection from all available slots
                                 document.querySelectorAll('.time-slot.available').forEach(s => {
-                                    s.classList.remove('selected', 'border-blue-500', 'bg-blue-100', 'text-blue-700');
+                                    s.classList.remove('selected', 'border-[#F00000]', 'bg-gray-100', 'text-[#D40000]');
                                     s.classList.add('border-green-500', 'bg-green-50', 'text-gray-700');
                                 });
 
                                 // Select this slot
                                 this.classList.remove('border-green-500', 'bg-green-50', 'text-gray-700');
-                                this.classList.add('selected', 'border-blue-500', 'bg-blue-100', 'text-blue-700');
+                                this.classList.add('selected', 'border-[#F00000]', 'bg-gray-100', 'text-[#D40000]');
 
                                 selectedTime.value = slot.start;
                                 currentSelectedSlot = slot.start;
@@ -298,10 +298,10 @@
             if (selectedTime.value) {
                 submitBtn.disabled = false;
                 submitBtn.classList.remove('bg-gray-400', 'cursor-not-allowed');
-                submitBtn.classList.add('bg-blue-600', 'hover:bg-blue-700');
+                submitBtn.classList.add('bg-[#F00000]', 'hover:bg-[#D40000]');
             } else {
                 submitBtn.disabled = true;
-                submitBtn.classList.remove('bg-blue-600', 'hover:bg-blue-700');
+                submitBtn.classList.remove('bg-[#F00000]', 'hover:bg-[#D40000]');
                 submitBtn.classList.add('bg-gray-400', 'cursor-not-allowed');
             }
         }

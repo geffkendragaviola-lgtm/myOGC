@@ -36,7 +36,7 @@ class StudentSeeder extends Seeder
             'citizenship' => 'Filipino',
             'address' => 'Iligan City',
             'phone_number' => '09952796162',
-            'email' => 'student@g.msuiit.edu.ph',
+            'email' => 'geff.gaviola@g.msuiit.edu.ph',
             'password' => Hash::make('1234567890'),
             'role' => 'student',
         ]);
@@ -550,6 +550,127 @@ class StudentSeeder extends Seeder
             'physical_disability' => 'None',
             'sex_identity' => 'female/woman',
             'romantic_attraction' => 'both men and women',
+        ]);
+
+        // 🧍 11th Student - Jaica Dionaldo (CCS)
+        $user11 = User::create([
+            'first_name' => 'Jaica',
+            'middle_name' => 'Dionaldo',
+            'last_name' => 'Dionaldo',
+            'birthdate' => '2003-07-15',
+            'age' => 21,
+            'sex' => 'female',
+            'birthplace' => 'Iligan City',
+            'religion' => 'Catholic',
+            'civil_status' => 'single',
+            'number_of_children' => 0,
+            'citizenship' => 'Filipino',
+            'address' => 'Iligan City',
+            'phone_number' => '09120000010',
+            'email' => 'jaica.dionaldo@g.msuiit.edu.ph',
+            'password' => Hash::make('1234567890'),
+            'role' => 'student',
+        ]);
+
+        $student11 = Student::create([
+            'user_id' => $user11->id,
+            'student_id' => '2023-1009',
+            'year_level' => '2nd Year',
+            'course' => 'Bachelor of Science in Computer Science',
+            'college_id' => 7, // CCS
+            'msu_sase_score' => 85.8,
+            'academic_year' => '2024-2025',
+            'student_status' => 'new',
+        ]);
+
+        StudentPersonalData::create([
+            'student_id' => $student11->id,
+            'nickname' => 'Jaica',
+            'home_address' => 'Iligan City',
+            'stays_with' => 'parents/guardian',
+            'working_student' => 'no and have no plan to work',
+            'talents_skills' => json_encode(['programming', 'web development', 'database design']),
+            'leisure_activities' => json_encode(['coding', 'reading tech blogs', 'gaming']),
+            'serious_medical_condition' => 'None',
+            'physical_disability' => 'None',
+            'sex_identity' => 'female/woman',
+            'romantic_attraction' => 'opposite sex',
+        ]);
+
+        StudentFamilyData::create([
+            'student_id' => $student11->id,
+            'father_name' => 'Dionaldo Sr.',
+            'father_deceased' => false,
+            'father_occupation' => 'Business Owner',
+            'father_phone_number' => '09123456790',
+            'mother_name' => 'Maria Dionaldo',
+            'mother_deceased' => false,
+            'mother_occupation' => 'Accountant',
+            'mother_phone_number' => '09198765433',
+            'parents_marital_status' => 'married',
+            'family_monthly_income' => '20001 above',
+            'guardian_name' => null,
+            'guardian_occupation' => null,
+            'guardian_phone_number' => null,
+            'guardian_relationship' => null,
+            'ordinal_position' => 'middle',
+            'number_of_siblings' => 3,
+            'home_environment_description' => 'Supportive and stable family environment',
+        ]);
+
+        StudentAcademicData::create([
+            'student_id' => $student11->id,
+            'shs_gpa' => 90.2,
+            'is_scholar' => true,
+            'scholarship_type' => 'Merit Scholar',
+            'school_last_attended' => 'Iligan City National High School',
+            'school_address' => 'Iligan City',
+            'shs_track' => 'academic',
+            'shs_strand' => 'STEM',
+            'awards_honors' => json_encode(['Honor Student', 'Best in Science']),
+            'student_organizations' => json_encode(['Computer Science Club', 'Programming Club']),
+            'co_curricular_activities' => json_encode(['Coding Competition', 'Tech Hackathon']),
+            'career_option_1' => 'Software Engineer',
+            'career_option_2' => 'Full Stack Developer',
+            'career_option_3' => 'Systems Analyst',
+            'course_choice_by' => 'own choice',
+            'course_choice_reason' => 'Strong interest in technology and software development',
+            'msu_choice_reasons' => json_encode(['quality education', 'good reputation', 'affordable fees']),
+            'future_career_plans' => 'Become a senior software engineer in a tech company',
+        ]);
+
+        StudentLearningResources::create([
+            'student_id' => $student11->id,
+            'internet_access' => 'full internet access',
+            'technology_gadgets' => json_encode(['laptop/notebook', 'mobile phone smartphone', 'tablet']),
+            'internet_connectivity' => json_encode(['home internet', 'mobile data']),
+            'distance_learning_readiness' => 'fully ready',
+            'learning_space_description' => 'Dedicated study room with high-speed internet',
+        ]);
+
+        StudentPsychosocialData::create([
+            'student_id' => $student11->id,
+            'personality_characteristics' => json_encode(['focused', 'detail-oriented', 'collaborative']),
+            'coping_mechanisms' => json_encode(['problem solving', 'talking to friends', 'exercise']),
+            'mental_health_perception' => 'Good, manages stress well',
+            'had_counseling_before' => false,
+            'sought_psychologist_help' => false,
+            'problem_sharing_targets' => json_encode(['friends', 'family']),
+            'needs_immediate_counseling' => false,
+            'future_counseling_concerns' => 'Career guidance and academic planning',
+        ]);
+
+        StudentNeedsAssessment::create([
+            'student_id' => $student11->id,
+            'improvement_needs' => json_encode(['Advanced programming skills', 'Leadership skills']),
+            'financial_assistance_needs' => json_encode(['Scholarships', 'Internship opportunities']),
+            'personal_social_needs' => json_encode(['Networking', 'Professional development']),
+            'stress_responses' => json_encode(['Focused on problem solving', 'Sought help from peers']),
+            'easy_discussion_target' => 'friends/relatives',
+            'counseling_perceptions' => json_encode([
+                'I know that help is available at the Guidance and Counseling Center of MSU-IIT.' => 'always',
+                'I am shy to ask assistance/seek counseling from my guidance counselor.' => 'rarely'
+            ]),
         ]);
     }
 }

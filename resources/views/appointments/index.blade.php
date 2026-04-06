@@ -6,24 +6,37 @@
 <div class="container mx-auto px-6 py-8">
 
     {{-- Header Section --}}
-    <div class="bg-white rounded-xl shadow-sm p-6 mb-6 flex items-center justify-between">
-        <h1 class="text-2xl font-bold text-gray-800">My Appointments</h1>
-        <a href="{{ route('appointments.create') }}"
-           class="bg-blue-600 text-white px-5 py-2.5 rounded-lg hover:bg-blue-700 transition flex items-center">
-            <i class="fas fa-plus mr-2"></i> Book New Appointment
-        </a>
+    <div class="bg-gradient-to-r from-[#820000] to-[#5a0000] rounded-xl shadow-lg p-8 mb-8 text-white">
+        <div class="flex flex-col md:flex-row md:items-center md:justify-between">
+            <div>
+                <h1 class="text-3xl font-bold">My Appointments</h1>
+                <p class="text-red-100 mt-2">Manage and track your counseling sessions</p>
+            </div>
+            <a href="{{ route('appointments.create') }}"
+               class="mt-4 md:mt-0 bg-white text-[#820000] px-6 py-3 rounded-lg hover:bg-gray-100 transition flex items-center font-semibold shadow-md">
+                <i class="fas fa-plus mr-2"></i> Book New Appointment
+            </a>
+        </div>
     </div>
 
     {{-- Alert Messages --}}
     @if(session('success'))
-        <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-6 shadow-sm">
-            {{ session('success') }}
+        <div class="bg-green-50 border-l-4 border-green-500 text-green-800 px-6 py-4 rounded-lg mb-6 shadow-sm flex items-start">
+            <i class="fas fa-check-circle text-green-500 text-xl mr-3 mt-0.5"></i>
+            <div>
+                <p class="font-semibold">Success!</p>
+                <p class="text-sm mt-1">{{ session('success') }}</p>
+            </div>
         </div>
     @endif
 
     @if(session('error'))
-        <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-6 shadow-sm">
-            {{ session('error') }}
+        <div class="bg-red-50 border-l-4 border-red-500 text-red-800 px-6 py-4 rounded-lg mb-6 shadow-sm flex items-start">
+            <i class="fas fa-exclamation-circle text-red-500 text-xl mr-3 mt-0.5"></i>
+            <div>
+                <p class="font-semibold">Error!</p>
+                <p class="text-sm mt-1">{{ session('error') }}</p>
+            </div>
         </div>
     @endif
 
@@ -43,81 +56,81 @@
         ];
     @endphp
 
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-6 mb-8">
+    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-8">
         {{-- Total Appointments --}}
-        <div class="bg-white rounded-xl shadow-md p-6 border-l-4 border-blue-500">
-            <div class="flex items-center">
-                <div class="p-3 bg-blue-100 rounded-lg mr-4">
-                    <i class="fas fa-calendar-alt text-blue-600 text-xl"></i>
+        <div class="bg-white border-t-4 border-[#820000] rounded-lg shadow-sm p-4 hover:shadow-md transition">
+            <div class="flex items-center gap-3">
+                <div class="p-3 bg-[#820000] rounded-lg">
+                    <i class="fas fa-calendar-alt text-white text-2xl"></i>
                 </div>
                 <div>
-                    <p class="text-sm text-gray-600">Total Appointments</p>
-                    <p class="text-2xl font-bold text-gray-800">{{ $stats['total'] }}</p>
+                    <p class="text-gray-600 text-xs font-medium uppercase">Total Appointments</p>
+                    <p class="text-3xl font-bold text-gray-900">{{ $stats['total'] }}</p>
                 </div>
             </div>
         </div>
 
         {{-- Rejected --}}
-        <div class="bg-white rounded-xl shadow-md p-6 border-l-4 border-red-500">
-            <div class="flex items-center">
-                <div class="p-3 bg-red-100 rounded-lg mr-4">
-                    <i class="fas fa-times-circle text-red-600 text-xl"></i>
+        <div class="bg-white border-t-4 border-[#820000] rounded-lg shadow-sm p-4 hover:shadow-md transition">
+            <div class="flex items-center gap-3">
+                <div class="p-3 bg-[#820000] rounded-lg">
+                    <i class="fas fa-times-circle text-white text-2xl"></i>
                 </div>
                 <div>
-                    <p class="text-sm text-gray-600">Rejected</p>
-                    <p class="text-2xl font-bold text-gray-800">{{ $stats['rejected'] }}</p>
+                    <p class="text-gray-600 text-xs font-medium uppercase">Rejected</p>
+                    <p class="text-3xl font-bold text-gray-900">{{ $stats['rejected'] }}</p>
                 </div>
             </div>
         </div>
 
         {{-- Cancelled --}}
-        <div class="bg-white rounded-xl shadow-md p-6 border-l-4 border-gray-500">
-            <div class="flex items-center">
-                <div class="p-3 bg-gray-100 rounded-lg mr-4">
-                    <i class="fas fa-ban text-gray-600 text-xl"></i>
+        <div class="bg-white border-t-4 border-[#820000] rounded-lg shadow-sm p-4 hover:shadow-md transition">
+            <div class="flex items-center gap-3">
+                <div class="p-3 bg-[#820000] rounded-lg">
+                    <i class="fas fa-ban text-white text-2xl"></i>
                 </div>
                 <div>
-                    <p class="text-sm text-gray-600">Cancelled</p>
-                    <p class="text-2xl font-bold text-gray-800">{{ $stats['cancelled'] }}</p>
+                    <p class="text-gray-600 text-xs font-medium uppercase">Cancelled</p>
+                    <p class="text-3xl font-bold text-gray-900">{{ $stats['cancelled'] }}</p>
                 </div>
             </div>
         </div>
 
         {{-- Pending --}}
-        <div class="bg-white rounded-xl shadow-md p-6 border-l-4 border-yellow-500">
-            <div class="flex items-center">
-                <div class="p-3 bg-yellow-100 rounded-lg mr-4">
-                    <i class="fas fa-clock text-yellow-600 text-xl"></i>
+        <div class="bg-white border-t-4 border-[#820000] rounded-lg shadow-sm p-4 hover:shadow-md transition">
+            <div class="flex items-center gap-3">
+                <div class="p-3 bg-[#820000] rounded-lg">
+                    <i class="fas fa-clock text-white text-2xl"></i>
                 </div>
                 <div>
-                    <p class="text-sm text-gray-600">Pending</p>
-                    <p class="text-2xl font-bold text-gray-800">{{ $stats['pending'] }}</p>
+                    <p class="text-gray-600 text-xs font-medium uppercase">Pending</p>
+                    <p class="text-3xl font-bold text-gray-900">{{ $stats['pending'] }}</p>
                 </div>
             </div>
         </div>
 
         {{-- Approved --}}
-        <div class="bg-white rounded-xl shadow-md p-6 border-l-4 border-green-500">
-            <div class="flex items-center">
-                <div class="p-3 bg-green-100 rounded-lg mr-4">
-                    <i class="fas fa-check-circle text-green-600 text-xl"></i>
+        <div class="bg-white border-t-4 border-[#820000] rounded-lg shadow-sm p-4 hover:shadow-md transition">
+            <div class="flex items-center gap-3">
+                <div class="p-3 bg-[#820000] rounded-lg">
+                    <i class="fas fa-check-circle text-white text-2xl"></i>
                 </div>
                 <div>
-                    <p class="text-sm text-gray-600">Approved</p>
-                    <p class="text-2xl font-bold text-gray-800">{{ $stats['approved'] }}</p>
+                    <p class="text-gray-600 text-xs font-medium uppercase">Approved</p>
+                    <p class="text-3xl font-bold text-gray-900">{{ $stats['approved'] }}</p>
                 </div>
             </div>
         </div>
 
         {{-- Referred --}}
-        <div class="bg-white rounded-xl shadow-md p-6 border-l-4 border-purple-500">
-            <div class="flex items-center">
-                <div class="p-3 bg-purple-100 rounded-lg mr-4">
-                    <i class="fas fa-exchange-alt text-purple-600 text-xl"></i>
+        <div class="bg-white border-t-4 border-[#820000] rounded-lg shadow-sm p-4 hover:shadow-md transition">
+            <div class="flex items-center gap-3">
+                <div class="p-3 bg-[#820000] rounded-lg">
+                    <i class="fas fa-exchange-alt text-white text-2xl"></i>
                 </div>
                 <div>
-                    <p class="text-sm text-gray-600">Referred</p>
-                    <p class="text-2xl font-bold text-gray-800">{{ $stats['referred'] }}</p>
+                    <p class="text-gray-600 text-xs font-medium uppercase">Referred</p>
+                    <p class="text-3xl font-bold text-gray-900">{{ $stats['referred'] }}</p>
                 </div>
             </div>
         </div>
@@ -134,7 +147,7 @@
                        name="search_date"
                        id="search_date"
                        value="{{ request('search_date') }}"
-                       class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                       class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#F8650C] focus:border-transparent">
             </div>
 
             {{-- Status Filter --}}
@@ -142,7 +155,7 @@
                 <label for="status" class="block text-sm font-medium text-gray-700 mb-2">Status Filter</label>
                 <select name="status"
                         id="status"
-                        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#F8650C] focus:border-transparent">
                     <option value="">All Statuses</option>
                     <option value="pending" {{ request('status') == 'pending' ? 'selected' : '' }}>Pending</option>
                     <option value="approved" {{ request('status') == 'approved' ? 'selected' : '' }}>Approved</option>
@@ -159,11 +172,11 @@
             {{-- Action Buttons --}}
             <div class="flex items-end space-x-2">
                 <button type="submit"
-                        class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition flex items-center">
+                        class="bg-[#F8650C] text-white px-4 py-2 rounded-lg hover:bg-[#E55A00] transition flex items-center">
                     <i class="fas fa-search mr-2"></i> Search
                 </button>
                 <a href="{{ route('appointments.index') }}"
-                   class="bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700 transition flex items-center">
+                   class="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600 transition flex items-center">
                     <i class="fas fa-refresh mr-2"></i> Reset
                 </a>
             </div>
@@ -176,15 +189,15 @@
                 <div class="flex items-center space-x-2 text-sm">
                     <span class="text-gray-600">Active filters:</span>
                     @if(request('search_date'))
-                        <span class="bg-blue-100 text-blue-800 px-2 py-1 rounded-full flex items-center">
+                        <span class="bg-[#FFF9E6] text-[#820000] px-2 py-1 rounded-full flex items-center">
                             Date: {{ \Carbon\Carbon::parse(request('search_date'))->format('M j, Y') }}
-                            <a href="{{ request()->fullUrlWithQuery(['search_date' => null]) }}" class="ml-1 text-blue-600 hover:text-blue-800">
+                            <a href="{{ request()->fullUrlWithQuery(['search_date' => null]) }}" class="ml-1 text-[#F8650C] hover:text-[#820000]">
                                 <i class="fas fa-times"></i>
                             </a>
                         </span>
                     @endif
                     @if(request('status'))
-                        <span class="bg-green-100 text-green-800 px-2 py-1 rounded-full flex items-center">
+                        <span class="bg-[#FFF9E6] text-[#820000] px-2 py-1 rounded-full flex items-center">
                             @php
                                 $filterStatusLabels = [
                                     'reschedule_rejected' => 'Rejected by Student',
@@ -193,7 +206,7 @@
                                 ];
                             @endphp
                             Status: {{ $filterStatusLabels[request('status')] ?? ucwords(str_replace('_', ' ', request('status'))) }}
-                            <a href="{{ request()->fullUrlWithQuery(['status' => null]) }}" class="ml-1 text-green-600 hover:text-green-800">
+                            <a href="{{ request()->fullUrlWithQuery(['status' => null]) }}" class="ml-1 text-[#F8650C] hover:text-[#820000]">
                                 <i class="fas fa-times"></i>
                             </a>
                         </span>
@@ -211,7 +224,7 @@
     <div class="bg-white rounded-xl shadow-sm p-6 mb-6">
         <div class="flex flex-wrap gap-2">
             <a href="{{ route('appointments.index') }}"
-               class="px-4 py-2 rounded-lg transition flex items-center {{ !request('status') && !request('search_date') ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300' }}">
+               class="px-4 py-2 rounded-lg transition flex items-center {{ !request('status') && !request('search_date') ? 'bg-[#820000] text-white' : 'bg-gray-100 text-gray-700 hover:bg-[#FFF9E6] hover:text-[#820000]' }}">
                 <i class="fas fa-list mr-2"></i> All Appointments
             </a>
             <a href="{{ route('appointments.index', ['status' => 'pending']) }}"
@@ -227,7 +240,7 @@
                 <i class="fas fa-calendar-alt mr-2"></i> Reschedule Requested
             </a>
             <a href="{{ route('appointments.index', ['status' => 'rescheduled']) }}"
-               class="px-4 py-2 rounded-lg transition flex items-center {{ request('status') == 'rescheduled' ? 'bg-indigo-600 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300' }}">
+               class="px-4 py-2 rounded-lg transition flex items-center {{ request('status') == 'rescheduled' ? 'bg-[#820000] text-white' : 'bg-gray-100 text-gray-700 hover:bg-[#FFF9E6] hover:text-[#820000]' }}">
                 <i class="fas fa-calendar-alt mr-2"></i> Rescheduled
             </a>
             <a href="{{ route('appointments.index', ['status' => 'reschedule_rejected']) }}"
@@ -235,11 +248,11 @@
                 <i class="fas fa-times mr-2"></i> Rejected by Student
             </a>
             <a href="{{ route('appointments.index', ['status' => 'completed']) }}"
-               class="px-4 py-2 rounded-lg transition flex items-center {{ request('status') == 'completed' ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300' }}">
+               class="px-4 py-2 rounded-lg transition flex items-center {{ request('status') == 'completed' ? 'bg-[#820000] text-white' : 'bg-gray-100 text-gray-700 hover:bg-[#FFF9E6] hover:text-[#820000]' }}">
                 <i class="fas fa-check-double mr-2"></i> Completed
             </a>
             <a href="{{ route('appointments.index', ['status' => 'referred']) }}"
-               class="px-4 py-2 rounded-lg transition flex items-center {{ request('status') == 'referred' ? 'bg-purple-600 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300' }}">
+               class="px-4 py-2 rounded-lg transition flex items-center {{ request('status') == 'referred' ? 'bg-[#820000] text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300' }}">
                 <i class="fas fa-exchange-alt mr-2"></i> Referred
             </a>
             <a href="{{ route('appointments.index', ['status' => 'rejected']) }}"
@@ -261,11 +274,11 @@
                 <p class="text-gray-500 text-lg">No appointments found.</p>
                 @if(request()->anyFilled(['search_date', 'status']))
                     <p class="text-gray-400 text-sm mt-2">Try adjusting your filters</p>
-                    <a href="{{ route('appointments.index') }}" class="text-blue-600 hover:text-blue-800 mt-2 inline-block">
+                    <a href="{{ route('appointments.index') }}" class="text-[#F8650C] hover:text-[#820000] mt-2 inline-block">
                         Clear all filters
                     </a>
                 @endif
-                <a href="{{ route('appointments.create') }}" class="text-blue-600 hover:text-blue-800 mt-2 inline-block">
+                <a href="{{ route('appointments.create') }}" class="text-[#F8650C] hover:text-[#820000] mt-2 inline-block">
                     Book your first appointment
                 </a>
             </div>
@@ -305,13 +318,13 @@
                                             </div>
                                         @endif
                                     @elseif($appointment->status === 'referred' && $appointment->proposed_date)
-                                        <div class="text-xs text-purple-700 mt-1">
+                                        <div class="text-xs text-[#820000] mt-1">
                                             Proposed: {{ \Carbon\Carbon::parse($appointment->proposed_date)->format('M j, Y') }}
                                             {{ \Carbon\Carbon::parse($appointment->proposed_start_time)->format('g:i A') }} -
                                             {{ \Carbon\Carbon::parse($appointment->proposed_end_time)->format('g:i A') }}
                                         </div>
                                         @if($appointment->referral_reason)
-                                            <div class="text-xs text-purple-600">
+                                            <div class="text-xs text-[#820000]">
                                                 Reason: {{ $appointment->referral_reason }}
                                             </div>
                                         @endif
@@ -325,7 +338,7 @@
                                         {{ $appointment->counselor->position }}
                                     </div>
                                     @if($appointment->is_referred && $appointment->original_counselor_id)
-                                        <div class="text-xs text-purple-600 mt-1">
+                                        <div class="text-xs text-[#820000] mt-1">
                                             <i class="fas fa-exchange-alt mr-1"></i>
                                             Originally with: {{ $appointment->originalCounselor->user->first_name }} {{ $appointment->originalCounselor->user->last_name }}
                                         </div>
@@ -340,14 +353,14 @@
                                     @php
                                         $statusColors = [
                                             'pending' => 'bg-yellow-100 text-yellow-800',
-                                            'approved' => 'bg-green-100 text-green-800',
+                                            'approved' => 'bg-[#FFF9E6] text-[#820000]',
                                             'rejected' => 'bg-red-100 text-red-800',
                                             'cancelled' => 'bg-gray-100 text-gray-800',
-                                            'completed' => 'bg-blue-100 text-blue-800',
-                                            'referred' => 'bg-purple-100 text-purple-800',
-                                            'rescheduled' => 'bg-indigo-100 text-indigo-800',
-                                            'reschedule_requested' => 'bg-orange-100 text-orange-800',
-                                            'reschedule_rejected' => 'bg-rose-100 text-rose-800'
+                                            'completed' => 'bg-[#FFF9E6] text-[#820000]',
+                                            'referred' => 'bg-[#FFF9E6] text-[#820000]',
+                                            'rescheduled' => 'bg-[#FFF9E6] text-[#820000]',
+                                            'reschedule_requested' => 'bg-orange-50 text-orange-700',
+                                            'reschedule_rejected' => 'bg-red-50 text-[#820000]'
                                         ];
                                         $statusLabels = [
                                             'rescheduled' => 'Scheduled (Rescheduled)',
@@ -365,11 +378,11 @@
                                 <td class="px-6 py-4 whitespace-nowrap">
                                     @if($appointment->status === 'referred' && $appointment->is_referred)
                                         <div class="text-sm">
-                                            <div class="font-medium text-purple-700">
+                                            <div class="font-medium text-[#820000]">
                                                 <i class="fas fa-user-md mr-1"></i>
                                                 {{ $appointment->referredCounselor->user->first_name }} {{ $appointment->referredCounselor->user->last_name }}
                                             </div>
-                                            <div class="text-xs text-purple-600 mt-1">
+                                            <div class="text-xs text-[#820000] mt-1">
                                                 <i class="fas fa-university mr-1"></i>
                                                 {{ $appointment->referredCounselor->college->name ?? 'N/A' }}
                                                 @if($appointment->student->college_id != $appointment->referredCounselor->college_id)
@@ -384,7 +397,7 @@
                                                             '{{ $appointment->referredCounselor->user->first_name }} {{ $appointment->referredCounselor->user->last_name }}',
                                                             {{ $appointment->student->college_id != $appointment->referredCounselor->college_id ? 'true' : 'false' }}
                                                         )"
-                                                        class="text-xs text-purple-600 hover:text-purple-800 mt-1 flex items-center">
+                                                        class="text-xs text-[#820000] hover:text-[#820000] mt-1 flex items-center">
                                                     <i class="fas fa-info-circle mr-1"></i>
                                                     View referral reason
                                                 </button>
@@ -450,7 +463,7 @@
                                                  </form>
                                              </div>
                                          @else
-                                             <span class="text-purple-600 italic">Awaiting referral details</span>
+                                             <span class="text-[#820000] italic">Awaiting referral details</span>
                                          @endif
                                      @endif
                                 </td>
@@ -468,21 +481,21 @@
             <div class="mt-3">
                 <div class="flex justify-between items-center mb-4">
                     <h3 class="text-lg font-medium text-gray-900">
-                        <i class="fas fa-info-circle mr-2 text-purple-600"></i>Referral Reason
+                        <i class="fas fa-info-circle mr-2 text-[#820000]"></i>Referral Reason
                     </h3>
                     <button onclick="closeReferralReasonModal()" class="text-gray-400 hover:text-gray-600 text-lg">
                         <i class="fas fa-times"></i>
                     </button>
                 </div>
                 <div class="mt-2">
-                    <div id="referralCounselorInfo" class="mb-3 p-3 bg-purple-50 rounded-lg border border-purple-200">
-                        <p class="text-sm text-purple-700" id="counselorInfoText"></p>
+                    <div id="referralCounselorInfo" class="mb-3 p-3 bg-[#FFF9E6] rounded-lg border border-[#FFC917]">
+                        <p class="text-sm text-[#820000]" id="counselorInfoText"></p>
                     </div>
-                    <p id="referralReasonContent" class="text-gray-700 whitespace-pre-line p-4 bg-purple-50 rounded-lg max-h-96 overflow-y-auto border border-purple-200"></p>
+                    <p id="referralReasonContent" class="text-gray-700 whitespace-pre-line p-4 bg-[#FFF9E6] rounded-lg max-h-96 overflow-y-auto border border-[#FFC917]"></p>
                 </div>
                 <div class="flex justify-end mt-4">
                     <button onclick="closeReferralReasonModal()"
-                            class="bg-purple-600 text-white px-6 py-2 rounded-lg hover:bg-purple-700 transition flex items-center">
+                            class="bg-[#820000] text-white px-6 py-2 rounded-lg hover:bg-[#820000] transition flex items-center">
                         <i class="fas fa-times mr-2"></i> Close
                     </button>
                 </div>

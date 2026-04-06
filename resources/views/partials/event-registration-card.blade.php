@@ -4,7 +4,7 @@
     $isRequiredEvent = $event->is_required && $event->isRequiredForStudent($student);
 @endphp
 
-<div class="event-card bg-white rounded-xl shadow-sm overflow-hidden border-l-4 {{ $isRequiredEvent ? 'border-red-500' : 'border-blue-500' }}">
+<div class="event-card bg-white rounded-xl shadow-sm overflow-hidden border-l-4 {{ $isRequiredEvent ? 'border-red-500' : 'border-[#F00000]' }}">
     <!-- Event Image Header -->
     <div class="relative h-48 bg-gray-200 overflow-hidden">
         <img src="{{ $event->image_url }}"
@@ -18,7 +18,7 @@
         <div class="absolute bottom-0 left-0 right-0 p-4 text-white">
             <div class="flex justify-between items-start mb-2">
                 <div class="flex flex-wrap gap-2">
-                    <span class="inline-block bg-blue-600/90 text-white text-xs px-2 py-1 rounded-full capitalize backdrop-blur-sm">
+                    <span class="inline-block bg-[#F00000]/90 text-white text-xs px-2 py-1 rounded-full capitalize backdrop-blur-sm">
                         {{ $event->type }}
                     </span>
                     @if($isRequiredEvent)
@@ -42,7 +42,7 @@
                     <i class="fas fa-globe mr-1"></i> All Colleges
                 </span>
             @else
-                <span class="college-badge text-xs backdrop-blur-sm bg-blue-600/90">
+                <span class="college-badge text-xs backdrop-blur-sm bg-[#F00000]/90">
                     <i class="fas fa-university mr-1"></i> {{ $event->colleges->count() }} Colleges
                 </span>
             @endif
@@ -54,7 +54,7 @@
         <!-- Date and Time -->
         <div class="space-y-2 mb-4">
             <div class="flex items-center text-sm text-gray-600">
-                <i class="far fa-calendar mr-2 text-blue-500"></i>
+                <i class="far fa-calendar mr-2 text-[#F8650C]"></i>
                 <span>{{ $event->date_range }}</span>
             </div>
             <div class="flex items-center text-sm text-gray-600">
@@ -66,7 +66,7 @@
                 <span class="line-clamp-1">{{ $event->location }}</span>
             </div>
             <div class="flex items-center text-sm text-gray-600">
-                <i class="far fa-calendar-check mr-2 text-purple-500"></i>
+                <i class="far fa-calendar-check mr-2 text-[#820000]"></i>
                 <span>Registered: {{ $registration->registered_at->format('M j, Y') }}</span>
             </div>
         </div>
@@ -131,7 +131,7 @@
 
             <!-- View Details Button -->
             <button onclick="toggleDetails('details-{{ $registration->id }}')"
-                    class="flex-1 bg-blue-100 text-blue-700 text-sm px-3 py-2 rounded-lg hover:bg-blue-200 transition flex items-center justify-center">
+                    class="flex-1 bg-gray-100 text-[#D40000] text-sm px-3 py-2 rounded-lg hover:bg-[#FFF9E6] transition flex items-center justify-center">
                 <i class="fas fa-info-circle mr-1"></i>
                 <span class="hidden sm:inline">Details</span>
             </button>
@@ -146,7 +146,7 @@
                 </div>
                 <div class="text-xs">
                     @if($event->is_upcoming)
-                        <span class="bg-blue-100 text-blue-800 px-2 py-1 rounded-full">
+                        <span class="bg-gray-100 text-[#820000] px-2 py-1 rounded-full">
                             <i class="fas fa-clock mr-1"></i> Upcoming
                         </span>
                     @else
@@ -200,12 +200,12 @@
 
                 <!-- Cancellation Info for Optional Events -->
                 @if(!$isRequiredEvent && $event->is_upcoming && $registration->status === 'registered')
-                    <div class="bg-blue-50 border border-blue-200 rounded-lg p-3">
+                    <div class="bg-[#FFF9E6] border border-[#FFE100] rounded-lg p-3">
                         <div class="flex items-center">
-                            <i class="fas fa-info-circle text-blue-500 mr-2"></i>
-                            <span class="text-blue-800 font-medium text-sm">Cancellation Policy</span>
+                            <i class="fas fa-info-circle text-[#F8650C] mr-2"></i>
+                            <span class="text-[#820000] font-medium text-sm">Cancellation Policy</span>
                         </div>
-                        <p class="text-blue-700 text-xs mt-1">
+                        <p class="text-[#D40000] text-xs mt-1">
                             You can cancel your registration up to 24 hours before the event starts.
                             @if($event->isCancellationAllowed())
                                 <br><strong>Cancellation cutoff: {{ $event->getCancellationCutoffTime() }}</strong>

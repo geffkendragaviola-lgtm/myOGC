@@ -6,32 +6,32 @@
 <div class="container mx-auto px-6 py-8">
 
 <!-- Welcome Section -->
-<div class="bg-white rounded-xl shadow-md p-6 mb-8">
-    <div class="flex justify-between items-start">
+<div class="bg-gradient-to-r from-[#820000] to-[#5a0000] rounded-xl shadow-lg p-8 mb-8 text-white">
+    <div class="flex flex-col md:flex-row md:justify-between md:items-start">
         <div>
-            <h1 class="text-2xl font-bold text-gray-800 mb-2">
+            <h1 class="text-3xl font-bold mb-3">
                 Welcome, {{ $counselor->user->first_name }}!
             </h1>
 
             <!-- Colleges -->
-            <div class="flex flex-wrap gap-2 mb-2">
+            <div class="flex flex-wrap gap-2 mb-3">
                 @foreach($allColleges as $college)
-                    <span class="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm">
-                        {{ $college->name }}
+                    <span class="bg-white bg-opacity-20 text-black px-3 py-1 rounded-full text-sm font-medium backdrop-blur-sm">
+                        <i class="fas fa-university mr-1"></i>{{ $college->name }}
                     </span>
                 @endforeach
             </div>
 
             <!-- Position & Credentials -->
-            <p class="text-gray-500 text-sm mt-1">
-                {{ $counselor->position }} • {{ $counselor->credentials }}
+            <p class="text-red-100 text-sm">
+                <i class="fas fa-user-tie mr-2"></i>{{ $counselor->position }} • {{ $counselor->credentials }}
             </p>
         </div>
 
         <!-- Date -->
-        <div class="text-right">
-            <p class="text-sm text-gray-500">Today is</p>
-            <p class="text-lg font-semibold text-gray-800">
+        <div class="mt-4 md:mt-0 text-left md:text-right">
+            <p class="text-sm text-red-100">Today is</p>
+            <p class="text-xl font-semibold text-white">
                 {{ now()->format('l, F j, Y') }}
             </p>
         </div>
@@ -41,38 +41,38 @@
 
     <!-- Statistics Cards -->
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-        <div class="bg-white rounded-xl shadow-md p-6 border-l-4 border-yellow-500">
-            <div class="flex items-center">
-                <div class="p-3 bg-yellow-100 rounded-lg mr-4">
-                    <i class="fas fa-clock text-yellow-600 text-xl"></i>
+        <div class="bg-white border-t-4 border-[#820000] rounded-lg shadow-sm p-6 hover:shadow-md transition">
+            <div class="flex items-center gap-3">
+                <div class="p-3 bg-[#820000] rounded-lg">
+                    <i class="fas fa-clock text-white text-2xl"></i>
                 </div>
                 <div>
-                    <p class="text-sm text-gray-600">Pending Appointments</p>
-                    <p class="text-2xl font-bold text-gray-800">{{ $appointmentStats['pending'] }}</p>
+                    <p class="text-gray-600 text-xs font-medium uppercase">Pending Appointments</p>
+                    <p class="text-3xl font-bold text-gray-900">{{ $appointmentStats['pending'] }}</p>
                 </div>
             </div>
         </div>
 
-        <div class="bg-white rounded-xl shadow-md p-6 border-l-4 border-green-500">
-            <div class="flex items-center">
-                <div class="p-3 bg-green-100 rounded-lg mr-4">
-                    <i class="fas fa-check-circle text-green-600 text-xl"></i>
+        <div class="bg-white border-t-4 border-[#820000] rounded-lg shadow-sm p-6 hover:shadow-md transition">
+            <div class="flex items-center gap-3">
+                <div class="p-3 bg-[#820000] rounded-lg">
+                    <i class="fas fa-check-circle text-white text-2xl"></i>
                 </div>
                 <div>
-                    <p class="text-sm text-gray-600">Approved Appointments</p>
-                    <p class="text-2xl font-bold text-gray-800">{{ $appointmentStats['approved'] }}</p>
+                    <p class="text-gray-600 text-xs font-medium uppercase">Approved Appointments</p>
+                    <p class="text-3xl font-bold text-gray-900">{{ $appointmentStats['approved'] }}</p>
                 </div>
             </div>
         </div>
 
-        <div class="bg-white rounded-xl shadow-md p-6 border-l-4 border-blue-500">
-            <div class="flex items-center">
-                <div class="p-3 bg-blue-100 rounded-lg mr-4">
-                    <i class="fas fa-calendar-alt text-blue-600 text-xl"></i>
+        <div class="bg-white border-t-4 border-[#820000] rounded-lg shadow-sm p-6 hover:shadow-md transition">
+            <div class="flex items-center gap-3">
+                <div class="p-3 bg-[#820000] rounded-lg">
+                    <i class="fas fa-calendar-alt text-white text-2xl"></i>
                 </div>
                 <div>
-                    <p class="text-sm text-gray-600">Total Appointments</p>
-                    <p class="text-2xl font-bold text-gray-800">{{ $appointmentStats['total'] }}</p>
+                    <p class="text-gray-600 text-xs font-medium uppercase">Total Appointments</p>
+                    <p class="text-3xl font-bold text-gray-900">{{ $appointmentStats['total'] }}</p>
                 </div>
             </div>
         </div>
@@ -81,10 +81,10 @@
     <!-- Today's Appointments and Quick Actions -->
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
         <!-- Left -->
-        <div class="bg-white rounded-xl shadow-md">
-            <div class="p-6 border-b border-gray-200">
+        <div class="bg-white rounded-xl shadow-sm">
+            <div class="p-6 border-b border-gray-200 bg-gradient-to-r from-red-50 to-white">
                 <h2 class="text-xl font-bold text-gray-800 flex items-center">
-                    <i class="fas fa-calendar-day text-blue-600 mr-3"></i> Today's Appointments
+                    <i class="fas fa-calendar-day text-[#820000] mr-3"></i> Today's Appointments
                 </h2>
             </div>
             <div class="p-6">
@@ -96,21 +96,23 @@
                 @else
                     <div class="space-y-4">
                         @foreach($todayAppointments as $appointment)
-                            <div class="border border-gray-200 rounded-lg p-4 hover:bg-gray-50 transition">
+                            <div class="border-l-4 border-[#820000] bg-gray-50 rounded-lg p-4 hover:shadow-md transition">
                                 <div class="flex justify-between items-start mb-2">
                                     <div>
                                         <h3 class="font-semibold text-gray-800">
                                             {{ $appointment->student->user->first_name }} {{ $appointment->student->user->last_name }}
                                         </h3>
-                                        <p class="text-sm text-gray-600">{{ $appointment->student->student_id }}</p>
+                                        <p class="text-sm text-gray-600">
+                                            <i class="fas fa-id-card mr-1"></i>{{ $appointment->student->student_id }}
+                                        </p>
                                     </div>
-                                    <span class="px-2 py-1 text-xs rounded-full
+                                    <span class="px-3 py-1 text-xs rounded-full font-semibold
                                         {{ $appointment->status === 'pending' ? 'bg-yellow-100 text-yellow-800' : 'bg-green-100 text-green-800' }}">
                                         {{ ucfirst($appointment->status) }}
                                     </span>
                                 </div>
-                                <p class="text-sm text-gray-700 mb-2">
-                                    <i class="fas fa-clock text-gray-400 mr-2"></i>
+                                <p class="text-sm text-gray-700 mb-2 font-medium">
+                                    <i class="fas fa-clock text-[#820000] mr-2"></i>
                                     {{ \Carbon\Carbon::parse($appointment->start_time)->format('g:i A') }} -
                                     {{ \Carbon\Carbon::parse($appointment->end_time)->format('g:i A') }}
                                 </p>
@@ -128,33 +130,33 @@
         <!-- Right -->
         <div class="space-y-8">
             <!-- Quick Actions -->
-            <div class="bg-white rounded-xl shadow-md">
-                <div class="p-6 border-b border-gray-200">
+            <div class="bg-white rounded-xl shadow-sm">
+                <div class="p-6 border-b border-gray-200 bg-gradient-to-r from-red-50 to-white">
                     <h2 class="text-xl font-bold text-gray-800 flex items-center">
-                        <i class="fas fa-bolt text-green-600 mr-3"></i> Quick Actions
+                        <i class="fas fa-bolt text-[#820000] mr-3"></i> Quick Actions
                     </h2>
                 </div>
                 <div class="p-6">
                     <div class="grid grid-cols-2 gap-4">
                         <a href="{{ route('counselor.calendar') }}"
-                           class="bg-blue-50 border border-blue-200 rounded-lg p-4 text-center hover:bg-blue-100 transition">
-                            <i class="fas fa-calendar-alt text-blue-600 text-2xl mb-2"></i>
-                            <p class="font-semibold text-blue-800">View Calendar</p>
+                           class="bg-gradient-to-br from-[#820000] to-[#5a0000] text-white rounded-lg p-6 text-center hover:shadow-lg transition transform hover:-translate-y-1">
+                            <i class="fas fa-calendar-alt text-3xl mb-3"></i>
+                            <p class="font-semibold">View Calendar</p>
                         </a>
                         <a href="{{ route('counselor.appointments') }}?status=pending"
-                           class="bg-yellow-50 border border-yellow-200 rounded-lg p-4 text-center hover:bg-yellow-100 transition">
-                            <i class="fas fa-clock text-yellow-600 text-2xl mb-2"></i>
-                            <p class="font-semibold text-yellow-800">Pending Requests</p>
+                           class="bg-gradient-to-br from-yellow-500 to-yellow-600 text-white rounded-lg p-6 text-center hover:shadow-lg transition transform hover:-translate-y-1">
+                            <i class="fas fa-clock text-3xl mb-3"></i>
+                            <p class="font-semibold">Pending Requests</p>
                         </a>
                     </div>
                 </div>
             </div>
 
             <!-- Upcoming Appointments -->
-            <div class="bg-white rounded-xl shadow-md">
-                <div class="p-6 border-b border-gray-200">
+            <div class="bg-white rounded-xl shadow-sm">
+                <div class="p-6 border-b border-gray-200 bg-gradient-to-r from-red-50 to-white">
                     <h2 class="text-xl font-bold text-gray-800 flex items-center">
-                        <i class="fas fa-calendar-plus text-purple-600 mr-3"></i> Upcoming Appointments
+                        <i class="fas fa-calendar-plus text-[#820000] mr-3"></i> Upcoming Appointments
                     </h2>
                 </div>
                 <div class="p-6">
@@ -165,24 +167,26 @@
                     @else
                         <div class="space-y-3">
                             @foreach($upcomingAppointments as $appointment)
-                                <div class="flex items-center justify-between p-3 border border-gray-200 rounded-lg">
-                                    <div class="flex items-center space-x-3">
-                                        <div class="text-center">
-                                            <p class="text-sm font-semibold text-gray-800">
+                                <div class="flex items-center justify-between p-4 bg-gray-50 border-l-4 border-[#820000] rounded-lg hover:shadow-md transition">
+                                    <div class="flex items-center space-x-4">
+                                        <div class="text-center bg-white rounded-lg p-3 shadow-sm">
+                                            <p class="text-sm font-bold text-[#820000]">
                                                 {{ \Carbon\Carbon::parse($appointment->appointment_date)->format('M j') }}
                                             </p>
-                                            <p class="text-xs text-gray-500">
+                                            <p class="text-xs text-gray-600 font-medium">
                                                 {{ \Carbon\Carbon::parse($appointment->start_time)->format('g:i A') }}
                                             </p>
                                         </div>
                                         <div>
-                                            <p class="font-medium text-gray-800">
+                                            <p class="font-semibold text-gray-800">
                                                 {{ $appointment->student->user->first_name }} {{ $appointment->student->user->last_name }}
                                             </p>
-                                            <p class="text-xs text-gray-500">{{ $appointment->student->college->name ?? 'N/A' }}</p>
+                                            <p class="text-xs text-gray-500">
+                                                <i class="fas fa-university mr-1"></i>{{ $appointment->student->college->name ?? 'N/A' }}
+                                            </p>
                                         </div>
                                     </div>
-                                    <span class="px-2 py-1 text-xs rounded-full
+                                    <span class="px-3 py-1 text-xs rounded-full font-semibold
                                         {{ $appointment->status === 'pending' ? 'bg-yellow-100 text-yellow-800' : 'bg-green-100 text-green-800' }}">
                                         {{ ucfirst($appointment->status) }}
                                     </span>

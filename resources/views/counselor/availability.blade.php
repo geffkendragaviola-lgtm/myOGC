@@ -48,7 +48,7 @@
                 <label for="daily_booking_limit" class="block text-sm font-medium text-gray-700 mb-2">Daily Booking Limit</label>
                 <input type="number" id="daily_booking_limit" name="daily_booking_limit" min="0" max="50"
                        value="{{ old('daily_booking_limit', $counselorProfile->daily_booking_limit ?? 3) }}"
-                       class="w-full md:w-1/3 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
+                       class="w-full md:w-1/3 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#F00000] focus:border-[#F00000] transition">
                 <p class="text-xs text-gray-500 mt-1">Set how many students you can see per day.</p>
                 @error('daily_booking_limit')
                     <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
@@ -66,14 +66,14 @@
                         <div class="border border-gray-200 rounded-lg p-4">
                             <label class="flex items-center mb-2">
                                 <input type="checkbox" name="availability_days[]" value="{{ $dayKey }}"
-                                       class="rounded border-gray-300 text-indigo-600 shadow-sm focus:ring-indigo-500"
+                                       class="rounded border-gray-300 text-[#F00000] shadow-sm focus:ring-[#F00000]"
                                        {{ $isAvailable ? 'checked' : '' }}>
                                 <span class="ms-2 text-sm font-medium text-gray-700">{{ $dayLabel }}</span>
                             </label>
                             <input type="text" name="availability_slots[{{ $dayKey }}]"
                                    value="{{ old('availability_slots.' . $dayKey, implode(', ', $slots)) }}"
                                    placeholder="08:00-12:00, 13:00-17:00"
-                                   class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
+                                   class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#F00000] focus:border-[#F00000] transition">
                             <p class="text-xs text-gray-500 mt-1">Use 24-hour format, comma-separated ranges.</p>
                         </div>
                     @endforeach
@@ -92,12 +92,12 @@
                                 <label class="block text-xs font-medium text-gray-600 mb-1">Date</label>
                                 <input type="date" name="schedule_overrides[{{ $index }}][date]"
                                        value="{{ $override->date->format('Y-m-d') }}"
-                                       class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
+                                       class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#F00000] focus:border-[#F00000] transition">
                             </div>
                             <div>
                                 <label class="block text-xs font-medium text-gray-600 mb-1">Status</label>
                                 <select name="schedule_overrides[{{ $index }}][status]"
-                                        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
+                                        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#F00000] focus:border-[#F00000] transition">
                                     <option value="open" {{ $override->is_closed ? '' : 'selected' }}>Open</option>
                                     <option value="closed" {{ $override->is_closed ? 'selected' : '' }}>Closed</option>
                                 </select>
@@ -107,7 +107,7 @@
                                 <input type="text" name="schedule_overrides[{{ $index }}][time_slots]"
                                        value="{{ old('schedule_overrides.' . $index . '.time_slots', implode(', ', $override->time_slots ?? [])) }}"
                                        placeholder="08:00-12:00, 13:00-17:00"
-                                       class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
+                                       class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#F00000] focus:border-[#F00000] transition">
                             </div>
                             <div class="flex items-center gap-2">
                                 <label class="flex items-center text-sm text-gray-600">
@@ -121,7 +121,7 @@
                 </div>
 
                 <button type="button" id="addOverride"
-                        class="mt-2 px-4 py-2 bg-blue-50 text-blue-700 rounded-lg hover:bg-blue-100 transition border border-blue-200">
+                        class="mt-2 px-4 py-2 bg-[#FFF9E6] text-[#D40000] rounded-lg hover:bg-gray-100 transition border border-[#FFE100]">
                     Add Date Override
                 </button>
                 <p class="text-xs text-gray-500 mt-2">If opening a date outside your usual days, add time slots.</p>
@@ -129,7 +129,7 @@
 
             <div class="mt-8 flex justify-end">
                 <button type="submit"
-                        class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition flex items-center">
+                        class="bg-[#F00000] text-white px-6 py-2 rounded-lg hover:bg-[#D40000] transition flex items-center">
                     <i class="fas fa-save mr-2"></i> Save Availability
                 </button>
             </div>
@@ -153,12 +153,12 @@
                     <div>
                         <label class="block text-xs font-medium text-gray-600 mb-1">Date</label>
                         <input type="date" name="schedule_overrides[${nextIndex}][date]"
-                               class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
+                               class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#F00000] focus:border-[#F00000] transition">
                     </div>
                     <div>
                         <label class="block text-xs font-medium text-gray-600 mb-1">Status</label>
                         <select name="schedule_overrides[${nextIndex}][status]"
-                                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
+                                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#F00000] focus:border-[#F00000] transition">
                             <option value="open">Open</option>
                             <option value="closed">Closed</option>
                         </select>
@@ -167,7 +167,7 @@
                         <label class="block text-xs font-medium text-gray-600 mb-1">Time Slots</label>
                         <input type="text" name="schedule_overrides[${nextIndex}][time_slots]"
                                placeholder="08:00-12:00, 13:00-17:00"
-                               class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
+                               class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#F00000] focus:border-[#F00000] transition">
                     </div>
                     <div class="flex items-center gap-2">
                         <button type="button" class="remove-override text-sm text-red-600 hover:text-red-700">Remove</button>

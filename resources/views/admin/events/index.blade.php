@@ -9,7 +9,7 @@
     }
 
     .events-navbar {
-        background: linear-gradient(90deg, #1e40af 0%, #3b82f6 100%);
+        background: linear-gradient(90deg, #F8650C 0%, #FFC917 100%);
         box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
     }
 
@@ -63,7 +63,7 @@
                 <p class="text-gray-600 mt-2">Admin panel for managing all mental health events, workshops, and seminars</p>
             </div>
             <a href="{{ route('admin.events.create') }}"
-               class="mt-4 md:mt-0 bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition flex items-center">
+               class="mt-4 md:mt-0 bg-[#F00000] text-white px-6 py-3 rounded-lg hover:bg-[#D40000] transition flex items-center">
                 <i class="fas fa-plus mr-2"></i> Create New Event
             </a>
         </div>
@@ -73,8 +73,8 @@
     <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
         <div class="stats-card bg-white rounded-xl shadow-sm p-6">
             <div class="flex items-center">
-                <div class="p-3 bg-blue-100 rounded-lg">
-                    <i class="fas fa-calendar text-blue-600 text-xl"></i>
+                <div class="p-3 bg-gray-100 rounded-lg">
+                    <i class="fas fa-calendar text-[#F00000] text-xl"></i>
                 </div>
                 <div class="ml-4">
                     <p class="text-sm text-gray-600">Total Events</p>
@@ -84,8 +84,8 @@
         </div>
         <div class="stats-card bg-white rounded-xl shadow-sm p-6">
             <div class="flex items-center">
-                <div class="p-3 bg-green-100 rounded-lg">
-                    <i class="fas fa-play-circle text-green-600 text-xl"></i>
+                <div class="p-3 bg-[#FFF9E6] rounded-lg">
+                    <i class="fas fa-play-circle text-[#F8650C] text-xl"></i>
                 </div>
                 <div class="ml-4">
                     <p class="text-sm text-gray-600">Active Events</p>
@@ -95,8 +95,8 @@
         </div>
         <div class="stats-card bg-white rounded-xl shadow-sm p-6">
             <div class="flex items-center">
-                <div class="p-3 bg-purple-100 rounded-lg">
-                    <i class="fas fa-users text-purple-600 text-xl"></i>
+                <div class="p-3 bg-[#FFF9E6] rounded-lg">
+                    <i class="fas fa-users text-[#820000] text-xl"></i>
                 </div>
                 <div class="ml-4">
                     <p class="text-sm text-gray-600">Total Registrations</p>
@@ -142,11 +142,11 @@
             <div class="grid grid-cols-1 md:grid-cols-5 gap-4">
                 <div>
                     <input type="text" name="search"
-                           class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                           class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#F00000] focus:border-[#F00000]"
                            placeholder="Search events..." value="{{ request('search') }}">
                 </div>
                 <div>
-                    <select name="status" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                    <select name="status" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#F00000] focus:border-[#F00000]">
                         <option value="all" {{ request('status') == 'all' ? 'selected' : '' }}>All Status</option>
                         <option value="active" {{ request('status') == 'active' ? 'selected' : '' }}>Active</option>
                         <option value="inactive" {{ request('status') == 'inactive' ? 'selected' : '' }}>Inactive</option>
@@ -155,7 +155,7 @@
                     </select>
                 </div>
                 <div>
-                    <select name="type" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                    <select name="type" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#F00000] focus:border-[#F00000]">
                         <option value="all" {{ request('type') == 'all' ? 'selected' : '' }}>All Types</option>
                         <option value="workshop" {{ request('type') == 'workshop' ? 'selected' : '' }}>Workshop</option>
                         <option value="seminar" {{ request('type') == 'seminar' ? 'selected' : '' }}>Seminar</option>
@@ -165,7 +165,7 @@
                     </select>
                 </div>
                 <div>
-                    <select name="counselor" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                    <select name="counselor" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#F00000] focus:border-[#F00000]">
                         <option value="all" {{ request('counselor') == 'all' ? 'selected' : '' }}>All Counselors</option>
                         @foreach($counselors as $counselor)
                             <option value="{{ $counselor->user_id }}" {{ request('counselor') == $counselor->user_id ? 'selected' : '' }}>
@@ -175,7 +175,7 @@
                     </select>
                 </div>
                 <div>
-                    <button type="submit" class="w-full bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition flex items-center justify-center">
+                    <button type="submit" class="w-full bg-[#F00000] text-white px-4 py-2 rounded-lg hover:bg-[#D40000] transition flex items-center justify-center">
                         <i class="fas fa-filter mr-2"></i> Filter
                     </button>
                 </div>
@@ -190,7 +190,7 @@
             <h3 class="text-xl font-semibold text-gray-600 mb-2">No Events Found</h3>
             <p class="text-gray-500 mb-6">No events match your current filters or no events have been created yet.</p>
             <a href="{{ route('admin.events.create') }}"
-               class="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition inline-flex items-center">
+               class="bg-[#F00000] text-white px-6 py-3 rounded-lg hover:bg-[#D40000] transition inline-flex items-center">
                 <i class="fas fa-plus mr-2"></i> Create Your First Event
             </a>
         </div>
@@ -206,7 +206,7 @@
                                     {{ $event->type }}
                                 </span>
                                 <h3 class="text-lg font-bold">{{ $event->title }}</h3>
-                                <p class="text-sm text-blue-100 mt-1">
+                                <p class="text-sm text-white mt-1">
                                     <i class="fas fa-user-tie mr-1"></i>
                                     {{ $event->user->first_name }} {{ $event->user->last_name }}
                                 </p>
@@ -252,12 +252,12 @@
                         <!-- Action Buttons -->
                         <div class="flex flex-wrap gap-2">
                             <a href="{{ route('admin.events.registrations', $event) }}"
-                               class="flex-1 bg-purple-100 text-purple-700 text-sm px-3 py-2 rounded-lg hover:bg-purple-200 transition text-center">
+                               class="flex-1 bg-[#FFF9E6] text-[#820000] text-sm px-3 py-2 rounded-lg hover:bg-[#FFE100] transition text-center">
                                 <i class="fas fa-users mr-1"></i> Registrations
                             </a>
 
                             <a href="{{ route('admin.events.edit', $event) }}"
-                               class="flex-1 bg-blue-100 text-blue-700 text-sm px-3 py-2 rounded-lg hover:bg-blue-200 transition text-center">
+                               class="flex-1 bg-gray-100 text-[#D40000] text-sm px-3 py-2 rounded-lg hover:bg-[#FFF9E6] transition text-center">
                                 <i class="fas fa-edit mr-1"></i> Edit
                             </a>
 
@@ -303,11 +303,11 @@
                     @if($events->onFirstPage())
                         <span class="px-4 py-2 bg-gray-100 text-gray-400 rounded-lg cursor-not-allowed">Previous</span>
                     @else
-                        <a href="{{ $events->previousPageUrl() }}" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">Previous</a>
+                        <a href="{{ $events->previousPageUrl() }}" class="px-4 py-2 bg-[#F00000] text-white rounded-lg hover:bg-[#D40000] transition">Previous</a>
                     @endif
 
                     @if($events->hasMorePages())
-                        <a href="{{ $events->nextPageUrl() }}" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">Next</a>
+                        <a href="{{ $events->nextPageUrl() }}" class="px-4 py-2 bg-[#F00000] text-white rounded-lg hover:bg-[#D40000] transition">Next</a>
                     @else
                         <span class="px-4 py-2 bg-gray-100 text-gray-400 rounded-lg cursor-not-allowed">Next</span>
                     @endif

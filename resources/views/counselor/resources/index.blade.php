@@ -14,7 +14,7 @@
                     </div>
                     <div class="mt-4 md:mt-0">
                         <a href="{{ route('counselor.resources.create') }}"
-                           class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition flex items-center">
+                           class="bg-[#F00000] text-white px-4 py-2 rounded-lg hover:bg-[#D40000] transition flex items-center">
                             <i class="fas fa-plus mr-2"></i> Add New Resource
                         </a>
                     </div>
@@ -29,7 +29,7 @@
                         <h3 class="text-xl font-semibold text-gray-600 mb-2">No Resources Yet</h3>
                         <p class="text-gray-500">Get started by creating your first resource.</p>
                         <a href="{{ route('counselor.resources.create') }}"
-                           class="inline-block mt-4 bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition">
+                           class="inline-block mt-4 bg-[#F00000] text-white px-6 py-2 rounded-lg hover:bg-[#D40000] transition">
                             Create Resource
                         </a>
                     </div>
@@ -51,8 +51,8 @@
                                     <tr class="hover:bg-gray-50 transition">
                                         <td class="px-6 py-4 whitespace-nowrap">
                                             <div class="flex items-center">
-                                                <div class="flex-shrink-0 h-10 w-10 bg-blue-100 rounded-full flex items-center justify-center">
-                                                    <i class="{{ $resource->icon }} text-blue-600"></i>
+                                                <div class="flex-shrink-0 h-10 w-10 bg-gray-100 rounded-full flex items-center justify-center">
+                                                    <i class="{{ $resource->icon }} text-[#F00000]"></i>
                                                 </div>
                                                 <div class="ml-4">
                                                     <div class="text-sm font-medium text-gray-900">
@@ -65,7 +65,7 @@
                                             </div>
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap">
-                                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 capitalize">
+                                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-[#820000] capitalize">
                                                 {{ $resource->category_label }}
                                             </span>
                                         </td>
@@ -74,7 +74,7 @@
                                                 <a href="{{ $resource->link }}"
                                                    target="_blank"
                                                    rel="noopener noreferrer"
-                                                   class="inline-flex items-center text-blue-600 hover:text-blue-800 transition text-sm"
+                                                   class="inline-flex items-center text-[#F00000] hover:text-[#820000] transition text-sm"
                                                    title="Open resource link">
                                                     <i class="fas fa-external-link-alt mr-1 text-xs"></i>
                                                     <span class="truncate max-w-xs">Visit Link</span>
@@ -103,7 +103,7 @@
                                         <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                             <div class="flex space-x-2">
                                                 <a href="{{ route('counselor.resources.edit', $resource) }}"
-                                                   class="text-blue-600 hover:text-blue-900 transition"
+                                                   class="text-[#F00000] hover:text-[#820000] transition"
                                                    title="Edit">
                                                     <i class="fas fa-edit"></i>
                                                 </a>

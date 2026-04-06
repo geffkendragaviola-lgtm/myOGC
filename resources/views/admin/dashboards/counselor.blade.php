@@ -28,7 +28,7 @@
                         </select>
                     </div>
                     <div>
-                        <button type="submit" class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700">
+                        <button type="submit" class="bg-[#F00000] text-white px-6 py-2 rounded-lg hover:bg-[#D40000]">
                             <i class="fas fa-search mr-2"></i>Search
                         </button>
                     </div>

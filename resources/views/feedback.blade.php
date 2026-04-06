@@ -12,7 +12,7 @@
         }
 
         .feedback-navbar {
-            background: linear-gradient(90deg, #1e40af 0%, #3b82f6 100%);
+            background: linear-gradient(90deg, #F8650C 0%, #FFC917 100%);
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
         }
 
@@ -30,15 +30,15 @@
         }
 
         .rating-option input[type="radio"]:checked + label {
-            background-color: #3b82f6;
+            background-color: #FFC917;
             color: white;
-            border-color: #3b82f6;
+            border-color: #FFC917;
         }
 
         .rating-option input[type="radio"]:checked + span {
-            background-color: #3b82f6;
+            background-color: #FFC917;
             color: white;
-            border-color: #3b82f6;
+            border-color: #FFC917;
         }
 
         .profile-dropdown {
@@ -78,26 +78,26 @@
                 @auth
 
 
-                    <button class="text-white p-2 rounded-full hover:bg-blue-700 transition">
+                    <button class="text-white p-2 rounded-full hover:bg-[#D40000] transition">
                         <i class="fas fa-bell"></i>
                     </button>
 
                     <div class="profile-dropdown">
-                        <button class="text-white p-2 rounded-full hover:bg-blue-700 transition">
+                        <button class="text-white p-2 rounded-full hover:bg-[#D40000] transition">
                             <i class="fas fa-user"></i>
                         </button>
                         <div class="profile-dropdown-content hidden">
                             <div class="mb-3 border-b pb-2">
                                 <div class="font-semibold text-gray-800">{{ Auth::user()->first_name }} {{ Auth::user()->last_name }}</div>
                                 <div class="text-sm text-gray-600">{{ Auth::user()->email }}</div>
-                                <div class="text-xs text-blue-600 capitalize">Role: {{ Auth::user()->role }}</div>
+                                <div class="text-xs text-[#F00000] capitalize">Role: {{ Auth::user()->role }}</div>
                             </div>
-                            <a href="{{ route('profile.edit') }}" class="block py-2 text-gray-700 hover:text-blue-600">
+                            <a href="{{ route('profile.edit') }}" class="block py-2 text-gray-700 hover:text-[#F00000]">
                                 <i class="fas fa-user-circle mr-2"></i> Profile
                             </a>
                             <form method="POST" action="{{ route('logout') }}" class="border-t pt-2 mt-2">
                                 @csrf
-                                <button type="submit" class="w-full text-left block py-2 text-gray-700 hover:text-blue-600">
+                                <button type="submit" class="w-full text-left block py-2 text-gray-700 hover:text-[#F00000]">
                                     <i class="fas fa-sign-out-alt mr-2"></i> Logout
                                 </button>
                             </form>
@@ -105,7 +105,7 @@
                     </div>
                 @else
                     <a href="{{ route('login') }}" class="text-white font-semibold hover:text-yellow-300 transition">Login</a>
-                    <a href="{{ route('register') }}" class="bg-white text-blue-700 font-semibold py-2 px-4 rounded-lg hover:bg-blue-50 transition">Register</a>
+                    <a href="{{ route('register') }}" class="bg-white text-[#D40000] font-semibold py-2 px-4 rounded-lg hover:bg-[#FFE100] transition">Register</a>
                 @endauth
             </div>
         </div>
@@ -157,7 +157,7 @@
                             type="checkbox"
                             name="share_mobile"
                             value="1"
-                            class="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                            class="rounded border-gray-300 text-[#F00000] focus:ring-[#F00000]"
                         >
                         <span class="ml-2 text-gray-600">Mobile Number (optional): I allow the counselor to see my mobile number</span>
                     </label>
@@ -168,7 +168,7 @@
                     <select
                         id="service_availed"
                         name="service_availed"
-                        class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#F00000] focus:border-transparent"
                         required
                     >
                         <option value="" disabled selected>Select service</option>
@@ -186,7 +186,7 @@
                     <select
                         id="target_counselor_id"
                         name="target_counselor_id"
-                        class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#F00000] focus:border-transparent"
                         required
                     >
                         <option value="" disabled selected>Select personnel</option>
@@ -215,7 +215,7 @@
                                 'D' => 'I do not know what a CC is and I did not see one in this office.'
                             ] as $code => $opt)
                                 <label class="flex items-start">
-                                    <input type="radio" name="cc1" value="{{ $code }}" class="mt-1 rounded border-gray-300 text-blue-600 focus:ring-blue-500" required>
+                                    <input type="radio" name="cc1" value="{{ $code }}" class="mt-1 rounded border-gray-300 text-[#F00000] focus:ring-[#F00000]" required>
                                     <span class="ml-2 text-gray-700">{{ $opt }}</span>
                                 </label>
                             @endforeach
@@ -227,7 +227,7 @@
                         <div class="space-y-2">
                             @foreach(['Easy to see','Somewhat easy to see','Difficult to see','Not visible at all','N/A'] as $opt)
                                 <label class="flex items-start">
-                                    <input type="radio" name="cc2" value="{{ $opt }}" class="mt-1 rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                                    <input type="radio" name="cc2" value="{{ $opt }}" class="mt-1 rounded border-gray-300 text-[#F00000] focus:ring-[#F00000]">
                                     <span class="ml-2 text-gray-700">{{ $opt }}</span>
                                 </label>
                             @endforeach
@@ -239,7 +239,7 @@
                         <div class="space-y-2">
                             @foreach(['Helped very much','Somewhat helped','Did not help','N/A'] as $opt)
                                 <label class="flex items-start">
-                                    <input type="radio" name="cc3" value="{{ $opt }}" class="mt-1 rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                                    <input type="radio" name="cc3" value="{{ $opt }}" class="mt-1 rounded border-gray-300 text-[#F00000] focus:ring-[#F00000]">
                                     <span class="ml-2 text-gray-700">{{ $opt }}</span>
                                 </label>
                             @endforeach
@@ -289,7 +289,7 @@
                     <textarea
                         id="comments"
                         name="comments"
-                        class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#F00000] focus:border-transparent"
                         rows="5"
                         placeholder="Your comments/suggestions"
                     ></textarea>
@@ -301,7 +301,7 @@
                             type="checkbox"
                             name="is_anonymous"
                             value="1"
-                            class="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                            class="rounded border-gray-300 text-[#F00000] focus:ring-[#F00000]"
                         >
                         <span class="ml-2 text-gray-600">Submit anonymously</span>
                     </label>
@@ -309,7 +309,7 @@
 
                 <button
                     type="submit"
-                    class="w-full bg-blue-600 text-white py-3 px-6 rounded-lg hover:bg-blue-700 transition text-lg font-semibold"
+                    class="w-full bg-[#F00000] text-white py-3 px-6 rounded-lg hover:bg-[#D40000] transition text-lg font-semibold"
                 >
                     Submit Survey
                 </button>

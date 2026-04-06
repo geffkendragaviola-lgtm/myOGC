@@ -10,7 +10,7 @@
             <!-- Header -->
             <div class="flex justify-between items-center mb-6">
                 <h1 class="text-3xl font-bold text-gray-900">Users Management</h1>
-                <a href="{{ route('admin.users.create') }}" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">
+                <a href="{{ route('admin.users.create') }}" class="bg-[#F00000] text-white px-4 py-2 rounded-lg hover:bg-[#D40000]">
                     <i class="fas fa-user-plus mr-2"></i>Create User
                 </a>
             </div>
@@ -32,7 +32,7 @@
                         </select>
                     </div>
                     <div>
-                        <button type="submit" class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700">
+                        <button type="submit" class="bg-[#F00000] text-white px-6 py-2 rounded-lg hover:bg-[#D40000]">
                             <i class="fas fa-search mr-2"></i>Search
                         </button>
                     </div>
@@ -56,8 +56,8 @@
                         <tr>
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <div class="flex items-center">
-                                    <div class="flex-shrink-0 h-10 w-10 bg-blue-100 rounded-full flex items-center justify-center">
-                                        <i class="fas fa-user text-blue-600"></i>
+                                    <div class="flex-shrink-0 h-10 w-10 bg-gray-100 rounded-full flex items-center justify-center">
+                                        <i class="fas fa-user text-[#F00000]"></i>
                                     </div>
                                     <div class="ml-4">
                                         <div class="text-sm font-medium text-gray-900">
@@ -70,7 +70,7 @@
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full
                                     {{ $user->role === 'admin' ? 'bg-red-100 text-red-800' :
-                                       ($user->role === 'counselor' ? 'bg-purple-100 text-purple-800' :
+                                       ($user->role === 'counselor' ? 'bg-[#FFF9E6] text-[#820000]' :
                                        'bg-green-100 text-green-800') }}">
                                     {{ ucfirst($user->role) }}
                                 </span>
@@ -88,7 +88,7 @@
                                 {{ $user->created_at->format('M j, Y') }}
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                <a href="{{ route('admin.users.edit', $user) }}" class="text-blue-600 hover:text-blue-900 mr-3">
+                                <a href="{{ route('admin.users.edit', $user) }}" class="text-[#F00000] hover:text-[#820000] mr-3">
                                     <i class="fas fa-edit"></i>
                                 </a>
                                 <form action="{{ route('admin.users.delete', $user) }}" method="POST" class="inline" onsubmit="return confirm('Are you sure you want to delete this user?')">

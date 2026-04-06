@@ -15,7 +15,7 @@
                     <i class="fas fa-arrow-left mr-2"></i>Back to Appointments
                 </a>
                 @if($appointment->student)
-                    <a href="{{ route('admin.students.edit', $appointment->student) }}" class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition">
+                    <a href="{{ route('admin.students.edit', $appointment->student) }}" class="px-4 py-2 bg-[#F00000] text-white rounded-lg hover:bg-[#D40000] transition">
                         <i class="fas fa-user mr-2"></i>View Student Details
                     </a>
                 @endif

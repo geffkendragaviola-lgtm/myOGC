@@ -10,7 +10,7 @@
             border-radius: 9999px;
         }
 
-        .status-registered { background-color: #dbeafe; color: #1e40af; }
+        .status-registered { background-color: #dbeafe; color: #F8650C; }
         .status-attended { background-color: #d1fae5; color: #065f46; }
         .status-cancelled { background-color: #fee2e2; color: #991b1b; }
     </style>
@@ -51,8 +51,8 @@
             <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
                 <div class="bg-white rounded-xl shadow-sm p-6">
                     <div class="flex items-center">
-                        <div class="p-3 bg-blue-100 rounded-lg">
-                            <i class="fas fa-users text-blue-600 text-xl"></i>
+                        <div class="p-3 bg-gray-100 rounded-lg">
+                            <i class="fas fa-users text-[#F00000] text-xl"></i>
                         </div>
                         <div class="ml-4">
                             <p class="text-sm text-gray-600">Total Registrations</p>
@@ -62,8 +62,8 @@
                 </div>
                 <div class="bg-white rounded-xl shadow-sm p-6">
                     <div class="flex items-center">
-                        <div class="p-3 bg-green-100 rounded-lg">
-                            <i class="fas fa-user-check text-green-600 text-xl"></i>
+                        <div class="p-3 bg-[#FFF9E6] rounded-lg">
+                            <i class="fas fa-user-check text-[#F8650C] text-xl"></i>
                         </div>
                         <div class="ml-4">
                             <p class="text-sm text-gray-600">Registered</p>
@@ -73,8 +73,8 @@
                 </div>
                 <div class="bg-white rounded-xl shadow-sm p-6">
                     <div class="flex items-center">
-                        <div class="p-3 bg-purple-100 rounded-lg">
-                            <i class="fas fa-calendar-check text-purple-600 text-xl"></i>
+                        <div class="p-3 bg-[#FFF9E6] rounded-lg">
+                            <i class="fas fa-calendar-check text-[#820000] text-xl"></i>
                         </div>
                         <div class="ml-4">
                             <p class="text-sm text-gray-600">Attended</p>
@@ -84,8 +84,8 @@
                 </div>
                 <div class="bg-white rounded-xl shadow-sm p-6">
                     <div class="flex items-center">
-                        <div class="p-3 bg-red-100 rounded-lg">
-                            <i class="fas fa-user-times text-red-600 text-xl"></i>
+                        <div class="p-3 bg-[#FFF0F0] rounded-lg">
+                            <i class="fas fa-user-times text-[#820000] text-xl"></i>
                         </div>
                         <div class="ml-4">
                             <p class="text-sm text-gray-600">Cancelled</p>
@@ -129,8 +129,8 @@
                                         <!-- Student Information -->
                                         <td class="px-6 py-4 whitespace-nowrap">
                                             <div class="flex items-center">
-                                                <div class="flex-shrink-0 h-10 w-10 bg-blue-100 rounded-full flex items-center justify-center">
-                                                    <span class="text-blue-600 font-semibold">
+                                                <div class="flex-shrink-0 h-10 w-10 bg-gray-100 rounded-full flex items-center justify-center">
+                                                    <span class="text-[#F00000] font-semibold">
                                                         {{ substr($user->first_name, 0, 1) }}{{ substr($user->last_name, 0, 1) }}
                                                     </span>
                                                 </div>
@@ -224,9 +224,9 @@
 
             <!-- Registration Summary -->
             @if(!$registrations->isEmpty())
-                <div class="mt-6 bg-blue-50 border border-blue-200 rounded-lg p-4">
-                    <h3 class="text-lg font-semibold text-blue-800 mb-2">Registration Summary</h3>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-blue-700">
+                <div class="mt-6 bg-[#FFF9E6] border border-[#FFE100] rounded-lg p-4">
+                    <h3 class="text-lg font-semibold text-[#820000] mb-2">Registration Summary</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-[#D40000]">
                         <div>
                             <strong>Total Capacity:</strong>
                             {{ $event->max_attendees ? $event->max_attendees . ' students' : 'Unlimited' }}

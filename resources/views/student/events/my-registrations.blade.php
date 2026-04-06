@@ -24,8 +24,8 @@
             <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
                 <div class="bg-white rounded-xl shadow-sm p-6">
                     <div class="flex items-center">
-                        <div class="p-3 bg-blue-100 rounded-lg">
-                            <i class="fas fa-calendar text-blue-600 text-xl"></i>
+                        <div class="p-3 bg-gray-100 rounded-lg">
+                            <i class="fas fa-calendar text-[#F00000] text-xl"></i>
                         </div>
                         <div class="ml-4">
                             <p class="text-sm text-gray-600">Total Registrations</p>
@@ -35,8 +35,8 @@
                 </div>
                 <div class="bg-white rounded-xl shadow-sm p-6">
                     <div class="flex items-center">
-                        <div class="p-3 bg-green-100 rounded-lg">
-                            <i class="fas fa-play-circle text-green-600 text-xl"></i>
+                        <div class="p-3 bg-[#FFF9E6] rounded-lg">
+                            <i class="fas fa-play-circle text-[#F8650C] text-xl"></i>
                         </div>
                         <div class="ml-4">
                             <p class="text-sm text-gray-600">Active Registrations</p>
@@ -46,8 +46,8 @@
                 </div>
                 <div class="bg-white rounded-xl shadow-sm p-6">
                     <div class="flex items-center">
-                        <div class="p-3 bg-purple-100 rounded-lg">
-                            <i class="fas fa-check-circle text-purple-600 text-xl"></i>
+                        <div class="p-3 bg-[#FFF9E6] rounded-lg">
+                            <i class="fas fa-check-circle text-[#820000] text-xl"></i>
                         </div>
                         <div class="ml-4">
                             <p class="text-sm text-gray-600">Attended Events</p>
@@ -72,7 +72,7 @@
             <div class="bg-white rounded-xl shadow-sm mb-6">
                 <div class="border-b border-gray-200">
                     <nav class="flex -mb-px">
-                        <button id="active-tab" class="tab-button active py-4 px-6 text-center border-b-2 border-blue-500 font-medium text-blue-600">
+                        <button id="active-tab" class="tab-button active py-4 px-6 text-center border-b-2 border-[#F00000] font-medium text-[#F00000]">
                             <i class="fas fa-calendar-check mr-2"></i>
                             Active Registrations ({{ $registrations->where('status', 'registered')->count() }})
                         </button>
@@ -95,7 +95,7 @@
                         <i class="fas fa-calendar-plus text-6xl text-gray-300 mb-4"></i>
                         <h3 class="text-xl font-semibold text-gray-600 mb-2">No Active Registrations</h3>
                         <p class="text-gray-500 mb-6">You don't have any upcoming event registrations.</p>
-                        <a href="{{ route('student.events.available') }}" class="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition">
+                        <a href="{{ route('student.events.available') }}" class="bg-[#F00000] text-white px-6 py-3 rounded-lg hover:bg-[#D40000] transition">
                             Browse Available Events
                         </a>
                     </div>
@@ -161,7 +161,7 @@
                                     <!-- Date and Time -->
                                     <div class="space-y-2 mb-4">
                                         <div class="flex items-center text-sm text-gray-600">
-                                            <i class="far fa-calendar mr-2 text-blue-500"></i>
+                                            <i class="far fa-calendar mr-2 text-[#F8650C]"></i>
                                             <span>{{ $registration->event->date_range }}</span>
                                         </div>
                                         <div class="flex items-center text-sm text-gray-600">
@@ -185,18 +185,18 @@
 
                                     <!-- Re-registration Option -->
                                     @if($registration->event->is_registration_open && $registration->event->hasAvailableSlots())
-                                        <div class="bg-blue-50 border border-blue-200 rounded-lg p-3 mb-4">
+                                        <div class="bg-[#FFF9E6] border border-[#FFE100] rounded-lg p-3 mb-4">
                                             <div class="flex items-center mb-2">
-                                                <i class="fas fa-redo-alt text-blue-500 mr-2"></i>
-                                                <span class="text-blue-800 font-medium text-sm">Re-registration Available</span>
+                                                <i class="fas fa-redo-alt text-[#F8650C] mr-2"></i>
+                                                <span class="text-[#820000] font-medium text-sm">Re-registration Available</span>
                                             </div>
-                                            <p class="text-blue-700 text-xs mb-3">
+                                            <p class="text-[#D40000] text-xs mb-3">
                                                 This event still has available slots. You can register again if you'd like to attend.
                                             </p>
                                             <form action="{{ route('student.events.re-register', $registration->event) }}" method="POST">
                                                 @csrf
                                                 <button type="submit"
-                                                        class="w-full bg-blue-600 text-white text-sm px-3 py-2 rounded-lg hover:bg-blue-700 transition flex items-center justify-center">
+                                                        class="w-full bg-[#F00000] text-white text-sm px-3 py-2 rounded-lg hover:bg-[#D40000] transition flex items-center justify-center">
                                                     <i class="fas fa-redo-alt mr-2"></i>
                                                     Re-register for Event
                                                 </button>
@@ -254,7 +254,7 @@
                                             <!-- Event Status -->
                                             <div class="flex justify-between items-center text-sm">
                                                 <span class="text-gray-700">Event Status:</span>
-                                                <span class="{{ $registration->event->is_upcoming ? 'bg-blue-100 text-blue-800' : 'bg-gray-100 text-gray-600' }} px-2 py-1 rounded-full text-xs">
+                                                <span class="{{ $registration->event->is_upcoming ? 'bg-gray-100 text-[#820000]' : 'bg-gray-100 text-gray-600' }} px-2 py-1 rounded-full text-xs">
                                                     {{ $registration->event->is_upcoming ? 'Upcoming' : 'Past' }}
                                                 </span>
                                             </div>
@@ -314,7 +314,7 @@
                                     <!-- Date and Time -->
                                     <div class="space-y-2 mb-4">
                                         <div class="flex items-center text-sm text-gray-600">
-                                            <i class="far fa-calendar mr-2 text-blue-500"></i>
+                                            <i class="far fa-calendar mr-2 text-[#F8650C]"></i>
                                             <span>{{ $registration->event->date_range }}</span>
                                         </div>
                                         <div class="flex items-center text-sm text-gray-600">
@@ -382,8 +382,8 @@
         }
 
         .tab-button.active {
-            border-bottom-color: #3b82f6;
-            color: #2563eb;
+            border-bottom-color: #FFC917;
+            color: #F8650C;
         }
 
         .tab-content {

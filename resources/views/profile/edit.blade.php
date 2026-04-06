@@ -12,7 +12,7 @@
         }
 
         .profile-navbar {
-            background: linear-gradient(90deg, #1e40af 0%, #3b82f6 100%);
+            background: linear-gradient(90deg, #F8650C 0%, #FFC917 100%);
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
         }
 
@@ -26,8 +26,8 @@
         }
 
         .tab-active {
-            border-bottom: 3px solid #3b82f6;
-            color: #3b82f6;
+            border-bottom: 3px solid #FFC917;
+            color: #FFC917;
             font-weight: 600;
         }
     </style>
@@ -50,7 +50,7 @@
                     <div class="text-white">
                         Welcome, {{ Auth::user()->first_name }}
                     </div>
-                    <a href="{{ route('dashboard') }}" class="text-white p-2 rounded-full hover:bg-blue-700 transition">
+                    <a href="{{ route('dashboard') }}" class="text-white p-2 rounded-full hover:bg-[#D40000] transition">
                         <i class="fas fa-home"></i>
                     </a>
                 </div>
@@ -77,13 +77,13 @@
             <div class="bg-white rounded-xl shadow-sm mb-6">
                 <div class="border-b">
                     <nav class="flex -mb-px">
-                        <button id="personal-tab" class="tab-active py-4 px-6 text-center font-medium text-gray-600 hover:text-blue-600 transition">
+                        <button id="personal-tab" class="tab-active py-4 px-6 text-center font-medium text-gray-600 hover:text-[#F00000] transition">
                             Personal Information
                         </button>
-                        <button id="role-tab" class="py-4 px-6 text-center font-medium text-gray-600 hover:text-blue-600 transition">
+                        <button id="role-tab" class="py-4 px-6 text-center font-medium text-gray-600 hover:text-[#F00000] transition">
                             {{ ucfirst(Auth::user()->role) }} Profile
                         </button>
-                        <button id="password-tab" class="py-4 px-6 text-center font-medium text-gray-600 hover:text-blue-600 transition">
+                        <button id="password-tab" class="py-4 px-6 text-center font-medium text-gray-600 hover:text-[#F00000] transition">
                             Change Password
                         </button>
                     </nav>
@@ -97,7 +97,7 @@
                     @elseif(session('status') == 'password-updated') bg-green-50 text-green-700 border border-green-200
                     @elseif(session('status') == 'student-profile-updated') bg-green-50 text-green-700 border border-green-200
                     @elseif(session('status') == 'counselor-profile-updated') bg-green-50 text-green-700 border border-green-200
-                    @else bg-blue-50 text-blue-700 border border-blue-200 @endif">
+                    @else bg-[#FFF9E6] text-[#D40000] border border-[#FFE100] @endif">
                     <div class="flex items-center">
                         <i class="fas fa-check-circle mr-2"></i>
                         @switch(session('status'))
@@ -139,7 +139,7 @@
                                 <label for="first_name" class="block text-sm font-medium text-gray-700 mb-2">First Name</label>
                                 <input type="text" id="first_name" name="first_name" value="{{ old('first_name', $user->first_name) }}"
                                        @if($lockPersonalInfo) disabled @endif
-                                       class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition @if($lockPersonalInfo) bg-gray-100 @endif">
+                                       class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#F00000] focus:border-[#F00000] transition @if($lockPersonalInfo) bg-gray-100 @endif">
                                 @error('first_name')
                                     <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                                 @enderror
@@ -150,7 +150,7 @@
                                 <label for="middle_name" class="block text-sm font-medium text-gray-700 mb-2">Middle Name</label>
                                 <input type="text" id="middle_name" name="middle_name" value="{{ old('middle_name', $user->middle_name) }}"
                                        @if($lockPersonalInfo) disabled @endif
-                                       class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition @if($lockPersonalInfo) bg-gray-100 @endif">
+                                       class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#F00000] focus:border-[#F00000] transition @if($lockPersonalInfo) bg-gray-100 @endif">
                                 @error('middle_name')
                                     <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                                 @enderror
@@ -161,7 +161,7 @@
                                 <label for="last_name" class="block text-sm font-medium text-gray-700 mb-2">Last Name</label>
                                 <input type="text" id="last_name" name="last_name" value="{{ old('last_name', $user->last_name) }}"
                                        @if($lockPersonalInfo) disabled @endif
-                                       class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition @if($lockPersonalInfo) bg-gray-100 @endif">
+                                       class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#F00000] focus:border-[#F00000] transition @if($lockPersonalInfo) bg-gray-100 @endif">
                                 @error('last_name')
                                     <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                                 @enderror
@@ -172,7 +172,7 @@
     <label for="birthdate" class="block text-sm font-medium text-gray-700 mb-2">Birthdate</label>
     <input type="date" id="birthdate" name="birthdate" value="{{ old('birthdate', $user->birthdate ? \Carbon\Carbon::parse($user->birthdate)->format('Y-m-d') : '') }}"
            @if($lockPersonalInfo) disabled @endif
-           class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition @if($lockPersonalInfo) bg-gray-100 @endif">
+           class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#F00000] focus:border-[#F00000] transition @if($lockPersonalInfo) bg-gray-100 @endif">
     @error('birthdate')
         <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
     @enderror
@@ -182,7 +182,7 @@
                             <div>
                                 <label for="age" class="block text-sm font-medium text-gray-700 mb-2">Age</label>
                                 <input type="number" id="age" name="age" value="{{ old('age', $user->age) }}" readonly
-                                       class="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
+                                       class="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-100 focus:ring-2 focus:ring-[#F00000] focus:border-[#F00000] transition">
                                 @error('age')
                                     <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                                 @enderror
@@ -191,7 +191,7 @@
                             <!-- Sex -->
                             <div>
                                 <label for="sex" class="block text-sm font-medium text-gray-700 mb-2">Sex</label>
-                                <select id="sex" name="sex" @if($lockPersonalInfo) disabled @endif class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition @if($lockPersonalInfo) bg-gray-100 @endif">
+                                <select id="sex" name="sex" @if($lockPersonalInfo) disabled @endif class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#F00000] focus:border-[#F00000] transition @if($lockPersonalInfo) bg-gray-100 @endif">
                                     <option value="">Select Sex</option>
                                     <option value="male" {{ old('sex', $user->sex) == 'male' ? 'selected' : '' }}>Male</option>
                                     <option value="female" {{ old('sex', $user->sex) == 'female' ? 'selected' : '' }}>Female</option>
@@ -207,7 +207,7 @@
                                 <label for="birthplace" class="block text-sm font-medium text-gray-700 mb-2">Birthplace</label>
                                 <input type="text" id="birthplace" name="birthplace" value="{{ old('birthplace', $user->birthplace) }}"
                                        @if($lockPersonalInfo) disabled @endif
-                                       class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition @if($lockPersonalInfo) bg-gray-100 @endif">
+                                       class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#F00000] focus:border-[#F00000] transition @if($lockPersonalInfo) bg-gray-100 @endif">
                                 @error('birthplace')
                                     <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                                 @enderror
@@ -218,7 +218,7 @@
                                 <label for="religion" class="block text-sm font-medium text-gray-700 mb-2">Religion</label>
                                 <input type="text" id="religion" name="religion" value="{{ old('religion', $user->religion) }}"
                                        @if($lockPersonalInfo) disabled @endif
-                                       class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition @if($lockPersonalInfo) bg-gray-100 @endif">
+                                       class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#F00000] focus:border-[#F00000] transition @if($lockPersonalInfo) bg-gray-100 @endif">
                                 @error('religion')
                                     <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                                 @enderror
@@ -229,7 +229,7 @@
                             <!-- Civil Status -->
                             <div>
                                 <label for="civil_status" class="block text-sm font-medium text-gray-700 mb-2">Civil Status</label>
-                                <select id="civil_status" name="civil_status" @if($lockPersonalInfo) disabled @endif class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition @if($lockPersonalInfo) bg-gray-100 @endif">
+                                <select id="civil_status" name="civil_status" @if($lockPersonalInfo) disabled @endif class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#F00000] focus:border-[#F00000] transition @if($lockPersonalInfo) bg-gray-100 @endif">
                                     <option value="">Select Civil Status</option>
                                     <option value="single" {{ old('civil_status', $user->civil_status) == 'single' ? 'selected' : '' }}>Single</option>
                                     <option value="married" {{ old('civil_status', $user->civil_status) == 'married' ? 'selected' : '' }}>Married</option>
@@ -246,7 +246,7 @@
                                 <label for="citizenship" class="block text-sm font-medium text-gray-700 mb-2">Citizenship</label>
                                 <input type="text" id="citizenship" name="citizenship" value="{{ old('citizenship', $user->citizenship) }}"
                                        @if($lockPersonalInfo) disabled @endif
-                                       class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition @if($lockPersonalInfo) bg-gray-100 @endif">
+                                       class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#F00000] focus:border-[#F00000] transition @if($lockPersonalInfo) bg-gray-100 @endif">
                                 @error('citizenship')
                                     <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                                 @enderror
@@ -257,7 +257,7 @@
                                 <label for="email" class="block text-sm font-medium text-gray-700 mb-2">Email Address</label>
                                 <input type="email" id="email" name="email" value="{{ old('email', $user->email) }}"
                                        @if($lockPersonalInfo) disabled @endif
-                                       class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition @if($lockPersonalInfo) bg-gray-100 @endif">
+                                       class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#F00000] focus:border-[#F00000] transition @if($lockPersonalInfo) bg-gray-100 @endif">
                                 @error('email')
                                     <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                                 @enderror
@@ -268,7 +268,7 @@
                                 <label for="phone_number" class="block text-sm font-medium text-gray-700 mb-2">Phone Number</label>
                                 <input type="text" id="phone_number" name="phone_number" value="{{ old('phone_number', $user->phone_number) }}"
                                        @if($lockPersonalInfo) disabled @endif
-                                       class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition @if($lockPersonalInfo) bg-gray-100 @endif">
+                                       class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#F00000] focus:border-[#F00000] transition @if($lockPersonalInfo) bg-gray-100 @endif">
                                 @error('phone_number')
                                     <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                                 @enderror
@@ -279,7 +279,7 @@
                                 <label for="address" class="block text-sm font-medium text-gray-700 mb-2">Address</label>
                                 <textarea id="address" name="address" rows="3"
                                           @if($lockPersonalInfo) disabled @endif
-                                          class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition @if($lockPersonalInfo) bg-gray-100 @endif">{{ old('address', $user->address) }}</textarea>
+                                          class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#F00000] focus:border-[#F00000] transition @if($lockPersonalInfo) bg-gray-100 @endif">{{ old('address', $user->address) }}</textarea>
                                 @error('address')
                                     <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                                 @enderror
@@ -289,7 +289,7 @@
                         @if(!$lockPersonalInfo)
                             <div class="mt-8 flex justify-end">
                                 <button type="submit"
-                                        class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition flex items-center">
+                                        class="bg-[#F00000] text-white px-6 py-2 rounded-lg hover:bg-[#D40000] transition flex items-center">
                                     <i class="fas fa-save mr-2"></i> Save Changes
                                 </button>
                             </div>
@@ -317,7 +317,7 @@
                                     <input type="text" id="student_id" name="student_id"
                                            value="{{ old('student_id', $studentProfile->student_id ?? '') }}"
                                            disabled
-                                           class="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
+                                           class="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-100 focus:ring-2 focus:ring-[#F00000] focus:border-[#F00000] transition">
                                     @error('student_id')
                                         <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                                     @enderror
@@ -328,7 +328,7 @@
                                     <label for="year_level" class="block text-sm font-medium text-gray-700 mb-2">Year Level</label>
                                     <select id="year_level" name="year_level"
                                             disabled
-                                            class="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
+                                            class="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-100 focus:ring-2 focus:ring-[#F00000] focus:border-[#F00000] transition">
                                         <option value="">Select Year Level</option>
                                         <option value="1st Year" {{ old('year_level', $studentProfile->year_level ?? '') == '1st Year' ? 'selected' : '' }}>1st Year</option>
                                         <option value="2nd Year" {{ old('year_level', $studentProfile->year_level ?? '') == '2nd Year' ? 'selected' : '' }}>2nd Year</option>
@@ -348,7 +348,7 @@
                                     <input type="text" id="course" name="course"
                                            value="{{ old('course', $studentProfile->course ?? '') }}"
                                            disabled
-                                           class="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
+                                           class="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-100 focus:ring-2 focus:ring-[#F00000] focus:border-[#F00000] transition"
                                            placeholder="e.g., Bachelor of Science in Computer Science">
                                     @error('course')
                                         <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
@@ -360,7 +360,7 @@
                                     <label for="college_id" class="block text-sm font-medium text-gray-700 mb-2">College</label>
                                     <select id="college_id" name="college_id"
                                             disabled
-                                            class="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
+                                            class="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-100 focus:ring-2 focus:ring-[#F00000] focus:border-[#F00000] transition">
                                         <option value="">Select College</option>
                                         @foreach(\App\Models\College::all() as $college)
                                             <option value="{{ $college->id }}"
@@ -388,7 +388,7 @@
                                     <input type="text" id="position" name="position"
                                            value="{{ old('position', $counselorProfile->position ?? '') }}"
                                            disabled
-                                           class="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
+                                           class="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-100 focus:ring-2 focus:ring-[#F00000] focus:border-[#F00000] transition">
                                     @error('position')
                                         <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                                     @enderror
@@ -400,7 +400,7 @@
                                     <input type="text" id="credentials" name="credentials"
                                            value="{{ old('credentials', $counselorProfile->credentials ?? '') }}"
                                            disabled
-                                           class="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
+                                           class="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-100 focus:ring-2 focus:ring-[#F00000] focus:border-[#F00000] transition">
                                     @error('credentials')
                                         <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                                     @enderror
@@ -412,7 +412,7 @@
                                     <input type="text" id="google_calendar_id" name="google_calendar_id"
                                            value="{{ old('google_calendar_id', $counselorProfile->google_calendar_id ?? '') }}"
                                            placeholder="e.g. counselor@yourdomain.com"
-                                           class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
+                                           class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#F00000] focus:border-[#F00000] transition">
                                     <p class="text-xs text-gray-500 mt-1">Used to sync booked appointments to your calendar.</p>
                                     @error('google_calendar_id')
                                         <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
@@ -424,7 +424,7 @@
                                     <label for="college_id" class="block text-sm font-medium text-gray-700 mb-2">Assigned College</label>
                                     <select id="college_id" name="college_id"
                                             disabled
-                                            class="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
+                                            class="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-100 focus:ring-2 focus:ring-[#F00000] focus:border-[#F00000] transition">
                                         <option value="">Select College</option>
                                         @foreach(\App\Models\College::all() as $college)
                                             <option value="{{ $college->id }}"
@@ -444,7 +444,7 @@
                                         <input type="checkbox" name="is_head" value="1"
                                                {{ old('is_head', $counselorProfile->is_head ?? '') ? 'checked' : '' }}
                                                disabled
-                                               class="rounded border-gray-300 text-indigo-600 shadow-sm focus:ring-indigo-500">
+                                               class="rounded border-gray-300 text-[#F00000] shadow-sm focus:ring-[#F00000]">
                                         <span class="ms-2 text-sm text-gray-600">Head Counselor</span>
                                     </label>
                                     @error('is_head')
@@ -456,7 +456,7 @@
 
                             <div class="mt-8 flex justify-end">
                                 <button type="submit"
-                                        class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition flex items-center">
+                                        class="bg-[#F00000] text-white px-6 py-2 rounded-lg hover:bg-[#D40000] transition flex items-center">
                                     <i class="fas fa-save mr-2"></i> Save Counselor Profile
                                 </button>
                             </div>
@@ -479,7 +479,7 @@
                             <div>
                                 <label for="current_password" class="block text-sm font-medium text-gray-700 mb-2">Current Password</label>
                                 <input type="password" id="current_password" name="current_password"
-                                       class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
+                                       class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#F00000] focus:border-[#F00000] transition">
                                 @error('current_password')
                                     <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                                 @enderror
@@ -489,7 +489,7 @@
                             <div>
                                 <label for="password" class="block text-sm font-medium text-gray-700 mb-2">New Password</label>
                                 <input type="password" id="password" name="password"
-                                       class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
+                                       class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#F00000] focus:border-[#F00000] transition">
                                 @error('password')
                                     <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                                 @enderror
@@ -499,13 +499,13 @@
                             <div>
                                 <label for="password_confirmation" class="block text-sm font-medium text-gray-700 mb-2">Confirm New Password</label>
                                 <input type="password" id="password_confirmation" name="password_confirmation"
-                                       class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
+                                       class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#F00000] focus:border-[#F00000] transition">
                             </div>
                         </div>
 
                         <div class="mt-8 flex justify-end">
                             <button type="submit"
-                                    class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition flex items-center">
+                                    class="bg-[#F00000] text-white px-6 py-2 rounded-lg hover:bg-[#D40000] transition flex items-center">
                                 <i class="fas fa-key mr-2"></i> Update Password
                             </button>
                         </div>
@@ -576,7 +576,7 @@
             statusMessages.forEach(message => {
                 // Check if it's actually a status message (has specific background colors)
                 const hasStatusStyle = message.classList.contains('bg-green-50') ||
-                                      message.classList.contains('bg-blue-50') ||
+                                      message.classList.contains('bg-[#FFF9E6]') ||
                                       message.classList.contains('bg-red-50') ||
                                       message.classList.contains('bg-yellow-50');
 

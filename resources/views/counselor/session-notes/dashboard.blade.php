@@ -54,8 +54,8 @@
         <div class="grid grid-cols-1 md:grid-cols-5 gap-6 mb-6">
             <div class="bg-white rounded-xl shadow-sm p-6">
                 <div class="flex items-center">
-                    <div class="p-3 bg-blue-100 rounded-lg">
-                        <i class="fas fa-clipboard-list text-blue-600 text-xl"></i>
+                    <div class="p-3 bg-gray-100 rounded-lg">
+                        <i class="fas fa-clipboard-list text-[#F00000] text-xl"></i>
                     </div>
                     <div class="ml-4">
                         <p class="text-sm text-gray-600">Total Notes</p>
@@ -65,8 +65,8 @@
             </div>
             <div class="bg-white rounded-xl shadow-sm p-6">
                 <div class="flex items-center">
-                    <div class="p-3 bg-purple-100 rounded-lg">
-                        <i class="fas fa-users text-purple-600 text-xl"></i>
+                    <div class="p-3 bg-[#FFF9E6] rounded-lg">
+                        <i class="fas fa-users text-[#820000] text-xl"></i>
                     </div>
                     <div class="ml-4">
                         <p class="text-sm text-gray-600">Students</p>
@@ -76,8 +76,8 @@
             </div>
             <div class="bg-white rounded-xl shadow-sm p-6">
                 <div class="flex items-center">
-                    <div class="p-3 bg-green-100 rounded-lg">
-                        <i class="fas fa-calendar-check text-green-600 text-xl"></i>
+                    <div class="p-3 bg-[#FFF9E6] rounded-lg">
+                        <i class="fas fa-calendar-check text-[#F8650C] text-xl"></i>
                     </div>
                     <div class="ml-4">
                         <p class="text-sm text-gray-600">This Month</p>
@@ -98,8 +98,8 @@
             </div>
             <div class="bg-white rounded-xl shadow-sm p-6">
                 <div class="flex items-center">
-                    <div class="p-3 bg-red-100 rounded-lg">
-                        <i class="fas fa-exclamation-triangle text-red-600 text-xl"></i>
+                    <div class="p-3 bg-[#FFF0F0] rounded-lg">
+                        <i class="fas fa-exclamation-triangle text-[#820000] text-xl"></i>
                     </div>
                     <div class="ml-4">
                         <p class="text-sm text-gray-600">Crisis Sessions</p>
@@ -122,7 +122,7 @@
                                    name="search"
                                    placeholder="Search by student name, notes, or college..."
                                    value="{{ request('search') }}"
-                                   class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
+                                   class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#F00000] focus:border-[#F00000] transition">
                             <div class="absolute inset-y-0 left-0 pl-3 flex items-center">
                                 <i class="fas fa-search text-gray-400"></i>
                             </div>
@@ -133,7 +133,7 @@
                     <div>
                         <label for="session_type" class="block text-sm font-medium text-gray-700 mb-2">Session Type</label>
                         <select id="session_type" name="session_type"
-                                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
+                                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#F00000] focus:border-[#F00000] transition">
                             <option value="">All Types</option>
                             @foreach($sessionTypes as $value => $label)
                                 <option value="{{ $value }}" {{ request('session_type') == $value ? 'selected' : '' }}>
@@ -147,7 +147,7 @@
                     <div>
                         <label for="date_range" class="block text-sm font-medium text-gray-700 mb-2">Date Range</label>
                         <select id="date_range" name="date_range"
-                                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
+                                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#F00000] focus:border-[#F00000] transition">
                             <option value="">All Time</option>
                             <option value="today" {{ request('date_range') == 'today' ? 'selected' : '' }}>Today</option>
                             <option value="week" {{ request('date_range') == 'week' ? 'selected' : '' }}>This Week</option>
@@ -168,7 +168,7 @@
                             <i class="fas fa-refresh mr-2"></i>Reset
                         </a>
                         <button type="submit"
-                                class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">
+                                class="px-4 py-2 bg-[#F00000] text-white rounded-lg hover:bg-[#D40000] transition">
                             <i class="fas fa-filter mr-2"></i>Apply Filters
                         </button>
                     </div>
@@ -196,7 +196,7 @@
                     <p class="text-gray-500 text-lg">No session notes found.</p>
                     <p class="text-gray-400 text-sm mt-1">Session notes will appear here after you create them.</p>
                     <a href="{{ route('counselor.appointments') }}"
-                       class="inline-block mt-4 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition">
+                       class="inline-block mt-4 bg-[#F00000] text-white px-4 py-2 rounded-lg hover:bg-[#D40000] transition">
                         <i class="fas fa-calendar-plus mr-2"></i>Go to Appointments
                     </a>
                 </div>
@@ -218,8 +218,8 @@
                                 <tr class="hover:bg-gray-50 transition fade-in">
                                     <td class="px-6 py-4 whitespace-nowrap">
                                         <div class="flex items-center">
-                                            <div class="flex-shrink-0 h-10 w-10 bg-blue-100 rounded-full flex items-center justify-center">
-                                                <i class="fas fa-user text-blue-600"></i>
+                                            <div class="flex-shrink-0 h-10 w-10 bg-gray-100 rounded-full flex items-center justify-center">
+                                                <i class="fas fa-user text-[#F00000]"></i>
                                             </div>
                                             <div class="ml-4">
                                                 <div class="text-sm font-medium text-gray-900">
@@ -246,7 +246,7 @@
                                         <div class="flex flex-col space-y-2">
                                             <!-- Session Number -->
                                             <div class="flex items-center">
-                                                <span class="session-badge px-2 py-1 rounded-full bg-indigo-100 text-indigo-800 font-semibold">
+                                                <span class="session-badge px-2 py-1 rounded-full bg-[#FFF9E6] text-[#820000] font-semibold">
                                                     {{ $note->session_number }}{{ $note->session_number == 1 ? 'st' : ($note->session_number == 2 ? 'nd' : ($note->session_number == 3 ? 'rd' : 'th')) }} Session
                                                 </span>
                                             </div>
@@ -279,7 +279,7 @@
                                             {{ Str::limit($note->notes, 100) }}
                                         </div>
                                         @if($note->follow_up_actions)
-                                            <div class="mt-1 text-xs text-blue-600">
+                                            <div class="mt-1 text-xs text-[#F00000]">
                                                 <i class="fas fa-tasks mr-1"></i>Has follow-up actions
                                             </div>
                                         @endif
@@ -306,7 +306,7 @@
                                         <div class="flex space-x-2">
                                             <!-- View Details Button - Now opens modal -->
                                             <button onclick="showSessionNoteDetails({{ $note->id }})"
-                                               class="text-blue-600 hover:text-blue-900 transition"
+                                               class="text-[#F00000] hover:text-[#820000] transition"
                                                title="View Details">
                                                 <i class="fas fa-eye"></i>
                                             </button>
@@ -317,12 +317,12 @@
                                                 <i class="fas fa-edit"></i>
                                             </a>
                                             <a href="{{ route('counselor.session-notes.index', $note->student) }}"
-                                               class="text-purple-600 hover:text-purple-900 transition"
+                                               class="text-[#820000] hover:text-[#820000] transition"
                                                title="All Student Notes">
                                                 <i class="fas fa-clipboard-list"></i>
                                             </a>
                                             <a href="{{ route('counselor.session-notes.create', $note->student) }}"
-                                               class="text-indigo-600 hover:text-indigo-900 transition"
+                                               class="text-[#F00000] hover:text-[#820000] transition"
                                                title="Add New Note">
                                                 <i class="fas fa-plus"></i>
                                             </a>
@@ -434,7 +434,7 @@
             // Show loading state
             document.getElementById('sessionNoteDetails').innerHTML = `
                 <div class="text-center py-8">
-                    <i class="fas fa-spinner fa-spin text-2xl text-blue-600 mb-4"></i>
+                    <i class="fas fa-spinner fa-spin text-2xl text-[#F00000] mb-4"></i>
                     <p class="text-gray-600">Loading session note details...</p>
                 </div>
             `;
@@ -479,7 +479,7 @@
                             </div>
 
                             <!-- Session Information -->
-                            <div class="bg-blue-50 rounded-lg p-4">
+                            <div class="bg-[#FFF9E6] rounded-lg p-4">
                                 <h4 class="text-lg font-semibold text-gray-800 mb-3">Session Information</h4>
                                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                                     <div>
@@ -544,7 +544,7 @@
                             ` : ''}
 
                             <!-- Session Statistics -->
-                            <div class="bg-purple-50 rounded-lg p-4">
+                            <div class="bg-[#FFF9E6] rounded-lg p-4">
                                 <h4 class="text-lg font-semibold text-gray-800 mb-3">Session Statistics</h4>
                                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     <div>
@@ -565,7 +565,7 @@
                                     <i class="fas fa-edit mr-2"></i>Edit Note
                                 </a>
                                 <a href="/counselor/students/${data.student.id}/session-notes"
-                                   class="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition">
+                                   class="px-4 py-2 bg-[#820000] text-white rounded-lg hover:bg-[#820000] transition">
                                     <i class="fas fa-clipboard-list mr-2"></i>All Student Notes
                                 </a>
                             </div>
@@ -594,10 +594,10 @@
         // Helper functions for modal
         function getSessionTypeColorClass(sessionType) {
             const colors = {
-                'initial': 'bg-blue-100 text-blue-800',
+                'initial': 'bg-gray-100 text-[#820000]',
                 'follow_up': 'bg-green-100 text-green-800',
                 'crisis': 'bg-red-100 text-red-800',
-                'regular': 'bg-purple-100 text-purple-800'
+                'regular': 'bg-[#FFF9E6] text-[#820000]'
             };
             return colors[sessionType] || 'bg-gray-100 text-gray-800';
         }
@@ -605,7 +605,7 @@
         function getMoodLevelColorClass(moodLevel) {
             const colors = {
                 'very_good': 'bg-green-100 text-green-800',
-                'good': 'bg-blue-100 text-blue-800',
+                'good': 'bg-gray-100 text-[#820000]',
                 'neutral': 'bg-yellow-100 text-yellow-800',
                 'low': 'bg-orange-100 text-orange-800',
                 'very_low': 'bg-red-100 text-red-800'
@@ -643,10 +643,10 @@
 // Helper functions (add these to your controller or a helper file)
 function getSessionTypeColor($sessionType) {
     $colors = [
-        'initial' => 'bg-blue-100 text-blue-800',
+        'initial' => 'bg-gray-100 text-[#820000]',
         'follow_up' => 'bg-green-100 text-green-800',
         'crisis' => 'bg-red-100 text-red-800',
-        'regular' => 'bg-purple-100 text-purple-800'
+        'regular' => 'bg-[#FFF9E6] text-[#820000]'
     ];
     return $colors[$sessionType] ?? 'bg-gray-100 text-gray-800';
 }
@@ -654,7 +654,7 @@ function getSessionTypeColor($sessionType) {
 function getMoodLevelColor($moodLevel) {
     $colors = [
         'very_good' => 'bg-green-100 text-green-800',
-        'good' => 'bg-blue-100 text-blue-800',
+        'good' => 'bg-gray-100 text-[#820000]',
         'neutral' => 'bg-yellow-100 text-yellow-800',
         'low' => 'bg-orange-100 text-orange-800',
         'very_low' => 'bg-red-100 text-red-800'

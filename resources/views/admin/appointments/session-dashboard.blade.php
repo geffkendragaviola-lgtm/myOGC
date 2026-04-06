@@ -30,7 +30,7 @@
                                    name="search"
                                    value="{{ request('search') }}"
                                    placeholder="Search by student name, counselor, student id, or concern..."
-                                   class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
+                                   class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#F00000] focus:border-[#F00000] transition">
                             <div class="absolute inset-y-0 left-0 pl-3 flex items-center">
                                 <i class="fas fa-search text-gray-400"></i>
                             </div>
@@ -40,7 +40,7 @@
                     <div>
                         <label for="status" class="block text-sm font-medium text-gray-700 mb-2">Status</label>
                         <select id="status" name="status"
-                                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
+                                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#F00000] focus:border-[#F00000] transition">
                             <option value="all" {{ request('status', 'all') === 'all' ? 'selected' : '' }}>All</option>
                             @foreach(\App\Models\Appointment::getStatuses() as $s)
                                 <option value="{{ $s }}" {{ request('status') === $s ? 'selected' : '' }}>{{ ucfirst(str_replace('_', ' ', $s)) }}</option>
@@ -51,7 +51,7 @@
                     <div>
                         <label for="date_range" class="block text-sm font-medium text-gray-700 mb-2">Date Range</label>
                         <select id="date_range" name="date_range"
-                                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
+                                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#F00000] focus:border-[#F00000] transition">
                             <option value="" {{ request('date_range') === null ? 'selected' : '' }}>All Time</option>
                             <option value="today" {{ request('date_range') === 'today' ? 'selected' : '' }}>Today</option>
                             <option value="week" {{ request('date_range') === 'week' ? 'selected' : '' }}>This Week</option>
@@ -64,7 +64,7 @@
 
                 <div class="flex justify-end mt-4">
                     <button type="submit"
-                            class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">
+                            class="px-4 py-2 bg-[#F00000] text-white rounded-lg hover:bg-[#D40000] transition">
                         <i class="fas fa-filter mr-2"></i>Apply Filters
                     </button>
                 </div>
@@ -78,7 +78,7 @@
                     <p class="text-gray-500 text-lg">No session notes found.</p>
                     <p class="text-gray-400 text-sm mt-1">Appointments will appear here once session notes are created.</p>
                     <a href="{{ route('admin.appointments') }}"
-                       class="inline-block mt-4 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition">
+                       class="inline-block mt-4 bg-[#F00000] text-white px-4 py-2 rounded-lg hover:bg-[#D40000] transition">
                         <i class="fas fa-list mr-2"></i>Go to Appointments
                     </a>
                 </div>

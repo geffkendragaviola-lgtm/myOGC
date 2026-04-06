@@ -61,6 +61,13 @@ class GenerateGoogleCalendarToken extends Command
         $client->setPrompt('consent');
         $client->setScopes([Google_Service_Calendar::CALENDAR]);
         $client->setRedirectUri(config('google-calendar.oauth_redirect_uri'));
+        
+        // Fix SSL certificate verification for Laragon
+        $client->setHttpClient(
+            new \GuzzleHttp\Client([
+                'verify' => false, // Disable SSL verification for development
+            ])
+        );
 
         $authUrl = $client->createAuthUrl();
         $this->info('Open this URL in your browser to authorize:');

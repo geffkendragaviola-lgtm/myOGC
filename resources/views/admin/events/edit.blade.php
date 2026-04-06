@@ -44,7 +44,7 @@
                 <div class="md:col-span-2">
                     <label for="title" class="block text-sm font-medium text-gray-700 mb-2">Event Title *</label>
                     <input type="text" id="title" name="title" value="{{ old('title', $event->title) }}"
-                           class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition form-input"
+                           class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#F00000] focus:border-[#F00000] transition form-input"
                            placeholder="Enter event title" required>
                     @error('title')
                         <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
@@ -55,7 +55,7 @@
                 <div>
                     <label for="type" class="block text-sm font-medium text-gray-700 mb-2">Event Type *</label>
                     <select id="type" name="type"
-                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition form-input" required>
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#F00000] focus:border-[#F00000] transition form-input" required>
                         <option value="">Select Event Type</option>
                         <option value="workshop" {{ old('type', $event->type) == 'workshop' ? 'selected' : '' }}>Workshop</option>
                         <option value="seminar" {{ old('type', $event->type) == 'seminar' ? 'selected' : '' }}>Seminar</option>
@@ -72,7 +72,7 @@
                 <div>
                     <label for="user_id" class="block text-sm font-medium text-gray-700 mb-2">Assign to Counselor *</label>
                     <select id="user_id" name="user_id"
-                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition form-input" required>
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#F00000] focus:border-[#F00000] transition form-input" required>
                         <option value="">Select Counselor</option>
                         @foreach($counselors as $counselor)
                             <option value="{{ $counselor->user_id }}" {{ old('user_id', $event->user_id) == $counselor->user_id ? 'selected' : '' }}>
@@ -89,7 +89,7 @@
                 <div>
                     <label for="max_attendees" class="block text-sm font-medium text-gray-700 mb-2">Max Attendees (Optional)</label>
                     <input type="number" id="max_attendees" name="max_attendees" value="{{ old('max_attendees', $event->max_attendees) }}"
-                           class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition form-input"
+                           class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#F00000] focus:border-[#F00000] transition form-input"
                            placeholder="Leave empty for unlimited" min="1">
                     @error('max_attendees')
                         <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
@@ -100,7 +100,7 @@
                 <div>
                     <label for="event_start_date" class="block text-sm font-medium text-gray-700 mb-2">Start Date *</label>
                     <input type="date" id="event_start_date" name="event_start_date" value="{{ old('event_start_date', $event->event_start_date->format('Y-m-d')) }}"
-                           class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition form-input" required>
+                           class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#F00000] focus:border-[#F00000] transition form-input" required>
                     @error('event_start_date')
                         <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                     @enderror
@@ -110,7 +110,7 @@
                 <div>
                     <label for="event_end_date" class="block text-sm font-medium text-gray-700 mb-2">End Date *</label>
                     <input type="date" id="event_end_date" name="event_end_date" value="{{ old('event_end_date', $event->event_end_date->format('Y-m-d')) }}"
-                           class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition form-input" required>
+                           class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#F00000] focus:border-[#F00000] transition form-input" required>
                     @error('event_end_date')
                         <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                     @enderror
@@ -120,7 +120,7 @@
                 <div>
                     <label for="start_time" class="block text-sm font-medium text-gray-700 mb-2">Start Time *</label>
                     <input type="time" id="start_time" name="start_time" value="{{ old('start_time', $event->start_time) }}"
-                           class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition form-input" required>
+                           class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#F00000] focus:border-[#F00000] transition form-input" required>
                     @error('start_time')
                         <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                     @enderror
@@ -130,7 +130,7 @@
                 <div>
                     <label for="end_time" class="block text-sm font-medium text-gray-700 mb-2">End Time *</label>
                     <input type="time" id="end_time" name="end_time" value="{{ old('end_time', $event->end_time) }}"
-                           class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition form-input" required>
+                           class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#F00000] focus:border-[#F00000] transition form-input" required>
                     @error('end_time')
                         <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                     @enderror
@@ -140,7 +140,7 @@
                 <div class="md:col-span-2">
                     <label for="location" class="block text-sm font-medium text-gray-700 mb-2">Location *</label>
                     <input type="text" id="location" name="location" value="{{ old('location', $event->location) }}"
-                           class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition form-input"
+                           class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#F00000] focus:border-[#F00000] transition form-input"
                            placeholder="Enter event location (e.g., Room 101, Online, etc.)" required>
                     @error('location')
                         <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
@@ -151,7 +151,7 @@
                 <div class="md:col-span-2">
                     <label for="description" class="block text-sm font-medium text-gray-700 mb-2">Description *</label>
                     <textarea id="description" name="description" rows="5"
-                              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition form-input"
+                              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#F00000] focus:border-[#F00000] transition form-input"
                               placeholder="Describe the event, its purpose, and what attendees can expect..." required>{{ old('description', $event->description) }}</textarea>
                     @error('description')
                         <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
@@ -163,7 +163,7 @@
                     <div class="flex items-center p-4 bg-gray-50 rounded-lg">
                         <input type="checkbox" id="is_active" name="is_active" value="1"
                                {{ old('is_active', $event->is_active) ? 'checked' : '' }}
-                               class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
+                               class="w-4 h-4 text-[#F00000] border-gray-300 rounded focus:ring-[#F00000]">
                         <label for="is_active" class="ml-3 text-sm font-medium text-gray-700">
                             Activate this event
                         </label>
@@ -175,26 +175,26 @@
             </div>
 
             <!-- Current Event Information -->
-            <div class="mt-8 p-6 bg-blue-50 border border-blue-200 rounded-lg">
-                <h3 class="text-lg font-semibold text-blue-800 mb-4">Current Event Information</h3>
+            <div class="mt-8 p-6 bg-[#FFF9E6] border border-[#FFE100] rounded-lg">
+                <h3 class="text-lg font-semibold text-[#820000] mb-4">Current Event Information</h3>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
                     <div>
-                        <span class="font-medium text-blue-700">Current Counselor:</span>
-                        <span class="text-blue-900">{{ $event->user->first_name }} {{ $event->user->last_name }}</span>
+                        <span class="font-medium text-[#D40000]">Current Counselor:</span>
+                        <span class="text-[#820000]">{{ $event->user->first_name }} {{ $event->user->last_name }}</span>
                     </div>
                     <div>
-                        <span class="font-medium text-blue-700">Current Status:</span>
+                        <span class="font-medium text-[#D40000]">Current Status:</span>
                         <span class="inline-block px-2 py-1 rounded-full text-xs font-medium {{ $event->is_active ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800' }}">
                             {{ $event->is_active ? 'Active' : 'Inactive' }}
                         </span>
                     </div>
                     <div>
-                        <span class="font-medium text-blue-700">Registrations:</span>
-                        <span class="text-blue-900">{{ $event->registrations->where('status', 'registered')->count() }} active</span>
+                        <span class="font-medium text-[#D40000]">Registrations:</span>
+                        <span class="text-[#820000]">{{ $event->registrations->where('status', 'registered')->count() }} active</span>
                     </div>
                     <div>
-                        <span class="font-medium text-blue-700">Created:</span>
-                        <span class="text-blue-900">{{ $event->created_at->format('M j, Y g:i A') }}</span>
+                        <span class="font-medium text-[#D40000]">Created:</span>
+                        <span class="text-[#820000]">{{ $event->created_at->format('M j, Y g:i A') }}</span>
                     </div>
                 </div>
             </div>
@@ -206,7 +206,7 @@
                     Cancel
                 </a>
                 <button type="submit"
-                        class="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition flex items-center justify-center">
+                        class="bg-[#F00000] text-white px-6 py-3 rounded-lg hover:bg-[#D40000] transition flex items-center justify-center">
                     <i class="fas fa-save mr-2"></i> Update Event
                 </button>
             </div>

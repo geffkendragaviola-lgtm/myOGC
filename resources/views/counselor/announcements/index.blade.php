@@ -15,7 +15,7 @@
                     </div>
                     <div class="mt-4 md:mt-0">
                         <a href="{{ route('counselor.announcements.create') }}"
-                           class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition flex items-center">
+                           class="bg-[#F00000] text-white px-4 py-2 rounded-lg hover:bg-[#D40000] transition flex items-center">
                             <i class="fas fa-plus mr-2"></i> Create Announcement
                         </a>
                     </div>
@@ -33,8 +33,8 @@
             <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
                 <div class="bg-white rounded-lg shadow p-6">
                     <div class="flex items-center">
-                        <div class="bg-blue-100 p-3 rounded-full mr-4">
-                            <i class="fas fa-bullhorn text-blue-600"></i>
+                        <div class="bg-gray-100 p-3 rounded-full mr-4">
+                            <i class="fas fa-bullhorn text-[#F00000]"></i>
                         </div>
                         <div>
                             <p class="text-sm text-gray-600">Total Announcements</p>
@@ -146,7 +146,7 @@
                                 <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                     <div class="flex space-x-2">
                                         <a href="{{ route('counselor.announcements.edit', $announcement) }}"
-                                           class="text-blue-600 hover:text-blue-900 transition"
+                                           class="text-[#F00000] hover:text-[#820000] transition"
                                            title="Edit">
                                             <i class="fas fa-edit"></i>
                                         </a>
@@ -209,7 +209,7 @@
                                         <p class="text-lg">No announcements found.</p>
                                         <p class="text-sm mt-2">Create your first announcement to get started.</p>
                                         <a href="{{ route('counselor.announcements.create') }}"
-                                           class="inline-block mt-4 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition">
+                                           class="inline-block mt-4 bg-[#F00000] text-white px-4 py-2 rounded-lg hover:bg-[#D40000] transition">
                                             Create Announcement
                                         </a>
                                     </div>

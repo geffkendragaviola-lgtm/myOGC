@@ -4,7 +4,7 @@
     }
 
     .event-form-navbar {
-        background: linear-gradient(90deg, #1e40af 0%, #3b82f6 100%);
+        background: linear-gradient(90deg, #F8650C 0%, #FFC917 100%);
         box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
     }
 </style>
@@ -61,7 +61,7 @@
                                     </p>
                                     <p class="text-xs text-gray-500">PNG, JPG, GIF (MAX. 2MB)</p>
                                     @if($event->image)
-                                        <p class="text-xs text-blue-500 mt-2">Uploading a new image will replace the current one</p>
+                                        <p class="text-xs text-[#F8650C] mt-2">Uploading a new image will replace the current one</p>
                                     @endif
                                 </div>
                                 <input id="image" name="image" type="file" class="hidden" accept="image/*" />
@@ -83,7 +83,7 @@
                     <div class="md:col-span-2">
                         <label for="title" class="block text-sm font-medium text-gray-700 mb-2">Event Title *</label>
                         <input type="text" id="title" name="title" value="{{ old('title', $event->title) }}"
-                               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
+                               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#F00000] focus:border-[#F00000] transition"
                                placeholder="Enter event title" required>
                         @error('title')
                             <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
@@ -94,7 +94,7 @@
                     <div>
                         <label for="type" class="block text-sm font-medium text-gray-700 mb-2">Event Type *</label>
                         <select id="type" name="type"
-                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition" required>
+                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#F00000] focus:border-[#F00000] transition" required>
                             <option value="">Select Event Type</option>
                             <option value="webinar" {{ old('type', $event->type) == 'webinar' ? 'selected' : '' }}>Webinar</option>
                             <option value="workshop" {{ old('type', $event->type) == 'workshop' ? 'selected' : '' }}>Workshop</option>
@@ -111,7 +111,7 @@
                     <div>
                         <label for="max_attendees" class="block text-sm font-medium text-gray-700 mb-2">Max Attendees (Optional)</label>
                         <input type="number" id="max_attendees" name="max_attendees" value="{{ old('max_attendees', $event->max_attendees) }}"
-                               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
+                               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#F00000] focus:border-[#F00000] transition"
                                placeholder="Leave empty for unlimited" min="1">
                         @error('max_attendees')
                             <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
@@ -127,7 +127,7 @@
                             <div class="flex items-center">
                                 <input type="radio" id="for_all_colleges_true" name="for_all_colleges" value="1"
                                        {{ old('for_all_colleges', $event->for_all_colleges) ? 'checked' : '' }}
-                                       class="w-4 h-4 text-blue-600 border-gray-300 focus:ring-blue-500">
+                                       class="w-4 h-4 text-[#F00000] border-gray-300 focus:ring-[#F00000]">
                                 <label for="for_all_colleges_true" class="ml-2 text-sm text-gray-700">
                                     All Colleges - Event available to students from all colleges
                                 </label>
@@ -136,7 +136,7 @@
                             <div class="flex items-center mt-2">
                                 <input type="radio" id="for_all_colleges_false" name="for_all_colleges" value="0"
                                        {{ old('for_all_colleges', $event->for_all_colleges) === '0' || !$event->for_all_colleges ? 'checked' : '' }}
-                                       class="w-4 h-4 text-blue-600 border-gray-300 focus:ring-blue-500">
+                                       class="w-4 h-4 text-[#F00000] border-gray-300 focus:ring-[#F00000]">
                                 <label for="for_all_colleges_false" class="ml-2 text-sm text-gray-700">
                                     Specific Colleges - Choose which colleges can see this event
                                 </label>
@@ -152,7 +152,7 @@
                                         <input type="checkbox" id="college_{{ $college->id }}" name="colleges[]"
                                                value="{{ $college->id }}"
                                                {{ in_array($college->id, old('colleges', $selectedColleges)) ? 'checked' : '' }}
-                                               class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
+                                               class="w-4 h-4 text-[#F00000] border-gray-300 rounded focus:ring-[#F00000]">
                                         <label for="college_{{ $college->id }}" class="ml-2 text-sm text-gray-700">
                                             {{ $college->name }}
                                         </label>
@@ -174,7 +174,7 @@
                         <div class="flex items-center">
                             <input type="checkbox" id="is_required" name="is_required" value="1"
                                    {{ old('is_required', $event->is_required) ? 'checked' : '' }}
-                                   class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
+                                   class="w-4 h-4 text-[#F00000] border-gray-300 rounded focus:ring-[#F00000]">
                             <label for="is_required" class="ml-2 text-sm text-gray-700">
                                 Required Event - Students from selected colleges must attend this event
                             </label>
@@ -191,7 +191,7 @@
                     <div>
                         <label for="event_start_date" class="block text-sm font-medium text-gray-700 mb-2">Start Date *</label>
                         <input type="date" id="event_start_date" name="event_start_date" value="{{ old('event_start_date', $event->event_start_date->format('Y-m-d')) }}"
-                               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition" required>
+                               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#F00000] focus:border-[#F00000] transition" required>
                         @error('event_start_date')
                             <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                         @enderror
@@ -201,7 +201,7 @@
                     <div>
                         <label for="event_end_date" class="block text-sm font-medium text-gray-700 mb-2">End Date *</label>
                         <input type="date" id="event_end_date" name="event_end_date" value="{{ old('event_end_date', $event->event_end_date->format('Y-m-d')) }}"
-                               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition" required>
+                               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#F00000] focus:border-[#F00000] transition" required>
                         @error('event_end_date')
                             <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                         @enderror
@@ -211,7 +211,7 @@
                     <div>
                         <label for="start_time" class="block text-sm font-medium text-gray-700 mb-2">Start Time *</label>
                         <input type="time" id="start_time" name="start_time" value="{{ old('start_time', $event->start_time) }}"
-                               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition" required>
+                               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#F00000] focus:border-[#F00000] transition" required>
                         @error('start_time')
                             <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                         @enderror
@@ -221,7 +221,7 @@
                     <div>
                         <label for="end_time" class="block text-sm font-medium text-gray-700 mb-2">End Time *</label>
                         <input type="time" id="end_time" name="end_time" value="{{ old('end_time', $event->end_time) }}"
-                               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition" required>
+                               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#F00000] focus:border-[#F00000] transition" required>
                         @error('end_time')
                             <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                         @enderror
@@ -231,7 +231,7 @@
                     <div class="md:col-span-2">
                         <label for="location" class="block text-sm font-medium text-gray-700 mb-2">Location *</label>
                         <input type="text" id="location" name="location" value="{{ old('location', $event->location) }}"
-                               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
+                               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#F00000] focus:border-[#F00000] transition"
                                placeholder="Enter event location (e.g., Room 101, Online, etc.)" required>
                         @error('location')
                             <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
@@ -242,7 +242,7 @@
                     <div class="md:col-span-2">
                         <label for="description" class="block text-sm font-medium text-gray-700 mb-2">Description *</label>
                         <textarea id="description" name="description" rows="5"
-                                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
+                                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#F00000] focus:border-[#F00000] transition"
                                   placeholder="Describe the event, its purpose, and what attendees can expect..." required>{{ old('description', $event->description) }}</textarea>
                         @error('description')
                             <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
@@ -254,7 +254,7 @@
                         <div class="flex items-center">
                             <input type="checkbox" id="is_active" name="is_active" value="1"
                                    {{ old('is_active', $event->is_active) ? 'checked' : '' }}
-                                   class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
+                                   class="w-4 h-4 text-[#F00000] border-gray-300 rounded focus:ring-[#F00000]">
                             <label for="is_active" class="ml-2 text-sm text-gray-700">
                                 Activate this event
                             </label>
@@ -269,8 +269,8 @@
                 </div>
 
                 <!-- Current Event Information -->
-                <div class="mt-8 p-4 bg-blue-50 rounded-lg border border-blue-200">
-                    <h3 class="text-lg font-semibold text-blue-800 mb-2">Current Event Information</h3>
+                <div class="mt-8 p-4 bg-[#FFF9E6] rounded-lg border border-[#FFE100]">
+                    <h3 class="text-lg font-semibold text-[#820000] mb-2">Current Event Information</h3>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
                         <div>
                             <span class="font-medium text-gray-700">College Availability:</span>
@@ -280,7 +280,7 @@
                                         All Colleges
                                     </span>
                                 @else
-                                    <span class="bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-xs font-medium">
+                                    <span class="bg-gray-100 text-[#820000] px-2 py-1 rounded-full text-xs font-medium">
                                         {{ $event->colleges->count() }} Specific {{ Str::plural('College', $event->colleges->count()) }}
                                     </span>
                                 @endif
@@ -338,7 +338,7 @@
                         Cancel
                     </a>
                     <button type="submit"
-                            class="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition flex items-center justify-center">
+                            class="bg-[#F00000] text-white px-6 py-3 rounded-lg hover:bg-[#D40000] transition flex items-center justify-center">
                         <i class="fas fa-save mr-2"></i> Update Event
                     </button>
                 </div>
