@@ -74,7 +74,7 @@
                         </div>
                         <div class="pt-2">
                             <a href="{{ route('counselor.students.profile', $appointment->student) }}"
-                               class="inline-flex items-center text-indigo-600 hover:text-indigo-800 text-sm">
+                               class="inline-flex items-center text-[#F00000] hover:text-[#820000] text-sm">
                                 <i class="fas fa-user mr-2"></i> View Student Profile
                             </a>
                         </div>
@@ -91,7 +91,7 @@
                         </div>
                         <div>
                             <a href="{{ route('counselor.appointments.session', $appointment) }}"
-                               class="inline-flex items-center px-4 py-2 rounded-lg border border-[#7c1d2a]/40 text-[#7c1d2a] hover:bg-[#7c1d2a]/10 transition text-sm">
+                               class="inline-flex items-center px-4 py-2 rounded-lg border border-[#F00000]/40 text-[#F00000] hover:bg-[#F00000]/10 transition text-sm">
                                 <i class="fas fa-pen mr-2"></i> Edit Session
                             </a>
                         </div>

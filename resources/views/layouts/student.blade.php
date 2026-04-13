@@ -5,238 +5,241 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@yield('title', 'Office of Guidance and Counseling')</title>
 
-    <!-- Bootstrap 5 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-
-    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-
-    <!-- Font Awesome -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
 
     <style>
-        .dashboard-container {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
+        * { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { overflow-x: hidden; background-color: #f9fafb; }
 
-        .dashboard-navbar {
-            background: linear-gradient(90deg, #1e40af 0%, #3b82f6 100%);
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        /* ── Navbar ── */
+        .ogc-navbar {
+            background: linear-gradient(135deg, #820000 0%, #F8650C 100%);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.15);
         }
+        .ogc-navbar a, .ogc-navbar button { color: #fff; }
+        .ogc-navbar a:hover { color: #FFE100; }
+        .ogc-nav-icon:hover { background-color: rgba(255,255,255,0.15); }
 
-        .sidebar {
-            background: linear-gradient(180deg, #1e3a8a 0%, #2563eb 100%);
-            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.15);
+        /* ── Sidebar ── */
+        .ogc-sidebar {
+            background: linear-gradient(180deg, #820000 0%, #5a0000 100%);
+            box-shadow: 2px 0 10px rgba(0,0,0,0.2);
         }
-
-        .sidebar a {
+        .ogc-sidebar .sidebar-link {
             display: flex;
             align-items: center;
-            padding: 0.75rem 1rem;
+            padding: 0.65rem 1rem;
             border-radius: 0.5rem;
-            color: white;
-            transition: background 0.3s;
+            color: #fff;
+            text-decoration: none;
+            transition: background 0.2s, color 0.2s;
+            font-size: 0.9rem;
         }
-
-        .sidebar a:hover {
-            background-color: rgba(255, 255, 255, 0.2);
+        .ogc-sidebar .sidebar-link:hover {
+            background-color: rgba(255,225,0,0.15);
+            color: #FFE100;
         }
-
-        .dashboard-profile-dropdown {
-            position: relative;
+        .ogc-sidebar .sidebar-link.active {
+            background-color: rgba(248,101,12,0.35);
+            color: #FFE100;
+            font-weight: 600;
         }
+        .ogc-sidebar .sidebar-divider { border-color: rgba(255,255,255,0.15); }
 
-        .dashboard-profile-dropdown-content {
+        /* ── Navbar dropdown ── */
+        .ogc-nav-dropdown { position: relative; }
+        .ogc-nav-dropdown-menu {
+            position: absolute;
+            top: calc(100% + 0.5rem);
+            left: 0;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+            min-width: 180px;
+            z-index: 50;
+            padding: 0.5rem 0;
+        }
+        .ogc-nav-dropdown-menu a {
+            display: block;
+            padding: 0.5rem 1rem;
+            color: #374151;
+            font-size: 0.875rem;
+            transition: background 0.15s;
+        }
+        .ogc-nav-dropdown-menu a:hover { background: #FFF9E6; color: #820000; }
+
+        /* ── Profile dropdown ── */
+        .ogc-profile-dropdown { position: relative; }
+        .ogc-profile-menu {
             position: absolute;
             right: 0;
-            top: 100%;
-            background: white;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-            border-radius: 8px;
+            top: calc(100% + 0.5rem);
+            background: #fff;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+            border-radius: 10px;
             padding: 1rem;
-            min-width: 200px;
+            min-width: 210px;
             z-index: 1000;
-            margin-top: 0.5rem;
         }
-
-        body {
-            overflow-x: hidden;
-        }
-
-        /* Bootstrap Tab Overrides for better styling */
-        .nav-tabs .nav-link {
-            color: #6c757d;
-            font-weight: 500;
+        .ogc-profile-menu a, .ogc-profile-menu button {
+            display: block;
+            width: 100%;
+            text-align: left;
+            padding: 0.5rem 0;
+            color: #374151;
+            background: none;
             border: none;
-            border-bottom: 2px solid transparent;
-            padding: 0.75rem 1.5rem;
+            cursor: pointer;
+            font-size: 0.875rem;
+            transition: color 0.2s;
         }
+        .ogc-profile-menu a:hover, .ogc-profile-menu button:hover { color: #820000; }
 
-        .nav-tabs .nav-link.active {
-            color: #0d6efd;
-            font-weight: 600;
-            background-color: transparent;
-            border-bottom: 2px solid #0d6efd;
-        }
-
-        .nav-tabs .nav-link:hover {
-            border-color: transparent;
-            border-bottom: 2px solid #dee2e6;
-        }
+        /* ── Bootstrap tab override ── */
+        .nav-tabs .nav-link { color: #6c757d; font-weight: 500; border: none; border-bottom: 3px solid transparent; padding: 0.75rem 1.5rem; transition: all 0.3s; }
+        .nav-tabs .nav-link.active { color: #820000; font-weight: 600; background: transparent; border-bottom: 3px solid #820000; }
+        .nav-tabs .nav-link:hover { border-color: transparent; border-bottom: 3px solid #FFC917; color: #333; }
     </style>
 
     @stack('styles')
 </head>
-<body class="bg-gray-50 dashboard-container">
+<body>
 
-    {{-- ✅ Layout for Students Only --}}
-    @if(Auth::check() && Auth::user()->role === 'student')
-        <!-- Top Navbar for Students -->
-        <nav class="dashboard-navbar fixed top-0 left-0 right-0 h-16 flex items-center justify-between px-6 z-40">
-            <!-- Centered Navigation Items -->
-            <div class="flex items-center space-x-8 absolute left-1/2 transform -translate-x-1/2">
-                <a href="{{ route('dashboard') }}" class="text-white font-semibold hover:text-yellow-300 transition">Home</a>
+@if(Auth::check() && Auth::user()->role === 'student')
 
-                <!-- Services Dropdown -->
-                <div class="relative" id="services-dropdown">
-                    <button class="text-white font-semibold hover:text-yellow-300 transition flex items-center" id="services-dropdown-btn">
-                        Services <i class="fas fa-chevron-down ml-1 text-sm"></i>
-                    </button>
-                    <div class="absolute hidden bg-white rounded-md shadow-lg py-2 mt-1 w-48 z-50" id="services-dropdown-menu">
-                        <a href="{{ route('bap') }}" class="block px-4 py-2 text-gray-800 hover:bg-blue-100">Book an Appointment</a>
-                        <a href="{{ route('mhc') }}" class="block px-4 py-2 text-gray-800 hover:bg-blue-100">Mental Health Corner</a>
-                    </div>
-                </div>
-
-                <!-- Student Dropdown -->
-
-                <a href="{{ route('feedback') }}" class="text-white font-semibold hover:text-yellow-300 transition">Feedback</a>
-            </div>
-
-            <div class="flex items-center space-x-4 ml-auto">
-                <button class="text-white p-2 rounded-full hover:bg-blue-700 transition">
-                    <i class="fas fa-bell"></i>
-                </button>
-
-                <!-- Profile Dropdown -->
-                <div class="dashboard-profile-dropdown">
-                    <button class="text-white p-2 rounded-full hover:bg-blue-700 transition" id="profile-dropdown-btn">
-                        <i class="fas fa-user"></i>
-                    </button>
-                    <div class="dashboard-profile-dropdown-content hidden" id="profile-dropdown-menu">
-                        <div class="mb-3 border-b pb-2">
-                            <div class="font-semibold text-gray-800">{{ Auth::user()->first_name }} {{ Auth::user()->last_name }}</div>
-                            <div class="text-sm text-gray-600">{{ Auth::user()->email }}</div>
-                            <div class="text-xs text-blue-600 capitalize">Role: {{ Auth::user()->role }}</div>
-                        </div>
-                        <a href="{{ route('profile.edit') }}" class="block py-2 text-gray-700 hover:text-blue-600">
-                            <i class="fas fa-user-circle mr-2"></i> Profile
-                        </a>
-                        <form method="POST" action="{{ route('logout') }}" class="inline">
-                            @csrf
-                            <button type="submit" class="w-full text-left block py-2 text-gray-700 hover:text-blue-600">
-                                <i class="fas fa-sign-out-alt mr-2"></i> Logout
-                            </button>
-                        </form>
-                    </div>
-                </div>
-            </div>
-        </nav>
-        <!-- Sidebar for Students -->
-        <nav class="sidebar fixed top-16 left-0 h-[calc(100vh-4rem)] w-64 text-white flex flex-col justify-between z-30">
-            <div>
-                <div class="p-6 border-b border-blue-700">
-                    <div class="font-semibold text-lg">{{ Auth::user()->first_name }} {{ Auth::user()->last_name }}</div>
-                    <div class="text-sm text-gray-300">{{ Auth::user()->email }}</div>
-                    <div class="text-xs text-gray-400 mt-1">
-                        @if(Auth::user()->college)
-                            {{ Auth::user()->college }}
-                        @endif
-                    </div>
-                </div>
-
-                <div class="mt-6 space-y-1 px-3">
-                    <a href="{{ route('appointments.index') }}"><i class="fas fa-calendar-plus mr-3"></i> My Appointments</a>
-                    <a href="{{ route('student.events.my-registrations') }}"><i class="fas fa-list-check mr-3"></i> My Registrations</a>
-                    <a href="{{ route('bap') }}"><i class="fas fa-calendar-check mr-3"></i> Book Appointment</a>
-                </div>
-            </div>
-
-            <div class="border-t border-blue-700 p-4">
-                <form method="POST" action="{{ route('logout') }}">
-                    @csrf
-                    <button type="submit" class="flex items-center w-full text-left text-white hover:bg-blue-700 p-2 rounded">
-                        <i class="fas fa-sign-out-alt mr-3"></i> Logout
-                    </button>
-                </form>
-            </div>
-        </nav>
-
-        <div class="ml-64 pt-16 min-h-screen">
-            @yield('content')
+    {{-- ── TOP NAVBAR (Student) ── --}}
+    <nav class="ogc-navbar fixed top-0 left-0 right-0 h-16 flex items-center justify-between px-6 z-40">
+        <div class="flex items-center space-x-2">
+            <img src="{{ asset('images/msu-iit-logo.png') }}" alt="MSU-IIT" class="h-9 w-9 object-contain" onerror="this.style.display='none'">
+            <span class="text-white font-bold text-sm leading-tight hidden md:block">MSU-IIT<br><span class="font-normal text-xs opacity-80">Guidance & Counseling</span></span>
         </div>
 
-    {{-- ✅ Default Layout for Guests --}}
-    @else
-        <main class="min-h-screen">
-            @yield('content')
-        </main>
-    @endif
+        <div class="hidden md:flex items-center space-x-6 absolute left-1/2 -translate-x-1/2">
+            <a href="{{ route('dashboard') }}" class="text-white font-medium text-sm hover:text-[#FFE100] transition">Home</a>
 
-    <!-- Bootstrap 5 JavaScript with Popper -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+            <div class="ogc-nav-dropdown" id="dd-services">
+                <button class="text-white font-medium text-sm hover:text-[#FFE100] transition flex items-center" id="dd-services-btn">
+                    Services <i class="fas fa-chevron-down ml-1 text-xs"></i>
+                </button>
+                <div class="ogc-nav-dropdown-menu hidden" id="dd-services-menu">
+                    <a href="{{ route('bap') }}"><i class="fas fa-calendar-plus mr-2 text-[#F8650C]"></i> Book Appointment</a>
+                    <a href="{{ route('mhc') }}"><i class="fas fa-heart mr-2 text-[#F8650C]"></i> Mental Health Corner</a>
+                </div>
+            </div>
 
-    @stack('scripts')
+            <a href="{{ route('feedback') }}" class="text-white font-medium text-sm hover:text-[#FFE100] transition">Feedback</a>
+        </div>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            function setupDropdown(dropdownId, btnId, menuId) {
-                const btn = document.getElementById(btnId);
-                const menu = document.getElementById(menuId);
-                if (!btn || !menu) return;
+        <div class="flex items-center space-x-3 ml-auto">
+            <button class="ogc-nav-icon text-white p-2 rounded-full transition">
+                <i class="fas fa-bell"></i>
+            </button>
+            <div class="ogc-profile-dropdown">
+                <button class="ogc-nav-icon text-white p-2 rounded-full transition" id="profile-dropdown-btn">
+                    <i class="fas fa-user-circle text-lg"></i>
+                </button>
+                <div class="ogc-profile-menu hidden" id="profile-dropdown-menu">
+                    <div class="mb-3 pb-3 border-b border-gray-100">
+                        <div class="font-semibold text-gray-800 text-sm">{{ Auth::user()->first_name }} {{ Auth::user()->last_name }}</div>
+                        <div class="text-xs text-gray-500 mt-0.5">{{ Auth::user()->email }}</div>
+                        <span class="inline-block mt-1 text-xs bg-[#820000] text-white px-2 py-0.5 rounded-full capitalize">{{ Auth::user()->role }}</span>
+                    </div>
+                    <a href="{{ route('profile.edit') }}"><i class="fas fa-user-circle mr-2 text-[#F8650C]"></i> My Profile</a>
+                    <a href="{{ route('student.profile') }}"><i class="fas fa-id-card mr-2 text-[#F8650C]"></i> Student Profile</a>
+                    <form method="POST" action="{{ route('logout') }}">
+                        @csrf
+                        <button type="submit"><i class="fas fa-sign-out-alt mr-2 text-[#F8650C]"></i> Logout</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </nav>
 
-                btn.addEventListener('click', function(e) {
-                    e.stopPropagation();
-                    document.querySelectorAll('[id$="-dropdown-menu"]').forEach(m => m.classList.add('hidden'));
-                    menu.classList.toggle('hidden');
-                });
-            }
+    {{-- ── SIDEBAR (Student) ── --}}
+    <nav class="ogc-sidebar fixed top-16 left-0 h-[calc(100vh-4rem)] w-64 text-white flex flex-col justify-between z-30">
+        <div class="overflow-y-auto">
+            <div class="p-5 border-b sidebar-divider">
+                <div class="font-semibold text-base">{{ Auth::user()->first_name }} {{ Auth::user()->last_name }}</div>
+                <div class="text-xs text-red-200 mt-0.5">{{ Auth::user()->email }}</div>
+                <span class="inline-block mt-2 text-xs bg-[#F8650C] text-white px-2 py-0.5 rounded-full">Student</span>
+            </div>
+            <div class="mt-4 space-y-0.5 px-3 pb-4">
+                <a href="{{ route('appointments.index') }}" class="sidebar-link {{ request()->routeIs('appointments.*') ? 'active' : '' }}">
+                    <i class="fas fa-calendar-check mr-3 w-4 text-center"></i> My Appointments
+                </a>
+                <a href="{{ route('student.events.my-registrations') }}" class="sidebar-link {{ request()->routeIs('student.events.my-registrations') ? 'active' : '' }}">
+                    <i class="fas fa-list-check mr-3 w-4 text-center"></i> My Registrations
+                </a>
+                <a href="{{ route('student.events.available') }}" class="sidebar-link {{ request()->routeIs('student.events.available') ? 'active' : '' }}">
+                    <i class="fas fa-calendar-alt mr-3 w-4 text-center"></i> Available Events
+                </a>
+                <a href="{{ route('bap') }}" class="sidebar-link {{ request()->routeIs('bap') ? 'active' : '' }}">
+                    <i class="fas fa-plus-circle mr-3 w-4 text-center"></i> Book Appointment
+                </a>
+                <a href="{{ route('mhc') }}" class="sidebar-link {{ request()->routeIs('mhc') ? 'active' : '' }}">
+                    <i class="fas fa-heart mr-3 w-4 text-center"></i> Mental Health Corner
+                </a>
+                <a href="{{ route('feedback') }}" class="sidebar-link {{ request()->routeIs('feedback') ? 'active' : '' }}">
+                    <i class="fas fa-comments mr-3 w-4 text-center"></i> Feedback
+                </a>
+            </div>
+        </div>
+        <div class="border-t sidebar-divider p-4">
+            <form method="POST" action="{{ route('logout') }}">
+                @csrf
+                <button type="submit" class="sidebar-link w-full">
+                    <i class="fas fa-sign-out-alt mr-3 w-4 text-center"></i> Logout
+                </button>
+            </form>
+        </div>
+    </nav>
 
-            setupDropdown('student-dropdown', 'student-dropdown-btn', 'student-dropdown-menu');
-            setupDropdown('services-dropdown', 'services-dropdown-btn', 'services-dropdown-menu');
+    <div class="ml-64 pt-16 min-h-screen">
+        @yield('content')
+    </div>
 
-            const profileBtn = document.getElementById('profile-dropdown-btn');
-            const profileMenu = document.getElementById('profile-dropdown-menu');
+@else
+    <main class="min-h-screen">
+        @yield('content')
+    </main>
+@endif
 
-            if (profileBtn && profileMenu) {
-                profileBtn.addEventListener('click', function(e) {
-                    e.stopPropagation();
-                    document.querySelectorAll('[id$="-dropdown-menu"]').forEach(m => m.classList.add('hidden'));
-                    profileMenu.classList.toggle('hidden');
-                });
-            }
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+@stack('scripts')
 
-            document.addEventListener('click', function(event) {
-                if (!event.target.closest('[id$="-dropdown"]') && !event.target.closest('.dashboard-profile-dropdown')) {
-                    document.querySelectorAll('[id$="-dropdown-menu"]').forEach(menu => menu.classList.add('hidden'));
-                    if (profileMenu) profileMenu.classList.add('hidden');
-                }
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    function bindDropdown(btnId, menuId) {
+        const btn = document.getElementById(btnId);
+        const menu = document.getElementById(menuId);
+        if (!btn || !menu) return;
+        btn.addEventListener('click', function (e) {
+            e.stopPropagation();
+            document.querySelectorAll('.ogc-nav-dropdown-menu, .ogc-profile-menu').forEach(m => {
+                if (m !== menu) m.classList.add('hidden');
             });
-
-            // Initialize Bootstrap tabs if they exist on the page
-            const tabTriggers = document.querySelectorAll('button[data-bs-toggle="tab"]');
-            if (tabTriggers.length > 0) {
-                console.log('Bootstrap tabs found, initializing...');
-
-                tabTriggers.forEach(triggerEl => {
-                    triggerEl.addEventListener('click', function(event) {
-                        event.preventDefault();
-                        const tab = new bootstrap.Tab(this);
-                        tab.show();
-                    });
-                });
-            }
+            menu.classList.toggle('hidden');
         });
-    </script>
+        menu.addEventListener('click', e => e.stopPropagation());
+    }
+
+    bindDropdown('dd-services-btn', 'dd-services-menu');
+    bindDropdown('profile-dropdown-btn', 'profile-dropdown-menu');
+
+    document.addEventListener('click', function () {
+        document.querySelectorAll('.ogc-nav-dropdown-menu, .ogc-profile-menu').forEach(m => m.classList.add('hidden'));
+    });
+
+    // Bootstrap tabs
+    document.querySelectorAll('button[data-bs-toggle="tab"]').forEach(el => {
+        el.addEventListener('click', function (e) {
+            e.preventDefault();
+            new bootstrap.Tab(this).show();
+        });
+    });
+});
+</script>
 </body>
 </html>

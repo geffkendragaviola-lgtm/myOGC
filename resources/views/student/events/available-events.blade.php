@@ -12,7 +12,7 @@
         }
 
         .events-navbar {
-            background: linear-gradient(90deg, #1e40af 0%, #3b82f6 100%);
+            background: #820000;
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
         }
 
@@ -22,7 +22,7 @@
         }
 
         .events-page-header {
-            background: linear-gradient(rgba(30, 64, 175, 0.9), rgba(30, 64, 175, 0.8)), url('https://images.unsplash.com/photo-1596363505724-6d24f19ad5a0?ixlib=rb-4.0.3&auto=format&fit=crop&w=2000&q=80');
+            background: linear-gradient(rgba(196, 30, 58, 0.9), rgba(196, 30, 58, 0.8)), url('https://images.unsplash.com/photo-1596363505724-6d24f19ad5a0?ixlib=rb-4.0.3&auto=format&fit=crop&w=2000&q=80');
             background-size: cover;
             background-position: center;
             padding: 3rem 0;
@@ -100,20 +100,20 @@
                                 Services <i class="fas fa-chevron-down ml-1 text-sm"></i>
                             </button>
                             <div class="absolute hidden group-hover:block bg-white rounded-md shadow-lg py-2 mt-1 w-48 z-10">
-                                <a href="{{ route('bap') }}" class="block px-4 py-2 text-gray-800 hover:bg-blue-100">Book an Appointment</a>
-                                <a href="{{ route('mhc') }}" class="block px-4 py-2 text-blue-600 bg-blue-50 font-semibold">Mental Health Corner</a>
+                                <a href="{{ route('bap') }}" class="block px-4 py-2 text-gray-800 hover:bg-gray-100">Book an Appointment</a>
+                                <a href="{{ route('mhc') }}" class="block px-4 py-2 text-[#F00000] bg-[#FFF9E6] font-semibold">Mental Health Corner</a>
                             </div>
                         </div>
                     </div>
                 </div>
 
                 <div class="flex items-center space-x-4">
-                    <button class="text-white p-2 rounded-full hover:bg-blue-700 transition">
+                    <button class="text-white p-2 rounded-full hover:bg-[#D40000] transition">
                         <i class="fas fa-bell"></i>
                     </button>
 
                     <div class="relative">
-                        <button class="text-white p-2 rounded-full hover:bg-blue-700 transition">
+                        <button class="text-white p-2 rounded-full hover:bg-[#D40000] transition">
                             <i class="fas fa-user"></i>
                         </button>
                         <div class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 hidden">
@@ -146,7 +146,7 @@
                         </div>
                         <div class="mt-4 md:mt-0">
                             <a href="{{ route('mhc') }}"
-                               class="bg-white text-blue-600 px-6 py-3 rounded-lg hover:bg-blue-50 transition font-semibold inline-flex items-center">
+                               class="bg-white text-[#820000] px-6 py-3 rounded-lg hover:bg-gray-100 transition font-semibold inline-flex items-center shadow-md">
                                 <i class="fas fa-arrow-left mr-2"></i> Back to Mental Health Corner
                             </a>
                         </div>
@@ -183,14 +183,14 @@
                         <div>
                             <h3 class="text-lg font-semibold text-gray-800 mb-2">Filter Events</h3>
                             <div class="flex flex-wrap gap-4">
-                                <select id="typeFilter" class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                                <select id="typeFilter" class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#820000] focus:border-[#820000]">
                                     <option value="">All Event Types</option>
                                     @foreach($eventTypes as $type)
                                         <option value="{{ $type }}">{{ ucfirst($type) }}</option>
                                     @endforeach
                                 </select>
 
-                                <select id="statusFilter" class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                                <select id="statusFilter" class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#820000] focus:border-[#820000]">
                                     <option value="">All Events</option>
                                     <option value="required">Required Events</option>
                                     <option value="optional">Optional Events</option>
@@ -225,8 +225,8 @@
                         <i class="fas fa-calendar-times text-gray-400 text-6xl mb-4"></i>
                         <h3 class="text-2xl font-semibold text-gray-600 mb-2">No Events Available</h3>
                         <p class="text-gray-500 mb-6">There are currently no upcoming events available for your college.</p>
-                        <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 max-w-md mx-auto">
-                            <p class="text-blue-700 text-sm">
+                        <div class="bg-[#FFF9E6] border border-[#FFE100] rounded-lg p-4 max-w-md mx-auto">
+                            <p class="text-[#D40000] text-sm">
                                 <i class="fas fa-info-circle mr-2"></i>
                                 New events will appear here when they are scheduled by your counselors.
                             </p>
@@ -251,7 +251,7 @@
                             $isRequiredAutoRegister = $isRequiredEvent && !$isRegistered;
                             @endphp
 
-                            <div class="event-card bg-white rounded-xl shadow-sm overflow-hidden border-l-4 {{ $isRequiredEvent ? 'border-red-500' : 'border-blue-500' }}"
+                            <div class="event-card bg-white rounded-xl shadow-sm overflow-hidden border-l-4 {{ $isRequiredEvent ? 'border-red-500' : 'border-[#F00000]' }}"
                                  data-type="{{ $event->type }}"
                                  data-required="{{ $isRequiredEvent ? 'true' : 'false' }}"
                                  data-registered="{{ $isRegistered ? 'true' : 'false' }}"
@@ -270,7 +270,7 @@
                                     <div class="absolute bottom-0 left-0 right-0 p-4 text-white">
                                         <div class="flex justify-between items-start mb-2">
                                             <div class="flex flex-wrap gap-2">
-                                                <span class="inline-block bg-blue-600/90 text-white text-xs px-2 py-1 rounded-full capitalize backdrop-blur-sm">
+                                                <span class="inline-block bg-[#F00000]/90 text-white text-xs px-2 py-1 rounded-full capitalize backdrop-blur-sm">
                                                     {{ $event->type }}
                                                 </span>
                                                 @if($isRequiredEvent)
@@ -284,7 +284,7 @@
                                                     Registered
                                                 </span>
                                             @elseif($isRequiredEvent)
-                                                <span class="status-badge bg-blue-600/90 backdrop-blur-sm text-white">
+                                                <span class="status-badge bg-[#F00000]/90 backdrop-blur-sm text-white">
                                                     Required
                                                 </span>
                                             @else
@@ -304,14 +304,14 @@
                                                 <i class="fas fa-globe mr-1"></i> All Colleges
                                             </span>
                                         @else
-                                            <span class="college-badge text-xs backdrop-blur-sm bg-blue-600/90">
+                                            <span class="college-badge text-xs backdrop-blur-sm bg-[#F00000]/90">
                                                 <i class="fas fa-university mr-1"></i> {{ $event->colleges->count() }} Colleges
                                             </span>
                                         @endif
                                     </div>
 
                                     <!-- Date Badge -->
-                                    <div class="absolute top-3 left-3 bg-blue-600/90 text-white text-xs px-2 py-1 rounded-full backdrop-blur-sm">
+                                    <div class="absolute top-3 left-3 bg-[#F00000]/90 text-white text-xs px-2 py-1 rounded-full backdrop-blur-sm">
                                         {{ \Carbon\Carbon::parse($event->event_start_date)->format('M d') }} - {{ \Carbon\Carbon::parse($event->event_end_date)->format('M d') }}
                                     </div>
                                 </div>
@@ -330,13 +330,13 @@
                                         </div>
                                         @if($event->max_attendees)
                                             <div class="flex items-center text-sm text-gray-600">
-                                                <i class="far fa-users mr-2 text-purple-500"></i>
+                                                <i class="far fa-users mr-2 text-[#820000]"></i>
                                                 <span>{{ $event->registered_count }}/{{ $event->max_attendees }} registered</span>
                                             </div>
                                         @endif
                                         @if($registrationDate)
                                             <div class="flex items-center text-sm text-gray-600">
-                                                <i class="far fa-calendar-check mr-2 text-blue-500"></i>
+                                                <i class="far fa-calendar-check mr-2 text-[#F8650C]"></i>
                                                 <span>Registered: {{ $registrationDate->format('M j, Y') }}</span>
                                             </div>
                                         @endif
@@ -390,7 +390,7 @@
                                             @endif
                                         @elseif($isRequiredEvent)
                                             <!-- Required Event - Auto Register -->
-                                            <span class="flex-1 bg-blue-600 text-white text-sm px-3 py-2 rounded-lg flex items-center justify-center">
+                                            <span class="flex-1 bg-[#F00000] text-white text-sm px-3 py-2 rounded-lg flex items-center justify-center">
                                                 <i class="fas fa-user-check mr-1"></i>
                                                 <span class="hidden sm:inline">Required</span>
                                             </span>
@@ -399,7 +399,7 @@
                                             <form action="{{ route('student.events.register', $event) }}" method="POST" class="flex-1">
                                                 @csrf
                                                 <button type="submit"
-                                                        class="w-full bg-blue-600 text-white text-sm px-3 py-2 rounded-lg hover:bg-blue-700 transition flex items-center justify-center">
+                                                        class="w-full bg-[#F00000] text-white text-sm px-3 py-2 rounded-lg hover:bg-[#D40000] transition flex items-center justify-center">
                                                     <i class="fas fa-calendar-plus mr-1"></i>
                                                     <span class="hidden sm:inline">Register</span>
                                                 </button>
@@ -415,7 +415,7 @@
 
                                         <!-- View Details Button -->
                                         <button onclick="toggleDetails('details-{{ $event->id }}')"
-                                                class="flex-1 bg-blue-100 text-blue-700 text-sm px-3 py-2 rounded-lg hover:bg-blue-200 transition flex items-center justify-center">
+                                                class="flex-1 bg-gray-100 text-[#D40000] text-sm px-3 py-2 rounded-lg hover:bg-[#FFF9E6] transition flex items-center justify-center">
                                             <i class="fas fa-info-circle mr-1"></i>
                                             <span class="hidden sm:inline">Details</span>
                                         </button>
@@ -430,7 +430,7 @@
                                             </div>
                                             <div class="text-xs">
                                                 @if($isUpcoming)
-                                                    <span class="bg-blue-100 text-blue-800 px-2 py-1 rounded-full">
+                                                    <span class="bg-gray-100 text-[#820000] px-2 py-1 rounded-full">
                                                         <i class="fas fa-clock mr-1"></i> Upcoming
                                                     </span>
                                                 @else

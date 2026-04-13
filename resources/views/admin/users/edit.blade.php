@@ -10,7 +10,7 @@
         }
 
         .profile-navbar {
-            background: linear-gradient(90deg, #1e40af 0%, #3b82f6 100%);
+            background: linear-gradient(90deg, #F8650C 0%, #FFC917 100%);
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
         }
 
@@ -24,8 +24,8 @@
         }
 
         .tab-active {
-            border-bottom: 3px solid #3b82f6;
-            color: #3b82f6;
+            border-bottom: 3px solid #FFC917;
+            color: #FFC917;
             font-weight: 600;
         }
     </style>
@@ -36,7 +36,7 @@
                     <div class="text-white">
                         Welcome, {{ Auth::user()->first_name }}
                     </div>
-                    <a href="{{ route('dashboard') }}" class="text-white p-2 rounded-full hover:bg-blue-700 transition">
+                    <a href="{{ route('dashboard') }}" class="text-white p-2 rounded-full hover:bg-[#D40000] transition">
                         <i class="fas fa-home"></i>
                     </a>
                 </div>
@@ -82,10 +82,10 @@
             <div class="bg-white rounded-xl shadow-sm mb-6">
                 <div class="border-b">
                     <nav class="flex -mb-px">
-                        <button id="personal-tab" class="tab-active py-4 px-6 text-center font-medium text-gray-600 hover:text-blue-600 transition">
+                        <button id="personal-tab" class="tab-active py-4 px-6 text-center font-medium text-gray-600 hover:text-[#F00000] transition">
                             Personal Information
                         </button>
-                        <button id="role-tab" class="py-4 px-6 text-center font-medium text-gray-600 hover:text-blue-600 transition">
+                        <button id="role-tab" class="py-4 px-6 text-center font-medium text-gray-600 hover:text-[#F00000] transition">
                             {{ ucfirst($user->role) }} Profile
                         </button>
                     </nav>
@@ -106,7 +106,7 @@
                             <div>
                                 <label for="first_name" class="block text-sm font-medium text-gray-700 mb-2">First Name</label>
                                 <input type="text" id="first_name" name="first_name" value="{{ old('first_name', $user->first_name) }}"
-                                       class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
+                                       class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#F00000] focus:border-[#F00000] transition">
                                 @error('first_name')
                                     <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                                 @enderror
@@ -116,7 +116,7 @@
                             <div>
                                 <label for="middle_name" class="block text-sm font-medium text-gray-700 mb-2">Middle Name</label>
                                 <input type="text" id="middle_name" name="middle_name" value="{{ old('middle_name', $user->middle_name) }}"
-                                       class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
+                                       class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#F00000] focus:border-[#F00000] transition">
                                 @error('middle_name')
                                     <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                                 @enderror
@@ -126,7 +126,7 @@
                             <div>
                                 <label for="last_name" class="block text-sm font-medium text-gray-700 mb-2">Last Name</label>
                                 <input type="text" id="last_name" name="last_name" value="{{ old('last_name', $user->last_name) }}"
-                                       class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
+                                       class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#F00000] focus:border-[#F00000] transition">
                                 @error('last_name')
                                     <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                                 @enderror
@@ -136,7 +136,7 @@
                             <div>
                                 <label for="email" class="block text-sm font-medium text-gray-700 mb-2">Email Address</label>
                                 <input type="email" id="email" name="email" value="{{ old('email', $user->email) }}"
-                                       class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
+                                       class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#F00000] focus:border-[#F00000] transition">
                                 @error('email')
                                     <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                                 @enderror
@@ -146,7 +146,7 @@
                             <div>
                                 <label for="phone_number" class="block text-sm font-medium text-gray-700 mb-2">Phone Number</label>
                                 <input type="text" id="phone_number" name="phone_number" value="{{ old('phone_number', $user->phone_number) }}"
-                                       class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
+                                       class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#F00000] focus:border-[#F00000] transition">
                                 @error('phone_number')
                                     <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                                 @enderror
@@ -156,7 +156,7 @@
                             <div class="md:col-span-2">
                                 <label for="address" class="block text-sm font-medium text-gray-700 mb-2">Address</label>
                                 <textarea id="address" name="address" rows="3"
-                                          class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">{{ old('address', $user->address) }}</textarea>
+                                          class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#F00000] focus:border-[#F00000] transition">{{ old('address', $user->address) }}</textarea>
                                 @error('address')
                                     <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                                 @enderror
@@ -169,7 +169,7 @@
                                 <i class="fas fa-arrow-left mr-2"></i> Back to Users
                             </a>
                             <button type="submit"
-                                    class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition flex items-center">
+                                    class="bg-[#F00000] text-white px-6 py-2 rounded-lg hover:bg-[#D40000] transition flex items-center">
                                 <i class="fas fa-save mr-2"></i> Update User
                             </button>
                         </div>
@@ -195,7 +195,7 @@
                                     <label for="student_id" class="block text-sm font-medium text-gray-700 mb-2">Student ID</label>
                                     <input type="text" id="student_id" name="student_id"
                                            value="{{ old('student_id', $user->student->student_id ?? '') }}"
-                                           class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
+                                           class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#F00000] focus:border-[#F00000] transition">
                                     @error('student_id')
                                         <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                                     @enderror
@@ -205,7 +205,7 @@
                                 <div>
                                     <label for="year_level" class="block text-sm font-medium text-gray-700 mb-2">Year Level</label>
                                     <select id="year_level" name="year_level"
-                                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
+                                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#F00000] focus:border-[#F00000] transition">
                                         <option value="">Select Year Level</option>
                                         <option value="1st Year" {{ old('year_level', $user->student->year_level ?? '') == '1st Year' ? 'selected' : '' }}>1st Year</option>
                                         <option value="2nd Year" {{ old('year_level', $user->student->year_level ?? '') == '2nd Year' ? 'selected' : '' }}>2nd Year</option>
@@ -224,7 +224,7 @@
                                     <label for="course" class="block text-sm font-medium text-gray-700 mb-2">Course</label>
                                     <input type="text" id="course" name="course"
                                            value="{{ old('course', $user->student->course ?? '') }}"
-                                           class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
+                                           class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#F00000] focus:border-[#F00000] transition"
                                            placeholder="e.g., Bachelor of Science in Computer Science">
                                     @error('course')
                                         <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
@@ -235,7 +235,7 @@
                                 <div class="md:col-span-2">
                                     <label for="college_id" class="block text-sm font-medium text-gray-700 mb-2">College</label>
                                     <select id="college_id" name="college_id"
-                                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
+                                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#F00000] focus:border-[#F00000] transition">
                                         <option value="">Select College</option>
                                         @foreach($colleges as $college)
                                             <option value="{{ $college->id }}"
@@ -256,7 +256,7 @@
                                     <i class="fas fa-arrow-left mr-2"></i> Back to Users
                                 </a>
                                 <button type="submit"
-                                        class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition flex items-center">
+                                        class="bg-[#F00000] text-white px-6 py-2 rounded-lg hover:bg-[#D40000] transition flex items-center">
                                     <i class="fas fa-save mr-2"></i> Update Student Profile
                                 </button>
                             </div>
@@ -273,7 +273,7 @@
                                     <label for="position" class="block text-sm font-medium text-gray-700 mb-2">Position</label>
                                     <input type="text" id="position" name="position"
                                            value="{{ old('position', $user->counselor->position ?? '') }}"
-                                           class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
+                                           class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#F00000] focus:border-[#F00000] transition">
                                     @error('position')
                                         <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                                     @enderror
@@ -284,7 +284,7 @@
                                     <label for="credentials" class="block text-sm font-medium text-gray-700 mb-2">Credentials</label>
                                     <input type="text" id="credentials" name="credentials"
                                            value="{{ old('credentials', $user->counselor->credentials ?? '') }}"
-                                           class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
+                                           class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#F00000] focus:border-[#F00000] transition">
                                     @error('credentials')
                                         <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                                     @enderror
@@ -294,7 +294,7 @@
                                 <div class="md:col-span-2">
                                     <label for="college_id" class="block text-sm font-medium text-gray-700 mb-2">Assigned College</label>
                                     <select id="college_id" name="college_id"
-                                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
+                                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#F00000] focus:border-[#F00000] transition">
                                         <option value="">Select College</option>
                                         @foreach($colleges as $college)
                                             <option value="{{ $college->id }}"
@@ -312,7 +312,7 @@
                                 <div class="md:col-span-2">
                                     <label for="specialization" class="block text-sm font-medium text-gray-700 mb-2">Specialization</label>
                                     <textarea id="specialization" name="specialization" rows="3"
-                                              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">{{ old('specialization', $user->counselor->specialization ?? '') }}</textarea>
+                                              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#F00000] focus:border-[#F00000] transition">{{ old('specialization', $user->counselor->specialization ?? '') }}</textarea>
                                     @error('specialization')
                                         <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                                     @enderror
@@ -323,7 +323,7 @@
                                     <label class="flex items-center">
                                         <input type="checkbox" name="is_head" value="1"
                                                {{ old('is_head', $user->counselor->is_head ?? '') ? 'checked' : '' }}
-                                               class="rounded border-gray-300 text-indigo-600 shadow-sm focus:ring-indigo-500">
+                                               class="rounded border-gray-300 text-[#F00000] shadow-sm focus:ring-[#F00000]">
                                         <span class="ms-2 text-sm text-gray-600">Head Counselor</span>
                                     </label>
                                     @error('is_head')
@@ -338,7 +338,7 @@
                                     <i class="fas fa-arrow-left mr-2"></i> Back to Users
                                 </a>
                                 <button type="submit"
-                                        class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition flex items-center">
+                                        class="bg-[#F00000] text-white px-6 py-2 rounded-lg hover:bg-[#D40000] transition flex items-center">
                                     <i class="fas fa-save mr-2"></i> Update Counselor Profile
                                 </button>
                             </div>
@@ -355,7 +355,7 @@
                                     <label for="credentials" class="block text-sm font-medium text-gray-700 mb-2">Admin Credentials</label>
                                     <input type="text" id="credentials" name="credentials"
                                            value="{{ old('credentials', $user->admin->credentials ?? '') }}"
-                                           class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
+                                           class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#F00000] focus:border-[#F00000] transition"
                                            placeholder="e.g., System Administrator, Head Admin">
                                     @error('credentials')
                                         <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
@@ -369,7 +369,7 @@
                                     <i class="fas fa-arrow-left mr-2"></i> Back to Users
                                 </a>
                                 <button type="submit"
-                                        class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition flex items-center">
+                                        class="bg-[#F00000] text-white px-6 py-2 rounded-lg hover:bg-[#D40000] transition flex items-center">
                                     <i class="fas fa-save mr-2"></i> Update Admin Profile
                                 </button>
                             </div>

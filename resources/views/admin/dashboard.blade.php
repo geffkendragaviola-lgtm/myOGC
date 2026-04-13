@@ -9,10 +9,9 @@
         <div class="container mx-auto px-6 py-8">
             <!-- Stats Cards -->
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mb-8">
-                <div class="bg-white rounded-lg shadow p-6">
+                <div class="bg-white border-t-4 border-[#820000] rounded-lg shadow p-6 hover:shadow-md transition">
                     <div class="flex items-center">
-                        <div class="p-3 bg-blue-100 rounded-lg">
-                            <i class="fas fa-users text-blue-600 text-xl"></i>
+                        <div class="p-3 bg-[#820000] rounded-lg"><i class="fas fa-users text-white text-xl"></i>
                         </div>
                         <div class="ml-4">
                             <p class="text-sm font-medium text-gray-600">Total Users</p>
@@ -21,10 +20,9 @@
                     </div>
                 </div>
 
-                <div class="bg-white rounded-lg shadow p-6">
+                <div class="bg-white border-t-4 border-[#820000] rounded-lg shadow p-6 hover:shadow-md transition">
                     <div class="flex items-center">
-                        <div class="p-3 bg-green-100 rounded-lg">
-                            <i class="fas fa-graduation-cap text-green-600 text-xl"></i>
+                        <div class="p-3 bg-[#F8650C] rounded-lg"><i class="fas fa-graduation-cap text-white text-xl"></i>
                         </div>
                         <div class="ml-4">
                             <p class="text-sm font-medium text-gray-600">Students</p>
@@ -33,10 +31,9 @@
                     </div>
                 </div>
 
-                <div class="bg-white rounded-lg shadow p-6">
+                <div class="bg-white border-t-4 border-[#820000] rounded-lg shadow p-6 hover:shadow-md transition">
                     <div class="flex items-center">
-                        <div class="p-3 bg-purple-100 rounded-lg">
-                            <i class="fas fa-user-md text-purple-600 text-xl"></i>
+                        <div class="p-3 bg-[#FFC917] rounded-lg"><i class="fas fa-user-tie text-white text-xl"></i>
                         </div>
                         <div class="ml-4">
                             <p class="text-sm font-medium text-gray-600">Counselors</p>
@@ -45,10 +42,9 @@
                     </div>
                 </div>
 
-                <div class="bg-white rounded-lg shadow p-6">
+                <div class="bg-white border-t-4 border-[#820000] rounded-lg shadow p-6 hover:shadow-md transition">
                     <div class="flex items-center">
-                        <div class="p-3 bg-red-100 rounded-lg">
-                            <i class="fas fa-user-shield text-red-600 text-xl"></i>
+                        <div class="p-3 bg-[#820000] rounded-lg"><i class="fas fa-user-shield text-white text-xl"></i>
                         </div>
                         <div class="ml-4">
                             <p class="text-sm font-medium text-gray-600">Admins</p>
@@ -57,10 +53,9 @@
                     </div>
                 </div>
 
-                <div class="bg-white rounded-lg shadow p-6">
+                <div class="bg-white border-t-4 border-[#820000] rounded-lg shadow p-6 hover:shadow-md transition">
                     <div class="flex items-center">
-                        <div class="p-3 bg-yellow-100 rounded-lg">
-                            <i class="fas fa-clock text-yellow-600 text-xl"></i>
+                        <div class="p-3 bg-[#FFE100] rounded-lg"><i class="fas fa-clock text-[#820000] text-xl"></i>
                         </div>
 
                     </div>
@@ -71,7 +66,7 @@
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
                 <a href="{{ route('admin.users.create') }}" class="bg-white rounded-lg shadow p-6 hover:shadow-md transition">
                     <div class="flex items-center">
-                        <i class="fas fa-user-plus text-blue-600 text-2xl"></i>
+                        <i class="fas fa-user-plus text-[#820000] text-2xl"></i>
                         <div class="ml-4">
                             <h3 class="font-semibold text-gray-900">Create User</h3>
                             <p class="text-sm text-gray-600">Add new user account</p>
@@ -81,7 +76,7 @@
 
                 <a href="{{ route('admin.users') }}" class="bg-white rounded-lg shadow p-6 hover:shadow-md transition">
                     <div class="flex items-center">
-                        <i class="fas fa-users-cog text-green-600 text-2xl"></i>
+                        <i class="fas fa-users-cog text-[#F8650C] text-2xl"></i>
                         <div class="ml-4">
                             <h3 class="font-semibold text-gray-900">Manage Users</h3>
                             <p class="text-sm text-gray-600">View all users</p>
@@ -91,7 +86,7 @@
 
                 <a href="{{ route('admin.students') }}" class="bg-white rounded-lg shadow p-6 hover:shadow-md transition">
                     <div class="flex items-center">
-                        <i class="fas fa-graduation-cap text-purple-600 text-2xl"></i>
+                        <i class="fas fa-graduation-cap text-[#820000] text-2xl"></i>
                         <div class="ml-4">
                             <h3 class="font-semibold text-gray-900">Student Records</h3>
                             <p class="text-sm text-gray-600">Manage student data</p>
@@ -131,7 +126,7 @@
                                 <td class="px-6 py-4 whitespace-nowrap">
                                     <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full
                                         {{ $user->role === 'admin' ? 'bg-red-100 text-red-800' :
-                                           ($user->role === 'counselor' ? 'bg-purple-100 text-purple-800' :
+                                           ($user->role === 'counselor' ? 'bg-[#FFF9E6] text-[#820000]' :
                                            'bg-green-100 text-green-800') }}">
                                         {{ ucfirst($user->role) }}
                                     </span>

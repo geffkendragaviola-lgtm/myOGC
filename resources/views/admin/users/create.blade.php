@@ -9,7 +9,7 @@
     <div class="container mx-auto px-4 py-8">
         <!-- Back Button and Header -->
         <div class="mb-6">
-            <a href="{{ route('admin.users') }}" class="inline-flex items-center text-blue-600 hover:text-blue-900 mb-4">
+            <a href="{{ route('admin.users') }}" class="inline-flex items-center text-[#F00000] hover:text-[#820000] mb-4">
                 <i class="fas fa-arrow-left mr-2"></i> Back to Users
             </a>
             <h1 class="text-3xl font-bold text-gray-800">Create New User</h1>
@@ -46,7 +46,7 @@
                         <div>
                             <label for="first_name" class="block text-sm font-medium text-gray-700 mb-2">First Name *</label>
                             <input type="text" id="first_name" name="first_name" value="{{ old('first_name') }}"
-                                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#F00000] focus:border-[#F00000]"
                                    required>
                         </div>
 
@@ -54,14 +54,14 @@
                         <div>
                             <label for="middle_name" class="block text-sm font-medium text-gray-700 mb-2">Middle Name</label>
                             <input type="text" id="middle_name" name="middle_name" value="{{ old('middle_name') }}"
-                                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#F00000] focus:border-[#F00000]">
                         </div>
 
                         <!-- Last Name -->
                         <div>
                             <label for="last_name" class="block text-sm font-medium text-gray-700 mb-2">Last Name *</label>
                             <input type="text" id="last_name" name="last_name" value="{{ old('last_name') }}"
-                                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#F00000] focus:border-[#F00000]"
                                    required>
                         </div>
 
@@ -69,20 +69,20 @@
                         <div>
                             <label for="birthdate" class="block text-sm font-medium text-gray-700 mb-2">Birthdate</label>
                             <input type="date" id="birthdate" name="birthdate" value="{{ old('birthdate') }}"
-                                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#F00000] focus:border-[#F00000]">
                         </div>
 
                         <!-- Age (auto-calculated) -->
                         <div>
                             <label for="age" class="block text-sm font-medium text-gray-700 mb-2">Age</label>
                             <input type="number" id="age" name="age" value="{{ old('age') }}" readonly
-                                   class="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                                   class="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-100 focus:outline-none focus:ring-2 focus:ring-[#F00000] focus:border-[#F00000]">
                         </div>
 
                         <!-- Sex -->
                         <div>
                             <label for="sex" class="block text-sm font-medium text-gray-700 mb-2">Sex</label>
-                            <select id="sex" name="sex" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                            <select id="sex" name="sex" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#F00000] focus:border-[#F00000]">
                                 <option value="">Select Sex</option>
                                 <option value="male" {{ old('sex') == 'male' ? 'selected' : '' }}>Male</option>
                                 <option value="female" {{ old('sex') == 'female' ? 'selected' : '' }}>Female</option>
@@ -94,21 +94,21 @@
                         <div>
                             <label for="birthplace" class="block text-sm font-medium text-gray-700 mb-2">Birthplace</label>
                             <input type="text" id="birthplace" name="birthplace" value="{{ old('birthplace') }}"
-                                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#F00000] focus:border-[#F00000]">
                         </div>
 
                         <!-- Religion -->
                         <div>
                             <label for="religion" class="block text-sm font-medium text-gray-700 mb-2">Religion</label>
                             <input type="text" id="religion" name="religion" value="{{ old('religion') }}"
-                                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#F00000] focus:border-[#F00000]">
                         </div>
 
 
                         <!-- Civil Status -->
                         <div>
                             <label for="civil_status" class="block text-sm font-medium text-gray-700 mb-2">Civil Status</label>
-                            <select id="civil_status" name="civil_status" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                            <select id="civil_status" name="civil_status" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#F00000] focus:border-[#F00000]">
                                 <option value="">Select Civil Status</option>
                                 <option value="single" {{ old('civil_status') == 'single' ? 'selected' : '' }}>Single</option>
                                 <option value="married" {{ old('civil_status') == 'married' ? 'selected' : '' }}>Married</option>
@@ -121,21 +121,21 @@
                         <div>
                             <label for="citizenship" class="block text-sm font-medium text-gray-700 mb-2">Citizenship</label>
                             <input type="text" id="citizenship" name="citizenship" value="{{ old('citizenship') }}"
-                                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#F00000] focus:border-[#F00000]">
                         </div>
 
                         <!-- Phone Number -->
                         <div>
                             <label for="phone_number" class="block text-sm font-medium text-gray-700 mb-2">Phone Number</label>
                             <input type="text" id="phone_number" name="phone_number" value="{{ old('phone_number') }}"
-                                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#F00000] focus:border-[#F00000]">
                         </div>
 
                         <!-- Email -->
                         <div>
                             <label for="email" class="block text-sm font-medium text-gray-700 mb-2">Email *</label>
                             <input type="email" id="email" name="email" value="{{ old('email') }}"
-                                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#F00000] focus:border-[#F00000]"
                                    required>
                         </div>
 
@@ -143,7 +143,7 @@
                         <div class="md:col-span-2">
                             <label for="address" class="block text-sm font-medium text-gray-700 mb-2">Address</label>
                             <textarea id="address" name="address" rows="3"
-                                      class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">{{ old('address') }}</textarea>
+                                      class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#F00000] focus:border-[#F00000]">{{ old('address') }}</textarea>
                         </div>
                     </div>
                 </div>
@@ -156,7 +156,7 @@
                         <div>
                             <label for="password" class="block text-sm font-medium text-gray-700 mb-2">Password *</label>
                             <input type="password" id="password" name="password"
-                                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#F00000] focus:border-[#F00000]"
                                    required>
                         </div>
 
@@ -164,14 +164,14 @@
                         <div>
                             <label for="password_confirmation" class="block text-sm font-medium text-gray-700 mb-2">Confirm Password *</label>
                             <input type="password" id="password_confirmation" name="password_confirmation"
-                                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#F00000] focus:border-[#F00000]"
                                    required>
                         </div>
 
                         <!-- Role -->
                         <div class="md:col-span-2">
                             <label for="role" class="block text-sm font-medium text-gray-700 mb-2">Role *</label>
-                            <select id="role" name="role" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" required>
+                            <select id="role" name="role" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#F00000] focus:border-[#F00000]" required>
                                 <option value="">Select Role</option>
                                 <option value="student" {{ old('role') == 'student' ? 'selected' : '' }}>Student</option>
                                 <option value="counselor" {{ old('role') == 'counselor' ? 'selected' : '' }}>Counselor</option>
@@ -189,13 +189,13 @@
                         <div>
                             <label for="student_id" class="block text-sm font-medium text-gray-700 mb-2">Student ID *</label>
                             <input type="text" id="student_id" name="student_id" value="{{ old('student_id') }}"
-                                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#F00000] focus:border-[#F00000]">
                         </div>
 
                         <!-- Year Level -->
                         <div>
                             <label for="year_level" class="block text-sm font-medium text-gray-700 mb-2">Year Level *</label>
-                            <select id="year_level" name="year_level" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                            <select id="year_level" name="year_level" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#F00000] focus:border-[#F00000]">
                                 <option value="">Select Year Level</option>
                                 <option value="1st Year" {{ old('year_level') == '1st Year' ? 'selected' : '' }}>1st Year</option>
                                 <option value="2nd Year" {{ old('year_level') == '2nd Year' ? 'selected' : '' }}>2nd Year</option>
@@ -210,13 +210,13 @@
                         <div class="md:col-span-2">
                             <label for="course" class="block text-sm font-medium text-gray-700 mb-2">Course *</label>
                             <input type="text" id="course" name="course" value="{{ old('course') }}"
-                                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#F00000] focus:border-[#F00000]">
                         </div>
 
                         <!-- College -->
                         <div class="md:col-span-2">
                             <label for="college_id" class="block text-sm font-medium text-gray-700 mb-2">College *</label>
-                            <select id="college_id" name="college_id" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                            <select id="college_id" name="college_id" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#F00000] focus:border-[#F00000]">
                                 <option value="">Select College</option>
                                 @foreach($colleges as $college)
                                     <option value="{{ $college->id }}" {{ old('college_id') == $college->id ? 'selected' : '' }}>
@@ -236,20 +236,20 @@
                         <div>
                             <label for="position" class="block text-sm font-medium text-gray-700 mb-2">Position *</label>
                             <input type="text" id="position" name="position" value="{{ old('position') }}"
-                                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#F00000] focus:border-[#F00000]">
                         </div>
 
                         <!-- Credentials -->
                         <div>
                             <label for="credentials" class="block text-sm font-medium text-gray-700 mb-2">Credentials *</label>
                             <input type="text" id="credentials" name="credentials" value="{{ old('credentials') }}"
-                                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#F00000] focus:border-[#F00000]">
                         </div>
 
                         <!-- College -->
                         <div class="md:col-span-2">
                             <label for="counselor_college_id" class="block text-sm font-medium text-gray-700 mb-2">College *</label>
-                            <select id="counselor_college_id" name="counselor_college_id" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                            <select id="counselor_college_id" name="counselor_college_id" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#F00000] focus:border-[#F00000]">
                                 <option value="">Select College</option>
                                 @foreach($colleges as $college)
                                     <option value="{{ $college->id }}" {{ old('counselor_college_id') == $college->id ? 'selected' : '' }}>
@@ -263,7 +263,7 @@
                         <div class="md:col-span-2">
                             <label class="flex items-center">
                                 <input type="checkbox" name="is_head" value="1" {{ old('is_head') ? 'checked' : '' }}
-                                       class="rounded border-gray-300 text-blue-600 shadow-sm focus:ring-blue-500">
+                                       class="rounded border-gray-300 text-[#F00000] shadow-sm focus:ring-[#F00000]">
                                 <span class="ml-2 text-sm text-gray-600">Head Counselor</span>
                             </label>
                         </div>
@@ -278,7 +278,7 @@
                         <div class="md:col-span-2">
                             <label for="admin_credentials" class="block text-sm font-medium text-gray-700 mb-2">Admin Credentials *</label>
                             <input type="text" id="admin_credentials" name="admin_credentials" value="{{ old('admin_credentials') }}"
-                                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#F00000] focus:border-[#F00000]"
                                    placeholder="e.g., System Administrator">
                         </div>
                     </div>
@@ -289,7 +289,7 @@
                     <a href="{{ route('admin.users') }}" class="bg-gray-500 text-white px-6 py-2 rounded-md hover:bg-gray-600 transition">
                         Cancel
                     </a>
-                    <button type="submit" class="bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700 transition flex items-center">
+                    <button type="submit" class="bg-[#F00000] text-white px-6 py-2 rounded-md hover:bg-[#D40000] transition flex items-center">
                         <i class="fas fa-user-plus mr-2"></i> Create User
                     </button>
                 </div>

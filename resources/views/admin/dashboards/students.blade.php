@@ -13,8 +13,8 @@
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
                 <div class="bg-white rounded-lg shadow p-6">
                     <div class="flex items-center">
-                        <div class="p-3 bg-green-100 rounded-lg">
-                            <i class="fas fa-graduation-cap text-green-600 text-xl"></i>
+                        <div class="p-3 bg-[#FFF9E6] rounded-lg">
+                            <i class="fas fa-graduation-cap text-[#F8650C] text-xl"></i>
                         </div>
                         <div class="ml-4">
                             <p class="text-sm font-medium text-gray-600">Total Students</p>
@@ -25,8 +25,8 @@
 
                 <div class="bg-white rounded-lg shadow p-6 md:col-span-2">
                     <div class="flex items-center mb-4">
-                        <div class="p-3 bg-blue-100 rounded-lg">
-                            <i class="fas fa-school text-blue-600 text-xl"></i>
+                        <div class="p-3 bg-gray-100 rounded-lg">
+                            <i class="fas fa-school text-[#F00000] text-xl"></i>
                         </div>
                         <div class="ml-4">
                             <p class="text-sm font-medium text-gray-600">Students per College</p>
@@ -66,7 +66,7 @@
                         </select>
                     </div>
                     <div>
-                        <button type="submit" class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700">
+                        <button type="submit" class="bg-[#F00000] text-white px-6 py-2 rounded-lg hover:bg-[#D40000]">
                             <i class="fas fa-search mr-2"></i>Search
                         </button>
                     </div>
@@ -119,7 +119,7 @@
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ ucfirst($student->student_status ?? 'new') }}</td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                    <a href="{{ route('admin.students.edit', $student) }}" class="text-blue-600 hover:text-blue-900 mr-3">
+                                    <a href="{{ route('admin.students.edit', $student) }}" class="text-[#F00000] hover:text-[#820000] mr-3">
                                         <i class="fas fa-edit"></i>
                                     </a>
                                 </td>

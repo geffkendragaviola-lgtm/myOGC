@@ -30,7 +30,7 @@
                                    name="search"
                                    value="{{ request('search') }}"
                                    placeholder="Search by student name, student id, or concern..."
-                                   class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
+                                   class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#F00000] focus:border-[#F00000] transition">
                             <div class="absolute inset-y-0 left-0 pl-3 flex items-center">
                                 <i class="fas fa-search text-gray-400"></i>
                             </div>
@@ -40,7 +40,7 @@
                     <div>
                         <label for="status" class="block text-sm font-medium text-gray-700 mb-2">Status</label>
                         <select id="status" name="status"
-                                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
+                                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#F00000] focus:border-[#F00000] transition">
                             <option value="all" {{ request('status', 'all') === 'all' ? 'selected' : '' }}>All</option>
                             <option value="pending" {{ request('status') === 'pending' ? 'selected' : '' }}>Pending</option>
                             <option value="approved" {{ request('status') === 'approved' ? 'selected' : '' }}>Approved</option>
@@ -52,7 +52,7 @@
                     <div>
                         <label for="date_range" class="block text-sm font-medium text-gray-700 mb-2">Date Range</label>
                         <select id="date_range" name="date_range"
-                                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
+                                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#F00000] focus:border-[#F00000] transition">
                             <option value="" {{ request('date_range') === null ? 'selected' : '' }}>All Time</option>
                             <option value="today" {{ request('date_range') === 'today' ? 'selected' : '' }}>Today</option>
                             <option value="week" {{ request('date_range') === 'week' ? 'selected' : '' }}>This Week</option>
@@ -65,7 +65,7 @@
 
                 <div class="flex justify-end mt-4">
                     <button type="submit"
-                            class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">
+                            class="px-4 py-2 bg-[#F00000] text-white rounded-lg hover:bg-[#D40000] transition">
                         <i class="fas fa-filter mr-2"></i>Apply Filters
                     </button>
                 </div>
@@ -79,7 +79,7 @@
                     <p class="text-gray-500 text-lg">No appointments found.</p>
                     <p class="text-gray-400 text-sm mt-1">Appointments will appear here once they are created.</p>
                     <a href="{{ route('counselor.appointments') }}"
-                       class="inline-block mt-4 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition">
+                       class="inline-block mt-4 bg-[#F00000] text-white px-4 py-2 rounded-lg hover:bg-[#D40000] transition">
                         <i class="fas fa-list mr-2"></i>Go to Appointments
                     </a>
                 </div>
@@ -136,7 +136,7 @@
                                             <i class="fas fa-eye mr-2"></i> View Session
                                         </a>
                                         <a href="{{ route('counselor.appointments.session', $appointment) }}"
-                                           class="inline-flex items-center px-3 py-2 rounded-lg border border-[#7c1d2a]/40 text-[#7c1d2a] hover:bg-[#7c1d2a]/10 transition text-sm">
+                                           class="inline-flex items-center px-3 py-2 rounded-lg border border-[#F00000]/40 text-[#F00000] hover:bg-[#F00000]/10 transition text-sm">
                                             <i class="fas fa-pen mr-2"></i> Edit Session
                                         </a>
                                     </div>

@@ -35,7 +35,7 @@
                             </div>
                             <div>
                                 <h2 class="text-2xl font-bold text-white">Anonymous Feedback Submission</h2>
-                                <p class="text-indigo-100 mt-1">Student identity protected for privacy</p>
+                                <p class="text-white mt-1">Student identity protected for privacy</p>
                             </div>
                         @else
                             <div class="bg-white bg-opacity-20 p-4 rounded-full mr-4">
@@ -45,9 +45,9 @@
                                 <h2 class="text-2xl font-bold text-white">
                                     {{ $feedback->user->first_name }} {{ $feedback->user->last_name }}
                                 </h2>
-                                <p class="text-indigo-100 mt-1">{{ $feedback->user->email }}</p>
+                                <p class="text-white mt-1">{{ $feedback->user->email }}</p>
                                 @if($feedback->user->student)
-                                    <p class="text-indigo-200 text-sm mt-1">
+                                    <p class="text-[#FFC917] text-sm mt-1">
                                         {{ $feedback->user->student->student_id }} •
                                         {{ $feedback->user->student->college->name ?? 'No College' }} •
                                         {{ $feedback->user->student->year_level ?? 'N/A' }}
@@ -60,7 +60,7 @@
                         <div class="text-white text-4xl font-bold mb-1">
                             {{ $feedback->satisfaction_rating }}/5
                         </div>
-                        <div class="text-indigo-100 text-lg">
+                        <div class="text-white text-lg">
                             {{ \App\Models\Feedback::getRatingLabel($feedback->satisfaction_rating) }}
                         </div>
                         <div class="text-yellow-300 mt-2">
@@ -79,7 +79,7 @@
                     <!-- Service Information -->
                     <div class="bg-gray-50 rounded-lg p-6">
                         <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center">
-                            <i class="fas fa-cog text-blue-500 mr-2"></i>
+                            <i class="fas fa-cog text-[#F8650C] mr-2"></i>
                             Service Information
                         </h3>
                         <div class="space-y-3">
@@ -91,7 +91,7 @@
                                 <label class="block text-sm font-medium text-gray-600">Submission Type</label>
                                 <p class="mt-1">
                                     @if($feedback->is_anonymous)
-                                        <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-purple-100 text-purple-800">
+                                        <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-[#FFF9E6] text-[#820000]">
                                             <i class="fas fa-user-secret mr-1"></i> Anonymous Submission
                                         </span>
                                     @else
@@ -164,7 +164,7 @@
                 <!-- Student Comments -->
                 <div class="mb-8">
                     <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center">
-                        <i class="fas fa-comment-dots text-blue-500 mr-2"></i>
+                        <i class="fas fa-comment-dots text-[#F8650C] mr-2"></i>
                         Student Comments & Feedback
                     </h3>
                     <div class="bg-gray-50 rounded-lg p-6 border border-gray-200">
@@ -229,7 +229,7 @@
                 </a>
                 @if(!$feedback->is_anonymous && $feedback->user->student)
                 <a href="{{ route('admin.students') }}?search={{ $feedback->user->student->student_id }}"
-                   class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition flex items-center">
+                   class="bg-[#F00000] text-white px-6 py-2 rounded-lg hover:bg-[#D40000] transition flex items-center">
                     <i class="fas fa-user-graduate mr-2"></i> View Student Profile
                 </a>
                 @endif
