@@ -149,11 +149,7 @@ class CounselorSeeder extends Seeder
                 'citizenship' => 'Filipino',
                 'address' => 'Iligan City, Lanao del Norte',
                 'phone_number' => '09123456795',
-<<<<<<< HEAD
                 'email' => 'rosekisol14@gmail.com',
-=======
-                'email' => 'jaica.dionaldo15@test.com',
->>>>>>> 8a20629593ff2b91144a854be491d9c4d7866602
                 'password' => Hash::make('1234567890'),
                 'role' => 'counselor',
                 'created_at' => now(),
@@ -243,11 +239,7 @@ class CounselorSeeder extends Seeder
                 'position' => 'Guidance Counselor III',
                 'credentials' => 'RGC, LPT',
                 'is_head' => false,
-<<<<<<< HEAD
                 'google_calendar_id' => 'rosekisol14@gmail.com',
-=======
-                'google_calendar_id' => 'jaica.dionaldo15@gmail.com',
->>>>>>> 8a20629593ff2b91144a854be491d9c4d7866602
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
@@ -258,11 +250,7 @@ class CounselorSeeder extends Seeder
                 'position' => 'Guidance Counselor III',
                 'credentials' => 'RGC, LPT',
                 'is_head' => false,
-<<<<<<< HEAD
                 'google_calendar_id' => 'rosekisol14@gmail.com',
-=======
-                'google_calendar_id' => 'jaica.dionaldo15@gmail.com',
->>>>>>> 8a20629593ff2b91144a854be491d9c4d7866602
                 'created_at' => now(),
                 'updated_at' => now(),
             ],

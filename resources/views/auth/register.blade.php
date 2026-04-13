@@ -124,19 +124,20 @@
         margin: 0 auto;
     }
 
-    .top-link {
-        margin-bottom: 16px;
+    .login-row {
+        margin-top: 22px;
+        text-align: center;
         font-size: 14px;
         color: #64748b;
     }
 
-    .top-link a {
+    .login-row a {
         color: #d70000;
         text-decoration: none;
         font-weight: 700;
     }
 
-    .top-link a:hover {
+    .login-row a:hover {
         text-decoration: underline;
     }
 
@@ -474,7 +475,7 @@
         font-size: 14px;
         margin-bottom: 16px;
     }
-
+    
     .alert-error {
         background: #fff1f2;
         border: 1px solid #fecdd3;
@@ -593,10 +594,6 @@
 
         <div class="auth-right">
             <div class="auth-form-wrap">
-                <div class="top-link">
-                    Already have an account?
-                    <a href="{{ route('login') }}">Log in here</a>
-                </div>
 
                 <div class="form-card">
                     @php
@@ -672,6 +669,10 @@
                                     Send Verification Code
                                 </button>
                             </form>
+                            <div class="login-row">
+                                Already have an account?
+                                <a href="{{ route('login') }}">Log in here</a>
+                            </div>
                         </div>
 
                         @if ($pendingEmail)

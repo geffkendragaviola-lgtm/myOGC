@@ -11,13 +11,6 @@
                 <div class="card-body">
                     <div class="row align-items-center">
                         <div class="col-md-8">
-                            <nav aria-label="breadcrumb">
-                                <ol class="breadcrumb mb-0">
-                                    <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">Dashboard</a></li>
-                                    <li class="breadcrumb-item"><a href="{{ route('admin.students') }}">Students</a></li>
-                                    <li class="breadcrumb-item active" aria-current="page">Student Details</li>
-                                </ol>
-                            </nav>
                             <h1 class="h3 mb-0 mt-2">Student Profile</h1>
                         </div>
                         <div class="col-md-4 text-end">
@@ -25,9 +18,6 @@
                                 <button class="btn btn-outline-primary" onclick="window.print()">
                                     <i class="fas fa-print"></i> Print
                                 </button>
-                                <a href="{{ route('admin.students') }}" class="btn btn-outline-secondary">
-                                    <i class="fas fa-arrow-left"></i> Back to List
-                                </a>
                             </div>
                         </div>
                     </div>

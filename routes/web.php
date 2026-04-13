@@ -22,9 +22,31 @@ Route::get('/', function () {
     return redirect()->route('login');
 });
 
+// Updated dashboard route with role-based redirection
 Route::get('/dashboard', function () {
+    $user = Auth::user();
+    
+    // Redirect based on user role
+    if ($user->role === 'admin') {
+        return redirect()->route('admin.dashboard');
+    }
+    
+    if ($user->role === 'counselor') {
+        return redirect()->route('counselor.dashboard');
+    }
+    
+    if ($user->role === 'student') {
+        // For students, you can either show the generic dashboard or create a student dashboard
+        // Option 1: Show the generic dashboard (currently used)
+        return view('dashboard');
+        // Option 2: Redirect to a student dashboard (uncomment if you create one)
+        // return redirect()->route('student.dashboard');
+    }
+    
+    // Fallback to generic dashboard
     return view('dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
+
 // In your web.php routes file
 // For student viewing their own profile
 Route::get('/student/{student}', [StudentController::class, 'show'])->name('student.show');

@@ -340,10 +340,6 @@
         <div class="auth-right">
             <div class="auth-card">
                 <h2 class="card-title">Log in</h2>
-                <p class="card-subtitle">
-                    Don’t have an account?
-                    <a href="{{ route('register') }}">Create one here</a>
-                </p>
 
                 <x-auth-session-status class="mb-4" :status="session('status')" />
 
@@ -411,7 +407,7 @@
                 </form>
 
                 <div class="register-row">
-                    New student?
+                    Don’t have an account?
                     <a href="{{ route('register') }}">Register here</a>
                 </div>
 

@@ -12,70 +12,39 @@
         }
 
         .dashboard-navbar {
-            background: linear-gradient(90deg, #820000 0%, #5a0000 100%);
-            box-shadow: 0 4px 12px rgba(196, 30, 58, 0.2);
+            background: linear-gradient(135deg, #6C0200 0%, #4a0100 100%);
+            box-shadow: 0 4px 20px rgba(108, 2, 0, 0.3);
+            border-bottom: 1px solid rgba(212, 175, 55, 0.3);
         }
 
         .dashboard-hero {
-            background: linear-gradient(135deg, rgba(196, 30, 58, 0.9), rgba(160, 24, 48, 0.9)), url('https://images.unsplash.com/photo-1523050854058-8df90110c9f1?ixlib=rb-4.0.3');
+            background: linear-gradient(135deg, rgba(108, 2, 0, 0.92), rgba(90, 1, 0, 0.92)), url('https://images.unsplash.com/photo-1523050854058-8df90110c9f1?ixlib=rb-4.0.3');
             background-size: cover;
             background-position: center;
-            height: 350px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            padding: 4rem 0;
             position: relative;
         }
 
-        .dashboard-hero-overlay {
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0, 0, 0, 0.3);
-        }
-
-        .dashboard-hero-title {
-            font-size: 3rem;
-            font-weight: bold;
-            color: white;
-            text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.6);
+        .dashboard-hero-content {
             position: relative;
             z-index: 10;
-            letter-spacing: 0.5px;
-        }
-
-        .dashboard-quote-section {
-            background: linear-gradient(135deg, #4A4A4A 0%, #2D2D2D 100%);
-            padding: 3rem 0;
-            text-align: center;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .dashboard-quote-section::before {
-            content: '"';
-            position: absolute;
-            top: -20px;
-            left: 50%;
-            transform: translateX(-50%);
-            font-size: 120px;
-            color: rgba(196, 30, 58, 0.2);
-            font-family: Georgia, serif;
-            z-index: 0;
         }
 
         .dashboard-quote-text {
-            font-size: 1.5rem;
+            font-size: 1rem;
             font-style: italic;
-            color: #ffffff;
-            max-width: 900px;
-            margin: 0 auto;
-            position: relative;
-            z-index: 1;
-            line-height: 1.8;
-            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+            color: #fef3c7;
+            max-width: 800px;
+            margin: 1rem auto 0;
+            line-height: 1.6;
+            font-weight: 400;
+        }
+
+        .dashboard-quote-author {
+            color: #d4af37;
+            font-size: 0.80rem;
+            margin-top: 0.75rem;
+            font-weight: 500;
         }
 
         .dashboard-card {
@@ -84,7 +53,7 @@
 
         .dashboard-card:hover {
             transform: translateY(-5px);
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
         }
 
         .dashboard-profile-dropdown {
@@ -127,15 +96,18 @@
 
         .dashboard-staff-card {
             transition: transform 0.3s ease;
+            border: 1px solid #f0f0f0;
         }
 
         .dashboard-staff-card:hover {
             transform: translateY(-3px);
+            border-color: #d4af37;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
         }
 
         .dashboard-divider {
             height: 1px;
-            background: linear-gradient(to right, transparent, #d1d5db, transparent);
+            background: linear-gradient(to right, transparent, #d4af37, #900500, #d4af37, transparent);
             margin: 3rem 0;
         }
 
@@ -157,16 +129,34 @@
             display: block;
         }
 
-        .image-placeholder {
-            width: 100%;
-            height: 300px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 1.5rem;
-            font-weight: bold;
+        /* Gold accent classes */
+        .gold-text {
+            color: #d4af37;
+        }
+        
+        .gold-border {
+            border-color: #d4af37;
+        }
+        
+        .gold-bg-light {
+            background-color: rgba(212, 175, 55, 0.1);
+        }
+        
+        .gold-hover:hover {
+            color: #d4af37;
+        }
+
+        /* Maroon variations - updated to #900500 */
+        .bg-maroon {
+            background: linear-gradient(135deg, #900500 0%, #6C0200 100%);
+        }
+        
+        .border-maroon {
+            border-color: #900500;
+        }
+        
+        .text-maroon {
+            color: #900500;
         }
 
         /* Responsive adjustments */
@@ -180,22 +170,30 @@
             .announcement-image {
                 max-height: 300px;
             }
-
-            .image-placeholder {
-                height: 200px;
-                font-size: 1.2rem;
-            }
         }
 
         @media (max-width: 640px) {
             .announcement-image {
                 max-height: 250px;
             }
-
-            .image-placeholder {
-                height: 150px;
-                font-size: 1rem;
-            }
+        }
+        
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: #900500;
+            border-radius: 4px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: #6C0200;
         }
     </style>
 </head>
@@ -204,14 +202,16 @@
         <nav class="dashboard-navbar py-4">
             <div class="container mx-auto px-6 flex justify-between items-center">
                 <div class="flex items-center">
-                    <div class="text-white font-bold text-2xl mr-10">OGC</div>
+                    <div class="text-white font-bold text-2xl mr-10 tracking-wide">
+                        <span class="gold-text">OGC</span>
+                    </div>
                     <div class="hidden md:flex space-x-8">
 
                         <!-- Counselor Dropdown (if user role is counselor) -->
                         @if(Auth::user()->role === 'counselor')
 <div class="relative" id="counselor-dropdown">
     <button
-        class="text-white font-semibold hover:text-yellow-300 transition flex items-center"
+        class="text-white font-semibold hover:gold-text transition flex items-center"
         id="counselor-dropdown-btn"
     >
         Counselor
@@ -222,27 +222,27 @@
         class="absolute hidden bg-white rounded-md shadow-lg mt-1 w-48 z-50"
         id="counselor-dropdown-menu"
     >
-        <a href="{{ route('counselor.dashboard') }}" class="block px-4 py-2 text-gray-800 hover:bg-gray-100">
+        <a href="{{ route('counselor.dashboard') }}" class="block px-4 py-2 text-gray-800 hover:text-[#900500] hover:bg-gray-100">
             <i class="fas fa-tachometer-alt mr-2"></i> Dashboard
         </a>
 
-        <a href="{{ route('counselor.resources.index') }}" class="block px-4 py-2 text-gray-800 hover:bg-gray-100">
+        <a href="{{ route('counselor.resources.index') }}" class="block px-4 py-2 text-gray-800 hover:text-[#900500] hover:bg-gray-100">
             <i class="fas fa-box-open mr-2"></i> Resources
         </a>
 
-        <a href="{{ route('counselor.announcements.index') }}" class="block px-4 py-2 text-gray-800 hover:bg-gray-100">
+        <a href="{{ route('counselor.announcements.index') }}" class="block px-4 py-2 text-gray-800 hover:text-[#900500] hover:bg-gray-100">
             <i class="fas fa-bullhorn mr-2"></i> Manage Announcements
         </a>
 
-        <a href="{{ route('counselor.events.index') }}" class="block px-4 py-2 text-gray-800 hover:bg-gray-100">
+        <a href="{{ route('counselor.events.index') }}" class="block px-4 py-2 text-gray-800 hover:text-[#900500] hover:bg-gray-100">
             <i class="fas fa-calendar-alt mr-2"></i> Manage Events
         </a>
 
-        <a href="{{ route('counselor.calendar') }}" class="block px-4 py-2 text-gray-800 hover:bg-gray-100">
+        <a href="{{ route('counselor.calendar') }}" class="block px-4 py-2 text-gray-800 hover:text-[#900500] hover:bg-gray-100">
             <i class="fas fa-calendar mr-2"></i> Calendar
         </a>
 
-        <a href="{{ route('counselor.appointments') }}" class="block px-4 py-2 text-gray-800 hover:bg-gray-100">
+        <a href="{{ route('counselor.appointments') }}" class="block px-4 py-2 text-gray-800 hover:text-[#900500] hover:bg-gray-100">
             <i class="fas fa-list mr-2"></i> Appointments
         </a>
     </div>
@@ -253,7 +253,7 @@
 @if(Auth::user()->role === 'admin')
 <div class="relative" id="admin-dropdown">
     <button
-        class="text-white font-semibold hover:text-yellow-300 transition flex items-center"
+        class="text-white font-semibold hover:gold-text transition flex items-center"
         id="admin-dropdown-btn"
     >
         Admin
@@ -264,26 +264,26 @@
         class="absolute hidden bg-white rounded-md shadow-lg mt-1 w-48 z-50"
         id="admin-dropdown-menu"
     >
-        <a href="{{ route('admin.dashboard') }}" class="block px-4 py-2 text-gray-800 hover:bg-gray-100">
+        <a href="{{ route('admin.dashboard') }}" class="block px-4 py-2 text-gray-800 hover:text-[#900500] hover:bg-gray-100">
             <i class="fas fa-tachometer-alt mr-2"></i> Dashboard
         </a>
 
-        <a href="{{ route('admin.users') }}" class="block px-4 py-2 text-gray-800 hover:bg-gray-100">
+        <a href="{{ route('admin.users') }}" class="block px-4 py-2 text-gray-800 hover:text-[#900500] hover:bg-gray-100">
             <i class="fas fa-users mr-2"></i> Manage Users
         </a>
 
-<a href="{{ route('admin.events') }}" class="block px-4 py-2 text-gray-800 hover:bg-gray-100">
+<a href="{{ route('admin.events') }}" class="block px-4 py-2 text-gray-800 hover:text-[#900500] hover:bg-gray-100">
             <i class="fas fa-calendar-alt mr-2"></i> Manage Events
         </a>
-        <a href="{{ route('admin.users.create') }}" class="block px-4 py-2 text-gray-800 hover:bg-gray-100">
+        <a href="{{ route('admin.users.create') }}" class="block px-4 py-2 text-gray-800 hover:text-[#900500] hover:bg-gray-100">
             <i class="fas fa-user-plus mr-2"></i> Create User
         </a>
 
-        <a href="{{ route('admin.students') }}" class="block px-4 py-2 text-gray-800 hover:bg-gray-100">
+        <a href="{{ route('admin.students') }}" class="block px-4 py-2 text-gray-800 hover:text-[#900500] hover:bg-gray-100">
             <i class="fas fa-user-graduate mr-2"></i> Students
         </a>
 
-        <a href="{{ route('admin.counselors') }}" class="block px-4 py-2 text-gray-800 hover:bg-gray-100">
+        <a href="{{ route('admin.counselors') }}" class="block px-4 py-2 text-gray-800 hover:text-[#900500] hover:bg-gray-100">
             <i class="fas fa-user-md mr-2"></i> Counselors
         </a>
 
@@ -297,51 +297,35 @@
 <!-- Student Dropdown (if user role is student) -->
 @if(Auth::user()->role === 'student')
 <div class="relative" id="student-dropdown">
-    <button class="text-white font-semibold hover:text-yellow-300 transition flex items-center" id="student-dropdown-btn">
-        Student <i class="fas fa-chevron-down ml-1 text-sm"></i>
-    </button>
-    <div class="absolute hidden bg-white rounded-md shadow-lg py-2 mt-1 w-48 z-50" id="student-dropdown-menu">
-        <a href="{{ route('student.show', Auth::user()->student->id) }}" class="block px-4 py-2 text-gray-800 hover:bg-gray-100">
-            <i class="fas fa-user mr-2"></i>My Profile
-        </a>
-        <a href="{{ route('appointments.index') }}" class="block px-4 py-2 text-gray-800 hover:bg-gray-100">
-            <i class="fas fa-calendar-plus mr-2"></i>My Appointments
-        </a>
-        <a href="{{ route('student.events.my-registrations') }}" class="block px-4 py-2 text-gray-800 hover:bg-gray-100">
-            <i class="fas fa-list-check mr-2"></i>My Registrations
-        </a>
-    </div>
+    <a href="{{ route('student.show', Auth::user()->student->id) }}" class="text-white font-semibold hover:gold-text transition flex items-center">
+    Profile</i>
+    </a>
 </div>
 @endif
-                        <a href="#" class="text-white font-semibold hover:text-yellow-300 transition">Home</a>
+                        <a href="#" class="text-white font-semibold hover:gold-text transition">Home</a>
 
                         @if(Auth::user()->role === 'student')
                             <!-- Services Dropdown -->
                             <div class="relative" id="services-dropdown">
-                                <button class="text-white font-semibold hover:text-yellow-300 transition flex items-center" id="services-dropdown-btn">
+                                <button class="text-white font-semibold hover:gold-text transition flex items-center" id="services-dropdown-btn">
                                     Services <i class="fas fa-chevron-down ml-1 text-sm"></i>
                                 </button>
                                 <div class="absolute hidden bg-white rounded-md shadow-lg py-2 mt-1 w-48 z-50" id="services-dropdown-menu">
-                                    <a href="{{ route('bap') }}" class="block px-4 py-2 text-gray-800 hover:bg-gray-100">Book an Appointment</a>
-                                    <a href="{{ route('mhc') }}" class="block px-4 py-2 text-gray-800 hover:bg-gray-100">Mental Health Corner</a>
+                                    <a href="{{ route('bap') }}" class="block px-4 py-2 text-gray-800 hover:text-[#900500] hover:bg-gray-100">Book an Appointment</a>
+                                    <a href="{{ route('mhc') }}" class="block px-4 py-2 text-gray-800 hover:text-[#900500] hover:bg-gray-100">Mental Health Corner</a>
                                 </div>
                             </div>
 
-                            <a href="{{ route('feedback') }}" class="text-white font-semibold hover:text-yellow-300 transition">Feedback</a>
+                            <a href="{{ route('feedback') }}" class="text-white font-semibold hover:gold-text transition">Feedback</a>
                         @endif
                     </div>
                 </div>
 
                 <div class="flex items-center space-x-4">
 <div class="flex items-center space-x-4">
-    @if(Auth::user()->role === 'student')
-        <a href="{{ route('appointments.index') }}"
-           class="bg-white text-[#820000] font-semibold py-2 px-4 rounded-lg flex items-center hover:bg-gray-100 transition">
-            <i class="fas fa-calendar-check mr-2"></i> My Appointment
-        </a>
-    @elseif(Auth::user()->role === 'counselor')
+    @if(Auth::user()->role === 'counselor')
         <a href="{{ route('counselor.appointments') }}"
-           class="bg-white text-[#820000] font-semibold py-2 px-4 rounded-lg flex items-center hover:bg-gray-100 transition">
+           class="bg-gradient-to-r from-[#d4af37] to-[#b8960c] text-[#6C0200] font-semibold py-2 px-4 rounded-lg flex items-center hover:shadow-lg transition">
             <i class="fas fa-calendar-check mr-2"></i> My Appointment
         </a>
     @endif
@@ -349,27 +333,27 @@
 
 
 
-                    <button class="text-white p-2 rounded-full hover:bg-white hover:bg-opacity-20 transition">
+                    <button class="text-white p-2 rounded-full hover:bg-white hover:bg-opacity-10 transition">
                         <i class="fas fa-bell"></i>
                     </button>
 
                     <!-- Profile Dropdown -->
                     <div class="dashboard-profile-dropdown">
-                        <button class="text-white p-2 rounded-full hover:bg-white hover:bg-opacity-20 transition" id="profile-dropdown-btn">
+                        <button class="text-white p-2 rounded-full hover:bg-white hover:bg-opacity-10 transition" id="profile-dropdown-btn">
                             <i class="fas fa-user"></i>
                         </button>
                         <div class="dashboard-profile-dropdown-content hidden" id="profile-dropdown-menu">
                             <div class="mb-3 border-b pb-2">
                                 <div class="font-semibold text-gray-800">{{ Auth::user()->first_name }} {{ Auth::user()->last_name }}</div>
                                 <div class="text-sm text-gray-600">{{ Auth::user()->email }}</div>
-                                <div class="text-xs text-[#820000] capitalize">Role: {{ Auth::user()->role }}</div>
+                                <div class="text-xs text-[#900500] capitalize font-semibold">Role: {{ Auth::user()->role }}</div>
                             </div>
-                            <a href="{{ route('profile.edit') }}" class="block py-2 text-gray-700 hover:text-[#820000]">
+                            <a href="{{ route('profile.edit') }}" class="block py-2 text-gray-700 hover:text-[#900500]">
                                 <i class="fas fa-user-circle mr-2"></i> Profile
                             </a>
                             <form method="POST" action="{{ route('logout') }}" class="inline">
                                 @csrf
-                                <button type="submit" class="w-full text-left block py-2 text-gray-700 hover:text-[#820000]">
+                                <button type="submit" class="w-full text-left block py-2 text-gray-700 hover:text-[#900500]">
                                     <i class="fas fa-sign-out-alt mr-2"></i> Logout
                                 </button>
                             </form>
@@ -379,344 +363,302 @@
             </div>
         </nav>
 
-        <!-- Hero Banner -->
+        <!-- Hero Banner with Welcome and Quote Combined -->
         <header class="dashboard-hero">
-            <div class="dashboard-hero-overlay"></div>
-            <div class="container mx-auto text-center px-6 z-10">
-                <h1 class="dashboard-hero-title">Office of Guidance and Counseling</h1>
+            <div class="container mx-auto px-6 text-center dashboard-hero-content">
+                <!-- Welcome Message - Smaller, above the title -->
+                <p class="text-white text-sm md:text-base mb-2 font-medium tracking-wide">
+                    </i>Welcome back, {{ Auth::user()->first_name }}!
+                </p>
+                
+                <!-- Main Title -->
+                <h1 class="text-3xl md:text-5xl font-bold text-white mb-4 drop-shadow-lg tracking-tight">
+                    Office of Guidance and Counseling
+                </h1>
+                
+                <!-- Inspiring Quote -->
+                <div class="max-w-3xl mx-auto">
+                    <div class="w-16 h-0.5 bg-gradient-to-r from-transparent via-[#d4af37] to-transparent mx-auto mb-4"></div>
+                    <p class="dashboard-quote-text">
+                        <i class="fas fa-quote-left gold-text mr-2 text-sm"></i>
+                        Make it a daily practice to purposefully look for joy — and when you find it, take a moment, inhale it, treasure it, and take it with you.
+                        <i class="fas fa-quote-right gold-text ml-2 text-sm"></i>
+                    </p>
+                    <p class="dashboard-quote-author">— Office of Guidance and Counseling</p>
+                    <div class="w-16 h-0.5 bg-gradient-to-r from-transparent via-[#d4af37] to-transparent mx-auto mt-4"></div>
+                </div>
             </div>
         </header>
-
-        <!-- Quote Section -->
-        <section class="dashboard-quote-section">
-            <div class="container mx-auto px-6">
-                <blockquote class="dashboard-quote-text">
-                    <i class="fas fa-quote-left text-[#820000] mr-3"></i>
-                    Make it a daily practice to purposefully look for joy — and when you find it, take a moment, inhale it, treasure it, and take it with you.
-                    <i class="fas fa-quote-right text-[#820000] ml-3"></i>
-                </blockquote>
-                <p class="text-gray-400 mt-4 text-sm">— Office of Guidance and Counseling</p>
-            </div>
-        </section>
 
         <!-- Dashboard Content -->
         <div class="min-h-screen bg-gray-50">
             <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
                 
-                {{-- Welcome Section --}}
-                <div class="bg-gradient-to-r from-[#820000] to-[#5a0000] rounded-xl shadow-lg p-8 mb-8 text-white">
-                    <h2 class="text-3xl font-bold mb-2">Welcome back, {{ Auth::user()->first_name }}!</h2>
-                    <p class="text-red-100 text-lg">
-                        @if(Auth::user()->role === 'student')
-                            Your mental health and well-being matter. We're here to support you.
-                        @elseif(Auth::user()->role === 'counselor')
-                            Ready to make a difference in students' lives today.
-                        @elseif(Auth::user()->role === 'admin')
-                            Manage and oversee the guidance and counseling system.
-                        @endif
-                    </p>
-                </div>
+                <!-- Announcements Section - Moved here (after hero, before Our Services) -->
+                <section class="mb-12">
+                    <h2 class="text-2xl font-bold text-gray-800 mb-6 flex items-center">
+                        <div class="h-8 w-1 bg-gradient-to-b from-[#900500] to-[#d4af37] rounded-full mr-3"></div>
+                        <i class="fas fa-bullhorn text-[#900500] mr-3"></i>Announcements
+                    </h2>
 
-                {{-- Quick Actions for Students --}}
-                @if(Auth::user()->role === 'student')
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                    <a href="{{ route('appointments.create') }}" class="bg-white rounded-lg shadow-sm hover:shadow-lg transition transform hover:-translate-y-1 p-6 border-t-4 border-[#820000]">
-                        <div class="flex items-center gap-4">
-                            <div class="p-4 bg-gradient-to-br from-[#820000] to-[#5a0000] rounded-lg">
-                                <i class="fas fa-calendar-plus text-white text-3xl"></i>
+                    @php
+                        use Carbon\Carbon;
+                        // Get announcements that are active and available for the user's college
+                        $userCollegeId = Auth::user()->student->college_id ?? null;
+                        $announcements = \App\Models\Announcement::with(['user', 'colleges'])
+                            ->active()
+                            ->when($userCollegeId, function($query) use ($userCollegeId) {
+                                return $query->forCollege($userCollegeId);
+                            })
+                            ->orderBy('created_at', 'desc')
+                            ->get();
+                    @endphp
+
+                    <div class="bg-white rounded-xl shadow-lg p-6 border-l-4 border-[#d4af37]">
+                        @if($announcements->isEmpty())
+                            <div class="text-center py-12">
+                                <i class="fas fa-bullhorn text-5xl text-gray-300 mb-4"></i>
+                                <p class="text-gray-500 text-lg">No current announcements at this time.</p>
                             </div>
-                            <div>
-                                <h3 class="font-bold text-gray-900 text-lg">Book Appointment</h3>
-                                <p class="text-sm text-gray-600">Schedule a counseling session</p>
-                            </div>
-                        </div>
-                    </a>
+                        @else
+                            <div class="dashboard-announcements-container">
+                                @foreach($announcements as $index => $announcement)
+                                    <div class="dashboard-announcement-item {{ $index === 0 ? 'dashboard-announcement-active' : '' }}">
+                                        <!-- Announcement Header -->
+                                        <div class="flex flex-col md:flex-row md:justify-between md:items-start mb-4 gap-3">
+                                            <div class="flex items-center space-x-3">
+                                                <!-- College Badge -->
+                                                <div class="flex flex-wrap gap-2">
+                                                    @if($announcement->for_all_colleges)
+                                                        <span class="bg-gradient-to-r from-[#900500] to-[#6C0200] text-white text-xs px-3 py-1 rounded-full font-medium">
+                                                            <i class="fas fa-globe mr-1"></i> All Colleges
+                                                        </span>
+                                                    @else
+                                                        @foreach($announcement->colleges->take(3) as $college)
+                                                            <span class="bg-gray-100 text-[#900500] text-xs px-3 py-1 rounded-full font-medium border border-[#d4af37]/30">
+                                                                <i class="fas fa-university mr-1"></i> {{ $college->name }}
+                                                            </span>
+                                                        @endforeach
+                                                        @if($announcement->colleges->count() > 3)
+                                                            <span class="bg-gray-100 text-[#900500] text-xs px-3 py-1 rounded-full font-medium">
+                                                                +{{ $announcement->colleges->count() - 3 }} more
+                                                            </span>
+                                                        @endif
+                                                    @endif
+                                                </div>
+                                            </div>
+                                        </div>
 
-                    <a href="{{ route('appointments.index') }}" class="bg-white rounded-lg shadow-sm hover:shadow-lg transition transform hover:-translate-y-1 p-6 border-t-4 border-[#F8650C]">
-                        <div class="flex items-center gap-4">
-                            <div class="p-4 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg">
-                                <i class="fas fa-calendar-check text-white text-3xl"></i>
-                            </div>
-                            <div>
-                                <h3 class="font-bold text-gray-900 text-lg">My Appointments</h3>
-                                <p class="text-sm text-gray-600">View your scheduled sessions</p>
-                            </div>
-                        </div>
-                    </a>
-
-                    <a href="{{ route('feedback') }}" class="bg-white rounded-lg shadow-sm hover:shadow-lg transition transform hover:-translate-y-1 p-6 border-t-4 border-green-500">
-                        <div class="flex items-center gap-4">
-                            <div class="p-4 bg-gradient-to-br from-green-500 to-green-600 rounded-lg">
-                                <i class="fas fa-comment-dots text-white text-3xl"></i>
-                            </div>
-                            <div>
-                                <h3 class="font-bold text-gray-900 text-lg">Give Feedback</h3>
-                                <p class="text-sm text-gray-600">Share your experience</p>
-                            </div>
-                        </div>
-                    </a>
-                </div>
-                @endif
-
-            <!-- Services Cards -->
-            @php
-                $services = \App\Models\Service::active()->ordered()->get();
-            @endphp
-            
-            @if(in_array(Auth::user()->role, ['student', 'counselor', 'admin']))
-                @if($services->isNotEmpty())
-                    <div class="mb-8">
-                        <h3 class="text-2xl font-bold text-gray-900 mb-6 flex items-center">
-                            <i class="fas fa-hands-helping text-[#820000] mr-3"></i>Our Services
-                        </h3>
-                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                            @foreach($services as $service)
-                                <div class="bg-white rounded-xl shadow-sm hover:shadow-lg transition transform hover:-translate-y-1 overflow-hidden border-t-4 border-[#820000]">
-                                    
-                                    <img src="{{ $service->image_url }}" 
-                                         alt="{{ $service->title }}" 
-                                         class="w-full h-48 object-cover">
-
-                                    <div class="p-6">
-                                        <h3 class="text-xl font-bold text-gray-900 mb-3">
-                                            {{ $service->title }}
-                                        </h3>
-
-                                        <p class="text-gray-600 mb-4 line-clamp-3">
-                                            {{ $service->description }}
-                                        </p>
-
-                                        {{-- Only Student Can See Button --}}
-                                        @if(Auth::user()->role === 'student')
-                                            @if($service->route_name)
-                                                <a href="{{ route($service->route_name) }}" 
-                                                   class="inline-flex items-center px-4 py-2 bg-gradient-to-r from-[#820000] to-[#5a0000] text-white font-medium rounded-lg hover:shadow-md transition">
-                                                    Learn More <i class="fas fa-arrow-right ml-2"></i>
-                                                </a>
-                                            @else
-                                                <button class="inline-flex items-center px-4 py-2 bg-gradient-to-r from-[#820000] to-[#5a0000] text-white font-medium rounded-lg hover:shadow-md transition">
-                                                    Learn More <i class="fas fa-arrow-right ml-2"></i>
-                                                </button>
+                                        <!-- Announcement Content with Image -->
+                                        <div class="flex flex-col lg:flex-row gap-8">
+                                            <!-- Image Section - Only show if image exists -->
+                                            @if($announcement->image_url)
+                                                <div class="lg:w-2/5">
+                                                    <div class="announcement-image-container">
+                                                        <img src="{{ $announcement->image_url }}"
+                                                             alt="{{ $announcement->title }}"
+                                                             class="announcement-image"
+                                                             onerror="this.style.display='none';">
+                                                    </div>
+                                                </div>
                                             @endif
-                                        @endif
 
+                                            <!-- Text Content Section - Full width if no image -->
+                                            <div class="{{ $announcement->image_url ? 'lg:w-3/5' : 'w-full' }}">
+                                                <h3 class="text-2xl font-bold text-gray-800 mb-4">{{ $announcement->title }}</h3>
+
+                                                <div class="text-gray-700 whitespace-pre-line leading-relaxed mb-6 text-lg">
+                                                    {{ $announcement->content }}
+                                                </div>
+
+                                                <!-- Announcement Meta Information -->
+                                                <div class="flex flex-wrap gap-4 text-sm text-gray-500 mt-6 pt-4 border-t border-gray-200">
+                                                    <div class="flex items-center">
+                                                        <i class="fas fa-user mr-2 text-[#900500]"></i>
+                                                        Posted by: {{ $announcement->user->first_name }} {{ $announcement->user->last_name }}
+                                                    </div>
+                                                    <div class="flex items-center">
+                                                        <i class="fas fa-calendar mr-2 text-[#900500]"></i>
+                                                        Posted: {{ $announcement->created_at->format('M j, Y') }}
+                                                    </div>
+                                                    @if($announcement->start_date || $announcement->end_date)
+                                                        <div class="flex items-center">
+                                                            <i class="fas fa-clock mr-2 text-[#900500]"></i>
+                                                            @if($announcement->start_date && $announcement->end_date)
+                                                                Valid: {{ $announcement->start_date->format('M j') }} - {{ $announcement->end_date->format('M j, Y') }}
+                                                            @elseif($announcement->start_date)
+                                                                Starts: {{ $announcement->start_date->format('M j, Y') }}
+                                                            @elseif($announcement->end_date)
+                                                                Until: {{ $announcement->end_date->format('M j, Y') }}
+                                                            @endif
+                                                        </div>
+                                                    @endif
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
-                                </div>
-                            @endforeach
-                        </div>
-                    </div>
-                @endif
-            @endif
-
-     <!-- Announcements Section -->
-<section class="mb-12">
-    <h2 class="text-2xl font-bold text-gray-800 mb-6 flex items-center">
-        <i class="fas fa-bullhorn text-[#820000] mr-3"></i>Announcements
-    </h2>
-
-    @php
-        use Carbon\Carbon;
-        // Get announcements that are active and available for the user's college
-        $userCollegeId = Auth::user()->student->college_id ?? null;
-        $announcements = \App\Models\Announcement::with(['user', 'colleges'])
-            ->active()
-            ->when($userCollegeId, function($query) use ($userCollegeId) {
-                return $query->forCollege($userCollegeId);
-            })
-            ->orderBy('created_at', 'desc')
-            ->get();
-    @endphp
-
-    <div class="bg-white rounded-xl shadow-lg p-6 border-t-4 border-[#820000]">
-        @if($announcements->isEmpty())
-            <div class="text-center py-12">
-                <i class="fas fa-bullhorn text-5xl text-gray-300 mb-4"></i>
-                <p class="text-gray-500 text-lg">No current announcements at this time.</p>
-            </div>
-        @else
-            <div class="dashboard-announcements-container">
-                @foreach($announcements as $index => $announcement)
-                    <div class="dashboard-announcement-item {{ $index === 0 ? 'dashboard-announcement-active' : '' }}">
-                        <!-- Announcement Header -->
-                        <div class="flex flex-col md:flex-row md:justify-between md:items-start mb-4 gap-3">
-                            <div class="flex items-center space-x-3">
-                                <!-- College Badge -->
-                                <div class="flex flex-wrap gap-2">
-                                    @if($announcement->for_all_colleges)
-                                        <span class="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full font-medium">
-                                            <i class="fas fa-globe mr-1"></i> All Colleges
-                                        </span>
-                                    @else
-                                        @foreach($announcement->colleges->take(3) as $college)
-                                            <span class="bg-gray-100 text-[#820000] text-xs px-2 py-1 rounded-full font-medium">
-                                                <i class="fas fa-university mr-1"></i> {{ $college->name }}
-                                            </span>
-                                        @endforeach
-                                        @if($announcement->colleges->count() > 3)
-                                            <span class="bg-gray-100 text-[#820000] text-xs px-2 py-1 rounded-full font-medium">
-                                                +{{ $announcement->colleges->count() - 3 }} more
-                                            </span>
-                                        @endif
-                                    @endif
-                                </div>
+                                @endforeach
                             </div>
-                        </div>
 
-                        <!-- Announcement Content with Image -->
-                        <div class="flex flex-col lg:flex-row gap-8">
-                            <!-- Image Section - Only show if image exists -->
-                            @if($announcement->image_url)
-                                <div class="lg:w-2/5">
-                                    <div class="announcement-image-container">
-                                        <img src="{{ $announcement->image_url }}"
-                                             alt="{{ $announcement->title }}"
-                                             class="announcement-image"
-                                             onerror="this.style.display='none';">
+                            @if($announcements->count() > 1)
+                                <div class="flex justify-between items-center mt-6 pt-4 border-t border-gray-200">
+                                    <!-- Announcement Counter -->
+                                    <div class="text-sm text-gray-600 font-medium">
+                                        <i class="fas fa-list mr-2 text-[#900500]"></i>Announcement <span id="current-announcement" class="font-bold text-[#900500]">1</span> of {{ $announcements->count() }}
+                                    </div>
+
+                                    <!-- Navigation Buttons -->
+                                    <div class="flex space-x-2">
+                                        <button class="dashboard-prev bg-gradient-to-r from-[#900500] to-[#6C0200] text-white p-3 rounded-full hover:shadow-lg transition transform hover:scale-110 hover:shadow-[#900500]/30">
+                                            <i class="fas fa-chevron-left"></i>
+                                        </button>
+                                        <button class="dashboard-next bg-gradient-to-r from-[#900500] to-[#6C0200] text-white p-3 rounded-full hover:shadow-lg transition transform hover:scale-110 hover:shadow-[#900500]/30">
+                                            <i class="fas fa-chevron-right"></i>
+                                        </button>
                                     </div>
                                 </div>
                             @endif
+                        @endif
+                    </div>
+                </section>
 
-                            <!-- Text Content Section - Full width if no image -->
-                            <div class="{{ $announcement->image_url ? 'lg:w-3/5' : 'w-full' }}">
-                                <h3 class="text-2xl font-bold text-gray-800 mb-4">{{ $announcement->title }}</h3>
+                <!-- Services Cards - This remains as the main services center -->
+                @php
+                    $services = \App\Models\Service::active()->ordered()->get();
+                @endphp
+                
+                @if(in_array(Auth::user()->role, ['student', 'counselor', 'admin']))
+                    @if($services->isNotEmpty())
+                        <div class="mb-12">
+                            <h3 class="text-2xl font-bold text-gray-800 mb-6 flex items-center">
+                                <div class="h-8 w-1 bg-gradient-to-b from-[#900500] to-[#d4af37] rounded-full mr-3"></div>
+                                <i class="fas fa-hands-helping text-[#900500] mr-3"></i>Our Services
+                            </h3>
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                                @foreach($services as $service)
+                                    <div class="bg-white rounded-xl shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden border-t-4 border-[#d4af37] group">
+                                        
+                                        <img src="{{ $service->image_url }}" 
+                                             alt="{{ $service->title }}" 
+                                             class="w-full h-48 object-cover group-hover:scale-105 transition duration-500">
 
-                                <div class="text-gray-700 whitespace-pre-line leading-relaxed mb-6 text-lg">
-                                    {{ $announcement->content }}
-                                </div>
+                                        <div class="p-6">
+                                            <h3 class="text-xl font-bold text-gray-800 mb-3">
+                                                {{ $service->title }}
+                                            </h3>
 
-                                <!-- Announcement Meta Information -->
-                                <div class="flex flex-wrap gap-4 text-sm text-gray-500 mt-6 pt-4 border-t border-gray-200">
-                                    <div class="flex items-center">
-                                        <i class="fas fa-user mr-2"></i>
-                                        Posted by: {{ $announcement->user->first_name }} {{ $announcement->user->last_name }}
-                                    </div>
-                                    <div class="flex items-center">
-                                        <i class="fas fa-calendar mr-2"></i>
-                                        Posted: {{ $announcement->created_at->format('M j, Y') }}
-                                    </div>
-                                    @if($announcement->start_date || $announcement->end_date)
-                                        <div class="flex items-center">
-                                            <i class="fas fa-clock mr-2"></i>
-                                            @if($announcement->start_date && $announcement->end_date)
-                                                Valid: {{ $announcement->start_date->format('M j') }} - {{ $announcement->end_date->format('M j, Y') }}
-                                            @elseif($announcement->start_date)
-                                                Starts: {{ $announcement->start_date->format('M j, Y') }}
-                                            @elseif($announcement->end_date)
-                                                Until: {{ $announcement->end_date->format('M j, Y') }}
+                                            <p class="text-gray-600 mb-4 line-clamp-3">
+                                                {{ $service->description }}
+                                            </p>
+
+                                            {{-- Only Student Can See Button --}}
+                                            @if(Auth::user()->role === 'student')
+                                                @if($service->route_name)
+                                                    <a href="{{ route($service->route_name) }}" 
+                                                       class="inline-flex items-center px-4 py-2 bg-gradient-to-r from-[#900500] to-[#6C0200] text-white font-medium rounded-lg hover:shadow-md hover:from-[#a00600] hover:to-[#7a0300] transition">
+                                                        Learn More <i class="fas fa-arrow-right ml-2"></i>
+                                                    </a>
+                                                @else
+                                                    <button class="inline-flex items-center px-4 py-2 bg-gradient-to-r from-[#900500] to-[#6C0200] text-white font-medium rounded-lg hover:shadow-md transition">
+                                                        Learn More <i class="fas fa-arrow-right ml-2"></i>
+                                                    </button>
+                                                @endif
                                             @endif
+
                                         </div>
-                                    @endif
-                                </div>
+                                    </div>
+                                @endforeach
                             </div>
                         </div>
-                    </div>
-                @endforeach
-            </div>
-
-            @if($announcements->count() > 1)
-                <div class="flex justify-between items-center mt-6 pt-4 border-t border-gray-200">
-                    <!-- Announcement Counter -->
-                    <div class="text-sm text-gray-600 font-medium">
-                        <i class="fas fa-list mr-2"></i>Announcement <span id="current-announcement">1</span> of {{ $announcements->count() }}
-                    </div>
-
-                    <!-- Navigation Buttons -->
-                    <div class="flex space-x-2">
-                        <button class="dashboard-prev bg-gradient-to-r from-[#820000] to-[#5a0000] text-white p-3 rounded-full hover:shadow-lg transition transform hover:scale-110">
-                            <i class="fas fa-chevron-left"></i>
-                        </button>
-                        <button class="dashboard-next bg-gradient-to-r from-[#820000] to-[#5a0000] text-white p-3 rounded-full hover:shadow-lg transition transform hover:scale-110">
-                            <i class="fas fa-chevron-right"></i>
-                        </button>
-                    </div>
-                </div>
-            @endif
-        @endif
-    </div>
-</section>
-
-            <!-- Divider -->
-            <div class="dashboard-divider"></div>
-
-            <!-- Staff Directory Section -->
-            <section class="mb-12">
-                <h2 class="text-2xl font-bold text-gray-800 mb-2 flex items-center">
-                    <i class="fas fa-users text-[#820000] mr-3"></i>Office of Guidance and Counseling
-                </h2>
-                <p class="text-gray-600 mb-6">Directory</p>
-
-                <!-- Head of Office -->
-                @php
-                    $headCounselor = \App\Models\Counselor::with(['user', 'college'])
-                        ->where('is_head', true)
-                        ->first();
-                @endphp
-
-                @if($headCounselor)
-                <div class="bg-white rounded-xl shadow-lg p-8 mb-8 flex flex-col md:flex-row items-center border-t-4 border-[#820000] hover:shadow-xl transition">
-                    <div class="w-32 h-32 bg-gradient-to-br from-[#820000] to-[#5a0000] rounded-full overflow-hidden mb-4 md:mb-0 md:mr-6 shadow-lg">
-                        <img src="https://images.unsplash.com/photo-1560250097-0b93528c311a?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80" alt="Head Counselor" class="w-full h-full object-cover">
-                    </div>
-                    <div>
-                        <h3 class="text-2xl font-bold text-gray-800">
-                            {{ $headCounselor->user->first_name }}
-                            {{ $headCounselor->user->middle_name ? $headCounselor->user->middle_name . ' ' : '' }}
-                            {{ $headCounselor->user->last_name }}
-                        </h3>
-                        <p class="text-[#820000] font-semibold text-lg">Head of the Office of Guidance and Counseling</p>
-                        <p class="text-gray-600">{{ $headCounselor->position }} • {{ $headCounselor->credentials }}</p>
-                        <p class="text-gray-600">
-                            <i class="fas fa-university mr-2"></i>{{ $headCounselor->college->name ?? 'N/A' }}
-                        </p>
-                        <p class="text-gray-600 mt-2">
-                            <i class="fas fa-envelope mr-2"></i>{{ $headCounselor->user->email }}
-                        </p>
-                            As the Head Counselor, {{ $headCounselor->user->first_name }} provides leadership and direction
-                            for all guidance and counseling services. With credentials in {{ $headCounselor->credentials }},
-                            {{ $headCounselor->user->first_name }} ensures the office delivers comprehensive support to students.
-                        </p>
-                    </div>
-                </div>
+                    @endif
                 @endif
 
-                <!-- Staff Grid -->
-                @php
-                    $counselors = \App\Models\Counselor::with(['user', 'college'])
-                        ->where('is_head', false)
-                        ->get();
+                <!-- Divider -->
+                <div class="dashboard-divider"></div>
 
-                    // Group counselors by user_id to handle multiple college assignments
-                    $groupedCounselors = $counselors->groupBy('user_id');
-                @endphp
+                <!-- Staff Directory Section -->
+                <section class="mb-12">
+                    <h2 class="text-2xl font-bold text-gray-800 mb-2 flex items-center">
+                        <div class="h-8 w-1 bg-gradient-to-b from-[#900500] to-[#d4af37] rounded-full mr-3"></div>
+                        <i class="fas fa-users text-[#900500] mr-3"></i>Office of Guidance and Counseling
+                    </h2>
+                    <p class="text-gray-600 mb-6 ml-4">Our dedicated team is here to support you</p>
 
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    @foreach($groupedCounselors as $userCounselors)
-                        @php
-                            $counselor = $userCounselors->first();
-                            $colleges = $userCounselors->pluck('college.name')->filter()->implode(', ');
-                        @endphp
-                        <div class="dashboard-staff-card bg-white rounded-xl shadow-md p-6 text-center">
-                            <div class="w-24 h-24 bg-gray-200 rounded-full overflow-hidden mx-auto mb-4">
-                                <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80" alt="Counselor" class="w-full h-full object-cover">
-                            </div>
-                            <h4 class="text-lg font-semibold text-gray-800">
-                                {{ $counselor->user->first_name }}
-                                {{ $counselor->user->middle_name ? substr($counselor->user->middle_name, 0, 1) . '. ' : '' }}
-                                {{ $counselor->user->last_name }}
-                            </h4>
-                            <p class="text-gray-600">{{ $counselor->position }}</p>
-                            <p class="text-gray-600">{{ $colleges }}</p>
-                            <p class="text-gray-600">{{ $counselor->credentials }}</p>
+                    <!-- Head of Office -->
+                    @php
+                        $headCounselor = \App\Models\Counselor::with(['user', 'college'])
+                            ->where('is_head', true)
+                            ->first();
+                    @endphp
+
+                    @if($headCounselor)
+                    <div class="bg-white rounded-xl shadow-lg p-8 mb-8 flex flex-col md:flex-row items-center border-l-4 border-[#d4af37] hover:shadow-xl transition">
+                        <div class="w-32 h-32 bg-gradient-to-br from-[#900500] to-[#6C0200] rounded-full overflow-hidden mb-4 md:mb-0 md:mr-6 shadow-lg ring-4 ring-[#d4af37]/30">
+                            <img src="https://images.unsplash.com/photo-1560250097-0b93528c311a?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80" alt="Head Counselor" class="w-full h-full object-cover">
                         </div>
-                    @endforeach
-                </div>
-            </section>
+                        <div>
+                            <h3 class="text-2xl font-bold text-gray-800">
+                                {{ $headCounselor->user->first_name }}
+                                {{ $headCounselor->user->middle_name ? $headCounselor->user->middle_name . ' ' : '' }}
+                                {{ $headCounselor->user->last_name }}
+                            </h3>
+                            <p class="text-[#d4af37] font-semibold text-lg">Head of the Office of Guidance and Counseling</p>
+                            <p class="text-gray-600">{{ $headCounselor->position }} • {{ $headCounselor->credentials }}</p>
+                            <p class="text-gray-600">
+                                <i class="fas fa-university mr-2 text-[#900500]"></i>{{ $headCounselor->college->name ?? 'N/A' }}
+                            </p>
+                            <p class="text-gray-600 mt-2">
+                                <i class="fas fa-envelope mr-2 text-[#900500]"></i>{{ $headCounselor->user->email }}
+                            </p>
+                            <p class="text-gray-600 mt-2">
+                                As the Head Counselor, {{ $headCounselor->user->first_name }} provides leadership and direction
+                                for all guidance and counseling services. With credentials in {{ $headCounselor->credentials }},
+                                {{ $headCounselor->user->first_name }} ensures the office delivers comprehensive support to students.
+                            </p>
+                        </div>
+                    </div>
+                    @endif
+
+                    <!-- Staff Grid -->
+                    @php
+                        $counselors = \App\Models\Counselor::with(['user', 'college'])
+                            ->where('is_head', false)
+                            ->get();
+
+                        // Group counselors by user_id to handle multiple college assignments
+                        $groupedCounselors = $counselors->groupBy('user_id');
+                    @endphp
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        @foreach($groupedCounselors as $userCounselors)
+                            @php
+                                $counselor = $userCounselors->first();
+                                $colleges = $userCounselors->pluck('college.name')->filter()->implode(', ');
+                            @endphp
+                            <div class="dashboard-staff-card bg-white rounded-xl shadow-md p-6 text-center">
+                                <div class="w-24 h-24 bg-gradient-to-br from-gray-200 to-gray-300 rounded-full overflow-hidden mx-auto mb-4 ring-2 ring-[#d4af37]/50">
+                                    <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80" alt="Counselor" class="w-full h-full object-cover">
+                                </div>
+                                <h4 class="text-lg font-semibold text-gray-800">
+                                    {{ $counselor->user->first_name }}
+                                    {{ $counselor->user->middle_name ? substr($counselor->user->middle_name, 0, 1) . '. ' : '' }}
+                                    {{ $counselor->user->last_name }}
+                                </h4>
+                                <p class="text-[#900500] font-medium">{{ $counselor->position }}</p>
+                                <p class="text-gray-600 text-sm mt-1">{{ $colleges }}</p>
+                                <p class="text-gray-500 text-sm mt-1">{{ $counselor->credentials }}</p>
+                            </div>
+                        @endforeach
+                    </div>
+                </section>
+            </div>
         </div>
 
         <!-- Footer -->
-        <footer class="bg-gray-800 text-white py-8">
+        <footer class="bg-gradient-to-r from-[#6C0200] to-[#3a0100] text-white py-8 mt-8">
             <div class="container mx-auto px-6 text-center">
-                <p>&copy; 2025 Office of Guidance and Counseling. All rights reserved.</p>
+                <p class="text-gray-400">&copy; 2025 Office of Guidance and Counseling. All rights reserved.</p>
+                <p class="text-xs text-gray-500 mt-2">Committed to your mental health and well-being</p>
             </div>
         </footer>
     </div>
@@ -792,74 +734,74 @@
                 });
             }
 
-// Announcement slider functionality
-const announcements = document.querySelectorAll('.dashboard-announcement-item');
-const prevBtn = document.querySelector('.dashboard-prev');
-const nextBtn = document.querySelector('.dashboard-next');
-const currentCounter = document.getElementById('current-announcement');
-let currentIndex = 0;
+            // Announcement slider functionality
+            const announcements = document.querySelectorAll('.dashboard-announcement-item');
+            const prevBtn = document.querySelector('.dashboard-prev');
+            const nextBtn = document.querySelector('.dashboard-next');
+            const currentCounter = document.getElementById('current-announcement');
+            let currentIndex = 0;
 
-if (announcements.length > 0 && prevBtn && nextBtn) {
-    function showAnnouncement(index) {
-        announcements.forEach(ann => ann.classList.remove('dashboard-announcement-active'));
-        announcements[index].classList.add('dashboard-announcement-active');
+            if (announcements.length > 0 && prevBtn && nextBtn) {
+                function showAnnouncement(index) {
+                    announcements.forEach(ann => ann.classList.remove('dashboard-announcement-active'));
+                    announcements[index].classList.add('dashboard-announcement-active');
 
-        // Update counter
-        if (currentCounter) {
-            currentCounter.textContent = index + 1;
-        }
-    }
+                    // Update counter
+                    if (currentCounter) {
+                        currentCounter.textContent = index + 1;
+                    }
+                }
 
-    prevBtn.addEventListener('click', function() {
-        currentIndex = (currentIndex - 1 + announcements.length) % announcements.length;
-        showAnnouncement(currentIndex);
-    });
+                prevBtn.addEventListener('click', function() {
+                    currentIndex = (currentIndex - 1 + announcements.length) % announcements.length;
+                    showAnnouncement(currentIndex);
+                });
 
-    nextBtn.addEventListener('click', function() {
-        currentIndex = (currentIndex + 1) % announcements.length;
-        showAnnouncement(currentIndex);
-    });
+                nextBtn.addEventListener('click', function() {
+                    currentIndex = (currentIndex + 1) % announcements.length;
+                    showAnnouncement(currentIndex);
+                });
 
-    // Auto-advance announcements every 8 seconds
-    setInterval(() => {
-        if (announcements.length > 1) {
-            currentIndex = (currentIndex + 1) % announcements.length;
-            showAnnouncement(currentIndex);
-        }
-    }, 8000);
-}
+                // Auto-advance announcements every 8 seconds
+                setInterval(() => {
+                    if (announcements.length > 1) {
+                        currentIndex = (currentIndex + 1) % announcements.length;
+                        showAnnouncement(currentIndex);
+                    }
+                }, 8000);
+            }
         });
 
         // Admin Dropdown functionality
-const adminDropdownBtn = document.getElementById('admin-dropdown-btn');
-const adminDropdownMenu = document.getElementById('admin-dropdown-menu');
+        const adminDropdownBtn = document.getElementById('admin-dropdown-btn');
+        const adminDropdownMenu = document.getElementById('admin-dropdown-menu');
 
-if (adminDropdownBtn && adminDropdownMenu) {
-    adminDropdownBtn.addEventListener('click', function(e) {
-        e.stopPropagation();
-        adminDropdownMenu.classList.toggle('hidden');
-    });
+        if (adminDropdownBtn && adminDropdownMenu) {
+            adminDropdownBtn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                adminDropdownMenu.classList.toggle('hidden');
+            });
 
-    // Close dropdown when clicking outside
-    document.addEventListener('click', function() {
-        adminDropdownMenu.classList.add('hidden');
-    });
+            // Close dropdown when clicking outside
+            document.addEventListener('click', function() {
+                adminDropdownMenu.classList.add('hidden');
+            });
 
-    // Prevent dropdown from closing when clicking inside
-    adminDropdownMenu.addEventListener('click', function(e) {
-        e.stopPropagation();
-    });
-}
+            // Prevent dropdown from closing when clicking inside
+            adminDropdownMenu.addEventListener('click', function(e) {
+                e.stopPropagation();
+            });
+        }
 
-// Image error handling - simplified to just hide broken images
-document.addEventListener('DOMContentLoaded', function() {
-    const images = document.querySelectorAll('.announcement-image');
-    images.forEach(img => {
-        img.addEventListener('error', function() {
-            this.style.display = 'none';
+        // Image error handling - simplified to just hide broken images
+        document.addEventListener('DOMContentLoaded', function() {
+            const images = document.querySelectorAll('.announcement-image');
+            images.forEach(img => {
+                img.addEventListener('error', function() {
+                    this.style.display = 'none';
+                });
+            });
         });
-    });
-});
     </script>
 </body>
 </html>
