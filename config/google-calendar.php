@@ -45,5 +45,5 @@ return [
     /*
      * Redirect URI used during OAuth flow.
      */
-    'oauth_redirect_uri' => env('GOOGLE_CALENDAR_OAUTH_REDIRECT', 'http://localhost/oauth2callback'),
+    'oauth_redirect_uri' => env('GOOGLE_CALENDAR_OAUTH_REDIRECT', 'http://127.0.0.1:8000/oauth2callback'),
 ];

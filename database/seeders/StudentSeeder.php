@@ -551,5 +551,126 @@ class StudentSeeder extends Seeder
             'sex_identity' => 'female/woman',
             'romantic_attraction' => 'both men and women',
         ]);
+
+        // 🧍 11th Student - Rose Andrea D. Kisol (CCS)
+        $user11 = User::create([
+            'first_name' => 'Rose Andrea',
+            'middle_name' => 'D',
+            'last_name' => 'Kisol',
+            'birthdate' => '2003-05-14',
+            'age' => 22,
+            'sex' => 'female',
+            'birthplace' => 'Iligan City',
+            'religion' => 'Roman Catholic',
+            'civil_status' => 'single',
+            'number_of_children' => 0,
+            'citizenship' => 'Filipino',
+            'address' => 'Tibanga, Iligan City',
+            'phone_number' => '09171234567',
+            'email' => 'roseandrea.kisol@g.msuiit.edu.ph',
+            'password' => Hash::make('1234567890'),
+            'role' => 'student',
+        ]);
+
+        $student11 = Student::create([
+            'user_id' => $user11->id,
+            'student_id' => '2022-3041',
+            'year_level' => '3rd Year',
+            'course' => 'Bachelor of Science in Computer Science',
+            'college_id' => 7, // CCS
+            'msu_sase_score' => 90.3,
+            'academic_year' => '2024-2025',
+            'student_status' => 'new',
+        ]);
+
+        StudentPersonalData::create([
+            'student_id' => $student11->id,
+            'nickname' => 'Rose',
+            'home_address' => 'Tibanga, Iligan City',
+            'stays_with' => 'parents/guardian',
+            'working_student' => 'no and have no plan to work',
+            'talents_skills' => json_encode(['programming', 'UI/UX design', 'problem solving']),
+            'leisure_activities' => json_encode(['reading', 'coding', 'drawing']),
+            'serious_medical_condition' => 'None',
+            'physical_disability' => 'None',
+            'sex_identity' => 'female/woman',
+            'romantic_attraction' => 'opposite sex',
+        ]);
+
+        StudentFamilyData::create([
+            'student_id' => $student11->id,
+            'father_name' => 'Roberto Kisol',
+            'father_deceased' => false,
+            'father_occupation' => 'Government Employee',
+            'father_phone_number' => '09181234567',
+            'mother_name' => 'Divina Kisol',
+            'mother_deceased' => false,
+            'mother_occupation' => 'Teacher',
+            'mother_phone_number' => '09191234567',
+            'parents_marital_status' => 'married',
+            'family_monthly_income' => '20001 above',
+            'guardian_name' => null,
+            'guardian_occupation' => null,
+            'guardian_phone_number' => null,
+            'guardian_relationship' => null,
+            'ordinal_position' => 'youngest',
+            'number_of_siblings' => 2,
+            'home_environment_description' => 'Warm and supportive family environment',
+        ]);
+
+        StudentAcademicData::create([
+            'student_id' => $student11->id,
+            'shs_gpa' => 94.0,
+            'is_scholar' => true,
+            'scholarship_type' => 'Academic Scholar',
+            'school_last_attended' => 'Iligan City National High School',
+            'school_address' => 'Iligan City',
+            'shs_track' => 'academic',
+            'shs_strand' => 'STEM',
+            'awards_honors' => json_encode(['With Honors', 'Best in ICT']),
+            'student_organizations' => json_encode(['Computer Science Society', 'Women in Tech']),
+            'co_curricular_activities' => json_encode(['Hackathon', 'Programming Contest']),
+            'career_option_1' => 'Software Engineer',
+            'career_option_2' => 'UI/UX Designer',
+            'career_option_3' => 'Full Stack Developer',
+            'course_choice_by' => 'own choice',
+            'course_choice_reason' => 'Passion for technology and creating impactful software',
+            'msu_choice_reasons' => json_encode(['quality education', 'affordable tuition fees', 'close to home']),
+            'future_career_plans' => 'Work as a software engineer in a tech company and eventually build my own startup',
+        ]);
+
+        StudentLearningResources::create([
+            'student_id' => $student11->id,
+            'internet_access' => 'full internet access',
+            'technology_gadgets' => json_encode(['laptop/notebook', 'mobile phone smartphone', 'tablet']),
+            'internet_connectivity' => json_encode(['home internet', 'mobile data']),
+            'distance_learning_readiness' => 'fully ready',
+            'learning_space_description' => 'Dedicated study room with good lighting and fast internet',
+        ]);
+
+        StudentPsychosocialData::create([
+            'student_id' => $student11->id,
+            'personality_characteristics' => json_encode(['creative', 'determined', 'empathetic']),
+            'coping_mechanisms' => json_encode(['drawing', 'listening to music', 'talking to family']),
+            'mental_health_perception' => 'Generally positive, manages stress well',
+            'had_counseling_before' => false,
+            'sought_psychologist_help' => false,
+            'problem_sharing_targets' => json_encode(['mother', 'close friends']),
+            'needs_immediate_counseling' => false,
+            'future_counseling_concerns' => 'Career planning and academic workload management',
+        ]);
+
+        StudentNeedsAssessment::create([
+            'student_id' => $student11->id,
+            'improvement_needs' => json_encode(['Time-management skills', 'Study habits']),
+            'financial_assistance_needs' => json_encode(['Grants/scholarships']),
+            'personal_social_needs' => json_encode(['Stress management', 'Self-confidence']),
+            'stress_responses' => json_encode(['Listened to music', 'Talked to someone I trust']),
+            'easy_discussion_target' => 'parents',
+            'counseling_perceptions' => json_encode([
+                'I know that help is available at the Guidance and Counseling Center of MSU-IIT.' => 'always',
+                'I am shy to ask assistance/seek counseling from my guidance counselor.' => 'rarely'
+            ]),
+        ]);
     }
 }
