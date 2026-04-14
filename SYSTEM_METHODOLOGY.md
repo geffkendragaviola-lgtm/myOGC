@@ -15,7 +15,7 @@ The myOGC (Mental Health Corner) system is a comprehensive student counseling ma
 
 ### 1.3 Technology Stack
 - **Framework:** Laravel 12
-- **Database:** SQLite (development) / MySQL (production)
+- **Database:** Postgre SQL
 - **Authentication:** Laravel Breeze
 - **Frontend:** Blade templates with Tailwind CSS
 - **External Integration:** Google Calendar API (Spatie package)

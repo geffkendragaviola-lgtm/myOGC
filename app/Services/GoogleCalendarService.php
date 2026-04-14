@@ -19,6 +19,7 @@ class GoogleCalendarService
 
         $tokenPath = storage_path('app/google-calendar/tokens/' . $counselor->user_id . '.json');
         if (!File::exists($tokenPath)) {
+            Log::warning("Google Calendar token not found for counselor user_id {$counselor->user_id} — skipping calendar check.");
             throw new \RuntimeException("Google Calendar token not found for counselor user_id {$counselor->user_id}");
         }
 
@@ -37,6 +38,10 @@ class GoogleCalendarService
     {
         $this->setAuthProfileForCalendar($calendarId);
 
+        // When the calendar ID is a Gmail address, the authenticated user's primary
+        // calendar must be accessed as 'primary' — using the email directly returns 404
+        $apiCalendarId = filter_var($calendarId, FILTER_VALIDATE_EMAIL) ? 'primary' : $calendarId;
+
         $timezone = config('app.timezone', 'UTC');
         $startOfDay = $date->copy()->timezone($timezone)->startOfDay();
         $endOfDay = $date->copy()->timezone($timezone)->endOfDay();
@@ -49,7 +54,7 @@ class GoogleCalendarService
                     'singleEvents' => true,
                     'timeZone' => $timezone,
                 ],
-                $calendarId
+                $apiCalendarId
             );
         } catch (\GuzzleHttp\Exception\RequestException $e) {
             // If SSL error in development, log and return empty array
@@ -134,9 +139,10 @@ class GoogleCalendarService
     public function createAppointmentEvent(array $eventData, string $calendarId): Event
     {
         $this->setAuthProfileForCalendar($calendarId);
+        $apiCalendarId = filter_var($calendarId, FILTER_VALIDATE_EMAIL) ? 'primary' : $calendarId;
 
         try {
-            return Event::create($eventData, $calendarId);
+            return Event::create($eventData, $apiCalendarId);
         } catch (\GuzzleHttp\Exception\RequestException $e) {
             // If SSL error in development, log and create mock event
             if (env('APP_ENV') === 'local' && strpos($e->getMessage(), 'cURL error 77') !== false) {
@@ -161,7 +167,8 @@ class GoogleCalendarService
 
         try {
             $this->setAuthProfileForCalendar($calendarId);
-            $event = Event::find($eventId, $calendarId);
+            $apiCalendarId = filter_var($calendarId, FILTER_VALIDATE_EMAIL) ? 'primary' : $calendarId;
+            $event = Event::find($eventId, $apiCalendarId);
             $event->delete();
         } catch (\Throwable $exception) {
             Log::warning('Failed to delete Google Calendar event', [
