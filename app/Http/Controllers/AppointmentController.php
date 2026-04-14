@@ -816,24 +816,24 @@ public function getAvailableDates(Request $request)
             $dayAvailability = $availability[$dayName] ?? [];
         }
 
-        if (empty($dayAvailability) || empty($calendarIds)) {
+        if (empty($dayAvailability)) {
             $results[$dateKey] = false;
             $currentDate->addDay();
             continue;
         }
 
         $calendarBusyIntervals = [];
-        try {
-            $calendarBusyIntervals = $this->getCalendarBusyIntervalsForDate($calendarIds, $currentDate);
-        } catch (\Throwable $exception) {
-            Log::error('Failed to load Google Calendar availability', [
-                'counselor_id' => $counselor->id,
-                'calendar_ids' => $calendarIds,
-                'error' => $exception->getMessage(),
-            ]);
-            $results[$dateKey] = false;
-            $currentDate->addDay();
-            continue;
+        if (!empty($calendarIds)) {
+            try {
+                $calendarBusyIntervals = $this->getCalendarBusyIntervalsForDate($calendarIds, $currentDate);
+            } catch (\Throwable $exception) {
+                Log::error('Failed to load Google Calendar availability', [
+                    'counselor_id' => $counselor->id,
+                    'calendar_ids' => $calendarIds,
+                    'error' => $exception->getMessage(),
+                ]);
+                // Calendar failed — still show dates based on schedule alone
+            }
         }
 
         $slotDuration = 60;

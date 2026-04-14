@@ -24,7 +24,7 @@
                         @if($counselorAssignments->count() > 1)
                             <label class="block text-gray-700 font-semibold mb-2">College</label>
                             <select id="collegeSelect"
-                                    class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" required>
+                                    class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#F00000] focus:border-[#F00000]" required>
                                 @foreach($counselorAssignments as $assignment)
                                     <option value="{{ $assignment->id }}" {{ (int) $selectedCounselor->id === (int) $assignment->id ? 'selected' : '' }}>
                                         {{ $assignment->college->name ?? 'N/A' }}
@@ -35,7 +35,7 @@
 
                         <label class="block text-gray-700 font-semibold mb-2 mt-{{ $counselorAssignments->count() > 1 ? '6' : '0' }}">Student</label>
                         <select name="student_id" id="studentSelect"
-                                class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" required>
+                                class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#F00000] focus:border-[#F00000]" required>
                             <option value="">Choose a student</option>
                             @foreach($students as $student)
                                 <option value="{{ $student->id }}" {{ old('student_id') == $student->id ? 'selected' : '' }}>
@@ -52,7 +52,7 @@
                 <div class="mt-6">
                     <label class="block text-gray-700 font-semibold mb-2">Type of Booking</label>
                     <select name="booking_type" id="bookingType"
-                            class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" required>
+                            class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#F00000] focus:border-[#F00000]" required>
                         <option value="">Choose a booking type</option>
                         <option value="Initial Interview" {{ old('booking_type') === 'Initial Interview' ? 'selected' : '' }}>Initial Interview</option>
                         <option value="Counseling" {{ old('booking_type') === 'Counseling' ? 'selected' : '' }}>Counseling</option>
@@ -106,7 +106,7 @@
                 <div class="mt-6">
                     <label class="block text-gray-700 font-semibold mb-2">Concern / Agenda</label>
                     <textarea name="concern" rows="4"
-                              class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                              class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#F00000] focus:border-[#F00000]"
                               required>{{ old('concern') }}</textarea>
                     @error('concern')
                         <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
@@ -117,7 +117,7 @@
                     <a href="{{ route('counselor.appointments') }}"
                        class="px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition">Cancel</a>
                     <button type="submit"
-                            class="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">Book Now (Auto-Approved)</button>
+                            class="px-6 py-3 bg-[#F00000] text-white rounded-lg hover:bg-[#D40000] transition">Book Now (Auto-Approved)</button>
                 </div>
             </form>
         </div>
@@ -387,12 +387,12 @@ document.addEventListener('DOMContentLoaded', function() {
             if (isDisabled) {
                 button.classList.add('border-transparent', 'text-gray-300', 'cursor-not-allowed');
             } else {
-                button.classList.add('border-[#7c1d2a]/30', 'text-[#7c1d2a]', 'hover:bg-[#7c1d2a]/10');
+                button.classList.add('border-[#F00000]/30', 'text-[#F00000]', 'hover:bg-[#F00000]/10');
             }
 
             if (selectedDate && isSameDay(selectedDate, date)) {
-                button.classList.remove('border-[#7c1d2a]/30', 'text-[#7c1d2a]', 'hover:bg-[#7c1d2a]/10');
-                button.classList.add('bg-[#7c1d2a]', 'text-white', 'border-[#7c1d2a]');
+                button.classList.remove('border-[#F00000]/30', 'text-[#F00000]', 'hover:bg-[#F00000]/10');
+                button.classList.add('bg-[#F00000]', 'text-white', 'border-[#F00000]');
             }
 
             button.addEventListener('click', () => {
@@ -494,17 +494,17 @@ document.addEventListener('DOMContentLoaded', function() {
                 availableSlots.forEach(slot => {
                     const slotElement = document.createElement('button');
                     slotElement.type = 'button';
-                    slotElement.className = 'time-slot p-4 border-2 border-gray-200 rounded-lg text-center hover:border-blue-500 hover:bg-blue-50 transition cursor-pointer';
+                    slotElement.className = 'time-slot p-4 border-2 border-gray-200 rounded-lg text-center hover:border-[#F00000] hover:bg-[#FFE100] transition cursor-pointer';
                     slotElement.textContent = slot.display;
 
                     slotElement.addEventListener('click', function() {
                         document.querySelectorAll('.time-slot').forEach(s => {
-                            s.classList.remove('border-blue-500', 'bg-blue-100', 'text-blue-700');
+                            s.classList.remove('border-[#F00000]', 'bg-gray-100', 'text-[#D40000]');
                             s.classList.add('border-gray-200', 'text-gray-700');
                         });
 
                         this.classList.remove('border-gray-200', 'text-gray-700');
-                        this.classList.add('border-blue-500', 'bg-blue-100', 'text-blue-700');
+                        this.classList.add('border-[#F00000]', 'bg-gray-100', 'text-[#D40000]');
 
                         selectedTime.value = slot.start;
                         currentSelectedSlot = slot.start;

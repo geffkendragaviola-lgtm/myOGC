@@ -103,7 +103,7 @@
                     <label for="title" class="block text-sm font-medium text-gray-700 mb-2">Title *</label>
                     <input type="text" name="title" id="title"
                            value="{{ old('title', $announcement->title) }}"
-                           class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
+                           class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#F00000] focus:border-[#F00000] transition"
                            placeholder="Enter announcement title" required>
                     @error('title')
                         <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
@@ -114,7 +114,7 @@
                 <div class="md:col-span-2">
                     <label for="content" class="block text-sm font-medium text-gray-700 mb-2">Content *</label>
                     <textarea name="content" id="content" rows="6"
-                              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
+                              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#F00000] focus:border-[#F00000] transition"
                               placeholder="Enter announcement content..." required>{{ old('content', $announcement->content) }}</textarea>
                     @error('content')
                         <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
@@ -130,7 +130,7 @@
                         <div class="flex items-center">
                             <input type="radio" id="for_all_colleges_true" name="for_all_colleges" value="1"
                                    {{ old('for_all_colleges', $announcement->for_all_colleges) ? 'checked' : '' }}
-                                   class="w-4 h-4 text-blue-600 border-gray-300 focus:ring-blue-500">
+                                   class="w-4 h-4 text-[#F00000] border-gray-300 focus:ring-[#F00000]">
                             <label for="for_all_colleges_true" class="ml-2 text-sm text-gray-700">
                                 All Colleges - Announcement visible to students from all colleges
                             </label>
@@ -139,7 +139,7 @@
                         <div class="flex items-center">
                             <input type="radio" id="for_all_colleges_false" name="for_all_colleges" value="0"
                                    {{ old('for_all_colleges', $announcement->for_all_colleges) === '0' ? 'checked' : '' }}
-                                   class="w-4 h-4 text-blue-600 border-gray-300 focus:ring-blue-500">
+                                   class="w-4 h-4 text-[#F00000] border-gray-300 focus:ring-[#F00000]">
                             <label for="for_all_colleges_false" class="ml-2 text-sm text-gray-700">
                                 Specific Colleges - Choose which colleges can see this announcement
                             </label>
@@ -155,7 +155,7 @@
                                     <input type="checkbox" id="college_{{ $college->id }}" name="colleges[]"
                                            value="{{ $college->id }}"
                                            {{ in_array($college->id, old('colleges', $selectedColleges ?? [])) ? 'checked' : '' }}
-                                           class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
+                                           class="w-4 h-4 text-[#F00000] border-gray-300 rounded focus:ring-[#F00000]">
                                     <label for="college_{{ $college->id }}" class="ml-2 text-sm text-gray-700">
                                         {{ $college->name }}
                                     </label>
@@ -173,7 +173,7 @@
                     <label for="start_date" class="block text-sm font-medium text-gray-700 mb-2">Start Date (Optional)</label>
                     <input type="date" name="start_date" id="start_date"
                            value="{{ old('start_date', $announcement->start_date ? $announcement->start_date->format('Y-m-d') : '') }}"
-                           class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
+                           class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#F00000] focus:border-[#F00000] transition">
                     @error('start_date')
                         <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                     @enderror
@@ -184,7 +184,7 @@
                     <label for="end_date" class="block text-sm font-medium text-gray-700 mb-2">End Date (Optional)</label>
                     <input type="date" name="end_date" id="end_date"
                            value="{{ old('end_date', $announcement->end_date ? $announcement->end_date->format('Y-m-d') : '') }}"
-                           class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
+                           class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#F00000] focus:border-[#F00000] transition">
                     @error('end_date')
                         <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                     @enderror
@@ -196,7 +196,7 @@
                     <div class="flex items-center">
                         <input type="checkbox" id="is_active" name="is_active" value="1"
                                {{ old('is_active', $announcement->is_active) ? 'checked' : '' }}
-                               class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
+                               class="w-4 h-4 text-[#F00000] border-gray-300 rounded focus:ring-[#F00000]">
                         <label for="is_active" class="ml-2 text-sm text-gray-700">
                             Activate this announcement immediately
                         </label>
@@ -208,18 +208,18 @@
 
                 <!-- Current Status Display -->
                 <div class="md:col-span-2">
-                    <div class="bg-blue-50 p-4 rounded-lg border border-blue-200">
-                        <h3 class="text-sm font-medium text-blue-800 mb-2">Current Status</h3>
+                    <div class="bg-[#FFF9E6] p-4 rounded-lg border border-[#FFE100]">
+                        <h3 class="text-sm font-medium text-[#820000] mb-2">Current Status</h3>
                         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
                             <div class="flex items-center space-x-4 text-sm">
                                 <span class="px-3 py-1 rounded-full text-xs font-semibold
                                     @if($announcement->status === 'active') bg-green-100 text-green-800
-                                    @elseif($announcement->status === 'scheduled') bg-blue-100 text-blue-800
+                                    @elseif($announcement->status === 'scheduled') bg-gray-100 text-[#820000]
                                     @elseif($announcement->status === 'expired') bg-gray-100 text-gray-800
                                     @else bg-red-100 text-red-800 @endif">
                                     {{ ucfirst($announcement->status) }}
                                 </span>
-                                <span class="text-blue-600">
+                                <span class="text-[#F00000]">
                                     <i class="fas fa-calendar mr-1"></i>
                                     Created: {{ $announcement->created_at->format('M j, Y') }}
                                 </span>
@@ -253,7 +253,7 @@
 
                 <!-- Update Button -->
                 <button type="submit"
-                        class="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition flex items-center justify-center">
+                        class="bg-[#F00000] text-white px-6 py-3 rounded-lg hover:bg-[#D40000] transition flex items-center justify-center">
                     <i class="fas fa-save mr-2"></i> Update Announcement
                 </button>
             </div>
@@ -286,7 +286,7 @@
                 </div>
 
                 <div class="flex justify-between items-start mb-4">
-                    <div class="text-sm text-blue-600 font-semibold" id="previewDate">
+                    <div class="text-sm text-[#F00000] font-semibold" id="previewDate">
                         {{ \Carbon\Carbon::now()->format('F j, Y') }}
                     </div>
                     <div class="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded hidden" id="previewDateRange">
@@ -307,7 +307,7 @@
             <div class="mt-6 flex justify-end">
                 <button type="button"
                         onclick="closePreview()"
-                        class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition">
+                        class="bg-[#F00000] text-white px-6 py-2 rounded-lg hover:bg-[#D40000] transition">
                     Close Preview
                 </button>
             </div>
@@ -399,13 +399,13 @@ function previewAnnouncement() {
     } else if (selectedColleges.length > 0) {
         selectedColleges.slice(0, 3).forEach(college => {
             const badge = document.createElement('span');
-            badge.className = 'bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full font-medium';
+            badge.className = 'bg-gray-100 text-[#820000] text-xs px-2 py-1 rounded-full font-medium';
             badge.innerHTML = `<i class="fas fa-university mr-1"></i> ${college}`;
             collegesContainer.appendChild(badge);
         });
         if (selectedColleges.length > 3) {
             const moreBadge = document.createElement('span');
-            moreBadge.className = 'bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full font-medium';
+            moreBadge.className = 'bg-gray-100 text-[#820000] text-xs px-2 py-1 rounded-full font-medium';
             moreBadge.textContent = `+${selectedColleges.length - 3} more`;
             collegesContainer.appendChild(moreBadge);
         }

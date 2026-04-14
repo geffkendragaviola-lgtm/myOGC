@@ -4,7 +4,7 @@
     }
 
     .events-navbar {
-        background: linear-gradient(90deg, #1e40af 0%, #3b82f6 100%);
+        background: linear-gradient(90deg, #F8650C 0%, #FFC917 100%);
         box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
     }
 
@@ -67,7 +67,7 @@
                     <p class="text-gray-600 mt-2">Create and manage mental health events, workshops, and seminars</p>
                 </div>
                 <a href="{{ route('counselor.events.create') }}"
-                   class="mt-4 md:mt-0 bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition flex items-center">
+                   class="mt-4 md:mt-0 bg-[#F00000] text-white px-6 py-3 rounded-lg hover:bg-[#D40000] transition flex items-center">
                     <i class="fas fa-plus mr-2"></i> Create New Event
                 </a>
             </div>
@@ -77,8 +77,8 @@
         <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
             <div class="bg-white rounded-xl shadow-sm p-6">
                 <div class="flex items-center">
-                    <div class="p-3 bg-blue-100 rounded-lg">
-                        <i class="fas fa-calendar text-blue-600 text-xl"></i>
+                    <div class="p-3 bg-gray-100 rounded-lg">
+                        <i class="fas fa-calendar text-[#F00000] text-xl"></i>
                     </div>
                     <div class="ml-4">
                         <p class="text-sm text-gray-600">Total Events</p>
@@ -88,8 +88,8 @@
             </div>
             <div class="bg-white rounded-xl shadow-sm p-6">
                 <div class="flex items-center">
-                    <div class="p-3 bg-green-100 rounded-lg">
-                        <i class="fas fa-play-circle text-green-600 text-xl"></i>
+                    <div class="p-3 bg-[#FFF9E6] rounded-lg">
+                        <i class="fas fa-play-circle text-[#F8650C] text-xl"></i>
                     </div>
                     <div class="ml-4">
                         <p class="text-sm text-gray-600">Active Events</p>
@@ -99,8 +99,8 @@
             </div>
             <div class="bg-white rounded-xl shadow-sm p-6">
                 <div class="flex items-center">
-                    <div class="p-3 bg-purple-100 rounded-lg">
-                        <i class="fas fa-users text-purple-600 text-xl"></i>
+                    <div class="p-3 bg-[#FFF9E6] rounded-lg">
+                        <i class="fas fa-users text-[#820000] text-xl"></i>
                     </div>
                     <div class="ml-4">
                         <p class="text-sm text-gray-600">Upcoming Events</p>
@@ -147,14 +147,14 @@
                 <h3 class="text-xl font-semibold text-gray-600 mb-2">No Events Created Yet</h3>
                 <p class="text-gray-500 mb-6">Start by creating your first event to help students with mental health awareness.</p>
                 <a href="{{ route('counselor.events.create') }}"
-                   class="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition inline-flex items-center">
+                   class="bg-[#F00000] text-white px-6 py-3 rounded-lg hover:bg-[#D40000] transition inline-flex items-center">
                     <i class="fas fa-plus mr-2"></i> Create Your First Event
                 </a>
             </div>
         @else
             <div class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
                 @foreach($events as $event)
-                    <div class="event-card bg-white rounded-xl shadow-sm overflow-hidden border-l-4 {{ $event->is_required ? 'border-red-500' : 'border-blue-500' }}">
+                    <div class="event-card bg-white rounded-xl shadow-sm overflow-hidden border-l-4 {{ $event->is_required ? 'border-red-500' : 'border-[#F00000]' }}">
                         <!-- Event Image Header -->
                         <div class="relative h-48 bg-gray-200 overflow-hidden">
                             <img src="{{ $event->image_url }}"
@@ -168,7 +168,7 @@
                             <div class="absolute bottom-0 left-0 right-0 p-4 text-white">
                                 <div class="flex justify-between items-start mb-2">
                                     <div class="flex flex-wrap gap-2">
-                                        <span class="inline-block bg-blue-600/90 text-white text-xs px-2 py-1 rounded-full capitalize backdrop-blur-sm">
+                                        <span class="inline-block bg-[#F00000]/90 text-white text-xs px-2 py-1 rounded-full capitalize backdrop-blur-sm">
                                             {{ $event->type }}
                                         </span>
                                         @if($event->is_required)
@@ -192,7 +192,7 @@
                                         <i class="fas fa-globe mr-1"></i> All Colleges
                                     </span>
                                 @else
-                                    <span class="college-badge text-xs backdrop-blur-sm bg-blue-600/90">
+                                    <span class="college-badge text-xs backdrop-blur-sm bg-[#F00000]/90">
                                         <i class="fas fa-university mr-1"></i> {{ $event->colleges->count() }} Colleges
                                     </span>
                                 @endif
@@ -204,7 +204,7 @@
                             <!-- Date and Time -->
                             <div class="space-y-2 mb-4">
                                 <div class="flex items-center text-sm text-gray-600">
-                                    <i class="far fa-calendar mr-2 text-blue-500"></i>
+                                    <i class="far fa-calendar mr-2 text-[#F8650C]"></i>
                                     <span>{{ $event->date_range }}</span>
                                 </div>
                                 <div class="flex items-center text-sm text-gray-600">
@@ -217,12 +217,12 @@
                                 </div>
                                 @if($event->max_attendees)
                                     <div class="flex items-center text-sm text-gray-600">
-                                        <i class="fas fa-users mr-2 text-purple-500"></i>
+                                        <i class="fas fa-users mr-2 text-[#820000]"></i>
                                         <span>{{ $event->registered_count }}/{{ $event->max_attendees }} registered</span>
                                     </div>
                                 @else
                                     <div class="flex items-center text-sm text-gray-600">
-                                        <i class="fas fa-users mr-2 text-purple-500"></i>
+                                        <i class="fas fa-users mr-2 text-[#820000]"></i>
                                         <span>{{ $event->registered_count }} registered (Unlimited capacity)</span>
                                     </div>
                                 @endif
@@ -255,13 +255,13 @@
                             <!-- Action Buttons -->
                             <div class="flex flex-wrap gap-2">
                                 <a href="{{ route('counselor.events.registrations', $event) }}"
-                                   class="flex-1 bg-purple-100 text-purple-700 text-sm px-3 py-2 rounded-lg hover:bg-purple-200 transition text-center flex items-center justify-center">
+                                   class="flex-1 bg-[#FFF9E6] text-[#820000] text-sm px-3 py-2 rounded-lg hover:bg-[#FFE100] transition text-center flex items-center justify-center">
                                     <i class="fas fa-users mr-1"></i>
                                     <span class="hidden sm:inline">Registrations</span>
                                 </a>
 
                                 <a href="{{ route('counselor.events.edit', $event) }}"
-                                   class="flex-1 bg-blue-100 text-blue-700 text-sm px-3 py-2 rounded-lg hover:bg-blue-200 transition text-center flex items-center justify-center">
+                                   class="flex-1 bg-gray-100 text-[#D40000] text-sm px-3 py-2 rounded-lg hover:bg-[#FFF9E6] transition text-center flex items-center justify-center">
                                     <i class="fas fa-edit mr-1"></i>
                                     <span class="hidden sm:inline">Edit</span>
                                 </a>
@@ -297,7 +297,7 @@
                                     </div>
                                     <div class="text-xs">
                                         @if($event->is_upcoming)
-                                            <span class="bg-blue-100 text-blue-800 px-2 py-1 rounded-full">
+                                            <span class="bg-gray-100 text-[#820000] px-2 py-1 rounded-full">
                                                 <i class="fas fa-clock mr-1"></i> Upcoming
                                             </span>
                                         @else
@@ -317,9 +317,9 @@
             <div class="mt-8 bg-white rounded-xl shadow-sm p-6">
                 <h3 class="text-lg font-semibold text-gray-800 mb-4">Event Overview</h3>
                 <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
-                    <div class="text-center p-3 bg-blue-50 rounded-lg">
-                        <div class="text-lg font-bold text-blue-600">{{ $events->where('is_active', true)->count() }}</div>
-                        <div class="text-blue-700">Active Events</div>
+                    <div class="text-center p-3 bg-[#FFF9E6] rounded-lg">
+                        <div class="text-lg font-bold text-[#F00000]">{{ $events->where('is_active', true)->count() }}</div>
+                        <div class="text-[#D40000]">Active Events</div>
                     </div>
                     <div class="text-center p-3 bg-green-50 rounded-lg">
                         <div class="text-lg font-bold text-green-600">
@@ -327,11 +327,11 @@
                         </div>
                         <div class="text-green-700">Upcoming</div>
                     </div>
-                    <div class="text-center p-3 bg-purple-50 rounded-lg">
-                        <div class="text-lg font-bold text-purple-600">
+                    <div class="text-center p-3 bg-[#FFF9E6] rounded-lg">
+                        <div class="text-lg font-bold text-[#820000]">
                             {{ $events->where('is_required', true)->count() }}
                         </div>
-                        <div class="text-purple-700">Required</div>
+                        <div class="text-[#820000]">Required</div>
                     </div>
                     <div class="text-center p-3 bg-orange-50 rounded-lg">
                         <div class="text-lg font-bold text-orange-600">

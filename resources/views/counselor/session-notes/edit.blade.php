@@ -19,7 +19,7 @@
                         <p class="text-gray-500 text-sm">
                             {{ $sessionNote->student->college->name ?? 'N/A' }} • {{ $sessionNote->student->year_level }}
                         </p>
-                        <p class="text-blue-600 text-sm mt-1">
+                        <p class="text-[#F00000] text-sm mt-1">
                             <i class="fas fa-calendar-alt mr-1"></i>
                             Session Date: {{ $sessionNote->session_date->format('F j, Y') }}
                         </p>
@@ -45,7 +45,7 @@
                                    name="session_date"
                                    id="session_date"
                                    value="{{ old('session_date', $sessionNote->session_date->format('Y-m-d')) }}"
-                                   class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                   class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#F00000] focus:border-transparent"
                                    required>
                             @error('session_date')
                                 <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
@@ -57,7 +57,7 @@
                             <label for="session_type" class="block text-sm font-medium text-gray-700 mb-2">Session Type *</label>
                             <select name="session_type"
                                     id="session_type"
-                                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#F00000] focus:border-transparent"
                                     required>
                                 <option value="">Select session type</option>
                                 @foreach($sessionTypes as $value => $label)
@@ -76,7 +76,7 @@
                             <label for="mood_level" class="block text-sm font-medium text-gray-700 mb-2">Student's Mood Level</label>
                             <select name="mood_level"
                                     id="mood_level"
-                                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#F00000] focus:border-transparent">
                                 <option value="">Select mood level</option>
                                 @foreach($moodLevels as $value => $label)
                                     <option value="{{ $value }}" {{ old('mood_level', $sessionNote->mood_level) == $value ? 'selected' : '' }}>
@@ -95,7 +95,7 @@
                         <textarea name="notes"
                                   id="notes"
                                   rows="8"
-                                  class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                  class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#F00000] focus:border-transparent"
                                   placeholder="Document the session details, topics discussed, observations, and any important insights..."
                                   required>{{ old('notes', $sessionNote->notes) }}</textarea>
                         @error('notes')
@@ -110,7 +110,7 @@
                         <textarea name="follow_up_actions"
                                   id="follow_up_actions"
                                   rows="4"
-                                  class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                  class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#F00000] focus:border-transparent"
                                   placeholder="Any recommended actions, homework, or follow-up tasks for the student...">{{ old('follow_up_actions', $sessionNote->follow_up_actions) }}</textarea>
                         @error('follow_up_actions')
                             <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
@@ -124,7 +124,7 @@
                             Cancel
                         </a>
                         <button type="submit"
-                                class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition flex items-center">
+                                class="bg-[#F00000] text-white px-6 py-2 rounded-lg hover:bg-[#D40000] transition flex items-center">
                             <i class="fas fa-save mr-2"></i>
                             Update Session Notes
                         </button>

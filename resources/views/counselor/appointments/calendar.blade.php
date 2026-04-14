@@ -25,7 +25,7 @@
                         <i class="fas fa-arrow-left mr-2"></i>Back to Dashboard
                     </a>
                     <a href="{{ route('counselor.appointments') }}"
-                       class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">
+                       class="px-4 py-2 bg-[#F00000] text-white rounded-lg hover:bg-[#D40000] transition">
                         <i class="fas fa-list mr-2"></i>View All Appointments
                     </a>
                     @if($googleCalendarUrl)
@@ -82,9 +82,9 @@
 
                 <form method="GET" class="flex items-center space-x-2">
                     <input type="date" name="date" value="{{ $selectedDate }}"
-                           class="p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                           class="p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#F00000] focus:border-[#F00000]"
                            min="{{ \Carbon\Carbon::now()->addDay()->format('Y-m-d') }}">
-                    <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">
+                    <button type="submit" class="px-4 py-2 bg-[#F00000] text-white rounded-lg hover:bg-[#D40000] transition">
                         Go
                     </button>
                     @php
@@ -171,16 +171,16 @@
                             @if($appointment)
                                 @if($appointment->status === 'pending') bg-yellow-50 border-yellow-200
                                 @elseif($appointment->status === 'approved') bg-green-50 border-green-200
-                                @elseif($appointment->status === 'rescheduled') bg-indigo-50 border-indigo-200
+                                @elseif($appointment->status === 'rescheduled') bg-[#FFF9E6] border-[#FFC917]
                                 @elseif($appointment->status === 'reschedule_requested') bg-orange-50 border-orange-200
                                 @elseif($appointment->status === 'reschedule_rejected') bg-rose-50 border-rose-200
-                                @elseif($appointment->status === 'referred') bg-purple-50 border-purple-200
-                                @elseif($appointment->status === 'completed') bg-blue-50 border-blue-200
+                                @elseif($appointment->status === 'referred') bg-[#FFF9E6] border-[#FFC917]
+                                @elseif($appointment->status === 'completed') bg-[#FFF9E6] border-[#FFE100]
                                 @elseif($appointment->status === 'rejected') bg-red-50 border-red-200
                                 @elseif($appointment->status === 'cancelled') bg-gray-50 border-gray-200
                                 @else bg-gray-50 border-gray-200 @endif
                             @elseif($isBusy)
-                                bg-purple-50 border-purple-200
+                                bg-[#FFF9E6] border-[#FFC917]
                             @else
                                 bg-gray-50 border-gray-200
                             @endif">
@@ -191,18 +191,18 @@
                                     <span class="px-2 py-1 text-xs rounded-full
                                         @if($appointment->status === 'pending') bg-yellow-100 text-yellow-800
                                         @elseif($appointment->status === 'approved') bg-green-100 text-green-800
-                                        @elseif($appointment->status === 'rescheduled') bg-indigo-100 text-indigo-800
+                                        @elseif($appointment->status === 'rescheduled') bg-[#FFF9E6] text-[#820000]
                                         @elseif($appointment->status === 'reschedule_requested') bg-orange-100 text-orange-800
                                         @elseif($appointment->status === 'reschedule_rejected') bg-rose-100 text-rose-800
-                                        @elseif($appointment->status === 'referred') bg-purple-100 text-purple-800
-                                        @elseif($appointment->status === 'completed') bg-blue-100 text-blue-800
+                                        @elseif($appointment->status === 'referred') bg-[#FFF9E6] text-[#820000]
+                                        @elseif($appointment->status === 'completed') bg-gray-100 text-[#820000]
                                         @elseif($appointment->status === 'rejected') bg-red-100 text-red-800
                                         @elseif($appointment->status === 'cancelled') bg-gray-100 text-gray-800
                                         @else bg-gray-100 text-gray-800 @endif">
                                         {{ $appointment->display_status ?? ucfirst($appointment->status) }}
                                     </span>
                                 @elseif($isBusy)
-                                    <span class="text-xs text-purple-700">Google Calendar</span>
+                                    <span class="text-xs text-[#820000]">Google Calendar</span>
                                 @else
                                     <span class="text-xs text-gray-500">Available</span>
                                 @endif
@@ -220,7 +220,7 @@
 
                                 <div class="mt-2 flex space-x-2 flex-wrap gap-1">
                                     <button onclick="showAppointmentDetails({{ $appointment->id }})"
-                                            class="text-xs bg-blue-600 text-white px-2 py-1 rounded hover:bg-blue-700 transition">
+                                            class="text-xs bg-[#F00000] text-white px-2 py-1 rounded hover:bg-[#D40000] transition">
                                         View
                                     </button>
                                     @if($appointment->status === 'pending')
@@ -245,7 +245,7 @@
                                             @csrf
                                             @method('PATCH')
                                             <input type="hidden" name="status" value="completed">
-                                            <button type="submit" class="text-xs bg-blue-600 text-white px-2 py-1 rounded hover:bg-blue-700 transition">
+                                            <button type="submit" class="text-xs bg-[#F00000] text-white px-2 py-1 rounded hover:bg-[#D40000] transition">
                                                 Complete
                                             </button>
                                         </form>
@@ -263,13 +263,13 @@
                             @else
                                 <!-- Show available slot -->
                                 @if($isBusy)
-                                    <div class="text-sm text-purple-700">
+                                    <div class="text-sm text-[#820000]">
                                         <p class="font-semibold">{{ $event['title'] ?? 'Busy' }}</p>
                                         @if(!empty($event['location']))
-                                            <p class="text-xs text-purple-700">{{ $event['location'] }}</p>
+                                            <p class="text-xs text-[#820000]">{{ $event['location'] }}</p>
                                         @endif
                                         @if(!empty($event['description']))
-                                            <p class="text-xs text-purple-700">{{ Str::limit($event['description'], 60) }}</p>
+                                            <p class="text-xs text-[#820000]">{{ Str::limit($event['description'], 60) }}</p>
                                         @endif
                                     </div>
                                 @else
@@ -300,16 +300,16 @@
                             @if($appointment)
                                 @if($appointment->status === 'pending') bg-yellow-50 border-yellow-200
                                 @elseif($appointment->status === 'approved') bg-green-50 border-green-200
-                                @elseif($appointment->status === 'rescheduled') bg-indigo-50 border-indigo-200
+                                @elseif($appointment->status === 'rescheduled') bg-[#FFF9E6] border-[#FFC917]
                                 @elseif($appointment->status === 'reschedule_requested') bg-orange-50 border-orange-200
                                 @elseif($appointment->status === 'reschedule_rejected') bg-rose-50 border-rose-200
-                                @elseif($appointment->status === 'referred') bg-purple-50 border-purple-200
-                                @elseif($appointment->status === 'completed') bg-blue-50 border-blue-200
+                                @elseif($appointment->status === 'referred') bg-[#FFF9E6] border-[#FFC917]
+                                @elseif($appointment->status === 'completed') bg-[#FFF9E6] border-[#FFE100]
                                 @elseif($appointment->status === 'rejected') bg-red-50 border-red-200
                                 @elseif($appointment->status === 'cancelled') bg-gray-50 border-gray-200
                                 @else bg-gray-50 border-gray-200 @endif
                             @elseif($isBusy)
-                                bg-purple-50 border-purple-200
+                                bg-[#FFF9E6] border-[#FFC917]
                             @else
                                 bg-gray-50 border-gray-200
                             @endif">
@@ -320,18 +320,18 @@
                                     <span class="px-2 py-1 text-xs rounded-full
                                         @if($appointment->status === 'pending') bg-yellow-100 text-yellow-800
                                         @elseif($appointment->status === 'approved') bg-green-100 text-green-800
-                                        @elseif($appointment->status === 'rescheduled') bg-indigo-100 text-indigo-800
+                                        @elseif($appointment->status === 'rescheduled') bg-[#FFF9E6] text-[#820000]
                                         @elseif($appointment->status === 'reschedule_requested') bg-orange-100 text-orange-800
                                         @elseif($appointment->status === 'reschedule_rejected') bg-rose-100 text-rose-800
-                                        @elseif($appointment->status === 'referred') bg-purple-100 text-purple-800
-                                        @elseif($appointment->status === 'completed') bg-blue-100 text-blue-800
+                                        @elseif($appointment->status === 'referred') bg-[#FFF9E6] text-[#820000]
+                                        @elseif($appointment->status === 'completed') bg-gray-100 text-[#820000]
                                         @elseif($appointment->status === 'rejected') bg-red-100 text-red-800
                                         @elseif($appointment->status === 'cancelled') bg-gray-100 text-gray-800
                                         @else bg-gray-100 text-gray-800 @endif">
                                         {{ $appointment->display_status ?? ucfirst($appointment->status) }}
                                     </span>
                                 @elseif($isBusy)
-                                    <span class="text-xs text-purple-700">Google Calendar</span>
+                                    <span class="text-xs text-[#820000]">Google Calendar</span>
                                 @else
                                     <span class="text-xs text-gray-500">Available</span>
                                 @endif
@@ -349,7 +349,7 @@
 
                                 <div class="mt-2 flex space-x-2 flex-wrap gap-1">
                                     <button onclick="showAppointmentDetails({{ $appointment->id }})"
-                                            class="text-xs bg-blue-600 text-white px-2 py-1 rounded hover:bg-blue-700 transition">
+                                            class="text-xs bg-[#F00000] text-white px-2 py-1 rounded hover:bg-[#D40000] transition">
                                         View
                                     </button>
                                     @if($appointment->status === 'pending')
@@ -374,7 +374,7 @@
                                             @csrf
                                             @method('PATCH')
                                             <input type="hidden" name="status" value="completed">
-                                            <button type="submit" class="text-xs bg-blue-600 text-white px-2 py-1 rounded hover:bg-blue-700 transition">
+                                            <button type="submit" class="text-xs bg-[#F00000] text-white px-2 py-1 rounded hover:bg-[#D40000] transition">
                                                 Complete
                                             </button>
                                         </form>
@@ -392,13 +392,13 @@
                             @else
                                 <!-- Show available slot -->
                                 @if($isBusy)
-                                    <div class="text-sm text-purple-700">
+                                    <div class="text-sm text-[#820000]">
                                         <p class="font-semibold">{{ $event['title'] ?? 'Busy' }}</p>
                                         @if(!empty($event['location']))
-                                            <p class="text-xs text-purple-700">{{ $event['location'] }}</p>
+                                            <p class="text-xs text-[#820000]">{{ $event['location'] }}</p>
                                         @endif
                                         @if(!empty($event['description']))
-                                            <p class="text-xs text-purple-700">{{ Str::limit($event['description'], 60) }}</p>
+                                            <p class="text-xs text-[#820000]">{{ Str::limit($event['description'], 60) }}</p>
                                         @endif
                                     </div>
                                 @else
@@ -423,7 +423,7 @@
                             <span class="text-sm text-gray-700">Approved</span>
                         </div>
                         <div class="flex items-center space-x-2">
-                            <div class="w-4 h-4 bg-blue-100 border border-blue-300 rounded"></div>
+                            <div class="w-4 h-4 bg-gray-100 border border-[#FFE100] rounded"></div>
                             <span class="text-sm text-gray-700">Completed</span>
                         </div>
                         <div class="flex items-center space-x-2">
@@ -435,7 +435,7 @@
                             <span class="text-sm text-gray-700">Available Slot</span>
                         </div>
                         <div class="flex items-center space-x-2">
-                            <div class="w-4 h-4 bg-purple-100 border border-purple-300 rounded"></div>
+                            <div class="w-4 h-4 bg-[#FFF9E6] border border-[#FFC917] rounded"></div>
                             <span class="text-sm text-gray-700">Google Calendar Busy</span>
                         </div>
                     </div>
@@ -458,7 +458,7 @@
                             </div>
                             <div class="flex justify-between text-sm">
                                 <span class="text-gray-600">Completed:</span>
-                                <span class="font-semibold text-blue-600">{{ $appointments->where('status', 'completed')->count() }}</span>
+                                <span class="font-semibold text-[#F00000]">{{ $appointments->where('status', 'completed')->count() }}</span>
                             </div>
                             <div class="flex justify-between text-sm">
                                 <span class="text-gray-600">Available Slots:</span>
@@ -588,7 +588,7 @@
                                     ${data.appointment.status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
                                       data.appointment.status === 'approved' ? 'bg-green-100 text-green-800' :
                                       data.appointment.status === 'rejected' ? 'bg-red-100 text-red-800' :
-                                      data.appointment.status === 'completed' ? 'bg-blue-100 text-blue-800' :
+                                      data.appointment.status === 'completed' ? 'bg-gray-100 text-[#820000]' :
                                       'bg-gray-100 text-gray-800'}">
                                     ${data.appointment.status.charAt(0).toUpperCase() + data.appointment.status.slice(1)}
                                 </span>

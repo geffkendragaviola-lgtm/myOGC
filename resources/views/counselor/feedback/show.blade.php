@@ -29,7 +29,7 @@
                             </div>
                             <div>
                                 <h2 class="text-xl font-bold text-white">Anonymous Feedback</h2>
-                                <p class="text-blue-100">Identity protected</p>
+                                <p class="text-white">Identity protected</p>
                             </div>
                         @else
                             <div class="bg-white bg-opacity-20 p-3 rounded-full mr-4">
@@ -39,13 +39,13 @@
                                 <h2 class="text-xl font-bold text-white">
                                     {{ $feedback->user->first_name }} {{ $feedback->user->last_name }}
                                 </h2>
-                                <p class="text-blue-100">{{ $feedback->user->email }}</p>
+                                <p class="text-white">{{ $feedback->user->email }}</p>
                             </div>
                         @endif
                     </div>
                     <div class="text-right">
                         <div class="text-white text-sm font-semibold">Submitted</div>
-                        <div class="text-blue-100">{{ $feedback->created_at->format('F j, Y \a\t g:i A') }}</div>
+                        <div class="text-white">{{ $feedback->created_at->format('F j, Y \a\t g:i A') }}</div>
                     </div>
                 </div>
             </div>
@@ -195,7 +195,7 @@
                             <span class="font-medium text-gray-600">Anonymous Submission:</span>
                             <span class="ml-2">
                                 @if($feedback->is_anonymous)
-                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-[#FFF9E6] text-[#820000]">
                                         Yes
                                     </span>
                                 @else

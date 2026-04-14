@@ -19,7 +19,7 @@
                 <div class="flex gap-3">
                     <button type="button"
                             onclick="openFollowupModal()"
-                            class="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition flex items-center">
+                            class="bg-[#F00000] text-white px-4 py-2 rounded-lg hover:bg-[#D40000] transition flex items-center">
                         <i class="fas fa-calendar-plus mr-2"></i> Book Follow-up
                     </button>
                     <a href="{{ route('counselor.appointments') }}"
@@ -124,7 +124,7 @@
                         </div>
                         <div class="pt-2">
                             <a href="{{ route('counselor.students.profile', $appointment->student) }}"
-                               class="inline-flex items-center text-indigo-600 hover:text-indigo-800 text-sm">
+                               class="inline-flex items-center text-[#F00000] hover:text-[#820000] text-sm">
                                 <i class="fas fa-user mr-2"></i> View Student Profile
                             </a>
                         </div>
@@ -144,7 +144,7 @@
                                 <label for="appointment_type" class="block text-sm font-medium text-gray-700 mb-2">Type of Appointment *</label>
                                 <select name="appointment_type"
                                         id="appointment_type"
-                                        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#F00000] focus:border-transparent"
                                         required>
                                     <option value="">Select type</option>
                                     @foreach($appointmentTypeOptions as $value => $label)
@@ -167,7 +167,7 @@
                                         <input type="checkbox"
                                                name="root_causes[]"
                                                value="{{ $value }}"
-                                               class="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                                               class="rounded border-gray-300 text-[#F00000] focus:ring-[#F00000]"
                                                {{ in_array($value, old('root_causes', $latestSessionNote->root_causes ?? []), true) ? 'checked' : '' }}>
                                         <span>{{ $label }}</span>
                                     </label>
@@ -186,7 +186,7 @@
                             <textarea name="notes"
                                       id="notes"
                                       rows="10"
-                                      class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                      class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#F00000] focus:border-transparent"
                                       required>{{ old('notes', $latestSessionNote->notes ?? '') }}</textarea>
                             @error('notes')
                                 <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
@@ -198,7 +198,7 @@
                             <textarea name="follow_up_actions"
                                       id="follow_up_actions"
                                       rows="5"
-                                      class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">{{ old('follow_up_actions', $latestSessionNote->follow_up_actions ?? '') }}</textarea>
+                                      class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#F00000] focus:border-transparent">{{ old('follow_up_actions', $latestSessionNote->follow_up_actions ?? '') }}</textarea>
                             @error('follow_up_actions')
                                 <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                             @enderror
@@ -206,7 +206,7 @@
 
                         <div class="mt-8 flex justify-end">
                             <button type="submit"
-                                    class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition flex items-center">
+                                    class="bg-[#F00000] text-white px-6 py-2 rounded-lg hover:bg-[#D40000] transition flex items-center">
                                 <i class="fas fa-save mr-2"></i> Save Session Notes
                             </button>
                         </div>
@@ -234,7 +234,7 @@
                         <label for="followup_booking_type" class="block text-sm font-medium text-gray-700 mb-2">Type of Booking *</label>
                         <select name="booking_type"
                                 id="followup_booking_type"
-                                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#F00000] focus:border-transparent"
                                 required>
                             <option value="">Choose a booking type</option>
                             <option value="Counseling" {{ old('booking_type') === 'Counseling' ? 'selected' : '' }}>Counseling</option>
@@ -251,7 +251,7 @@
                                name="appointment_date"
                                id="followup_appointment_date"
                                min="{{ now()->addDay()->format('Y-m-d') }}"
-                               class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                               class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#F00000] focus:border-transparent"
                                required>
                     </div>
 
@@ -274,7 +274,7 @@
                     <textarea name="concern"
                               id="followup_concern"
                               rows="3"
-                              class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                              class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#F00000] focus:border-transparent"
                               required>{{ old('concern', 'Follow-up session') }}</textarea>
                 </div>
 
@@ -284,7 +284,7 @@
                            id="followup_auto_approve"
                            value="1"
                            checked
-                           class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded">
+                           class="h-4 w-4 text-[#F00000] focus:ring-[#F00000] border-gray-300 rounded">
                     <label for="followup_auto_approve" class="ml-2 block text-sm text-gray-700">
                         Auto-approve this follow-up appointment
                     </label>
@@ -298,7 +298,7 @@
                     </button>
                     <button type="submit"
                             id="followup_submit_btn"
-                            class="bg-indigo-600 text-white px-6 py-2 rounded-lg hover:bg-indigo-700 transition disabled:opacity-50 disabled:cursor-not-allowed">
+                            class="bg-[#F00000] text-white px-6 py-2 rounded-lg hover:bg-[#D40000] transition disabled:opacity-50 disabled:cursor-not-allowed">
                         Book Follow-up
                     </button>
                 </div>
@@ -345,13 +345,13 @@
             selectedTime.value = startTime;
 
             document.querySelectorAll('#followup_time_slots button[data-start]').forEach((btn) => {
-                btn.classList.remove('bg-indigo-600', 'text-white', 'border-indigo-600');
+                btn.classList.remove('bg-[#F00000]', 'text-white', 'border-[#820000]');
                 btn.classList.add('bg-white', 'text-gray-700', 'border-gray-300');
             });
 
             if (buttonEl) {
                 buttonEl.classList.remove('bg-white', 'text-gray-700', 'border-gray-300');
-                buttonEl.classList.add('bg-indigo-600', 'text-white', 'border-indigo-600');
+                buttonEl.classList.add('bg-[#F00000]', 'text-white', 'border-[#820000]');
             }
             updateFollowupSubmitState();
         }

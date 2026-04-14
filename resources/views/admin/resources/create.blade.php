@@ -25,7 +25,7 @@
                 <div class="md:col-span-2">
                     <label for="title" class="block text-sm font-medium text-gray-700 mb-2">Title *</label>
                     <input type="text" name="title" id="title" value="{{ old('title') }}"
-                           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" required>
+                           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#F00000] focus:border-transparent" required>
                     @error('title')
                         <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                     @enderror
@@ -34,7 +34,7 @@
                 <div class="md:col-span-2">
                     <label for="description" class="block text-sm font-medium text-gray-700 mb-2">Description *</label>
                     <textarea name="description" id="description" rows="3"
-                              class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" required>{{ old('description') }}</textarea>
+                              class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#F00000] focus:border-transparent" required>{{ old('description') }}</textarea>
                     @error('description')
                         <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                     @enderror
@@ -43,7 +43,7 @@
                 <div>
                     <label for="icon" class="block text-sm font-medium text-gray-700 mb-2">Icon *</label>
                     <select name="icon" id="icon"
-                            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" required>
+                            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#F00000] focus:border-transparent" required>
                         <option value="">Select an icon</option>
                         @foreach($icons as $icon)
                             <option value="{{ $icon }}" {{ old('icon') == $icon ? 'selected' : '' }}>{{ $icon }}</option>
@@ -57,7 +57,7 @@
                 <div>
                     <label for="category" class="block text-sm font-medium text-gray-700 mb-2">Category *</label>
                     <select name="category" id="category"
-                            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" required>
+                            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#F00000] focus:border-transparent" required>
                         <option value="">Select a category</option>
                         @foreach($categories as $value => $label)
                             <option value="{{ $value }}" {{ old('category') == $value ? 'selected' : '' }}>{{ $label }}</option>
@@ -71,7 +71,7 @@
                 <div>
                     <label for="button_text" class="block text-sm font-medium text-gray-700 mb-2">Button Text *</label>
                     <input type="text" name="button_text" id="button_text" value="{{ old('button_text') }}"
-                           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" required>
+                           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#F00000] focus:border-transparent" required>
                     @error('button_text')
                         <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                     @enderror
@@ -80,7 +80,7 @@
                 <div>
                     <label for="order" class="block text-sm font-medium text-gray-700 mb-2">Display Order</label>
                     <input type="number" name="order" id="order" value="{{ old('order', 0) }}" min="0"
-                           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#F00000] focus:border-transparent">
                     @error('order')
                         <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                     @enderror
@@ -89,7 +89,7 @@
                 <div class="md:col-span-2">
                     <label for="link" class="block text-sm font-medium text-gray-700 mb-2">Resource Link *</label>
                     <input type="url" name="link" id="link" value="{{ old('link') }}"
-                           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" required>
+                           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#F00000] focus:border-transparent" required>
                     @error('link')
                         <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                     @enderror
@@ -106,20 +106,20 @@
                 <div class="md:col-span-2 space-y-3">
                     <div class="flex items-center">
                         <input type="checkbox" name="use_yt_thumbnail" id="use_yt_thumbnail" value="1" {{ old('use_yt_thumbnail') ? 'checked' : '' }}
-                               class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                               class="h-4 w-4 text-[#F00000] focus:ring-[#F00000] border-gray-300 rounded">
                         <label for="use_yt_thumbnail" class="ml-2 block text-sm text-gray-700">Use YouTube thumbnail (for YouTube links)</label>
                     </div>
 
                     <div class="flex items-center">
                         <input type="checkbox" name="show_disclaimer" id="show_disclaimer" value="1" {{ old('show_disclaimer') ? 'checked' : '' }}
-                               class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                               class="h-4 w-4 text-[#F00000] focus:ring-[#F00000] border-gray-300 rounded">
                         <label for="show_disclaimer" class="ml-2 block text-sm text-gray-700">Show disclaimer</label>
                     </div>
 
                     <div>
                         <label for="disclaimer_text" class="block text-sm font-medium text-gray-700 mb-2">Disclaimer Text (optional)</label>
                         <textarea name="disclaimer_text" id="disclaimer_text" rows="3"
-                                  class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">{{ old('disclaimer_text') }}</textarea>
+                                  class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#F00000] focus:border-transparent">{{ old('disclaimer_text') }}</textarea>
                         @error('disclaimer_text')
                             <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                         @enderror
@@ -127,7 +127,7 @@
 
                     <div class="flex items-center">
                         <input type="checkbox" name="is_active" id="is_active" value="1" {{ old('is_active', true) ? 'checked' : '' }}
-                               class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                               class="h-4 w-4 text-[#F00000] focus:ring-[#F00000] border-gray-300 rounded">
                         <label for="is_active" class="ml-2 block text-sm text-gray-700">Make this resource active and visible to students</label>
                     </div>
                 </div>
@@ -135,7 +135,7 @@
 
             <div class="mt-8 flex justify-end space-x-3">
                 <a href="{{ route('admin.resources.index') }}" class="bg-gray-600 text-white px-6 py-2 rounded-lg hover:bg-gray-700 transition">Cancel</a>
-                <button type="submit" class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition flex items-center">
+                <button type="submit" class="bg-[#F00000] text-white px-6 py-2 rounded-lg hover:bg-[#D40000] transition flex items-center">
                     <i class="fas fa-save mr-2"></i> Create Resource
                 </button>
             </div>

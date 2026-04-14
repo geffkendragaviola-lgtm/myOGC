@@ -17,14 +17,14 @@
                         <p class="text-gray-500 text-sm">
                             {{ $student->college->name ?? 'N/A' }} • {{ $student->year_level }}
                         </p>
-                        <p class="text-sm text-blue-600 mt-1">
+                        <p class="text-sm text-[#F00000] mt-1">
                             <i class="fas fa-clipboard-list mr-1"></i>
                             {{ $sessionNotes->count() }} session note(s) found
                         </p>
                     </div>
                     <div class="mt-4 md:mt-0 flex space-x-3">
                         <a href="{{ route('counselor.session-notes.create', $student) }}"
-                           class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition flex items-center">
+                           class="bg-[#F00000] text-white px-4 py-2 rounded-lg hover:bg-[#D40000] transition flex items-center">
                             <i class="fas fa-plus mr-2"></i> New Session Note
                         </a>
                         <a href="{{ route('counselor.appointments') }}"
@@ -48,7 +48,7 @@
                     <h3 class="text-xl font-semibold text-gray-600 mb-2">No Session Notes Yet</h3>
                     <p class="text-gray-500">Start documenting your counseling sessions with this student.</p>
                     <a href="{{ route('counselor.session-notes.create', $student) }}"
-                       class="inline-block mt-4 bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition">
+                       class="inline-block mt-4 bg-[#F00000] text-white px-6 py-2 rounded-lg hover:bg-[#D40000] transition">
                         Create First Session Note
                     </a>
                 </div>
@@ -73,7 +73,7 @@
                                 </div>
                                 <div class="flex space-x-2">
                                     <a href="{{ route('counselor.session-notes.edit', $note) }}"
-                                       class="text-blue-600 hover:text-blue-800 transition">
+                                       class="text-[#F00000] hover:text-[#820000] transition">
                                         <i class="fas fa-edit"></i>
                                     </a>
                                 </div>
@@ -85,7 +85,7 @@
                                     @php
                                         // Fixed nested ternary with proper parentheses
                                         $moodColor = ($note->mood_level === 'very_good') ? 'bg-green-100 text-green-800' :
-                                                    (($note->mood_level === 'good') ? 'bg-blue-100 text-blue-800' :
+                                                    (($note->mood_level === 'good') ? 'bg-gray-100 text-[#820000]' :
                                                     (($note->mood_level === 'neutral') ? 'bg-yellow-100 text-yellow-800' :
                                                     (($note->mood_level === 'low') ? 'bg-orange-100 text-orange-800' :
                                                     'bg-red-100 text-red-800')));

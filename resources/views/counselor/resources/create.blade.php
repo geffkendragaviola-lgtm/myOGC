@@ -31,7 +31,7 @@
                            name="title"
                            id="title"
                            value="{{ old('title') }}"
-                           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#F00000] focus:border-transparent"
                            required>
                     @error('title')
                         <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
@@ -44,7 +44,7 @@
                     <textarea name="description"
                               id="description"
                               rows="3"
-                              class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                              class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#F00000] focus:border-transparent"
                               required>{{ old('description') }}</textarea>
                     @error('description')
                         <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
@@ -56,7 +56,7 @@
                     <label for="icon" class="block text-sm font-medium text-gray-700 mb-2">Icon *</label>
                     <select name="icon"
                             id="icon"
-                            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#F00000] focus:border-transparent"
                             required>
                         <option value="">Select an icon</option>
                         @foreach($icons as $icon)
@@ -75,7 +75,7 @@
                     <label for="category" class="block text-sm font-medium text-gray-700 mb-2">Category *</label>
                     <select name="category"
                             id="category"
-                            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#F00000] focus:border-transparent"
                             required>
                         <option value="">Select a category</option>
                         @foreach($categories as $value => $label)
@@ -96,7 +96,7 @@
                            name="button_text"
                            id="button_text"
                            value="{{ old('button_text') }}"
-                           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#F00000] focus:border-transparent"
                            placeholder="e.g., Watch Video, Read eBook, Access Content"
                            required>
                     @error('button_text')
@@ -111,7 +111,7 @@
                            name="link"
                            id="link"
                            value="{{ old('link') }}"
-                           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#F00000] focus:border-transparent"
                            placeholder="https://example.com/resource or https://youtube.com/watch?v=..."
                            required>
                     @error('link')
@@ -126,7 +126,7 @@
                            name="image"
                            id="image"
                            accept="image/*"
-                           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#F00000] focus:border-transparent">
                     <p class="mt-1 text-sm text-gray-500">Upload a custom image for this resource (optional)</p>
                     @error('image')
                         <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
@@ -141,7 +141,7 @@
                                id="use_yt_thumbnail"
                                value="1"
                                {{ old('use_yt_thumbnail') ? 'checked' : '' }}
-                               class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                               class="h-4 w-4 text-[#F00000] focus:ring-[#F00000] border-gray-300 rounded">
                         <label for="use_yt_thumbnail" class="ml-2 block text-sm text-gray-700">
                             Use YouTube thumbnail (for YouTube links only)
                         </label>
@@ -163,7 +163,7 @@
                                    id="show_disclaimer"
                                    value="1"
                                    {{ old('show_disclaimer') ? 'checked' : '' }}
-                                   class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                                   class="h-4 w-4 text-[#F00000] focus:ring-[#F00000] border-gray-300 rounded">
                             <label for="show_disclaimer" class="ml-2 block text-sm font-medium text-gray-700">
                                 Show disclaimer for this resource
                             </label>
@@ -182,7 +182,7 @@
                                   id="disclaimer_text"
                                   rows="3"
                                   placeholder="Enter custom disclaimer text. If left empty, a default disclaimer will be used."
-                                  class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">{{ old('disclaimer_text') }}</textarea>
+                                  class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#F00000] focus:border-transparent">{{ old('disclaimer_text') }}</textarea>
                         <p class="mt-1 text-sm text-gray-500">
                             Default disclaimer: "We do not claim ownership of this content. All rights, credits, and copyrights belong to the original owners. These resources are shared for educational and informational purposes only."
                         </p>
@@ -200,7 +200,7 @@
                                id="is_active"
                                value="1"
                                {{ old('is_active', true) ? 'checked' : '' }}
-                               class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                               class="h-4 w-4 text-[#F00000] focus:ring-[#F00000] border-gray-300 rounded">
                         <label for="is_active" class="ml-2 block text-sm text-gray-700">
                             Make this resource active and visible to students
                         </label>
@@ -215,7 +215,7 @@
                     Cancel
                 </a>
                 <button type="submit"
-                        class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition flex items-center">
+                        class="bg-[#F00000] text-white px-6 py-2 rounded-lg hover:bg-[#D40000] transition flex items-center">
                     <i class="fas fa-plus mr-2"></i>
                     Create Resource
                 </button>

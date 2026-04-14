@@ -30,8 +30,8 @@
     <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
         <div class="bg-white rounded-lg shadow p-6">
             <div class="flex items-center">
-                <div class="bg-blue-100 p-3 rounded-full mr-4">
-                    <i class="fas fa-comments text-blue-600"></i>
+                <div class="bg-gray-100 p-3 rounded-full mr-4">
+                    <i class="fas fa-comments text-[#F00000]"></i>
                 </div>
                 <div>
                     <p class="text-sm text-gray-600">Total Feedback</p>
@@ -54,8 +54,8 @@
 
         <div class="bg-white rounded-lg shadow p-6">
             <div class="flex items-center">
-                <div class="bg-purple-100 p-3 rounded-full mr-4">
-                    <i class="fas fa-user-secret text-purple-600"></i>
+                <div class="bg-[#FFF9E6] p-3 rounded-full mr-4">
+                    <i class="fas fa-user-secret text-[#820000]"></i>
                 </div>
                 <div>
                     <p class="text-sm text-gray-600">Anonymous Feedback</p>
@@ -89,13 +89,13 @@
                 <label class="block text-sm font-medium text-gray-700 mb-1">Search</label>
                 <input type="text" name="search" value="{{ request('search') }}"
                        placeholder="Search by student, service, or comments..."
-                       class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                       class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#F00000]">
             </div>
 
             <!-- Rating Filter -->
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">Rating</label>
-                <select name="rating" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <select name="rating" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#F00000]">
                     <option value="">All Ratings</option>
                     @for($i = 5; $i >= 1; $i--)
                         <option value="{{ $i }}" {{ request('rating') == $i ? 'selected' : '' }}>
@@ -108,7 +108,7 @@
             <!-- Service Filter -->
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">Service</label>
-                <select name="service" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <select name="service" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#F00000]">
                     <option value="">All Services</option>
                     @foreach($serviceTypes as $service)
                         <option value="{{ $service }}" {{ request('service') == $service ? 'selected' : '' }}>
@@ -121,7 +121,7 @@
             <!-- Date Range -->
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">Date Range</label>
-                <select name="date_range" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <select name="date_range" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#F00000]">
                     <option value="">All Time</option>
                     <option value="today" {{ request('date_range') == 'today' ? 'selected' : '' }}>Today</option>
                     <option value="week" {{ request('date_range') == 'week' ? 'selected' : '' }}>This Week</option>
@@ -132,7 +132,7 @@
             <!-- Anonymous Filter -->
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">Anonymous</label>
-                <select name="anonymous" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <select name="anonymous" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#F00000]">
                     <option value="">All</option>
                     <option value="1" {{ request('anonymous') == '1' ? 'selected' : '' }}>Anonymous Only</option>
                     <option value="0" {{ request('anonymous') == '0' ? 'selected' : '' }}>Non-anonymous Only</option>
@@ -142,7 +142,7 @@
             <!-- Filter Buttons -->
             <div class="md:col-span-5 flex justify-end space-x-3 pt-2">
                 <button type="submit"
-                        class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition flex items-center">
+                        class="bg-[#F00000] text-white px-6 py-2 rounded-lg hover:bg-[#D40000] transition flex items-center">
                     <i class="fas fa-filter mr-2"></i> Apply Filters
                 </button>
                 <a href="{{ route('counselor.feedback.index') }}"
@@ -181,16 +181,16 @@
                         <td class="px-6 py-4">
                             <div class="flex items-center">
                                 @if($feedback->is_anonymous)
-                                    <div class="bg-purple-100 p-2 rounded-full mr-3">
-                                        <i class="fas fa-user-secret text-purple-600"></i>
+                                    <div class="bg-[#FFF9E6] p-2 rounded-full mr-3">
+                                        <i class="fas fa-user-secret text-[#820000]"></i>
                                     </div>
                                     <div>
                                         <div class="text-sm font-medium text-gray-900">Anonymous</div>
                                         <div class="text-sm text-gray-500">{{ $feedback->user->student->college->name ?? 'N/A' }}</div>
                                     </div>
                                 @else
-                                    <div class="bg-blue-100 p-2 rounded-full mr-3">
-                                        <i class="fas fa-user text-blue-600"></i>
+                                    <div class="bg-gray-100 p-2 rounded-full mr-3">
+                                        <i class="fas fa-user text-[#F00000]"></i>
                                     </div>
                                     <div>
                                         <div class="text-sm font-medium text-gray-900">
@@ -233,7 +233,7 @@
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                             <a href="{{ route('counselor.feedback.show', $feedback) }}"
-                               class="text-blue-600 hover:text-blue-900 transition mr-3"
+                               class="text-[#F00000] hover:text-[#820000] transition mr-3"
                                title="View Details">
                                 <i class="fas fa-eye"></i>
                             </a>
