@@ -3,28 +3,202 @@
 @section('title', 'Feedback Details - Admin Panel')
 
 @section('content')
+<style>
+    :root {
+        --maroon-900: #3a0c0c;
+        --maroon-800: #5c1a1a;
+        --maroon-700: #7a2a2a;
+        --gold-500: #c9a227;
+        --gold-400: #d4af37;
+        --bg-warm: #faf8f5;
+        --border-soft: #e5e0db;
+        --text-primary: #2c2420;
+        --text-secondary: #6b5e57;
+        --text-muted: #8b7e76;
+    }
 
+    .users-shell {
+        position: relative;
+        overflow: hidden;
+        background: var(--bg-warm);
+        min-height: 100vh;
+    }
+    .users-glow {
+        position: absolute; border-radius: 50%; filter: blur(80px); pointer-events: none; opacity: 0.25;
+    }
+    .users-glow.one { top: -30px; left: -40px; width: 200px; height: 200px; background: var(--gold-400); }
+    .users-glow.two { bottom: -30px; right: -60px; width: 220px; height: 220px; background: var(--maroon-800); }
 
-    <!-- Main Content -->
-    <div class="container mx-auto px-4 py-8">
-        <!-- Back Button and Header -->
-        <div class="mb-6">
-            <a href="{{ route('admin.users') }}" class="inline-flex items-center text-[#F00000] hover:text-[#820000] mb-4">
-                <i class="fas fa-arrow-left mr-2"></i> Back to Users
-            </a>
-            <h1 class="text-3xl font-bold text-gray-800">Create New User</h1>
-            <p class="text-gray-600 mt-2">Add a new user to the system</p>
+    .hero-card, .panel-card, .glass-card {
+        position: relative; overflow: hidden; border-radius: 0.75rem;
+        border: 1px solid var(--border-soft); background: rgba(255,255,255,0.95);
+        backdrop-filter: blur(8px); box-shadow: 0 2px 8px rgba(44,36,32,0.04);
+        transition: box-shadow 0.2s ease;
+    }
+    .hero-card:hover, .panel-card:hover, .glass-card:hover { box-shadow: 0 4px 14px rgba(44,36,32,0.06); }
+    .hero-card::before, .panel-card::before, .glass-card::before {
+        content: ""; position: absolute; inset: 0; pointer-events: none;
+        background: radial-gradient(circle at top right, rgba(212,175,55,0.06), transparent 30%);
+    }
+
+    .hero-icon, .panel-icon {
+        display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+    }
+    .hero-icon {
+        width: 2.75rem; height: 2.75rem; border-radius: 0.75rem; color: #fef9e7;
+        background: linear-gradient(135deg, var(--maroon-800) 0%, var(--maroon-700) 100%);
+        box-shadow: 0 4px 12px rgba(92,26,26,0.15);
+    }
+    .hero-badge {
+        display: inline-flex; align-items: center; gap: 0.4rem; border-radius: 999px;
+        border: 1px solid rgba(212,175,55,0.3); background: rgba(254,249,231,0.8);
+        padding: 0.2rem 0.55rem; font-size: 9px; font-weight: 700; text-transform: uppercase;
+        letter-spacing: 0.16em; color: var(--maroon-700);
+    }
+    .hero-badge-dot { width: 0.3rem; height: 0.3rem; border-radius: 999px; background: var(--gold-400); }
+
+    .summary-card {
+        position: relative; overflow: hidden; border-radius: 0.75rem;
+        border: 1px solid rgba(92,26,26,0.15);
+        background: linear-gradient(135deg, var(--maroon-800) 0%, var(--maroon-900) 100%); color: white;
+        box-shadow: 0 4px 12px rgba(58,12,12,0.15);
+    }
+    .summary-card::before {
+        content: ""; position: absolute; inset: 0; opacity: 0.15;
+        background: radial-gradient(circle at top right, var(--gold-400), transparent 40%); pointer-events: none;
+    }
+    .summary-icon {
+        width: 2.5rem; height: 2.5rem; border-radius: 0.75rem; display: flex;
+        align-items: center; justify-content: center; background: rgba(255,255,255,0.1);
+        border: 1px solid rgba(255,255,255,0.1); color: #fef9e7; flex-shrink: 0;
+    }
+    .summary-label { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.2em; color: rgba(255,255,255,0.7); }
+    .summary-value { font-size: 1.2rem; line-height: 1.2; font-weight: 800; margin-top: 0.35rem; }
+    .summary-subtext { font-size: 0.7rem; color: rgba(255,255,255,0.8); margin-top: 0.2rem; }
+
+    .primary-btn, .secondary-btn {
+        border-radius: 0.6rem; font-weight: 600; transition: all 0.2s ease;
+        display: inline-flex; align-items: center; justify-content: center; white-space: nowrap;
+    }
+    .primary-btn {
+        color: #fef9e7; background: linear-gradient(135deg, var(--maroon-800) 0%, var(--maroon-700) 100%);
+        box-shadow: 0 4px 10px rgba(92,26,26,0.15);
+    }
+    .primary-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 14px rgba(92,26,26,0.2); }
+    .secondary-btn {
+        color: var(--text-primary); background: rgba(255,255,255,0.9);
+        border: 1px solid var(--border-soft);
+    }
+    .secondary-btn:hover { background: rgba(254,249,231,0.6); border-color: var(--maroon-700); }
+
+    .panel-topline { position: absolute; inset-inline: 0; top: 0; height: 3px; background: linear-gradient(90deg, var(--maroon-800) 0%, var(--gold-400) 50%, var(--maroon-800) 100%); }
+    .panel-header { display: flex; align-items: center; gap: 0.7rem; padding: 0.85rem 1.25rem; border-bottom: 1px solid var(--border-soft)/60; }
+    .panel-icon { width: 2rem; height: 2rem; border-radius: 0.6rem; display: flex; align-items: center; justify-content: center; background: rgba(254,249,231,0.7); color: var(--maroon-700); }
+    .panel-title { font-size: 0.8rem; font-weight: 600; color: var(--text-primary); }
+    .panel-subtitle { font-size: 0.68rem; color: var(--text-muted); margin-top: 0.1rem; }
+
+    .field-label { display: block; font-size: 0.65rem; font-weight: 600; color: var(--text-secondary); margin-bottom: 0.35rem; text-transform: uppercase; letter-spacing: 0.08em; }
+    .input-field, .select-field, .textarea-field {
+        width: 100%; border: 1px solid var(--border-soft); border-radius: 0.6rem;
+        background: rgba(255,255,255,0.9); color: var(--text-primary); outline: none;
+        transition: all 0.2s ease; font-size: 0.8rem; padding: 0.55rem 0.75rem;
+        box-shadow: inset 0 1px 2px rgba(44,36,32,0.02);
+    }
+    .textarea-field { padding: 0.75rem; resize: vertical; min-height: 3.5rem; }
+    .input-field:focus, .select-field:focus, .textarea-field:focus { border-color: var(--maroon-700); box-shadow: 0 0 0 3px rgba(92,26,26,0.08); }
+
+    .checkbox-card {
+        display: flex; align-items: center; padding: 0.75rem 1rem;
+        border-radius: 0.6rem; background: rgba(250,248,245,0.6);
+        border: 1px solid var(--border-soft); transition: all 0.2s ease;
+    }
+    .checkbox-card:hover { background: rgba(254,249,231,0.4); border-color: var(--maroon-700); }
+
+    .success-alert {
+        background: rgba(236,253,245,0.95); border: 1px solid #10b981/30;
+        color: #065f46; padding: 0.85rem 1.1rem; border-radius: 0.6rem;
+        font-size: 0.8rem;
+    }
+    .error-alert {
+        background: rgba(254,242,242,0.96); border: 1px solid #ef4444/30;
+        color: #b91c1c; padding: 0.85rem 1.1rem; border-radius: 0.6rem;
+        font-size: 0.8rem;
+    }
+    .error-alert ul { margin: 0; padding-left: 1.2rem; }
+    .error-alert li { margin: 0.15rem 0; }
+
+    .back-link {
+        display: inline-flex; align-items: center; gap: 0.4rem;
+        color: var(--maroon-700); font-size: 0.75rem; font-weight: 600;
+        transition: all 0.18s ease;
+    }
+    .back-link:hover { color: var(--maroon-900); transform: translateX(-2px); }
+
+    @media (max-width: 639px) {
+        .panel-header { padding: 0.75rem 1rem; }
+        .input-field, .select-field, .textarea-field { padding: 0.6rem 0.75rem; font-size: 0.85rem; }
+        .primary-btn, .secondary-btn { width: 100%; justify-content: center; padding: 0.75rem; }
+        .flex-end-mobile { flex-direction: column; gap: 0.75rem !important; }
+        .hero-card, .summary-card { padding: 1rem !important; }
+        .hero-icon { width: 2.25rem; height: 2.25rem; }
+        .summary-icon { width: 2.25rem; height: 2.25rem; }
+    }
+</style>
+
+<div class="min-h-screen users-shell">
+    <div class="users-glow one"></div>
+    <div class="users-glow two"></div>
+
+    <div class="relative max-w-7xl mx-auto px-4 sm:px-6 py-5 md:py-8">
+        <!-- Header -->
+        <div class="mb-5 sm:mb-6">
+            <div class="grid grid-cols-1 xl:grid-cols-[1fr_auto] gap-4 items-stretch">
+                <div class="hero-card">
+                    <div class="relative p-4 sm:p-5 flex items-start gap-3">
+                        <div class="hero-icon">
+                            <i class="fas fa-user-plus text-base sm:text-lg"></i>
+                        </div>
+                        <div class="min-w-0">
+                            <a href="{{ route('admin.users') }}" class="back-link mb-2">
+                                <i class="fas fa-arrow-left text-[9px]"></i> Back to Users
+                            </a>
+                            <div class="hero-badge">
+                                <span class="hero-badge-dot"></span>
+                                User Creation
+                            </div>
+                            <h1 class="text-lg sm:text-xl lg:text-2xl font-semibold tracking-tight text-[#2c2420] mt-2">Create New User</h1>
+                            <p class="text-[#6b5e57] text-xs sm:text-sm mt-1.5 max-w-2xl">
+                                Add a new user to the system with personal, account, and role-based information.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="summary-card">
+                    <div class="relative h-full flex flex-col sm:flex-row items-center justify-between gap-3 p-4">
+                        <div class="flex items-center gap-3 text-center sm:text-left">
+                            <div class="summary-icon flex-shrink-0">
+                                <i class="fas fa-id-badge text-sm"></i>
+                            </div>
+                            <div class="min-w-0">
+                                <p class="summary-label">Access Setup</p>
+                                <p class="summary-value">Student, Counselor, or Admin</p>
+                                <p class="summary-subtext hidden sm:block">Role-specific sections appear after selection.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
 
-        <!-- Success/Error Messages -->
         @if(session('success'))
-            <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-6">
+            <div class="glass-card success-alert mb-5">
                 {{ session('success') }}
             </div>
         @endif
 
         @if($errors->any())
-            <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-6">
+            <div class="glass-card error-alert mb-5">
                 <ul class="list-disc list-inside">
                     @foreach($errors->all() as $error)
                         <li>{{ $error }}</li>
@@ -33,268 +207,274 @@
             </div>
         @endif
 
-        <!-- Create User Form -->
-        <div class="bg-white rounded-lg shadow-md p-6">
-            <form method="POST" action="{{ route('admin.users.store') }}">
-                @csrf
+        <form method="POST" action="{{ route('admin.users.store') }}" class="space-y-5 sm:space-y-6">
+            @csrf
 
-                <!-- Personal Information Section -->
-                <div class="mb-8">
-                    <h3 class="text-xl font-semibold mb-4 text-gray-800 border-b pb-2">Personal Information</h3>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <!-- First Name -->
-                        <div>
-                            <label for="first_name" class="block text-sm font-medium text-gray-700 mb-2">First Name *</label>
-                            <input type="text" id="first_name" name="first_name" value="{{ old('first_name') }}"
-                                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#F00000] focus:border-[#F00000]"
-                                   required>
-                        </div>
-
-                        <!-- Middle Name -->
-                        <div>
-                            <label for="middle_name" class="block text-sm font-medium text-gray-700 mb-2">Middle Name</label>
-                            <input type="text" id="middle_name" name="middle_name" value="{{ old('middle_name') }}"
-                                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#F00000] focus:border-[#F00000]">
-                        </div>
-
-                        <!-- Last Name -->
-                        <div>
-                            <label for="last_name" class="block text-sm font-medium text-gray-700 mb-2">Last Name *</label>
-                            <input type="text" id="last_name" name="last_name" value="{{ old('last_name') }}"
-                                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#F00000] focus:border-[#F00000]"
-                                   required>
-                        </div>
-
-                        <!-- Birthdate -->
-                        <div>
-                            <label for="birthdate" class="block text-sm font-medium text-gray-700 mb-2">Birthdate</label>
-                            <input type="date" id="birthdate" name="birthdate" value="{{ old('birthdate') }}"
-                                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#F00000] focus:border-[#F00000]">
-                        </div>
-
-                        <!-- Age (auto-calculated) -->
-                        <div>
-                            <label for="age" class="block text-sm font-medium text-gray-700 mb-2">Age</label>
-                            <input type="number" id="age" name="age" value="{{ old('age') }}" readonly
-                                   class="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-100 focus:outline-none focus:ring-2 focus:ring-[#F00000] focus:border-[#F00000]">
-                        </div>
-
-                        <!-- Sex -->
-                        <div>
-                            <label for="sex" class="block text-sm font-medium text-gray-700 mb-2">Sex</label>
-                            <select id="sex" name="sex" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#F00000] focus:border-[#F00000]">
-                                <option value="">Select Sex</option>
-                                <option value="male" {{ old('sex') == 'male' ? 'selected' : '' }}>Male</option>
-                                <option value="female" {{ old('sex') == 'female' ? 'selected' : '' }}>Female</option>
-                                <option value="other" {{ old('sex') == 'other' ? 'selected' : '' }}>Other</option>
-                            </select>
-                        </div>
-
-                        <!-- Birthplace -->
-                        <div>
-                            <label for="birthplace" class="block text-sm font-medium text-gray-700 mb-2">Birthplace</label>
-                            <input type="text" id="birthplace" name="birthplace" value="{{ old('birthplace') }}"
-                                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#F00000] focus:border-[#F00000]">
-                        </div>
-
-                        <!-- Religion -->
-                        <div>
-                            <label for="religion" class="block text-sm font-medium text-gray-700 mb-2">Religion</label>
-                            <input type="text" id="religion" name="religion" value="{{ old('religion') }}"
-                                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#F00000] focus:border-[#F00000]">
-                        </div>
-
-
-                        <!-- Civil Status -->
-                        <div>
-                            <label for="civil_status" class="block text-sm font-medium text-gray-700 mb-2">Civil Status</label>
-                            <select id="civil_status" name="civil_status" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#F00000] focus:border-[#F00000]">
-                                <option value="">Select Civil Status</option>
-                                <option value="single" {{ old('civil_status') == 'single' ? 'selected' : '' }}>Single</option>
-                                <option value="married" {{ old('civil_status') == 'married' ? 'selected' : '' }}>Married</option>
-                                <option value="divorced" {{ old('civil_status') == 'divorced' ? 'selected' : '' }}>Divorced</option>
-                                <option value="widowed" {{ old('civil_status') == 'widowed' ? 'selected' : '' }}>Widowed</option>
-                            </select>
-                        </div>
-
-                        <!-- Citizenship -->
-                        <div>
-                            <label for="citizenship" class="block text-sm font-medium text-gray-700 mb-2">Citizenship</label>
-                            <input type="text" id="citizenship" name="citizenship" value="{{ old('citizenship') }}"
-                                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#F00000] focus:border-[#F00000]">
-                        </div>
-
-                        <!-- Phone Number -->
-                        <div>
-                            <label for="phone_number" class="block text-sm font-medium text-gray-700 mb-2">Phone Number</label>
-                            <input type="text" id="phone_number" name="phone_number" value="{{ old('phone_number') }}"
-                                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#F00000] focus:border-[#F00000]">
-                        </div>
-
-                        <!-- Email -->
-                        <div>
-                            <label for="email" class="block text-sm font-medium text-gray-700 mb-2">Email *</label>
-                            <input type="email" id="email" name="email" value="{{ old('email') }}"
-                                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#F00000] focus:border-[#F00000]"
-                                   required>
-                        </div>
-
-                        <!-- Address -->
-                        <div class="md:col-span-2">
-                            <label for="address" class="block text-sm font-medium text-gray-700 mb-2">Address</label>
-                            <textarea id="address" name="address" rows="3"
-                                      class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#F00000] focus:border-[#F00000]">{{ old('address') }}</textarea>
-                        </div>
+            <!-- Personal Information -->
+            <div class="panel-card">
+                <div class="panel-topline"></div>
+                <div class="panel-header">
+                    <div class="panel-icon"><i class="fas fa-user text-[9px] sm:text-xs"></i></div>
+                    <div>
+                        <h3 class="panel-title">Personal Information</h3>
+                        <p class="panel-subtitle hidden sm:block">Basic identity, contact details, and demographic information.</p>
                     </div>
                 </div>
 
-                <!-- Account Information Section -->
-                <div class="mb-8">
-                    <h3 class="text-xl font-semibold mb-4 text-gray-800 border-b pb-2">Account Information</h3>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <!-- Password -->
-                        <div>
-                            <label for="password" class="block text-sm font-medium text-gray-700 mb-2">Password *</label>
-                            <input type="password" id="password" name="password"
-                                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#F00000] focus:border-[#F00000]"
-                                   required>
-                        </div>
+                <div class="p-4 sm:p-5 grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-5">
+                    <div>
+                        <label for="first_name" class="field-label">First Name *</label>
+                        <input type="text" id="first_name" name="first_name" value="{{ old('first_name') }}"
+                               class="input-field" required>
+                    </div>
 
-                        <!-- Confirm Password -->
-                        <div>
-                            <label for="password_confirmation" class="block text-sm font-medium text-gray-700 mb-2">Confirm Password *</label>
-                            <input type="password" id="password_confirmation" name="password_confirmation"
-                                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#F00000] focus:border-[#F00000]"
-                                   required>
-                        </div>
+                    <div>
+                        <label for="middle_name" class="field-label">Middle Name</label>
+                        <input type="text" id="middle_name" name="middle_name" value="{{ old('middle_name') }}"
+                               class="input-field">
+                    </div>
 
-                        <!-- Role -->
-                        <div class="md:col-span-2">
-                            <label for="role" class="block text-sm font-medium text-gray-700 mb-2">Role *</label>
-                            <select id="role" name="role" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#F00000] focus:border-[#F00000]" required>
-                                <option value="">Select Role</option>
-                                <option value="student" {{ old('role') == 'student' ? 'selected' : '' }}>Student</option>
-                                <option value="counselor" {{ old('role') == 'counselor' ? 'selected' : '' }}>Counselor</option>
-                                <option value="admin" {{ old('role') == 'admin' ? 'selected' : '' }}>Admin</option>
-                            </select>
-                        </div>
+                    <div>
+                        <label for="last_name" class="field-label">Last Name *</label>
+                        <input type="text" id="last_name" name="last_name" value="{{ old('last_name') }}"
+                               class="input-field" required>
+                    </div>
+
+                    <div>
+                        <label for="birthdate" class="field-label">Birthdate</label>
+                        <input type="date" id="birthdate" name="birthdate" value="{{ old('birthdate') }}"
+                               class="input-field">
+                    </div>
+
+                    <div>
+                        <label for="age" class="field-label">Age</label>
+                        <input type="number" id="age" name="age" value="{{ old('age') }}" readonly
+                               class="input-field bg-[#f5f0eb]">
+                    </div>
+
+                    <div>
+                        <label for="sex" class="field-label">Sex</label>
+                        <select id="sex" name="sex" class="select-field">
+                            <option value="">Select Sex</option>
+                            <option value="male" {{ old('sex') == 'male' ? 'selected' : '' }}>Male</option>
+                            <option value="female" {{ old('sex') == 'female' ? 'selected' : '' }}>Female</option>
+                            <option value="other" {{ old('sex') == 'other' ? 'selected' : '' }}>Other</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label for="birthplace" class="field-label">Birthplace</label>
+                        <input type="text" id="birthplace" name="birthplace" value="{{ old('birthplace') }}"
+                               class="input-field">
+                    </div>
+
+                    <div>
+                        <label for="religion" class="field-label">Religion</label>
+                        <input type="text" id="religion" name="religion" value="{{ old('religion') }}"
+                               class="input-field">
+                    </div>
+
+                    <div>
+                        <label for="civil_status" class="field-label">Civil Status</label>
+                        <select id="civil_status" name="civil_status" class="select-field">
+                            <option value="">Select Civil Status</option>
+                            <option value="single" {{ old('civil_status') == 'single' ? 'selected' : '' }}>Single</option>
+                            <option value="married" {{ old('civil_status') == 'married' ? 'selected' : '' }}>Married</option>
+                            <option value="divorced" {{ old('civil_status') == 'divorced' ? 'selected' : '' }}>Divorced</option>
+                            <option value="widowed" {{ old('civil_status') == 'widowed' ? 'selected' : '' }}>Widowed</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label for="citizenship" class="field-label">Citizenship</label>
+                        <input type="text" id="citizenship" name="citizenship" value="{{ old('citizenship') }}"
+                               class="input-field">
+                    </div>
+
+                    <div>
+                        <label for="phone_number" class="field-label">Phone Number</label>
+                        <input type="text" id="phone_number" name="phone_number" value="{{ old('phone_number') }}"
+                               class="input-field">
+                    </div>
+
+                    <div>
+                        <label for="email" class="field-label">Email *</label>
+                        <input type="email" id="email" name="email" value="{{ old('email') }}"
+                               class="input-field" required>
+                    </div>
+
+                    <div class="md:col-span-2">
+                        <label for="address" class="field-label">Address</label>
+                        <textarea id="address" name="address" rows="3"
+                                  class="textarea-field">{{ old('address') }}</textarea>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Account Information -->
+            <div class="panel-card">
+                <div class="panel-topline"></div>
+                <div class="panel-header">
+                    <div class="panel-icon"><i class="fas fa-lock text-[9px] sm:text-xs"></i></div>
+                    <div>
+                        <h3 class="panel-title">Account Information</h3>
+                        <p class="panel-subtitle hidden sm:block">Credentials and role assignment for platform access.</p>
                     </div>
                 </div>
 
-                <!-- Student-specific fields -->
-                <div id="student-fields" class="mb-8 hidden">
-                    <h3 class="text-xl font-semibold mb-4 text-gray-800 border-b pb-2">Student Information</h3>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <!-- Student ID -->
-                        <div>
-                            <label for="student_id" class="block text-sm font-medium text-gray-700 mb-2">Student ID *</label>
-                            <input type="text" id="student_id" name="student_id" value="{{ old('student_id') }}"
-                                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#F00000] focus:border-[#F00000]">
-                        </div>
+                <div class="p-4 sm:p-5 grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-5">
+                    <div>
+                        <label for="password" class="field-label">Password *</label>
+                        <input type="password" id="password" name="password"
+                               class="input-field" required>
+                    </div>
 
-                        <!-- Year Level -->
-                        <div>
-                            <label for="year_level" class="block text-sm font-medium text-gray-700 mb-2">Year Level *</label>
-                            <select id="year_level" name="year_level" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#F00000] focus:border-[#F00000]">
-                                <option value="">Select Year Level</option>
-                                <option value="1st Year" {{ old('year_level') == '1st Year' ? 'selected' : '' }}>1st Year</option>
-                                <option value="2nd Year" {{ old('year_level') == '2nd Year' ? 'selected' : '' }}>2nd Year</option>
-                                <option value="3rd Year" {{ old('year_level') == '3rd Year' ? 'selected' : '' }}>3rd Year</option>
-                                <option value="4th Year" {{ old('year_level') == '4th Year' ? 'selected' : '' }}>4th Year</option>
-                                <option value="5th Year" {{ old('year_level') == '5th Year' ? 'selected' : '' }}>5th Year</option>
-                                <option value="Graduate" {{ old('year_level') == 'Graduate' ? 'selected' : '' }}>Graduate</option>
-                            </select>
-                        </div>
+                    <div>
+                        <label for="password_confirmation" class="field-label">Confirm Password *</label>
+                        <input type="password" id="password_confirmation" name="password_confirmation"
+                               class="input-field" required>
+                    </div>
 
-                        <!-- Course -->
-                        <div class="md:col-span-2">
-                            <label for="course" class="block text-sm font-medium text-gray-700 mb-2">Course *</label>
-                            <input type="text" id="course" name="course" value="{{ old('course') }}"
-                                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#F00000] focus:border-[#F00000]">
-                        </div>
+                    <div class="md:col-span-2">
+                        <label for="role" class="field-label">Role *</label>
+                        <select id="role" name="role" class="select-field" required>
+                            <option value="">Select Role</option>
+                            <option value="student" {{ old('role') == 'student' ? 'selected' : '' }}>Student</option>
+                            <option value="counselor" {{ old('role') == 'counselor' ? 'selected' : '' }}>Counselor</option>
+                            <option value="admin" {{ old('role') == 'admin' ? 'selected' : '' }}>Admin</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
 
-                        <!-- College -->
-                        <div class="md:col-span-2">
-                            <label for="college_id" class="block text-sm font-medium text-gray-700 mb-2">College *</label>
-                            <select id="college_id" name="college_id" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#F00000] focus:border-[#F00000]">
-                                <option value="">Select College</option>
-                                @foreach($colleges as $college)
-                                    <option value="{{ $college->id }}" {{ old('college_id') == $college->id ? 'selected' : '' }}>
-                                        {{ $college->name }}
-                                    </option>
-                                @endforeach
-                            </select>
-                        </div>
+            <!-- Student-specific fields -->
+            <div id="student-fields" class="panel-card hidden">
+                <div class="panel-topline"></div>
+                <div class="panel-header">
+                    <div class="panel-icon"><i class="fas fa-user-graduate text-[9px] sm:text-xs"></i></div>
+                    <div>
+                        <h3 class="panel-title">Student Information</h3>
+                        <p class="panel-subtitle hidden sm:block">Student-specific academic and college information.</p>
                     </div>
                 </div>
 
-                <!-- Counselor-specific fields -->
-                <div id="counselor-fields" class="mb-8 hidden">
-                    <h3 class="text-xl font-semibold mb-4 text-gray-800 border-b pb-2">Counselor Information</h3>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <!-- Position -->
-                        <div>
-                            <label for="position" class="block text-sm font-medium text-gray-700 mb-2">Position *</label>
-                            <input type="text" id="position" name="position" value="{{ old('position') }}"
-                                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#F00000] focus:border-[#F00000]">
-                        </div>
+                <div class="p-4 sm:p-5 grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-5">
+                    <div>
+                        <label for="student_id" class="field-label">Student ID *</label>
+                        <input type="text" id="student_id" name="student_id" value="{{ old('student_id') }}"
+                               class="input-field">
+                    </div>
 
-                        <!-- Credentials -->
-                        <div>
-                            <label for="credentials" class="block text-sm font-medium text-gray-700 mb-2">Credentials *</label>
-                            <input type="text" id="credentials" name="credentials" value="{{ old('credentials') }}"
-                                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#F00000] focus:border-[#F00000]">
-                        </div>
+                    <div>
+                        <label for="year_level" class="field-label">Year Level *</label>
+                        <select id="year_level" name="year_level" class="select-field">
+                            <option value="">Select Year Level</option>
+                            <option value="1st Year" {{ old('year_level') == '1st Year' ? 'selected' : '' }}>1st Year</option>
+                            <option value="2nd Year" {{ old('year_level') == '2nd Year' ? 'selected' : '' }}>2nd Year</option>
+                            <option value="3rd Year" {{ old('year_level') == '3rd Year' ? 'selected' : '' }}>3rd Year</option>
+                            <option value="4th Year" {{ old('year_level') == '4th Year' ? 'selected' : '' }}>4th Year</option>
+                            <option value="5th Year" {{ old('year_level') == '5th Year' ? 'selected' : '' }}>5th Year</option>
+                            <option value="Graduate" {{ old('year_level') == 'Graduate' ? 'selected' : '' }}>Graduate</option>
+                        </select>
+                    </div>
 
-                        <!-- College -->
-                        <div class="md:col-span-2">
-                            <label for="counselor_college_id" class="block text-sm font-medium text-gray-700 mb-2">College *</label>
-                            <select id="counselor_college_id" name="counselor_college_id" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#F00000] focus:border-[#F00000]">
-                                <option value="">Select College</option>
-                                @foreach($colleges as $college)
-                                    <option value="{{ $college->id }}" {{ old('counselor_college_id') == $college->id ? 'selected' : '' }}>
-                                        {{ $college->name }}
-                                    </option>
-                                @endforeach
-                            </select>
-                        </div>
+                    <div class="md:col-span-2">
+                        <label for="course" class="field-label">Course *</label>
+                        <input type="text" id="course" name="course" value="{{ old('course') }}"
+                               class="input-field">
+                    </div>
 
-                        <!-- Is Head Counselor -->
-                        <div class="md:col-span-2">
-                            <label class="flex items-center">
-                                <input type="checkbox" name="is_head" value="1" {{ old('is_head') ? 'checked' : '' }}
-                                       class="rounded border-gray-300 text-[#F00000] shadow-sm focus:ring-[#F00000]">
-                                <span class="ml-2 text-sm text-gray-600">Head Counselor</span>
-                            </label>
-                        </div>
+                    <div class="md:col-span-2">
+                        <label for="college_id" class="field-label">College *</label>
+                        <select id="college_id" name="college_id" class="select-field">
+                            <option value="">Select College</option>
+                            @foreach($colleges as $college)
+                                <option value="{{ $college->id }}" {{ old('college_id') == $college->id ? 'selected' : '' }}>
+                                    {{ $college->name }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Counselor-specific fields -->
+            <div id="counselor-fields" class="panel-card hidden">
+                <div class="panel-topline"></div>
+                <div class="panel-header">
+                    <div class="panel-icon"><i class="fas fa-user-tie text-[9px] sm:text-xs"></i></div>
+                    <div>
+                        <h3 class="panel-title">Counselor Information</h3>
+                        <p class="panel-subtitle hidden sm:block">Professional role, credentials, and college assignment.</p>
                     </div>
                 </div>
 
-                <!-- Admin-specific fields -->
-                <div id="admin-fields" class="mb-8 hidden">
-                    <h3 class="text-xl font-semibold mb-4 text-gray-800 border-b pb-2">Admin Information</h3>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <!-- Admin Credentials -->
-                        <div class="md:col-span-2">
-                            <label for="admin_credentials" class="block text-sm font-medium text-gray-700 mb-2">Admin Credentials *</label>
-                            <input type="text" id="admin_credentials" name="admin_credentials" value="{{ old('admin_credentials') }}"
-                                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#F00000] focus:border-[#F00000]"
-                                   placeholder="e.g., System Administrator">
-                        </div>
+                <div class="p-4 sm:p-5 grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-5">
+                    <div>
+                        <label for="position" class="field-label">Position *</label>
+                        <input type="text" id="position" name="position" value="{{ old('position') }}"
+                               class="input-field">
+                    </div>
+
+                    <div>
+                        <label for="credentials" class="field-label">Credentials *</label>
+                        <input type="text" id="credentials" name="credentials" value="{{ old('credentials') }}"
+                               class="input-field">
+                    </div>
+
+                    <div class="md:col-span-2">
+                        <label for="counselor_college_id" class="field-label">College *</label>
+                        <select id="counselor_college_id" name="counselor_college_id" class="select-field">
+                            <option value="">Select College</option>
+                            @foreach($colleges as $college)
+                                <option value="{{ $college->id }}" {{ old('counselor_college_id') == $college->id ? 'selected' : '' }}>
+                                    {{ $college->name }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+
+                    <div class="md:col-span-2">
+                        <label class="checkbox-card">
+                            <input type="checkbox" name="is_head" value="1" {{ old('is_head') ? 'checked' : '' }}
+                                   class="rounded border-[#e5e0db] text-[#7a2a2a] focus:ring-[#7a2a2a]">
+                            <span class="ml-3 text-[0.8rem] text-[#6b5e57] font-medium">Head Counselor</span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Admin-specific fields -->
+            <div id="admin-fields" class="panel-card hidden">
+                <div class="panel-topline"></div>
+                <div class="panel-header">
+                    <div class="panel-icon"><i class="fas fa-user-shield text-[9px] sm:text-xs"></i></div>
+                    <div>
+                        <h3 class="panel-title">Admin Information</h3>
+                        <p class="panel-subtitle hidden sm:block">Administrative credential details for system access.</p>
                     </div>
                 </div>
 
-                <!-- Submit Buttons -->
-                <div class="flex justify-end space-x-4">
-                    <a href="{{ route('admin.users') }}" class="bg-gray-500 text-white px-6 py-2 rounded-md hover:bg-gray-600 transition">
-                        Cancel
-                    </a>
-                    <button type="submit" class="bg-[#F00000] text-white px-6 py-2 rounded-md hover:bg-[#D40000] transition flex items-center">
-                        <i class="fas fa-user-plus mr-2"></i> Create User
-                    </button>
+                <div class="p-4 sm:p-5 grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-5">
+                    <div class="md:col-span-2">
+                        <label for="admin_credentials" class="field-label">Admin Credentials *</label>
+                        <input type="text" id="admin_credentials" name="admin_credentials" value="{{ old('admin_credentials') }}"
+                               class="input-field"
+                               placeholder="e.g., System Administrator">
+                    </div>
                 </div>
-            </form>
-        </div>
+            </div>
+
+            <div class="flex justify-end space-x-3 sm:space-x-4 flex-end-mobile">
+                <a href="{{ route('admin.users') }}" class="secondary-btn px-5 py-2.5 text-xs sm:text-sm">
+                    Cancel
+                </a>
+                <button type="submit" class="primary-btn px-5 py-2.5 text-xs sm:text-sm">
+                    <i class="fas fa-user-plus mr-1.5 text-[9px] sm:text-xs"></i>
+                    <span>Create User</span>
+                </button>
+            </div>
+        </form>
     </div>
 
     <script>
