@@ -3,137 +3,312 @@
 @section('title', 'Counselor Dashboard - OGC')
 
 @section('content')
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
-    <style>
-        .fade-in {
-            animation: fadeIn 0.5s ease-in;
-        }
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        .notes-preview {
-            display: -webkit-box;
-            -webkit-line-clamp: 2;
-            -webkit-box-orient: vertical;
-            overflow: hidden;
-        }
-        .session-badge {
-            font-size: 0.7rem;
-            padding: 2px 6px;
-        }
-        .modal-content {
-            max-height: 80vh;
-            overflow-y: auto;
-        }
-    </style>
-</head>
-<body class="bg-gray-50">
+<style>
+    :root {
+        --maroon-900: #3a0c0c;
+        --maroon-800: #5c1a1a;
+        --maroon-700: #7a2a2a;
+        --gold-500: #c9a227;
+        --gold-400: #d4af37;
+        --bg-warm: #faf8f5;
+        --border-soft: #e5e0db;
+        --text-primary: #2c2420;
+        --text-secondary: #6b5e57;
+        --text-muted: #8b7e76;
+    }
 
-    <div class="container mx-auto px-6 py-8">
+    /* Base Layout & Glow */
+    .notes-shell {
+        position: relative;
+        background: var(--bg-warm);
+        min-height: 100vh;
+        padding-bottom: 3rem;
+    }
+    .notes-glow {
+        position: absolute; border-radius: 50%; filter: blur(80px); pointer-events: none; opacity: 0.2; z-index: 0;
+    }
+    .notes-glow.one { top: -50px; left: -50px; width: 250px; height: 250px; background: var(--gold-400); }
+    .notes-glow.two { bottom: 10%; right: -50px; width: 220px; height: 220px; background: var(--maroon-800); }
+
+    /* Animations */
+    .fade-in { animation: fadeIn 0.5s ease-in; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+    /* Glass Cards */
+    .panel-card {
+        position: relative; z-index: 1; overflow: hidden; border-radius: 0.75rem;
+        border: 1px solid var(--border-soft); background: rgba(255,255,255,0.95);
+        backdrop-filter: blur(8px); box-shadow: 0 2px 8px rgba(44,36,32,0.04);
+        transition: box-shadow 0.2s ease;
+    }
+    .panel-card::before {
+        content: ""; position: absolute; inset: 0; pointer-events: none;
+        background: radial-gradient(circle at top right, rgba(212,175,55,0.06), transparent 30%);
+    }
+
+    /* Header Specifics */
+    .page-header h1 { color: var(--text-primary); font-weight: 700; letter-spacing: -0.02em; }
+    .page-header p { color: var(--text-secondary); }
+
+    /* Stats Cards */
+    .stat-card {
+        display: flex; align-items: center; gap: 1rem; padding: 1rem;
+        border-radius: 0.75rem; border: 1px solid var(--border-soft);
+        background: rgba(255,255,255,0.8);
+    }
+    .stat-icon-box {
+        width: 3rem; height: 3rem; border-radius: 0.6rem;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 1.25rem; flex-shrink: 0;
+    }
+    .stat-icon-gray { background: rgba(229, 231, 235, 0.6); color: var(--maroon-700); }
+    .stat-icon-gold { background: rgba(255, 249, 230, 0.6); color: var(--maroon-800); }
+    .stat-icon-orange { background: rgba(255, 237, 213, 0.6); color: #c2410c; }
+    .stat-icon-red { background: rgba(254, 242, 242, 0.6); color: var(--maroon-800); }
+    
+    .stat-label { font-size: 0.75rem; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.05em; }
+    .stat-value { font-size: 1.5rem; font-weight: 800; color: var(--text-primary); line-height: 1.2; }
+
+    /* Form Elements */
+    .input-field, .select-field {
+        width: 100%; border: 1px solid var(--border-soft); border-radius: 0.6rem;
+        background: rgba(255,255,255,0.9); color: var(--text-primary); outline: none;
+        transition: all 0.2s ease; font-size: 0.85rem; padding: 0.6rem 0.75rem;
+        box-shadow: inset 0 1px 2px rgba(44,36,32,0.02);
+    }
+    .input-field:focus, .select-field:focus {
+        border-color: var(--maroon-700); box-shadow: 0 0 0 3px rgba(92,26,26,0.08);
+    }
+    .field-label {
+        display: block; font-size: 0.65rem; font-weight: 600; color: var(--text-secondary);
+        margin-bottom: 0.35rem; text-transform: uppercase; letter-spacing: 0.08em;
+    }
+
+    /* Buttons */
+    .btn-action {
+        display: inline-flex; align-items: center; justify-content: center;
+        padding: 0.6rem 1rem; border-radius: 0.6rem; font-weight: 600; font-size: 0.8rem;
+        transition: all 0.2s ease; white-space: nowrap; gap: 0.5rem; text-decoration: none;
+    }
+    .btn-export {
+        background: linear-gradient(135deg, #059669 0%, #047857 100%); color: white;
+        box-shadow: 0 4px 10px rgba(5, 150, 105, 0.15); border: none; cursor: pointer;
+    }
+    .btn-export:hover { transform: translateY(-1px); box-shadow: 0 6px 14px rgba(5, 150, 105, 0.2); }
+    
+    .btn-filter {
+        background: linear-gradient(135deg, var(--maroon-800) 0%, var(--maroon-700) 100%);
+        color: #fef9e7; border: none;
+    }
+    .btn-filter:hover { transform: translateY(-1px); box-shadow: 0 6px 14px rgba(92,26,26,0.2); }
+
+    .btn-reset {
+        background: white; color: var(--text-secondary); border: 1px solid var(--border-soft);
+    }
+    .btn-reset:hover { background: var(--bg-warm); color: var(--text-primary); border-color: var(--maroon-700); }
+
+    /* Table Styling */
+    .table-container { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+    .custom-table { width: 100%; border-collapse: separate; border-spacing: 0; min-width: 900px; }
+    .custom-table thead th {
+        background: rgba(250,248,245,0.8); color: var(--text-muted);
+        font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em;
+        padding: 0.75rem 1rem; border-bottom: 1px solid var(--border-soft);
+        text-align: left;
+    }
+    .custom-table tbody td {
+        padding: 0.85rem 1rem; border-bottom: 1px solid rgba(229, 224, 219, 0.5);
+        color: var(--text-secondary); font-size: 0.8rem; vertical-align: middle;
+    }
+    .custom-table tbody tr:last-child td { border-bottom: none; }
+    .custom-table tbody tr:hover { background: rgba(254,249,231,0.3); }
+
+    /* Avatar & Info */
+    .avatar-circle {
+        width: 2.5rem; height: 2.5rem; border-radius: 50%;
+        background: rgba(250,248,245,0.8); border: 1px solid var(--border-soft);
+        display: flex; align-items: center; justify-content: center;
+        color: var(--maroon-700); font-weight: 700; font-size: 0.75rem; flex-shrink: 0;
+    }
+    .student-name { font-weight: 600; color: var(--text-primary); font-size: 0.85rem; }
+    .student-id { font-size: 0.7rem; color: var(--text-muted); font-family: monospace; }
+    .student-meta { font-size: 0.65rem; color: var(--text-muted); margin-top: 0.1rem; }
+
+    /* Badges */
+    .session-badge {
+        display: inline-block; padding: 0.25rem 0.6rem; border-radius: 999px;
+        font-size: 0.65rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em;
+    }
+    .badge-gold { background: rgba(255, 249, 230, 0.8); color: var(--maroon-800); border: 1px solid rgba(212, 175, 55, 0.3); }
+    
+    /* Dynamic Badge Colors (Used in JS too) */
+    .badge-initial { background: rgba(229, 231, 235, 0.6); color: var(--maroon-800); border: 1px solid var(--border-soft); }
+    .badge-follow_up { background: rgba(209, 250, 229, 0.8); color: #047857; border: 1px solid rgba(16, 185, 129, 0.3); }
+    .badge-crisis { background: rgba(254, 226, 226, 0.8); color: #b91c1c; border: 1px solid rgba(185, 28, 28, 0.3); }
+    .badge-regular { background: rgba(255, 249, 230, 0.8); color: var(--maroon-800); border: 1px solid rgba(212, 175, 55, 0.3); }
+
+    .badge-very_good { background: rgba(209, 250, 229, 0.8); color: #047857; border: 1px solid rgba(16, 185, 129, 0.3); }
+    .badge-good { background: rgba(229, 231, 235, 0.6); color: var(--maroon-800); border: 1px solid var(--border-soft); }
+    .badge-neutral { background: rgba(254, 243, 199, 0.8); color: #92400e; border: 1px solid rgba(245, 158, 11, 0.3); }
+    .badge-low { background: rgba(255, 237, 213, 0.8); color: #c2410c; border: 1px solid rgba(249, 115, 22, 0.3); }
+    .badge-very_low { background: rgba(254, 226, 226, 0.8); color: #b91c1c; border: 1px solid rgba(185, 28, 28, 0.3); }
+
+    /* Notes Preview */
+    .notes-preview {
+        display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
+        overflow: hidden; color: var(--text-secondary); font-size: 0.8rem; line-height: 1.4;
+    }
+
+    /* Action Icons */
+    .action-btn {
+        display: inline-flex; align-items: center; justify-content: center;
+        width: 2rem; height: 2rem; border-radius: 0.5rem;
+        transition: all 0.2s ease; background: transparent; border: none; cursor: pointer;
+    }
+    .action-view { color: var(--maroon-700); } .action-view:hover { background: rgba(122, 42, 42, 0.1); color: var(--maroon-900); }
+    .action-edit { color: #059669; } .action-edit:hover { background: rgba(5, 150, 105, 0.1); color: #047857; }
+    .action-list { color: var(--maroon-800); } .action-list:hover { background: rgba(92, 26, 26, 0.1); color: var(--maroon-900); }
+    .action-add { color: var(--maroon-700); } .action-add:hover { background: rgba(122, 42, 42, 0.1); color: var(--maroon-900); }
+
+    /* Alerts */
+    .alert-toast {
+        padding: 0.75rem 1rem; border-radius: 0.6rem;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1); display: flex; align-items: center; gap: 0.75rem;
+        font-weight: 500; font-size: 0.85rem; margin-bottom: 1rem;
+    }
+    .alert-success { background: white; border-left: 4px solid #059669; color: #047857; }
+    .alert-error { background: white; border-left: 4px solid #b91c1c; color: #b91c1c; }
+
+    /* Modal */
+    .modal-overlay {
+        position: fixed; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(4px);
+        display: flex; align-items: center; justify-content: center; z-index: 50;
+    }
+    .modal-content {
+        background: white; border-radius: 0.75rem; width: 90%; max-width: 800px;
+        max-height: 90vh; overflow-y: auto; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+    }
+    .modal-header {
+        padding: 1.25rem; border-bottom: 1px solid var(--border-soft);
+        display: flex; justify-content: space-between; align-items: center;
+    }
+    .modal-body { padding: 1.5rem; }
+    .modal-close { color: var(--text-muted); cursor: pointer; transition: color 0.2s; }
+    .modal-close:hover { color: var(--maroon-700); }
+
+    /* Mobile Adjustments */
+    @media (max-width: 639px) {
+        .header-actions { flex-direction: column; width: 100%; }
+        .header-actions .btn-action { width: 100%; }
+        .stat-card { padding: 0.75rem; }
+        .stat-icon-box { width: 2.5rem; height: 2.5rem; font-size: 1rem; }
+        .stat-value { font-size: 1.25rem; }
+        .filter-grid { grid-template-columns: 1fr !important; }
+        .filter-actions { flex-direction: column; width: 100%; }
+        .filter-actions .btn-action { width: 100%; }
+        .custom-table { font-size: 0.75rem; }
+        .custom-table thead th, .custom-table tbody td { padding: 0.6rem 0.5rem; }
+        .avatar-circle { width: 2rem; height: 2rem; font-size: 0.65rem; }
+    }
+</style>
+
+<div class="min-h-screen notes-shell">
+    <div class="notes-glow one"></div>
+    <div class="notes-glow two"></div>
+
+    <div class="relative max-w-7xl mx-auto px-4 sm:px-6 py-6 md:py-8">
+        
         <!-- Header -->
-        <div class="flex justify-between items-center mb-6">
-            <div>
-                <h1 class="text-2xl font-bold text-gray-800">Session Notes Dashboard</h1>
-                <p class="text-gray-600 mt-1">View and manage all student session notes</p>
+        <div class="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4 mb-6">
+            <div class="page-header">
+                <h1 class="text-xl sm:text-2xl font-bold">Session Notes Dashboard</h1>
+                <p class="text-sm mt-1">View and manage all student session notes.</p>
             </div>
-            <div class="flex space-x-4">
+            <div class="header-actions flex flex-col sm:flex-row gap-3 w-full lg:w-auto">
                 <a href="{{ route('counselor.dashboard') }}"
-                   class="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition">
-                    <i class="fas fa-arrow-left mr-2"></i>Dashboard
+                   class="btn-action btn-reset">
+                    <i class="fas fa-arrow-left"></i> Dashboard
                 </a>
                 <button onclick="exportToExcel()"
-                        class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition">
-                    <i class="fas fa-file-export mr-2"></i>Export to Excel
+                        class="btn-action btn-export">
+                    <i class="fas fa-file-export"></i> Export to Excel
                 </button>
             </div>
         </div>
 
         <!-- Quick Stats -->
-        <div class="grid grid-cols-1 md:grid-cols-5 gap-6 mb-6">
-            <div class="bg-white rounded-xl shadow-sm p-6">
-                <div class="flex items-center">
-                    <div class="p-3 bg-gray-100 rounded-lg">
-                        <i class="fas fa-clipboard-list text-[#F00000] text-xl"></i>
-                    </div>
-                    <div class="ml-4">
-                        <p class="text-sm text-gray-600">Total Notes</p>
-                        <p class="text-2xl font-bold text-gray-800">{{ $totalNotes }}</p>
-                    </div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 mb-6">
+            <div class="stat-card">
+                <div class="stat-icon-box stat-icon-gray">
+                    <i class="fas fa-clipboard-list"></i>
+                </div>
+                <div>
+                    <p class="stat-label">Total Notes</p>
+                    <p class="stat-value">{{ $totalNotes }}</p>
                 </div>
             </div>
-            <div class="bg-white rounded-xl shadow-sm p-6">
-                <div class="flex items-center">
-                    <div class="p-3 bg-[#FFF9E6] rounded-lg">
-                        <i class="fas fa-users text-[#820000] text-xl"></i>
-                    </div>
-                    <div class="ml-4">
-                        <p class="text-sm text-gray-600">Students</p>
-                        <p class="text-2xl font-bold text-gray-800">{{ $totalStudents }}</p>
-                    </div>
+            <div class="stat-card">
+                <div class="stat-icon-box stat-icon-gold">
+                    <i class="fas fa-users"></i>
+                </div>
+                <div>
+                    <p class="stat-label">Students</p>
+                    <p class="stat-value">{{ $totalStudents }}</p>
                 </div>
             </div>
-            <div class="bg-white rounded-xl shadow-sm p-6">
-                <div class="flex items-center">
-                    <div class="p-3 bg-[#FFF9E6] rounded-lg">
-                        <i class="fas fa-calendar-check text-[#F8650C] text-xl"></i>
-                    </div>
-                    <div class="ml-4">
-                        <p class="text-sm text-gray-600">This Month</p>
-                        <p class="text-2xl font-bold text-gray-800">{{ $notesThisMonth }}</p>
-                    </div>
+            <div class="stat-card">
+                <div class="stat-icon-box stat-icon-gold" style="color: var(--gold-500);">
+                    <i class="fas fa-calendar-check"></i>
+                </div>
+                <div>
+                    <p class="stat-label">This Month</p>
+                    <p class="stat-value">{{ $notesThisMonth }}</p>
                 </div>
             </div>
-            <div class="bg-white rounded-xl shadow-sm p-6">
-                <div class="flex items-center">
-                    <div class="p-3 bg-orange-100 rounded-lg">
-                        <i class="fas fa-star text-orange-600 text-xl"></i>
-                    </div>
-                    <div class="ml-4">
-                        <p class="text-sm text-gray-600">Avg. Sessions</p>
-                        <p class="text-2xl font-bold text-gray-800">{{ number_format($averageSessionsPerStudent, 1) }}</p>
-                    </div>
+            <div class="stat-card">
+                <div class="stat-icon-box stat-icon-orange">
+                    <i class="fas fa-star"></i>
+                </div>
+                <div>
+                    <p class="stat-label">Avg. Sessions</p>
+                    <p class="stat-value">{{ number_format($averageSessionsPerStudent, 1) }}</p>
                 </div>
             </div>
-            <div class="bg-white rounded-xl shadow-sm p-6">
-                <div class="flex items-center">
-                    <div class="p-3 bg-[#FFF0F0] rounded-lg">
-                        <i class="fas fa-exclamation-triangle text-[#820000] text-xl"></i>
-                    </div>
-                    <div class="ml-4">
-                        <p class="text-sm text-gray-600">Crisis Sessions</p>
-                        <p class="text-2xl font-bold text-gray-800">{{ $crisisSessions }}</p>
-                    </div>
+            <div class="stat-card">
+                <div class="stat-icon-box stat-icon-red">
+                    <i class="fas fa-exclamation-triangle"></i>
+                </div>
+                <div>
+                    <p class="stat-label">Crisis Sessions</p>
+                    <p class="stat-value">{{ $crisisSessions }}</p>
                 </div>
             </div>
         </div>
 
         <!-- Search and Filters -->
-        <div class="bg-white rounded-xl shadow-md p-6 mb-6">
+        <div class="panel-card mb-6 p-4 sm:p-5">
             <form method="GET" action="{{ route('counselor.session-notes.dashboard') }}">
-                <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <div class="filter-grid grid grid-cols-1 md:grid-cols-4 gap-4">
                     <!-- Search -->
                     <div class="md:col-span-2">
-                        <label for="search" class="block text-sm font-medium text-gray-700 mb-2">Search</label>
+                        <label for="search" class="field-label">Search</label>
                         <div class="relative">
-                            <input type="text"
-                                   id="search"
-                                   name="search"
+                            <input type="text" id="search" name="search"
                                    placeholder="Search by student name, notes, or college..."
                                    value="{{ request('search') }}"
-                                   class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#F00000] focus:border-[#F00000] transition">
-                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center">
-                                <i class="fas fa-search text-gray-400"></i>
+                                   class="input-field pl-10">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <i class="fas fa-search text-[var(--text-muted)]"></i>
                             </div>
                         </div>
                     </div>
 
                     <!-- Session Type Filter -->
                     <div>
-                        <label for="session_type" class="block text-sm font-medium text-gray-700 mb-2">Session Type</label>
-                        <select id="session_type" name="session_type"
-                                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#F00000] focus:border-[#F00000] transition">
+                        <label for="session_type" class="field-label">Session Type</label>
+                        <select id="session_type" name="session_type" class="select-field">
                             <option value="">All Types</option>
                             @foreach($sessionTypes as $value => $label)
                                 <option value="{{ $value }}" {{ request('session_type') == $value ? 'selected' : '' }}>
@@ -145,9 +320,8 @@
 
                     <!-- Date Filter -->
                     <div>
-                        <label for="date_range" class="block text-sm font-medium text-gray-700 mb-2">Date Range</label>
-                        <select id="date_range" name="date_range"
-                                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#F00000] focus:border-[#F00000] transition">
+                        <label for="date_range" class="field-label">Date Range</label>
+                        <select id="date_range" name="date_range" class="select-field">
                             <option value="">All Time</option>
                             <option value="today" {{ request('date_range') == 'today' ? 'selected' : '' }}>Today</option>
                             <option value="week" {{ request('date_range') == 'week' ? 'selected' : '' }}>This Week</option>
@@ -158,18 +332,18 @@
                 </div>
 
                 <!-- Action Buttons -->
-                <div class="flex justify-between items-center mt-4">
-                    <div class="text-sm text-gray-600">
-                        Showing {{ $sessionNotes->firstItem() ?? 0 }}-{{ $sessionNotes->lastItem() ?? 0 }} of {{ $sessionNotes->total() }} session notes
+                <div class="filter-actions flex flex-col sm:flex-row justify-between items-center mt-4 gap-3">
+                    <div class="text-xs sm:text-sm text-[var(--text-secondary)]">
+                        Showing {{ $sessionNotes->firstItem() ?? 0 }}-{{ $sessionNotes->lastItem() ?? 0 }} of {{ $sessionNotes->total() }} notes
                     </div>
-                    <div class="flex space-x-2">
+                    <div class="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
                         <a href="{{ route('counselor.session-notes.dashboard') }}"
-                           class="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition">
-                            <i class="fas fa-refresh mr-2"></i>Reset
+                           class="btn-action btn-reset w-full sm:w-auto">
+                            <i class="fas fa-refresh"></i> Reset
                         </a>
                         <button type="submit"
-                                class="px-4 py-2 bg-[#F00000] text-white rounded-lg hover:bg-[#D40000] transition">
-                            <i class="fas fa-filter mr-2"></i>Apply Filters
+                                class="btn-action btn-filter w-full sm:w-auto">
+                            <i class="fas fa-filter"></i> Apply Filters
                         </button>
                     </div>
                 </div>
@@ -177,154 +351,138 @@
         </div>
 
         @if(session('success'))
-            <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-6 fade-in">
-                <i class="fas fa-check-circle mr-2"></i>{{ session('success') }}
+            <div class="alert-toast alert-success fade-in">
+                <i class="fas fa-check-circle"></i>{{ session('success') }}
             </div>
         @endif
 
         @if(session('error'))
-            <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-6 fade-in">
-                <i class="fas fa-exclamation-circle mr-2"></i>{{ session('error') }}
+            <div class="alert-toast alert-error fade-in">
+                <i class="fas fa-exclamation-circle"></i>{{ session('error') }}
             </div>
         @endif
 
         <!-- Session Notes Table -->
-        <div class="bg-white rounded-xl shadow-md overflow-hidden">
+        <div class="panel-card overflow-hidden">
             @if($sessionNotes->isEmpty())
                 <div class="text-center py-12">
-                    <i class="fas fa-clipboard-list text-4xl text-gray-300 mb-4"></i>
-                    <p class="text-gray-500 text-lg">No session notes found.</p>
-                    <p class="text-gray-400 text-sm mt-1">Session notes will appear here after you create them.</p>
+                    <i class="fas fa-clipboard-list text-6xl text-[var(--border-soft)] mb-4"></i>
+                    <p class="text-[var(--text-secondary)] text-lg font-medium">No session notes found.</p>
+                    <p class="text-[var(--text-muted)] text-sm mt-1">Session notes will appear here after you create them.</p>
                     <a href="{{ route('counselor.appointments') }}"
-                       class="inline-block mt-4 bg-[#F00000] text-white px-4 py-2 rounded-lg hover:bg-[#D40000] transition">
-                        <i class="fas fa-calendar-plus mr-2"></i>Go to Appointments
+                       class="btn-action btn-filter mt-4">
+                        <i class="fas fa-calendar-plus"></i> Go to Appointments
                     </a>
                 </div>
             @else
-                <div class="overflow-x-auto">
-                    <table class="w-full" id="sessionNotesTable">
-                        <thead class="bg-gray-50">
+                <div class="table-container">
+                    <table class="custom-table" id="sessionNotesTable">
+                        <thead>
                             <tr>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Student</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">College & Course</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Session Info</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Session Notes</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Last Session</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                                <th class="w-[20%]">Student</th>
+                                <th class="w-[15%]">College & Course</th>
+                                <th class="w-[20%]">Session Info</th>
+                                <th class="w-[25%]">Session Notes</th>
+                                <th class="w-[10%]">Last Session</th>
+                                <th class="w-[10%] text-right">Actions</th>
                             </tr>
                         </thead>
-                        <tbody class="bg-white divide-y divide-gray-200">
+                        <tbody class="divide-y divide-[var(--border-soft)]/50">
                             @foreach($sessionNotes as $note)
-                                <tr class="hover:bg-gray-50 transition fade-in">
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                        <div class="flex items-center">
-                                            <div class="flex-shrink-0 h-10 w-10 bg-gray-100 rounded-full flex items-center justify-center">
-                                                <i class="fas fa-user text-[#F00000]"></i>
+                                <tr class="hover:bg-[rgba(254,249,231,0.3)] transition fade-in">
+                                    <td>
+                                        <div class="flex items-center gap-3">
+                                            <div class="avatar-circle">
+                                                <i class="fas fa-user"></i>
                                             </div>
-                                            <div class="ml-4">
-                                                <div class="text-sm font-medium text-gray-900">
+                                            <div class="min-w-0">
+                                                <div class="student-name truncate">
                                                     {{ $note->student->user->first_name }} {{ $note->student->user->last_name }}
                                                 </div>
-                                                <div class="text-sm text-gray-500">
-                                                    {{ $note->student->student_id }}
-                                                </div>
-                                                <div class="text-xs text-gray-400">
-                                                    Year {{ $note->student->year_level }}
-                                                </div>
+                                                <div class="student-id">{{ $note->student->student_id }}</div>
+                                                <div class="student-meta">Year {{ $note->student->year_level }}</div>
                                             </div>
                                         </div>
                                     </td>
-                                    <td class="px-6 py-4">
-                                        <div class="text-sm text-gray-900">
+                                    <td>
+                                        <div class="font-medium text-[var(--text-primary)] text-xs">
                                             {{ $note->student->college->name ?? 'N/A' }}
                                         </div>
-                                        <div class="text-sm text-gray-500">
+                                        <div class="text-[var(--text-muted)] text-xs mt-0.5">
                                             {{ $note->student->program ?? 'Not specified' }}
                                         </div>
                                     </td>
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                        <div class="flex flex-col space-y-2">
+                                    <td>
+                                        <div class="flex flex-col gap-2">
                                             <!-- Session Number -->
-                                            <div class="flex items-center">
-                                                <span class="session-badge px-2 py-1 rounded-full bg-[#FFF9E6] text-[#820000] font-semibold">
-                                                    {{ $note->session_number }}{{ $note->session_number == 1 ? 'st' : ($note->session_number == 2 ? 'nd' : ($note->session_number == 3 ? 'rd' : 'th')) }} Session
-                                                </span>
-                                            </div>
+                                            <span class="session-badge badge-gold">
+                                                {{ $note->session_number }}{{ $note->session_number == 1 ? 'st' : ($note->session_number == 2 ? 'nd' : ($note->session_number == 3 ? 'rd' : 'th')) }} Session
+                                            </span>
 
                                             <!-- Session Type -->
-                                            <div class="flex items-center">
-                                                <span class="px-2 py-1 text-xs font-semibold rounded-full {{ getSessionTypeColor($note->session_type) }}">
-                                                    {{ $note->session_type_label }}
-                                                </span>
-                                            </div>
+                                            <span class="session-badge {{ getSessionTypeColor($note->session_type) }}">
+                                                {{ $note->session_type_label }}
+                                            </span>
 
                                             <!-- Mood Level -->
                                             @if($note->mood_level)
-                                                <div class="flex items-center">
-                                                    <span class="px-2 py-1 text-xs rounded-full {{ getMoodLevelColor($note->mood_level) }}">
-                                                        <i class="fas fa-smile mr-1"></i>{{ $note->mood_level_label }}
-                                                    </span>
-                                                </div>
+                                                <span class="session-badge {{ getMoodLevelColor($note->mood_level) }}">
+                                                    <i class="fas fa-smile mr-1"></i>{{ $note->mood_level_label }}
+                                                </span>
                                             @endif
 
-                                            <!-- Total Sessions for Student -->
-                                            <div class="text-xs text-gray-500">
+                                            <!-- Total Sessions -->
+                                            <div class="text-[10px] text-[var(--text-muted)]">
                                                 <i class="fas fa-chart-line mr-1"></i>
-                                                Total: {{ $note->student_total_sessions }} sessions
+                                                Total: {{ $note->student_total_sessions }}
                                             </div>
                                         </div>
                                     </td>
-                                    <td class="px-6 py-4">
-                                        <div class="notes-preview text-sm text-gray-600 mb-2">
+                                    <td>
+                                        <div class="notes-preview">
                                             {{ Str::limit($note->notes, 100) }}
                                         </div>
                                         @if($note->follow_up_actions)
-                                            <div class="mt-1 text-xs text-[#F00000]">
+                                            <div class="mt-1 text-[10px] text-[var(--maroon-700)] font-medium">
                                                 <i class="fas fa-tasks mr-1"></i>Has follow-up actions
                                             </div>
                                         @endif
                                         @if($note->requires_follow_up)
-                                            <div class="mt-1 text-xs text-orange-600">
+                                            <div class="mt-1 text-[10px] text-orange-600 font-medium">
                                                 <i class="fas fa-calendar-check mr-1"></i>Follow-up scheduled
                                             </div>
                                         @endif
                                     </td>
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                        <div class="text-sm text-gray-900">
+                                    <td>
+                                        <div class="text-xs font-medium text-[var(--text-primary)]">
                                             {{ $note->session_date->format('M j, Y') }}
                                         </div>
-                                        <div class="text-sm text-gray-500">
+                                        <div class="text-[10px] text-[var(--text-muted)]">
                                             {{ $note->session_date->diffForHumans() }}
                                         </div>
                                         @if($note->appointment)
-                                            <div class="text-xs text-gray-400">
+                                            <div class="text-[10px] text-[var(--text-muted)]">
                                                 {{ \Carbon\Carbon::parse($note->appointment->start_time)->format('g:i A') }}
                                             </div>
                                         @endif
                                     </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                        <div class="flex space-x-2">
-                                            <!-- View Details Button - Now opens modal -->
+                                    <td class="text-right">
+                                        <div class="flex items-center justify-end gap-1">
                                             <button onclick="showSessionNoteDetails({{ $note->id }})"
-                                               class="text-[#F00000] hover:text-[#820000] transition"
-                                               title="View Details">
-                                                <i class="fas fa-eye"></i>
+                                               class="action-btn action-view" title="View Details">
+                                                <i class="fas fa-eye text-xs"></i>
                                             </button>
-
                                             <a href="{{ route('counselor.session-notes.edit', $note) }}"
-                                               class="text-green-600 hover:text-green-900 transition"
-                                               title="Edit Note">
-                                                <i class="fas fa-edit"></i>
+                                               class="action-btn action-edit" title="Edit Note">
+                                                <i class="fas fa-edit text-xs"></i>
                                             </a>
                                             <a href="{{ route('counselor.session-notes.index', $note->student) }}"
-                                               class="text-[#820000] hover:text-[#820000] transition"
-                                               title="All Student Notes">
-                                                <i class="fas fa-clipboard-list"></i>
+                                               class="action-btn action-list" title="All Student Notes">
+                                                <i class="fas fa-clipboard-list text-xs"></i>
                                             </a>
                                             <a href="{{ route('counselor.session-notes.create', $note->student) }}"
-                                               class="text-[#F00000] hover:text-[#820000] transition"
-                                               title="Add New Note">
-                                                <i class="fas fa-plus"></i>
+                                               class="action-btn action-add" title="Add New Note">
+                                                <i class="fas fa-plus text-xs"></i>
                                             </a>
                                         </div>
                                     </td>
@@ -335,330 +493,277 @@
                 </div>
 
                 <!-- Pagination -->
-                <div class="bg-white px-4 py-3 border-t border-gray-200 sm:px-6">
+                <div class="p-4 border-t border-[var(--border-soft)] bg-[rgba(250,248,245,0.4)]">
                     {{ $sessionNotes->appends(request()->query())->links() }}
                 </div>
             @endif
         </div>
     </div>
+</div>
 
-    <!-- Session Note Details Modal -->
-    <div id="sessionNoteModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50">
-        <div class="bg-white rounded-xl shadow-2xl max-w-4xl w-full mx-4 max-h-[90vh] overflow-y-auto">
-            <div class="p-6 border-b border-gray-200">
-                <div class="flex justify-between items-center">
-                    <h3 class="text-xl font-bold text-gray-800">Session Note Details</h3>
-                    <button onclick="closeSessionNoteModal()" class="text-gray-500 hover:text-gray-700 transition">
-                        <i class="fas fa-times text-xl"></i>
-                    </button>
-                </div>
-            </div>
-            <div id="sessionNoteDetails" class="p-6">
-                <!-- Content will be loaded via AJAX -->
-            </div>
+<!-- Session Note Details Modal -->
+<div id="sessionNoteModal" class="modal-overlay hidden">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3 class="text-lg font-bold text-[var(--text-primary)]">Session Note Details</h3>
+            <button onclick="closeSessionNoteModal()" class="modal-close">
+                <i class="fas fa-times text-xl"></i>
+            </button>
+        </div>
+        <div id="sessionNoteDetails" class="modal-body">
+            <!-- Content will be loaded via AJAX -->
         </div>
     </div>
+</div>
 
-    <script>
-        // Export to Excel functionality
-        function exportToExcel() {
+<script>
+    // Export to Excel functionality
+    function exportToExcel() {
+        const exportBtn = event.target.closest('button');
+        const originalText = exportBtn.innerHTML;
+        exportBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Exporting...';
+        exportBtn.disabled = true;
+
+        try {
             const table = document.getElementById('sessionNotesTable');
             const ws = XLSX.utils.table_to_sheet(table);
             const wb = XLSX.utils.book_new();
             XLSX.utils.book_append_sheet(wb, ws, "Session Notes");
 
-            // Get current date for filename
             const today = new Date().toISOString().split('T')[0];
             XLSX.writeFile(wb, `session_notes_${today}.xlsx`);
+        } catch (error) {
+            console.error('Error exporting to Excel:', error);
+            alert('Error exporting session notes. Please try again.');
+        } finally {
+            exportBtn.innerHTML = originalText;
+            exportBtn.disabled = false;
         }
+    }
 
-        // Enhanced Export to Excel functionality
-        function exportToExcel() {
-            // Show loading indicator
-            const exportBtn = event.target;
-            const originalText = exportBtn.innerHTML;
-            exportBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Exporting...';
-            exportBtn.disabled = true;
+    // Session Note Modal Functions
+    function showSessionNoteDetails(noteId) {
+        document.getElementById('sessionNoteDetails').innerHTML = `
+            <div class="text-center py-8">
+                <i class="fas fa-spinner fa-spin text-2xl text-[var(--maroon-700)] mb-4"></i>
+                <p class="text-[var(--text-secondary)]">Loading session note details...</p>
+            </div>
+        `;
+        document.getElementById('sessionNoteModal').classList.remove('hidden');
 
-            try {
-                const table = document.getElementById('sessionNotesTable');
-
-                // Create a copy of the table for export
-                const exportTable = table.cloneNode(true);
-
-                // Remove action buttons and other non-essential columns if needed
-                const headers = exportTable.getElementsByTagName('thead')[0].rows[0].cells;
-
-                // Create worksheet from table
-                const ws = XLSX.utils.table_to_sheet(exportTable);
-
-                // Auto-size columns
-                const colWidths = [];
-                const range = XLSX.utils.decode_range(ws['!ref']);
-                for (let C = range.s.c; C <= range.e.c; ++C) {
-                    let max_width = 0;
-                    for (let R = range.s.r; R <= range.e.r; ++R) {
-                        const cell = ws[XLSX.utils.encode_cell({c: C, r: R})];
-                        if (cell && cell.v) {
-                            const cellWidth = cell.v.toString().length;
-                            if (cellWidth > max_width) max_width = cellWidth;
-                        }
-                    }
-                    colWidths.push({wch: Math.min(max_width + 2, 50)}); // Max width 50 characters
-                }
-                ws['!cols'] = colWidths;
-
-                // Create workbook and append worksheet
-                const wb = XLSX.utils.book_new();
-                XLSX.utils.book_append_sheet(wb, ws, "Session Notes");
-
-                // Get current date for filename
-                const today = new Date().toISOString().split('T')[0];
-                const fileName = `session_notes_${today}.xlsx`;
-
-                // Export to Excel
-                XLSX.writeFile(wb, fileName);
-
-            } catch (error) {
-                console.error('Error exporting to Excel:', error);
-                alert('Error exporting session notes. Please try again.');
-            } finally {
-                // Restore button state
-                exportBtn.innerHTML = originalText;
-                exportBtn.disabled = false;
-            }
-        }
-
-        // Session Note Modal Functions
-        function showSessionNoteDetails(noteId) {
-            // Show loading state
-            document.getElementById('sessionNoteDetails').innerHTML = `
-                <div class="text-center py-8">
-                    <i class="fas fa-spinner fa-spin text-2xl text-[#F00000] mb-4"></i>
-                    <p class="text-gray-600">Loading session note details...</p>
-                </div>
-            `;
-
-            // Show modal
-            document.getElementById('sessionNoteModal').classList.remove('hidden');
-
-            // Fetch session note details via AJAX
-            fetch(`/counselor/session-notes/${noteId}/details`)
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error('Network response was not ok');
-                    }
-                    return response.json();
-                })
-                .then(data => {
-                    const modalContent = document.getElementById('sessionNoteDetails');
-
-                    modalContent.innerHTML = `
-                        <div class="space-y-6">
-                            <!-- Student Information -->
-                            <div class="bg-gray-50 rounded-lg p-4">
-                                <h4 class="text-lg font-semibold text-gray-800 mb-3">Student Information</h4>
-                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                    <div>
-                                        <label class="block text-sm font-medium text-gray-700">Name</label>
-                                        <p class="mt-1 text-sm text-gray-900">${data.student.user.first_name} ${data.student.user.last_name}</p>
-                                    </div>
-                                    <div>
-                                        <label class="block text-sm font-medium text-gray-700">Student ID</label>
-                                        <p class="mt-1 text-sm text-gray-900">${data.student.student_id}</p>
-                                    </div>
-                                    <div>
-                                        <label class="block text-sm font-medium text-gray-700">College</label>
-                                        <p class="mt-1 text-sm text-gray-900">${data.student.college?.name || 'N/A'}</p>
-                                    </div>
-                                    <div>
-                                        <label class="block text-sm font-medium text-gray-700">Year Level</label>
-                                        <p class="mt-1 text-sm text-gray-900">${data.student.year_level}</p>
-                                    </div>
+        fetch(`/counselor/session-notes/${noteId}/details`)
+            .then(response => {
+                if (!response.ok) throw new Error('Network response was not ok');
+                return response.json();
+            })
+            .then(data => {
+                const modalContent = document.getElementById('sessionNoteDetails');
+                modalContent.innerHTML = `
+                    <div class="space-y-6">
+                        <!-- Student Information -->
+                        <div class="bg-[rgba(250,248,245,0.6)] rounded-lg p-4 border border-[var(--border-soft)]">
+                            <h4 class="text-base font-bold text-[var(--maroon-800)] mb-3">Student Information</h4>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-xs font-semibold text-[var(--text-secondary)] uppercase">Name</label>
+                                    <p class="mt-1 text-sm font-medium text-[var(--text-primary)]">${data.student.user.first_name} ${data.student.user.last_name}</p>
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-semibold text-[var(--text-secondary)] uppercase">Student ID</label>
+                                    <p class="mt-1 text-sm font-medium text-[var(--text-primary)]">${data.student.student_id}</p>
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-semibold text-[var(--text-secondary)] uppercase">College</label>
+                                    <p class="mt-1 text-sm font-medium text-[var(--text-primary)]">${data.student.college?.name || 'N/A'}</p>
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-semibold text-[var(--text-secondary)] uppercase">Year Level</label>
+                                    <p class="mt-1 text-sm font-medium text-[var(--text-primary)]">${data.student.year_level}</p>
                                 </div>
                             </div>
+                        </div>
 
-                            <!-- Session Information -->
-                            <div class="bg-[#FFF9E6] rounded-lg p-4">
-                                <h4 class="text-lg font-semibold text-gray-800 mb-3">Session Information</h4>
-                                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                                    <div>
-                                        <label class="block text-sm font-medium text-gray-700">Session Date</label>
-                                        <p class="mt-1 text-sm text-gray-900">${data.session_date_formatted}</p>
-                                    </div>
-                                    <div>
-                                        <label class="block text-sm font-medium text-gray-700">Session Type</label>
-                                        <span class="mt-1 inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getSessionTypeColorClass(data.session_type)}">
-                                            ${data.session_type_label}
-                                        </span>
-                                    </div>
-                                    ${data.mood_level ? `
-                                    <div>
-                                        <label class="block text-sm font-medium text-gray-700">Mood Level</label>
-                                        <span class="mt-1 inline-flex px-2 py-1 text-xs rounded-full ${getMoodLevelColorClass(data.mood_level)}">
-                                            <i class="fas fa-smile mr-1"></i>${data.mood_level_label}
-                                        </span>
-                                    </div>
-                                    ` : ''}
+                        <!-- Session Information -->
+                        <div class="bg-[rgba(255,249,230,0.4)] rounded-lg p-4 border border-[rgba(212,175,55,0.2)]">
+                            <h4 class="text-base font-bold text-[var(--maroon-800)] mb-3">Session Information</h4>
+                            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                                <div>
+                                    <label class="block text-xs font-semibold text-[var(--text-secondary)] uppercase">Session Date</label>
+                                    <p class="mt-1 text-sm font-medium text-[var(--text-primary)]">${data.session_date_formatted}</p>
                                 </div>
-                                ${data.appointment_time ? `
-                                <div class="mt-3">
-                                    <label class="block text-sm font-medium text-gray-700">Appointment Time</label>
-                                    <p class="mt-1 text-sm text-gray-900">${data.appointment_time}</p>
+                                <div>
+                                    <label class="block text-xs font-semibold text-[var(--text-secondary)] uppercase">Session Type</label>
+                                    <span class="mt-1 inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getSessionTypeColorClass(data.session_type)}">
+                                        ${data.session_type_label}
+                                    </span>
+                                </div>
+                                ${data.mood_level ? `
+                                <div>
+                                    <label class="block text-xs font-semibold text-[var(--text-secondary)] uppercase">Mood Level</label>
+                                    <span class="mt-1 inline-flex px-2 py-1 text-xs rounded-full ${getMoodLevelColorClass(data.mood_level)}">
+                                        <i class="fas fa-smile mr-1"></i>${data.mood_level_label}
+                                    </span>
                                 </div>
                                 ` : ''}
                             </div>
-
-                            <!-- Session Notes -->
-                            <div>
-                                <h4 class="text-lg font-semibold text-gray-800 mb-3">Session Notes</h4>
-                                <div class="bg-white border border-gray-200 rounded-lg p-4">
-                                    <p class="text-gray-700 whitespace-pre-line">${data.notes || 'No notes provided.'}</p>
-                                </div>
-                            </div>
-
-                            <!-- Follow-up Actions -->
-                            ${data.follow_up_actions ? `
-                            <div>
-                                <h4 class="text-lg font-semibold text-gray-800 mb-3">Follow-up Actions</h4>
-                                <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-                                    <p class="text-gray-700 whitespace-pre-line">${data.follow_up_actions}</p>
-                                </div>
+                            ${data.appointment_time ? `
+                            <div class="mt-3">
+                                <label class="block text-xs font-semibold text-[var(--text-secondary)] uppercase">Appointment Time</label>
+                                <p class="mt-1 text-sm font-medium text-[var(--text-primary)]">${data.appointment_time}</p>
                             </div>
                             ` : ''}
+                        </div>
 
-                            <!-- Follow-up Information -->
-                            ${data.requires_follow_up ? `
-                            <div class="bg-green-50 rounded-lg p-4">
-                                <h4 class="text-lg font-semibold text-gray-800 mb-3">Follow-up Information</h4>
-                                <div class="flex items-center">
-                                    <i class="fas fa-calendar-check text-green-600 mr-3"></i>
-                                    <div>
-                                        <p class="text-sm font-medium text-green-800">Follow-up Session Scheduled</p>
-                                        ${data.next_session_date ? `
-                                        <p class="text-sm text-green-700">Next session: ${data.next_session_date}</p>
-                                        ` : ''}
-                                    </div>
-                                </div>
-                            </div>
-                            ` : ''}
-
-                            <!-- Session Statistics -->
-                            <div class="bg-[#FFF9E6] rounded-lg p-4">
-                                <h4 class="text-lg font-semibold text-gray-800 mb-3">Session Statistics</h4>
-                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                    <div>
-                                        <label class="block text-sm font-medium text-gray-700">Session Number</label>
-                                        <p class="mt-1 text-sm text-gray-900">${data.session_number}${getOrdinalSuffix(data.session_number)} Session</p>
-                                    </div>
-                                    <div>
-                                        <label class="block text-sm font-medium text-gray-700">Total Sessions with Student</label>
-                                        <p class="mt-1 text-sm text-gray-900">${data.total_sessions} sessions</p>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Action Buttons -->
-                            <div class="flex justify-end space-x-3 pt-4 border-t border-gray-200">
-                                <a href="/counselor/session-notes/${data.id}/edit"
-                                   class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition">
-                                    <i class="fas fa-edit mr-2"></i>Edit Note
-                                </a>
-                                <a href="/counselor/students/${data.student.id}/session-notes"
-                                   class="px-4 py-2 bg-[#820000] text-white rounded-lg hover:bg-[#820000] transition">
-                                    <i class="fas fa-clipboard-list mr-2"></i>All Student Notes
-                                </a>
+                        <!-- Session Notes -->
+                        <div>
+                            <h4 class="text-base font-bold text-[var(--maroon-800)] mb-3">Session Notes</h4>
+                            <div class="bg-white border border-[var(--border-soft)] rounded-lg p-4 shadow-sm">
+                                <p class="text-sm text-[var(--text-secondary)] whitespace-pre-line leading-relaxed">${data.notes || 'No notes provided.'}</p>
                             </div>
                         </div>
-                    `;
-                })
-                .catch(error => {
-                    console.error('Error fetching session note details:', error);
-                    document.getElementById('sessionNoteDetails').innerHTML = `
-                        <div class="text-center py-8">
-                            <i class="fas fa-exclamation-triangle text-4xl text-red-300 mb-4"></i>
-                            <p class="text-red-500">Error loading session note details. Please try again.</p>
-                            <button onclick="closeSessionNoteModal()"
-                                    class="mt-4 px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition">
+
+                        <!-- Follow-up Actions -->
+                        ${data.follow_up_actions ? `
+                        <div>
+                            <h4 class="text-base font-bold text-[var(--maroon-800)] mb-3">Follow-up Actions</h4>
+                            <div class="bg-[rgba(254,243,199,0.3)] border border-[rgba(245,158,11,0.2)] rounded-lg p-4">
+                                <p class="text-sm text-[var(--text-secondary)] whitespace-pre-line">${data.follow_up_actions}</p>
+                            </div>
+                        </div>
+                        ` : ''}
+
+                        <!-- Follow-up Information -->
+                        ${data.requires_follow_up ? `
+                        <div class="bg-[rgba(209,250,229,0.3)] rounded-lg p-4 border border-[rgba(16,185,129,0.2)]">
+                            <h4 class="text-base font-bold text-[#047857] mb-3">Follow-up Information</h4>
+                            <div class="flex items-center">
+                                <i class="fas fa-calendar-check text-[#059669] mr-3 text-lg"></i>
+                                <div>
+                                    <p class="text-sm font-medium text-[#047857]">Follow-up Session Scheduled</p>
+                                    ${data.next_session_date ? `
+                                    <p class="text-sm text-[#047857]">Next session: ${data.next_session_date}</p>
+                                    ` : ''}
+                                </div>
+                            </div>
+                        </div>
+                        ` : ''}
+
+                        <!-- Session Statistics -->
+                        <div class="bg-[rgba(255,249,230,0.4)] rounded-lg p-4 border border-[rgba(212,175,55,0.2)]">
+                            <h4 class="text-base font-bold text-[var(--maroon-800)] mb-3">Session Statistics</h4>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-xs font-semibold text-[var(--text-secondary)] uppercase">Session Number</label>
+                                    <p class="mt-1 text-sm font-medium text-[var(--text-primary)]">${data.session_number}${getOrdinalSuffix(data.session_number)} Session</p>
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-semibold text-[var(--text-secondary)] uppercase">Total Sessions with Student</label>
+                                    <p class="mt-1 text-sm font-medium text-[var(--text-primary)]">${data.total_sessions} sessions</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Action Buttons -->
+                        <div class="flex flex-col sm:flex-row justify-end gap-3 pt-4 border-t border-[var(--border-soft)]">
+                            <a href="/counselor/session-notes/${data.id}/edit"
+                               class="btn-action btn-filter w-full sm:w-auto">
+                                <i class="fas fa-edit"></i> Edit Note
+                            </a>
+                            <a href="/counselor/students/${data.student.id}/session-notes"
+                               class="btn-action btn-reset w-full sm:w-auto">
+                                <i class="fas fa-clipboard-list"></i> All Student Notes
+                            </a>
+                        </div>
+                    </div>
+                `;
+            })
+            .catch(error => {
+                console.error('Error fetching session note details:', error);
+                document.getElementById('sessionNoteDetails').innerHTML = `
+                    <div class="text-center py-8">
+                        <i class="fas fa-exclamation-triangle text-4xl text-red-300 mb-4"></i>
+                        <p class="text-red-500 font-medium">Error loading session note details. Please try again.</p>
+                        <button onclick="closeSessionNoteModal()"
+                                class="mt-4 btn-action btn-reset">
                                 Close
-                            </button>
-                        </div>
-                    `;
-                });
+                        </button>
+                    </div>
+                `;
+            });
+    }
+
+    function closeSessionNoteModal() {
+        document.getElementById('sessionNoteModal').classList.add('hidden');
+    }
+
+    // Helper functions for modal (Matching CSS classes)
+    function getSessionTypeColorClass(sessionType) {
+        const colors = {
+            'initial': 'badge-initial',
+            'follow_up': 'badge-follow_up',
+            'crisis': 'badge-crisis',
+            'regular': 'badge-regular'
+        };
+        return colors[sessionType] || 'badge-initial';
+    }
+
+    function getMoodLevelColorClass(moodLevel) {
+        const colors = {
+            'very_good': 'badge-very_good',
+            'good': 'badge-good',
+            'neutral': 'badge-neutral',
+            'low': 'badge-low',
+            'very_low': 'badge-very_low'
+        };
+        return colors[moodLevel] || 'badge-good';
+    }
+
+    function getOrdinalSuffix(number) {
+        if (number % 100 >= 11 && number % 100 <= 13) return 'th';
+        switch (number % 10) {
+            case 1: return 'st';
+            case 2: return 'nd';
+            case 3: return 'rd';
+            default: return 'th';
         }
+    }
 
-        function closeSessionNoteModal() {
-            document.getElementById('sessionNoteModal').classList.add('hidden');
+    // Close modal when clicking outside
+    document.addEventListener('click', function(e) {
+        if (e.target.id === 'sessionNoteModal') {
+            closeSessionNoteModal();
         }
+    });
 
-        // Helper functions for modal
-        function getSessionTypeColorClass(sessionType) {
-            const colors = {
-                'initial': 'bg-gray-100 text-[#820000]',
-                'follow_up': 'bg-green-100 text-green-800',
-                'crisis': 'bg-red-100 text-red-800',
-                'regular': 'bg-[#FFF9E6] text-[#820000]'
-            };
-            return colors[sessionType] || 'bg-gray-100 text-gray-800';
+    // Close modal with Escape key
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            closeSessionNoteModal();
         }
-
-        function getMoodLevelColorClass(moodLevel) {
-            const colors = {
-                'very_good': 'bg-green-100 text-green-800',
-                'good': 'bg-gray-100 text-[#820000]',
-                'neutral': 'bg-yellow-100 text-yellow-800',
-                'low': 'bg-orange-100 text-orange-800',
-                'very_low': 'bg-red-100 text-red-800'
-            };
-            return colors[moodLevel] || 'bg-gray-100 text-gray-800';
-        }
-
-        function getOrdinalSuffix(number) {
-            if (number % 100 >= 11 && number % 100 <= 13) return 'th';
-            switch (number % 10) {
-                case 1: return 'st';
-                case 2: return 'nd';
-                case 3: return 'rd';
-                default: return 'th';
-            }
-        }
-
-        // Close modal when clicking outside
-        document.addEventListener('click', function(e) {
-            if (e.target.id === 'sessionNoteModal') {
-                closeSessionNoteModal();
-            }
-        });
-
-        // Close modal with Escape key
-        document.addEventListener('keydown', function(e) {
-            if (e.key === 'Escape') {
-                closeSessionNoteModal();
-            }
-        });
-    </script>
+    });
+</script>
 @endsection
 
 <?php
-// Helper functions (add these to your controller or a helper file)
+// Helper functions (Ensure these match the CSS classes defined above)
 function getSessionTypeColor($sessionType) {
     $colors = [
-        'initial' => 'bg-gray-100 text-[#820000]',
-        'follow_up' => 'bg-green-100 text-green-800',
-        'crisis' => 'bg-red-100 text-red-800',
-        'regular' => 'bg-[#FFF9E6] text-[#820000]'
+        'initial' => 'badge-initial',
+        'follow_up' => 'badge-follow_up',
+        'crisis' => 'badge-crisis',
+        'regular' => 'badge-regular'
     ];
-    return $colors[$sessionType] ?? 'bg-gray-100 text-gray-800';
+    return $colors[$sessionType] ?? 'badge-initial';
 }
 
 function getMoodLevelColor($moodLevel) {
     $colors = [
-        'very_good' => 'bg-green-100 text-green-800',
-        'good' => 'bg-gray-100 text-[#820000]',
-        'neutral' => 'bg-yellow-100 text-yellow-800',
-        'low' => 'bg-orange-100 text-orange-800',
-        'very_low' => 'bg-red-100 text-red-800'
+        'very_good' => 'badge-very_good',
+        'good' => 'badge-good',
+        'neutral' => 'badge-neutral',
+        'low' => 'badge-low',
+        'very_low' => 'badge-very_low'
     ];
-    return $colors[$moodLevel] ?? 'bg-gray-100 text-gray-800';
+    return $colors[$moodLevel] ?? 'badge-good';
 }
 ?>
