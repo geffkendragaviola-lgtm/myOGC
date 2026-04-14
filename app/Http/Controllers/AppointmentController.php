@@ -541,29 +541,19 @@ public function getFollowupAvailableSlots(Request $request)
         ->get(['start_time', 'end_time', 'status']);
 
     $calendarIds = $this->getCounselorCalendarIds($counselorIds);
-    if (empty($calendarIds)) {
-        return response()->json([
-            'available_slots' => [],
-            'booked_slots' => [],
-            'message' => 'Counselor calendar is not configured'
-        ]);
-    }
 
     $calendarBusyIntervals = [];
-    try {
-        $calendarBusyIntervals = $this->getCalendarBusyIntervalsForDate($calendarIds, $date);
-    } catch (\Throwable $exception) {
-        Log::error('Failed to load Google Calendar availability', [
-            'counselor_id' => $counselor->id,
-            'calendar_ids' => $calendarIds,
-            'error' => $exception->getMessage(),
-        ]);
-
-        return response()->json([
-            'available_slots' => [],
-            'booked_slots' => [],
-            'message' => 'Unable to load counselor calendar availability'
-        ]);
+    if (!empty($calendarIds)) {
+        try {
+            $calendarBusyIntervals = $this->getCalendarBusyIntervalsForDate($calendarIds, $date);
+        } catch (\Throwable $exception) {
+            Log::warning('Google Calendar unavailable  falling back to DB-only availability', [
+                'counselor_id' => $counselor->id,
+                'calendar_ids' => $calendarIds,
+                'error' => $exception->getMessage(),
+            ]);
+            // Continue with empty calendar intervals  DB availability still works
+        }
     }
 
     // Generate all possible time slots
@@ -669,29 +659,19 @@ public function getAvailableSlots(Request $request)
         ->get(['start_time', 'end_time', 'status']);
 
     $calendarIds = $this->getCounselorCalendarIds($counselorIds);
-    if (empty($calendarIds)) {
-        return response()->json([
-            'available_slots' => [],
-            'booked_slots' => [],
-            'message' => 'Counselor calendar is not configured'
-        ]);
-    }
 
     $calendarBusyIntervals = [];
-    try {
-        $calendarBusyIntervals = $this->getCalendarBusyIntervalsForDate($calendarIds, $date);
-    } catch (\Throwable $exception) {
-        Log::error('Failed to load Google Calendar availability', [
-            'counselor_id' => $counselor->id,
-            'calendar_ids' => $calendarIds,
-            'error' => $exception->getMessage(),
-        ]);
-
-        return response()->json([
-            'available_slots' => [],
-            'booked_slots' => [],
-            'message' => 'Unable to load counselor calendar availability'
-        ]);
+    if (!empty($calendarIds)) {
+        try {
+            $calendarBusyIntervals = $this->getCalendarBusyIntervalsForDate($calendarIds, $date);
+        } catch (\Throwable $exception) {
+            Log::warning('Google Calendar unavailable  falling back to DB-only availability', [
+                'counselor_id' => $counselor->id,
+                'calendar_ids' => $calendarIds,
+                'error' => $exception->getMessage(),
+            ]);
+            // Continue with empty calendar intervals  DB availability still works
+        }
     }
 
     // Generate all possible time slots

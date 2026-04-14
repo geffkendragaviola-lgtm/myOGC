@@ -3,28 +3,229 @@
 @section('title', 'Book Appointment - OGC')
 
 @section('content')
-<div class="container mx-auto px-6 py-8">
-    <div class="max-w-4xl mx-auto">
-        <div class="bg-white rounded-xl shadow-md p-6">
-            <div class="flex items-center justify-between mb-6">
-                <h1 class="text-2xl font-bold text-gray-800">Book New Appointment</h1>
-                <a href="{{ route('counselor.appointments') }}"
-                   class="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition">
-                    Back
-                </a>
+<style>
+    :root {
+        --maroon-900: #3a0c0c;
+        --maroon-800: #5c1a1a;
+        --maroon-700: #7a2a2a;
+        --gold-500: #c9a227;
+        --gold-400: #d4af37;
+        --bg-warm: #faf8f5;
+        --border-soft: #e5e0db;
+        --text-primary: #2c2420;
+        --text-secondary: #6b5e57;
+        --text-muted: #8b7e76;
+    }
+
+    .book-shell {
+        position: relative;
+        overflow: hidden;
+        background: var(--bg-warm);
+        min-height: 100vh;
+        padding-bottom: 2rem;
+    }
+    .book-glow {
+        position: absolute; border-radius: 50%; filter: blur(80px); pointer-events: none; opacity: 0.25;
+    }
+    .book-glow.one { top: -30px; left: -40px; width: 200px; height: 200px; background: var(--gold-400); }
+    .book-glow.two { bottom: -30px; right: -60px; width: 220px; height: 220px; background: var(--maroon-800); }
+
+    .hero-card, .panel-card, .glass-card {
+        position: relative; overflow: hidden; border-radius: 0.75rem;
+        border: 1px solid var(--border-soft); background: rgba(255,255,255,0.95);
+        backdrop-filter: blur(8px); box-shadow: 0 2px 8px rgba(44,36,32,0.04);
+        transition: box-shadow 0.2s ease;
+    }
+    .hero-card:hover, .panel-card:hover, .glass-card:hover { 
+        box-shadow: 0 4px 14px rgba(44,36,32,0.06); 
+    }
+    .hero-card::before, .panel-card::before, .glass-card::before {
+        content: ""; position: absolute; inset: 0; pointer-events: none;
+        background: radial-gradient(circle at top right, rgba(212,175,55,0.06), transparent 30%);
+    }
+
+    .hero-icon {
+        display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+        width: 2.75rem; height: 2.75rem; border-radius: 0.75rem; color: #fef9e7;
+        background: linear-gradient(135deg, var(--maroon-800) 0%, var(--maroon-700) 100%);
+        box-shadow: 0 4px 12px rgba(92,26,26,0.15);
+    }
+    .hero-badge {
+        display: inline-flex; align-items: center; gap: 0.4rem; border-radius: 999px;
+        border: 1px solid rgba(212,175,55,0.3); background: rgba(254,249,231,0.8);
+        padding: 0.2rem 0.55rem; font-size: 9px; font-weight: 700; text-transform: uppercase;
+        letter-spacing: 0.16em; color: var(--maroon-700);
+    }
+    .hero-badge-dot { width: 0.3rem; height: 0.3rem; border-radius: 999px; background: var(--gold-400); }
+
+    .panel-topline { position: absolute; inset-inline: 0; top: 0; height: 3px; background: linear-gradient(90deg, var(--maroon-800) 0%, var(--gold-400) 50%, var(--maroon-800) 100%); }
+    .panel-header { display: flex; align-items: center; gap: 0.7rem; padding: 0.85rem 1.25rem; border-bottom: 1px solid var(--border-soft)/60; }
+    .panel-icon { 
+        width: 2rem; height: 2rem; border-radius: 0.6rem; display: flex; 
+        align-items: center; justify-content: center; 
+        background: rgba(254,249,231,0.7); color: var(--maroon-700); 
+    }
+    .panel-title { font-size: 0.8rem; font-weight: 600; color: var(--text-primary); }
+    .panel-subtitle { font-size: 0.68rem; color: var(--text-muted); margin-top: 0.1rem; }
+
+    .field-label { 
+        display: block; font-size: 0.65rem; font-weight: 600; color: var(--text-secondary); 
+        margin-bottom: 0.35rem; text-transform: uppercase; letter-spacing: 0.08em; 
+    }
+    .input-field, .select-field, .textarea-field {
+        width: 100%; border: 1px solid var(--border-soft); border-radius: 0.6rem;
+        background: rgba(255,255,255,0.9); color: var(--text-primary); outline: none;
+        transition: all 0.2s ease; font-size: 0.8rem; padding: 0.55rem 0.75rem;
+        box-shadow: inset 0 1px 2px rgba(44,36,32,0.02);
+    }
+    .input-field:focus, .select-field:focus, .textarea-field:focus { 
+        border-color: var(--maroon-700); box-shadow: 0 0 0 3px rgba(92,26,26,0.08); 
+    }
+    .textarea-field { min-height: 120px; resize: vertical; line-height: 1.5; }
+
+    .error-text {
+        font-size: 0.7rem; color: #b91c1c; margin-top: 0.25rem;
+        display: flex; align-items: center; gap: 0.25rem;
+    }
+    .error-text::before { content: "•"; font-weight: bold; }
+
+    .helper-text {
+        font-size: 0.7rem; color: var(--text-muted); margin-top: 0.25rem;
+    }
+
+    .calendar-card {
+        border: 1px solid var(--border-soft); border-radius: 0.75rem;
+        background: rgba(255,255,255,0.95); padding: 1rem;
+    }
+    .calendar-nav {
+        display: flex; align-items: center; justify-content: space-between;
+        padding: 0.5rem 0; margin-bottom: 0.5rem;
+    }
+    .calendar-nav-btn {
+        width: 2.25rem; height: 2.25rem; border-radius: 999px;
+        display: flex; align-items: center; justify-content: center;
+        border: 1px solid var(--border-soft); color: var(--text-secondary);
+        transition: all 0.18s ease; font-size: 1rem;
+    }
+    .calendar-nav-btn:hover { background: rgba(254,249,231,0.7); border-color: var(--maroon-700); color: var(--maroon-700); }
+    .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 0.5rem; }
+    .calendar-day-header {
+        text-align: center; font-size: 0.65rem; font-weight: 600;
+        text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted);
+    }
+    .calendar-day {
+        width: 2.5rem; height: 2.5rem; border-radius: 0.5rem;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 0.75rem; font-weight: 500; border: 1px solid transparent;
+        transition: all 0.18s ease;
+    }
+    .calendar-day.available {
+        border-color: rgba(122,42,42,0.3); color: var(--maroon-700);
+        background: rgba(254,249,231,0.5);
+    }
+    .calendar-day.available:hover {
+        background: rgba(212,175,55,0.2); border-color: var(--gold-400);
+    }
+    .calendar-day.selected {
+        background: var(--maroon-700); color: #fef9e7; border-color: var(--maroon-700);
+    }
+    .calendar-day:disabled {
+        color: var(--text-muted); cursor: not-allowed; opacity: 0.5;
+    }
+    .calendar-status {
+        font-size: 0.7rem; color: var(--text-muted); margin-top: 0.5rem;
+        min-height: 1rem;
+    }
+    .calendar-status.success { color: #065f46; }
+    .calendar-status.error { color: #b91c1c; }
+
+    .time-slot {
+        padding: 0.75rem; border-radius: 0.5rem; border: 1px solid var(--border-soft);
+        text-align: center; font-size: 0.75rem; font-weight: 500;
+        transition: all 0.18s ease; cursor: pointer;
+        background: rgba(255,255,255,0.9);
+    }
+    .time-slot:hover { border-color: var(--maroon-700); background: rgba(254,249,231,0.6); }
+    .time-slot.selected {
+        border-color: var(--maroon-700); background: rgba(254,249,231,0.9);
+        color: var(--maroon-700); font-weight: 600;
+    }
+
+    .form-actions {
+        display: flex; flex-direction: column-reverse; gap: 0.75rem;
+        padding-top: 1rem; border-top: 1px solid var(--border-soft)/60;
+    }
+    @media (min-width: 768px) { 
+        .form-actions { flex-direction: row; justify-content: flex-end; } 
+    }
+
+    .primary-btn {
+        border-radius: 0.6rem; font-weight: 600; transition: all 0.2s ease;
+        display: inline-flex; align-items: center; justify-content: center; white-space: nowrap;
+        color: #fef9e7; background: linear-gradient(135deg, var(--maroon-800) 0%, var(--maroon-700) 100%);
+        box-shadow: 0 4px 10px rgba(92,26,26,0.15);
+    }
+    .primary-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 14px rgba(92,26,26,0.2); }
+
+    .secondary-btn {
+        border-radius: 0.6rem; font-weight: 600; transition: all 0.2s ease;
+        display: inline-flex; align-items: center; justify-content: center; white-space: nowrap;
+        color: var(--text-secondary); background: rgba(255,255,255,0.9);
+        border: 1px solid var(--border-soft);
+    }
+    .secondary-btn:hover { background: rgba(254,249,231,0.7); border-color: var(--maroon-700); }
+
+    @media (max-width: 639px) {
+        .panel-header { padding: 0.75rem 1rem; }
+        .input-field, .select-field, .textarea-field { padding: 0.6rem 0.75rem; font-size: 0.85rem; }
+        .primary-btn, .secondary-btn { width: 100%; justify-content: center; }
+        .calendar-day { width: 2rem; height: 2rem; font-size: 0.7rem; }
+        .time-slot { padding: 0.5rem; font-size: 0.7rem; }
+        .calendar-nav-btn { width: 2rem; height: 2rem; font-size: 0.9rem; }
+    }
+</style>
+
+<div class="min-h-screen book-shell">
+    <div class="book-glow one"></div>
+    <div class="book-glow two"></div>
+
+    <div class="relative max-w-4xl mx-auto px-4 sm:px-6 py-5 md:py-8">
+        <!-- Header -->
+        <div class="mb-5 sm:mb-6">
+            <div class="hero-card">
+                <div class="relative p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                    <div class="flex items-start gap-3">
+                        <div class="hero-icon">
+                            <i class="fas fa-calendar-plus text-base sm:text-lg"></i>
+                        </div>
+                        <div class="min-w-0">
+                            <div class="hero-badge">
+                                <span class="hero-badge-dot"></span>
+                                Counselor Portal
+                            </div>
+                            <h1 class="text-lg sm:text-xl lg:text-2xl font-semibold tracking-tight text-[#2c2420] mt-2">Book New Appointment</h1>
+                        </div>
+                    </div>
+                    <a href="{{ route('counselor.appointments') }}"
+                       class="secondary-btn px-4 py-2 text-xs sm:text-sm w-full sm:w-auto">
+                        <i class="fas fa-arrow-left mr-1.5 text-[9px] sm:text-xs"></i>Back
+                    </a>
+                </div>
             </div>
+        </div>
 
-            <form id="appointmentForm" action="{{ route('counselor.appointments.store') }}" method="POST">
+        <!-- Form -->
+        <div class="panel-card">
+            <div class="panel-topline"></div>
+            <form id="appointmentForm" action="{{ route('counselor.appointments.store') }}" method="POST" class="p-4 sm:p-5 md:p-6">
                 @csrf
-
                 <input type="hidden" name="counselor_id" id="counselorIdInput" value="{{ $selectedCounselor->id }}">
 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
                     <div>
                         @if($counselorAssignments->count() > 1)
-                            <label class="block text-gray-700 font-semibold mb-2">College</label>
-                            <select id="collegeSelect"
-                                    class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#F00000] focus:border-[#F00000]" required>
+                            <label class="field-label">College</label>
+                            <select id="collegeSelect" class="select-field text-xs sm:text-sm" required>
                                 @foreach($counselorAssignments as $assignment)
                                     <option value="{{ $assignment->id }}" {{ (int) $selectedCounselor->id === (int) $assignment->id ? 'selected' : '' }}>
                                         {{ $assignment->college->name ?? 'N/A' }}
@@ -33,9 +234,8 @@
                             </select>
                         @endif
 
-                        <label class="block text-gray-700 font-semibold mb-2 mt-{{ $counselorAssignments->count() > 1 ? '6' : '0' }}">Student</label>
-                        <select name="student_id" id="studentSelect"
-                                class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#F00000] focus:border-[#F00000]" required>
+                        <label class="field-label mt-{{ $counselorAssignments->count() > 1 ? '6' : '0' }}">Student</label>
+                        <select name="student_id" id="studentSelect" class="select-field text-xs sm:text-sm" required>
                             <option value="">Choose a student</option>
                             @foreach($students as $student)
                                 <option value="{{ $student->id }}" {{ old('student_id') == $student->id ? 'selected' : '' }}>
@@ -44,80 +244,78 @@
                             @endforeach
                         </select>
                         @error('student_id')
-                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                            <p class="error-text">{{ $message }}</p>
                         @enderror
                     </div>
                 </div>
 
                 <div class="mt-6">
-                    <label class="block text-gray-700 font-semibold mb-2">Type of Booking</label>
-                    <select name="booking_type" id="bookingType"
-                            class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#F00000] focus:border-[#F00000]" required>
+                    <label class="field-label">Type of Booking</label>
+                    <select name="booking_type" id="bookingType" class="select-field text-xs sm:text-sm" required>
                         <option value="">Choose a booking type</option>
                         <option value="Initial Interview" {{ old('booking_type') === 'Initial Interview' ? 'selected' : '' }}>Initial Interview</option>
                         <option value="Counseling" {{ old('booking_type') === 'Counseling' ? 'selected' : '' }}>Counseling</option>
                         <option value="Consultation" {{ old('booking_type') === 'Consultation' ? 'selected' : '' }}>Consultation</option>
                     </select>
-                    <p class="mt-2 text-sm text-gray-500" id="bookingTypeHelp">Select the reason for the appointment.</p>
+                    <p class="helper-text" id="bookingTypeHelp">Select the reason for the appointment.</p>
                     @error('booking_type')
-                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                        <p class="error-text">{{ $message }}</p>
                     @enderror
                 </div>
 
                 <div class="mt-6">
-                    <label class="block text-gray-700 font-semibold mb-2">Select Date</label>
-                    <div id="appointmentCalendar" class="border border-gray-200 rounded-xl bg-white p-4 shadow-sm">
-                        <div class="flex items-center justify-between mb-4">
-                            <button type="button" id="calendarPrev"
-                                    class="h-9 w-9 rounded-full border border-gray-200 text-gray-600 hover:bg-gray-50 transition">‹</button>
-                            <h3 id="calendarMonthLabel" class="text-lg font-semibold text-gray-800"></h3>
-                            <button type="button" id="calendarNext"
-                                    class="h-9 w-9 rounded-full border border-gray-200 text-gray-600 hover:bg-gray-50 transition">›</button>
+                    <label class="field-label">Select Date</label>
+                    <div class="calendar-card">
+                        <div class="calendar-nav">
+                            <button type="button" id="calendarPrev" class="calendar-nav-btn">‹</button>
+                            <h3 id="calendarMonthLabel" class="text-sm font-semibold text-[#2c2420]"></h3>
+                            <button type="button" id="calendarNext" class="calendar-nav-btn">›</button>
                         </div>
-                        <div class="grid grid-cols-7 text-xs font-semibold text-gray-500 mb-2">
-                            <span class="text-center">Sun</span>
-                            <span class="text-center">Mon</span>
-                            <span class="text-center">Tue</span>
-                            <span class="text-center">Wed</span>
-                            <span class="text-center">Thu</span>
-                            <span class="text-center">Fri</span>
-                            <span class="text-center">Sat</span>
+                        <div class="calendar-grid mb-2">
+                            <span class="calendar-day-header">Sun</span>
+                            <span class="calendar-day-header">Mon</span>
+                            <span class="calendar-day-header">Tue</span>
+                            <span class="calendar-day-header">Wed</span>
+                            <span class="calendar-day-header">Thu</span>
+                            <span class="calendar-day-header">Fri</span>
+                            <span class="calendar-day-header">Sat</span>
                         </div>
-                        <div id="calendarGrid" class="grid grid-cols-7 gap-2 text-sm"></div>
-                        <p id="calendarStatus" class="mt-3 text-sm text-gray-500">Loading available dates...</p>
+                        <div id="calendarGrid" class="calendar-grid"></div>
+                        <p id="calendarStatus" class="calendar-status">Loading available dates...</p>
                     </div>
                     <input type="hidden" name="appointment_date" id="dateSelect" min="{{ date('Y-m-d', strtotime('+1 day')) }}" required>
                     @error('appointment_date')
-                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                        <p class="error-text">{{ $message }}</p>
                     @enderror
                 </div>
 
                 <div class="mt-6">
-                    <label class="block text-gray-700 font-semibold mb-2">Available Time Slots</label>
-                    <div id="timeSlots" class="grid grid-cols-2 md:grid-cols-3 gap-3">
-                        <div class="text-gray-500 text-center p-4 border-2 border-dashed border-gray-300 rounded-lg">Select a counselor and date to see available time slots</div>
+                    <label class="field-label">Available Time Slots</label>
+                    <div id="timeSlots" class="grid grid-cols-2 md:grid-cols-3 gap-2 sm:gap-3">
+                        <div class="text-[#8b7e76] text-center p-4 border-2 border-dashed border-[#e5e0db] rounded-lg text-xs">
+                            Select a counselor and date to see available time slots
+                        </div>
                     </div>
                     <input type="hidden" name="start_time" id="selectedTime" required>
                     @error('start_time')
-                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                        <p class="error-text">{{ $message }}</p>
                     @enderror
                 </div>
 
                 <div class="mt-6">
-                    <label class="block text-gray-700 font-semibold mb-2">Concern / Agenda</label>
-                    <textarea name="concern" rows="4"
-                              class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#F00000] focus:border-[#F00000]"
-                              required>{{ old('concern') }}</textarea>
+                    <label class="field-label">Concern / Agenda</label>
+                    <textarea name="concern" rows="4" class="textarea-field" required>{{ old('concern') }}</textarea>
                     @error('concern')
-                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                        <p class="error-text">{{ $message }}</p>
                     @enderror
                 </div>
 
-                <div class="mt-6 flex justify-end space-x-4">
+                <div class="form-actions">
                     <a href="{{ route('counselor.appointments') }}"
-                       class="px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition">Cancel</a>
-                    <button type="submit"
-                            class="px-6 py-3 bg-[#F00000] text-white rounded-lg hover:bg-[#D40000] transition">Book Now (Auto-Approved)</button>
+                       class="secondary-btn px-5 py-2.5 text-xs sm:text-sm">Cancel</a>
+                    <button type="submit" class="primary-btn px-5 py-2.5 text-xs sm:text-sm">
+                        Book Now (Auto-Approved)
+                    </button>
                 </div>
             </form>
         </div>
@@ -344,13 +542,11 @@ document.addEventListener('DOMContentLoaded', function() {
     function setCalendarStatus(message, tone = 'muted') {
         if (!calendarStatus) return;
         calendarStatus.textContent = message;
-        calendarStatus.classList.remove('text-gray-500', 'text-green-600', 'text-red-600');
+        calendarStatus.className = 'calendar-status';
         if (tone === 'success') {
-            calendarStatus.classList.add('text-green-600');
+            calendarStatus.classList.add('success');
         } else if (tone === 'error') {
-            calendarStatus.classList.add('text-red-600');
-        } else {
-            calendarStatus.classList.add('text-gray-500');
+            calendarStatus.classList.add('error');
         }
     }
 
@@ -382,17 +578,16 @@ document.addEventListener('DOMContentLoaded', function() {
             button.type = 'button';
             button.textContent = day;
             button.disabled = isDisabled;
-            button.className = 'h-10 w-10 md:h-11 md:w-11 rounded-lg border text-sm font-medium transition';
+            button.className = 'calendar-day';
 
             if (isDisabled) {
-                button.classList.add('border-transparent', 'text-gray-300', 'cursor-not-allowed');
+                button.classList.add('disabled');
             } else {
-                button.classList.add('border-[#F00000]/30', 'text-[#F00000]', 'hover:bg-[#F00000]/10');
+                button.classList.add('available');
             }
 
             if (selectedDate && isSameDay(selectedDate, date)) {
-                button.classList.remove('border-[#F00000]/30', 'text-[#F00000]', 'hover:bg-[#F00000]/10');
-                button.classList.add('bg-[#F00000]', 'text-white', 'border-[#F00000]');
+                button.classList.add('selected');
             }
 
             button.addEventListener('click', () => {
@@ -465,24 +660,24 @@ document.addEventListener('DOMContentLoaded', function() {
         const date = dateSelect.value;
 
         if (!counselorId || !date) {
-            timeSlots.innerHTML = '<div class="text-gray-500 text-center p-4 border-2 border-dashed border-gray-300 rounded-lg">Select a counselor and date to see available time slots</div>';
+            timeSlots.innerHTML = '<div class="text-[#8b7e76] text-center p-4 border-2 border-dashed border-[#e5e0db] rounded-lg text-xs">Select a counselor and date to see available time slots</div>';
             selectedTime.value = '';
             return;
         }
 
-        timeSlots.innerHTML = '<div class="text-gray-500 text-center p-4 border-2 border-dashed border-gray-300 rounded-lg">Loading available slots...</div>';
+        timeSlots.innerHTML = '<div class="text-[#8b7e76] text-center p-4 border-2 border-dashed border-[#e5e0db] rounded-lg text-xs">Loading available slots...</div>';
 
         fetch(`/appointments/available-slots?counselor_id=${counselorId}&date=${date}`)
             .then(response => response.json())
             .then(data => {
                 if (data.message) {
-                    timeSlots.innerHTML = `<div class="text-red-500 text-center p-4 border-2 border-dashed border-red-300 rounded-lg">${data.message}</div>`;
+                    timeSlots.innerHTML = `<div class="text-red-500 text-center p-4 border-2 border-dashed border-red-300 rounded-lg text-xs">${data.message}</div>`;
                     selectedTime.value = '';
                     return;
                 }
 
                 if (!Array.isArray(data.available_slots) || data.available_slots.length === 0) {
-                    timeSlots.innerHTML = '<div class="text-yellow-700 text-center p-4 bg-yellow-50 border border-yellow-200 rounded-lg">No available time slots for this date. Please choose another date or counselor.</div>';
+                    timeSlots.innerHTML = '<div class="text-yellow-700 text-center p-4 bg-yellow-50 border border-yellow-200 rounded-lg text-xs">No available time slots for this date. Please choose another date or counselor.</div>';
                     selectedTime.value = '';
                     return;
                 }
@@ -494,17 +689,15 @@ document.addEventListener('DOMContentLoaded', function() {
                 availableSlots.forEach(slot => {
                     const slotElement = document.createElement('button');
                     slotElement.type = 'button';
-                    slotElement.className = 'time-slot p-4 border-2 border-gray-200 rounded-lg text-center hover:border-[#F00000] hover:bg-[#FFE100] transition cursor-pointer';
+                    slotElement.className = 'time-slot';
                     slotElement.textContent = slot.display;
 
                     slotElement.addEventListener('click', function() {
                         document.querySelectorAll('.time-slot').forEach(s => {
-                            s.classList.remove('border-[#F00000]', 'bg-gray-100', 'text-[#D40000]');
-                            s.classList.add('border-gray-200', 'text-gray-700');
+                            s.classList.remove('selected');
                         });
 
-                        this.classList.remove('border-gray-200', 'text-gray-700');
-                        this.classList.add('border-[#F00000]', 'bg-gray-100', 'text-[#D40000]');
+                        this.classList.add('selected');
 
                         selectedTime.value = slot.start;
                         currentSelectedSlot = slot.start;
@@ -517,7 +710,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 });
             })
             .catch(() => {
-                timeSlots.innerHTML = '<div class="text-red-500 text-center p-4 border-2 border-dashed border-red-300 rounded-lg">Error loading time slots. Please try again.</div>';
+                timeSlots.innerHTML = '<div class="text-red-500 text-center p-4 border-2 border-dashed border-red-300 rounded-lg text-xs">Error loading time slots. Please try again.</div>';
             });
     }
 

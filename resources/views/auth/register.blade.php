@@ -1,601 +1,107 @@
 <x-guest-layout>
 <style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
-
-    html, body {
-        margin: 0;
-        padding: 0;
-        width: 100%;
-        min-height: 100%;
+    .reg-overlay {
+        position: fixed; inset: 0; z-index: 200;
+        background: rgba(15,23,42,0.55);
+        backdrop-filter: blur(4px);
+        display: flex; align-items: flex-start; justify-content: center;
+        padding: 80px 24px 24px;
+        overflow-y: auto;
     }
-
-    * {
-        box-sizing: border-box;
-    }
-
-    .auth-page {
-        position: fixed;
-        inset: 0;
-        width: 100vw;
-        height: 100vh;
-        overflow: auto;
-        font-family: 'Inter', sans-serif;
-        background:
-            linear-gradient(135deg, rgba(255,255,255,0.96), rgba(255,255,255,0.96)),
-            linear-gradient(135deg, #f4f6fb 0%, #edf2f9 100%);
-        display: flex;
-        align-items: stretch;
-        justify-content: center;
-        padding: 24px;
-    }
-
-    .auth-shell {
-        width: min(1440px, 100%);
-        min-height: calc(100vh - 48px);
-        background: #ffffff;
-        border: 1px solid #e8edf5;
-        border-radius: 30px;
-        overflow: hidden;
-        display: grid;
-        grid-template-columns: 0.9fr 1.35fr;
-        box-shadow: 0 24px 70px rgba(15, 23, 42, 0.08);
-    }
-
-    .auth-left {
+    .reg-modal {
+        background: #fff; border-radius: 24px;
+        width: 100%; max-width: 860px;
+        box-shadow: 0 32px 80px rgba(15,23,42,0.18);
         position: relative;
-        padding: 64px 54px;
-        background:
-            radial-gradient(circle at top left, rgba(220, 38, 38, 0.07), transparent 30%),
-            linear-gradient(180deg, #fbfbfd 0%, #f7f9fc 100%);
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-    }
-
-    .auth-left::after {
-        content: "";
-        position: absolute;
-        right: 0;
-        top: 8%;
-        width: 1px;
-        height: 84%;
-        background: #eceff5;
-    }
-
-    .portal-badge {
-        display: inline-flex;
-        align-items: center;
-        gap: 10px;
-        width: fit-content;
-        padding: 10px 16px;
-        border-radius: 999px;
-        background: #fff3f3;
-        border: 1px solid #ffdede;
-        color: #c81e1e;
-        font-size: 13px;
-        font-weight: 700;
+        animation: slideUp 0.3s ease;
         margin-bottom: 24px;
     }
-
-    .auth-left h1 {
-        margin: 0 0 18px;
-        font-size: 48px;
-        line-height: 1.05;
-        letter-spacing: -0.04em;
-        color: #0f172a;
-        font-weight: 800;
-        max-width: 520px;
+    @keyframes slideUp {
+        from { opacity: 0; transform: translateY(20px); }
+        to   { opacity: 1; transform: translateY(0); }
     }
-
-    .auth-left p {
-        margin: 0;
-        max-width: 520px;
-        font-size: 17px;
-        line-height: 1.8;
-        color: #475569;
+    .reg-modal-close {
+        position: absolute; top: 18px; right: 18px;
+        width: 32px; height: 32px; border-radius: 8px;
+        background: #f1f5f9; border: none; cursor: pointer;
+        display: flex; align-items: center; justify-content: center;
+        color: #64748b; font-size: 14px; transition: background 0.2s;
+        z-index: 10;
     }
+    .reg-modal-close:hover { background: #e2e8f0; color: #0f172a; }
 
-    .left-note {
-        margin-top: 32px;
-        max-width: 520px;
-        padding: 20px 22px;
-        border-radius: 18px;
-        background: #ffffff;
-        border: 1px solid #ebeff5;
-        color: #334155;
-        font-size: 15px;
-        line-height: 1.75;
-        box-shadow: 0 10px 30px rgba(15, 23, 42, 0.04);
-    }
+    /*  keep all existing form-card styles  */
+    * { box-sizing: border-box; }
+    body { font-family: 'Inter', sans-serif; }
 
-    .left-note strong {
-        color: #b91c1c;
-    }
-
-    .auth-right {
-        background: #ffffff;
-        padding: 32px;
-        overflow: auto;
-    }
-
-    .auth-form-wrap {
-        width: 100%;
-        max-width: 900px;
-        margin: 0 auto;
-    }
-
-    .login-row {
-        margin-top: 22px;
-        text-align: center;
-        font-size: 14px;
-        color: #64748b;
-    }
-
-    .login-row a {
-        color: #d70000;
-        text-decoration: none;
-        font-weight: 700;
-    }
-
-    .login-row a:hover {
-        text-decoration: underline;
-    }
-
-    .form-card {
-        background: #ffffff;
-        border: 1px solid #ebeff5;
-        border-radius: 24px;
-        padding: 28px;
-        box-shadow: 0 12px 32px rgba(15, 23, 42, 0.04);
-    }
-
-    .card-header {
-        display: flex;
-        align-items: center;
-        gap: 16px;
-        margin-bottom: 24px;
-        padding-bottom: 20px;
-        border-bottom: 1px solid #eef2f7;
-    }
-
-    .card-header-text h1 {
-        margin: 0 0 4px;
-        font-size: 30px;
-        line-height: 1.15;
-        letter-spacing: -0.03em;
-        font-weight: 800;
-        color: #0f172a;
-    }
-
-    .card-header-text p {
-        margin: 0;
-        font-size: 14px;
-        line-height: 1.6;
-        color: #64748b;
-    }
-
-    .school-badge {
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-        background: #fff5f5;
-        border: 1px solid #fde0e0;
-        border-radius: 999px;
-        padding: 8px 14px;
-        font-size: 12px;
-        font-weight: 800;
-        color: #d70000;
-        letter-spacing: 0.05em;
-        text-transform: uppercase;
-        flex-shrink: 0;
-    }
-
-    .steps-header {
-        margin-bottom: 24px;
-    }
-
-    .steps-title {
-        font-size: 14px;
-        font-weight: 700;
-        color: #334155;
-        margin-bottom: 10px;
-    }
-
-    .step-pills {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 8px;
-        margin-bottom: 12px;
-    }
-
-    .step-pill {
-        padding: 8px 14px;
-        border-radius: 999px;
-        font-size: 13px;
-        font-weight: 700;
-        background: #f1f5f9;
-        color: #94a3b8;
-        border: 1px solid transparent;
-        transition: all 0.2s ease;
-        cursor: pointer;
-    }
-
-    .step-pill.active {
-        background: #fff5f5;
-        color: #d70000;
-        border-color: #fde0e0;
-    }
-
-    .step-pill.done {
-        background: #effaf3;
-        color: #15803d;
-        border-color: #ccebd6;
-    }
-
-    .progress-bar-wrap {
-        height: 7px;
-        background: #eef2f7;
-        border-radius: 999px;
-        overflow: hidden;
-    }
-
-    .progress-bar {
-        height: 100%;
-        background: linear-gradient(90deg, #e00000, #ff6b6b);
-        border-radius: 999px;
-        transition: width 0.35s ease;
-    }
-
-    .step-panel {
-        display: none;
-    }
-
-    .step-panel.active {
-        display: block;
-    }
-
-    .section-title {
-        font-size: 20px;
-        font-weight: 800;
-        color: #0f172a;
-        margin-bottom: 20px;
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        letter-spacing: -0.02em;
-    }
-
-    .section-title-icon {
-        width: 36px;
-        height: 36px;
-        background: linear-gradient(135deg, #fff5f5, #fde0e0);
-        border-radius: 10px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: #d70000;
-        flex-shrink: 0;
-    }
-
-    .field-grid {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 18px;
-    }
-
-    .field-grid .span2 {
-        grid-column: 1 / -1;
-    }
-
-    .field-wrap {
-        position: relative;
-    }
-
-    .field-label {
-        display: block;
-        margin-bottom: 8px;
-        font-size: 12px;
-        font-weight: 800;
-        color: #334155;
-        text-transform: uppercase;
-        letter-spacing: 0.08em;
-    }
-
-    .field-icon {
-        position: absolute;
-        left: 16px;
-        top: 43px;
-        width: 16px;
-        height: 16px;
-        color: #94a3b8;
-        pointer-events: none;
-    }
-
-    .auth-input,
-    .auth-select,
-    .auth-textarea {
-        width: 100%;
-        border: 1.5px solid #dbe3ee;
-        border-radius: 14px;
-        background: #f8fbff;
-        font-size: 15px;
-        color: #0f172a;
-        outline: none;
-        transition: 0.2s ease;
-        font-family: 'Inter', sans-serif;
-    }
-
-    .auth-input,
-    .auth-select {
-        min-height: 54px;
-        padding: 0 16px;
-    }
-
-    .auth-input.with-icon {
-        padding-left: 46px;
-    }
-
-    .auth-textarea {
-        min-height: 110px;
-        padding: 14px 16px;
-        resize: vertical;
-    }
-
-    .auth-input:focus,
-    .auth-select:focus,
-    .auth-textarea:focus {
-        border-color: #d70000;
-        background: #ffffff;
-        box-shadow: 0 0 0 4px rgba(215, 0, 0, 0.08);
-    }
-
-    .auth-input[readonly] {
-        background: #f1f5f9;
-        color: #64748b;
-        cursor: not-allowed;
-    }
-
-    .verify-card {
-        background: linear-gradient(135deg, #fff8f8, #ffffff);
-        border: 1px solid #fde0e0;
-        border-radius: 20px;
-        padding: 24px;
-        margin-bottom: 18px;
-    }
-
-    .verify-card h2 {
-        margin: 0 0 8px;
-        font-size: 22px;
-        line-height: 1.2;
-        font-weight: 800;
-        color: #0f172a;
-        letter-spacing: -0.02em;
-    }
-
-    .verify-card p {
-        margin: 0 0 18px;
-        color: #64748b;
-        line-height: 1.7;
-        font-size: 14px;
-    }
-
-    .otp-group {
-        display: flex;
-        gap: 12px;
-        align-items: flex-end;
-        flex-wrap: wrap;
-    }
-
-    .file-upload-wrap {
-        border: 2px dashed #dbe3ee;
-        border-radius: 16px;
-        padding: 22px;
-        text-align: center;
-        cursor: pointer;
-        transition: border-color 0.2s ease, background 0.2s ease;
-        background: #f8fbff;
-        display: block;
-    }
-
-    .file-upload-wrap:hover {
-        border-color: #d70000;
-        background: #fffdfd;
-    }
-
-    .file-upload-wrap input {
-        display: none;
-    }
-
-    .file-upload-icon {
-        color: #94a3b8;
-    }
-
-    .file-upload-text {
-        font-size: 14px;
-        color: #64748b;
-        margin-top: 8px;
-    }
-
-    .nav-btns {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-top: 28px;
-        padding-top: 20px;
-        border-top: 1px solid #eef2f7;
-    }
-
-    .btn-back,
-    .btn-next,
-    .btn-submit {
-        min-height: 52px;
-        padding: 0 20px;
-        border-radius: 14px;
-        font-family: 'Inter', sans-serif;
-        font-size: 15px;
-        font-weight: 700;
-        cursor: pointer;
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-        transition: 0.18s ease;
-    }
-
-    .btn-back {
-        border: 1.5px solid #dbe3ee;
-        background: #ffffff;
-        color: #475569;
-    }
-
-    .btn-back:hover {
-        border-color: #b8c4d3;
-        color: #0f172a;
-    }
-
-    .btn-next,
-    .btn-submit {
-        border: none;
-        background: linear-gradient(135deg, #e00000 0%, #bf0000 100%);
-        color: #ffffff;
-        box-shadow: 0 14px 28px rgba(191, 0, 0, 0.16);
-    }
-
-    .btn-next:hover,
-    .btn-submit:hover {
-        transform: translateY(-1px);
-        box-shadow: 0 18px 34px rgba(191, 0, 0, 0.22);
-    }
-
-    .alert-success {
-        background: #effaf3;
-        border: 1px solid #ccebd6;
-        color: #15803d;
-        border-radius: 14px;
-        padding: 14px 16px;
-        font-size: 14px;
-        margin-bottom: 16px;
-    }
-    
-    .alert-error {
-        background: #fff1f2;
-        border: 1px solid #fecdd3;
-        color: #b91c1c;
-        border-radius: 14px;
-        padding: 14px 16px;
-        font-size: 14px;
-        margin-bottom: 16px;
-    }
-
-    .hidden {
-        display: none !important;
-    }
-
-    .form-note {
-        background: #fff8f8;
-        border: 1px solid #fde0e0;
-        border-radius: 14px;
-        padding: 16px;
-        color: #64748b;
-        font-size: 14px;
-        line-height: 1.7;
-    }
-
-    .form-note strong {
-        color: #d70000;
-    }
-
-    @media (max-width: 1180px) {
-        .auth-shell {
-            grid-template-columns: 1fr;
-            min-height: auto;
-        }
-
-        .auth-left {
-            display: none;
-        }
-
-        .auth-right {
-            padding: 20px;
-        }
-
-        .auth-form-wrap {
-            max-width: 100%;
-        }
-    }
+    .form-card { border-radius: 24px; padding: 32px; }
+    .card-header { display: flex; align-items: center; gap: 16px; margin-bottom: 24px; padding-bottom: 20px; border-bottom: 1px solid #eef2f7; }
+    .card-header-text h1 { margin: 0 0 4px; font-size: 28px; line-height: 1.15; letter-spacing: -0.03em; font-weight: 800; color: #0f172a; }
+    .card-header-text p { margin: 0; font-size: 14px; line-height: 1.6; color: #64748b; }
+    .school-badge { display: inline-flex; align-items: center; gap: 8px; background: #fff5f5; border: 1px solid #fde0e0; border-radius: 999px; padding: 8px 14px; font-size: 12px; font-weight: 800; color: #820000; letter-spacing: 0.05em; text-transform: uppercase; flex-shrink: 0; }
+    .steps-header { margin-bottom: 24px; }
+    .steps-title { font-size: 14px; font-weight: 700; color: #334155; margin-bottom: 10px; }
+    .step-pills { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; }
+    .step-pill { padding: 8px 14px; border-radius: 999px; font-size: 13px; font-weight: 700; background: #f1f5f9; color: #94a3b8; border: 1px solid transparent; transition: all 0.2s ease; cursor: pointer; }
+    .step-pill.active { background: #fff5f5; color: #820000; border-color: #fde0e0; }
+    .step-pill.done { background: #effaf3; color: #15803d; border-color: #ccebd6; }
+    .progress-bar-wrap { height: 7px; background: #eef2f7; border-radius: 999px; overflow: hidden; }
+    .progress-bar { height: 100%; background: linear-gradient(90deg, #820000, #F8650C); border-radius: 999px; transition: width 0.35s ease; }
+    .step-panel { display: none; }
+    .step-panel.active { display: block; }
+    .section-title { font-size: 20px; font-weight: 800; color: #0f172a; margin-bottom: 20px; display: flex; align-items: center; gap: 10px; letter-spacing: -0.02em; }
+    .section-title-icon { width: 36px; height: 36px; background: linear-gradient(135deg, #fff5f5, #fde0e0); border-radius: 10px; display: flex; align-items: center; justify-content: center; color: #820000; flex-shrink: 0; }
+    .field-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+    .field-grid .span2 { grid-column: 1 / -1; }
+    .field-wrap { position: relative; }
+    .field-label { display: block; margin-bottom: 8px; font-size: 12px; font-weight: 800; color: #334155; text-transform: uppercase; letter-spacing: 0.08em; }
+    .field-icon { position: absolute; left: 16px; top: 43px; width: 16px; height: 16px; color: #94a3b8; pointer-events: none; }
+    .auth-input, .auth-select, .auth-textarea { width: 100%; border: 1.5px solid #dbe3ee; border-radius: 14px; background: #f8fbff; font-size: 15px; color: #0f172a; outline: none; transition: 0.2s ease; font-family: 'Inter', sans-serif; }
+    .auth-input, .auth-select { min-height: 54px; padding: 0 16px; }
+    .auth-input.with-icon { padding-left: 46px; }
+    .auth-textarea { min-height: 110px; padding: 14px 16px; resize: vertical; }
+    .auth-input:focus, .auth-select:focus, .auth-textarea:focus { border-color: #820000; background: #ffffff; box-shadow: 0 0 0 4px rgba(130,0,0,0.08); }
+    .auth-input[readonly] { background: #f1f5f9; color: #64748b; cursor: not-allowed; }
+    .verify-card { background: linear-gradient(135deg, #fff8f8, #ffffff); border: 1px solid #fde0e0; border-radius: 20px; padding: 24px; margin-bottom: 18px; }
+    .verify-card h2 { margin: 0 0 8px; font-size: 22px; line-height: 1.2; font-weight: 800; color: #0f172a; letter-spacing: -0.02em; }
+    .verify-card p { margin: 0 0 18px; color: #64748b; line-height: 1.7; font-size: 14px; }
+    .otp-group { display: flex; gap: 12px; align-items: flex-end; flex-wrap: wrap; }
+    .file-upload-wrap { border: 2px dashed #dbe3ee; border-radius: 16px; padding: 22px; text-align: center; cursor: pointer; transition: border-color 0.2s ease, background 0.2s ease; background: #f8fbff; display: block; }
+    .file-upload-wrap:hover { border-color: #820000; background: #fffdfd; }
+    .file-upload-wrap input { display: none; }
+    .file-upload-icon { color: #94a3b8; }
+    .file-upload-text { font-size: 14px; color: #64748b; margin-top: 8px; }
+    .nav-btns { display: flex; justify-content: space-between; align-items: center; margin-top: 28px; padding-top: 20px; border-top: 1px solid #eef2f7; }
+    .btn-back, .btn-next, .btn-submit { min-height: 52px; padding: 0 20px; border-radius: 14px; font-family: 'Inter', sans-serif; font-size: 15px; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; transition: 0.18s ease; }
+    .btn-back { border: 1.5px solid #dbe3ee; background: #ffffff; color: #475569; }
+    .btn-back:hover { border-color: #b8c4d3; color: #0f172a; }
+    .btn-next, .btn-submit { border: none; background: linear-gradient(135deg, #820000 0%, #F8650C 100%); color: #ffffff; box-shadow: 0 14px 28px rgba(130,0,0,0.16); }
+    .btn-next:hover, .btn-submit:hover { transform: translateY(-1px); box-shadow: 0 18px 34px rgba(130,0,0,0.22); }
+    .alert-success { background: #effaf3; border: 1px solid #ccebd6; color: #15803d; border-radius: 14px; padding: 14px 16px; font-size: 14px; margin-bottom: 16px; }
+    .alert-error { background: #fff1f2; border: 1px solid #fecdd3; color: #820000; border-radius: 14px; padding: 14px 16px; font-size: 14px; margin-bottom: 16px; }
+    .hidden { display: none !important; }
+    .form-note { background: #fff8f8; border: 1px solid #fde0e0; border-radius: 14px; padding: 16px; color: #64748b; font-size: 14px; line-height: 1.7; }
+    .form-note strong { color: #820000; }
+    .login-row { margin-top: 22px; text-align: center; font-size: 14px; color: #64748b; }
+    .login-row a { color: #820000; text-decoration: none; font-weight: 700; }
+    .login-row a:hover { text-decoration: underline; }
 
     @media (max-width: 760px) {
-        .auth-page {
-            padding: 14px;
-        }
-
-        .auth-shell {
-            min-height: auto;
-            border-radius: 22px;
-        }
-
-        .form-card {
-            padding: 18px;
-            border-radius: 18px;
-        }
-
-        .card-header {
-            align-items: flex-start;
-            flex-direction: column;
-        }
-
-        .field-grid {
-            grid-template-columns: 1fr;
-        }
-
-        .field-grid .span2 {
-            grid-column: 1;
-        }
-
-        .nav-btns {
-            flex-direction: column;
-            gap: 12px;
-            align-items: stretch;
-        }
-
-        .btn-back,
-        .btn-next,
-        .btn-submit {
-            justify-content: center;
-            width: 100%;
-        }
-
-        .otp-group {
-            flex-direction: column;
-            align-items: stretch;
-        }
+        .reg-overlay { padding: 72px 12px 12px; }
+        .form-card { padding: 18px; border-radius: 18px; }
+        .card-header { align-items: flex-start; flex-direction: column; }
+        .field-grid { grid-template-columns: 1fr; }
+        .field-grid .span2 { grid-column: 1; }
+        .nav-btns { flex-direction: column; gap: 12px; align-items: stretch; }
+        .btn-back, .btn-next, .btn-submit { justify-content: center; width: 100%; }
+        .otp-group { flex-direction: column; align-items: stretch; }
     }
 </style>
 
-<div class="auth-page">
-    <div class="auth-shell">
-        <div class="auth-left">
-            <div class="portal-badge">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M12 3L1 9l11 6 9-4.91V17h2V9L12 3zM5 13.18v4L12 21l7-3.82v-4L12 17l-7-3.82z"/>
-                </svg>
-                MSU-IIT Guidance and Counseling Portal
-            </div>
-
-            <h1>Create your student portal account.</h1>
-
-            <p>
-                Register to access the MSU-IIT Office of Guidance and Counseling Portal. Your account gives you a more convenient way to complete your student profile, access guidance services, and stay connected with official student support resources.
-            </p>
-
-            <div class="left-note">
-                <strong>Registration is your first step.</strong> Once your account is created, you can use a secure and organized platform designed to make student support services easier to access.
-            </div>
-        </div>
-
-        <div class="auth-right">
-            <div class="auth-form-wrap">
-
-                <div class="form-card">
+<div class="reg-overlay">
+    <div class="reg-modal">
+        <a href="/" class="reg-modal-close" title="Back to home"><i class="fas fa-times"></i></a>
+<div class="form-card">
                     @php
                         $verifiedEmail = session('registration_email_verified');
                         $pendingEmail = session('registration_email_pending');
@@ -1164,4 +670,6 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 </script>
+    </div>
+</div>
 </x-guest-layout>

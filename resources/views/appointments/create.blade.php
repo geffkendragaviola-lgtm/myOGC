@@ -3,88 +3,374 @@
 @section('title', 'Book Appointment - OGC')
 
 @section('content')
-<div class="container mx-auto px-6 py-8">
-    <div class="max-w-4xl mx-auto">
-        <div class="bg-white rounded-xl shadow-md p-6">
-            <h1 class="text-2xl font-bold text-gray-800 mb-6">Book an Appointment</h1>
+<style>
+    :root {
+        --maroon-900: #3a0c0c;
+        --maroon-800: #5c1a1a;
+        --maroon-700: #7a2a2a;
+        --gold-500: #c9a227;
+        --gold-400: #d4af37;
+        --bg-warm: #faf8f5;
+        --border-soft: #e5e0db;
+        --text-primary: #2c2420;
+        --text-secondary: #6b5e57;
+        --text-muted: #8b7e76;
+    }
 
-            <form id="appointmentForm" action="{{ route('appointments.store') }}" method="POST">
+    .booking-shell {
+        position: relative;
+        overflow: hidden;
+        background: var(--bg-warm);
+        min-height: 100vh;
+    }
+    .booking-glow {
+        position: absolute; border-radius: 50%; filter: blur(80px); pointer-events: none; opacity: 0.25;
+    }
+    .booking-glow.one { top: -30px; left: -40px; width: 200px; height: 200px; background: var(--gold-400); }
+    .booking-glow.two { bottom: -30px; right: -60px; width: 220px; height: 220px; background: var(--maroon-800); }
+
+    .hero-card, .panel-card, .glass-card, .form-card {
+        position: relative; overflow: hidden; border-radius: 0.75rem;
+        border: 1px solid var(--border-soft); background: rgba(255,255,255,0.95);
+        backdrop-filter: blur(8px); box-shadow: 0 2px 8px rgba(44,36,32,0.04);
+        transition: box-shadow 0.2s ease;
+    }
+    .hero-card:hover, .panel-card:hover, .glass-card:hover, .form-card:hover { box-shadow: 0 4px 14px rgba(44,36,32,0.06); }
+    .hero-card::before, .panel-card::before, .glass-card::before, .form-card::before {
+        content: ""; position: absolute; inset: 0; pointer-events: none;
+        background: radial-gradient(circle at top right, rgba(212,175,55,0.06), transparent 30%);
+    }
+
+    .hero-icon, .panel-icon {
+        display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+    }
+    .hero-icon {
+        width: 2.75rem; height: 2.75rem; border-radius: 0.75rem; color: #fef9e7;
+        background: linear-gradient(135deg, var(--maroon-800) 0%, var(--maroon-700) 100%);
+        box-shadow: 0 4px 12px rgba(92,26,26,0.15);
+    }
+    .hero-badge {
+        display: inline-flex; align-items: center; gap: 0.4rem; border-radius: 999px;
+        border: 1px solid rgba(212,175,55,0.3); background: rgba(254,249,231,0.9);
+        padding: 0.2rem 0.55rem; font-size: 9px; font-weight: 700; text-transform: uppercase;
+        letter-spacing: 0.16em; color: var(--maroon-700);
+    }
+    .hero-badge-dot { width: 0.3rem; height: 0.3rem; border-radius: 999px; background: var(--gold-400); }
+
+    .summary-card {
+        position: relative; overflow: hidden; border-radius: 0.75rem;
+        border: 1px solid rgba(92,26,26,0.15);
+        background: linear-gradient(135deg, var(--maroon-800) 0%, var(--maroon-900) 100%); color: white;
+        box-shadow: 0 4px 12px rgba(58,12,12,0.15);
+    }
+    .summary-card::before {
+        content: ""; position: absolute; inset: 0; opacity: 0.15;
+        background: radial-gradient(circle at top right, var(--gold-400), transparent 40%); pointer-events: none;
+    }
+    .summary-icon {
+        width: 2.5rem; height: 2.5rem; border-radius: 0.75rem; display: flex;
+        align-items: center; justify-content: center; background: rgba(255,255,255,0.1);
+        border: 1px solid rgba(255,255,255,0.1); color: #fef9e7; flex-shrink: 0;
+    }
+    .summary-label { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.2em; color: rgba(255,255,255,0.7); }
+    .summary-value { font-size: 1.2rem; line-height: 1.2; font-weight: 800; margin-top: 0.35rem; }
+    .summary-subtext { font-size: 0.7rem; color: rgba(255,255,255,0.8); margin-top: 0.2rem; }
+
+    .primary-btn, .secondary-btn {
+        border-radius: 0.6rem; font-weight: 600; transition: all 0.2s ease;
+        display: inline-flex; align-items: center; justify-content: center; white-space: nowrap;
+        font-size: 0.8rem; padding: 0.55rem 1rem;
+    }
+    .primary-btn {
+        color: #fef9e7; background: linear-gradient(135deg, var(--maroon-800) 0%, var(--maroon-700) 100%);
+        box-shadow: 0 4px 10px rgba(92,26,26,0.15);
+    }
+    .primary-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 14px rgba(92,26,26,0.2); }
+    .secondary-btn {
+        color: var(--text-primary); background: rgba(255,255,255,0.95);
+        border: 1px solid var(--border-soft);
+    }
+    .secondary-btn:hover { background: rgba(254,249,231,0.7); border-color: var(--maroon-700); }
+
+    .panel-topline { position: absolute; inset-inline: 0; top: 0; height: 3px; background: linear-gradient(90deg, var(--maroon-800) 0%, var(--gold-400) 50%, var(--maroon-800) 100%); }
+    .panel-header { display: flex; align-items: center; gap: 0.7rem; padding: 0.85rem 1.25rem; border-bottom: 1px solid var(--border-soft)/60; }
+    .panel-icon { width: 2rem; height: 2rem; border-radius: 0.6rem; display: flex; align-items: center; justify-content: center; background: rgba(254,249,231,0.7); color: var(--maroon-700); }
+    .panel-title { font-size: 0.8rem; font-weight: 600; color: var(--text-primary); }
+    .panel-subtitle { font-size: 0.68rem; color: var(--text-muted); margin-top: 0.1rem; }
+
+    .field-label { display: block; font-size: 0.65rem; font-weight: 600; color: var(--text-secondary); margin-bottom: 0.35rem; text-transform: uppercase; letter-spacing: 0.08em; }
+    .input-field, .select-field, .textarea-field {
+        width: 100%; border: 1px solid var(--border-soft); border-radius: 0.6rem;
+        background: rgba(255,255,255,0.95); color: var(--text-primary); outline: none;
+        transition: all 0.2s ease; font-size: 0.8rem; padding: 0.55rem 0.75rem;
+        box-shadow: inset 0 1px 2px rgba(44,36,32,0.02);
+    }
+    .textarea-field { padding: 0.75rem; resize: vertical; min-height: 4rem; }
+    .input-field:focus, .select-field:focus, .textarea-field:focus { border-color: var(--maroon-700); box-shadow: 0 0 0 3px rgba(92,26,26,0.08); }
+    .input-field:disabled, .select-field:disabled { background: rgba(245,240,235,0.6); color: var(--text-muted); cursor: not-allowed; }
+
+    /* Radio/Checkbox styling */
+    .radio-label, .checkbox-label {
+        display: inline-flex; align-items: center; gap: 0.4rem;
+        font-size: 0.8rem; color: var(--text-primary); cursor: pointer;
+    }
+    .radio-label input[type="radio"], .checkbox-label input[type="checkbox"] {
+        width: 1rem; height: 1rem; accent-color: var(--maroon-700);
+    }
+
+    /* Calendar styles - adapted to design system */
+    .calendar-card {
+        border: 1px solid var(--border-soft); border-radius: 0.75rem;
+        background: white; padding: 1rem;
+    }
+    .calendar-header {
+        display: flex; align-items: center; justify-content: space-between;
+        margin-bottom: 0.75rem;
+    }
+    .calendar-nav-btn {
+        width: 2rem; height: 2rem; border-radius: 999px;
+        display: flex; align-items: center; justify-content: center;
+        border: 1px solid var(--border-soft); background: white;
+        color: var(--text-secondary); font-weight: 600; cursor: pointer;
+        transition: all 0.15s ease;
+    }
+    .calendar-nav-btn:hover { background: rgba(254,249,231,0.7); border-color: var(--maroon-700); color: var(--maroon-700); }
+    .calendar-month { font-size: 0.85rem; font-weight: 700; color: var(--text-primary); }
+    .calendar-days {
+        display: grid; grid-template-columns: repeat(7, 1fr);
+        gap: 0.25rem; margin-bottom: 0.5rem;
+    }
+    .calendar-day-header {
+        text-align: center; font-size: 0.65rem; font-weight: 600;
+        color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em;
+    }
+    .calendar-grid {
+        display: grid; grid-template-columns: repeat(7, 1fr); gap: 0.35rem;
+    }
+    .calendar-date-btn {
+        width: 2rem; height: 2rem; border-radius: 0.5rem;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 0.75rem; font-weight: 500; border: 1px solid transparent;
+        color: var(--text-muted); cursor: not-allowed; transition: all 0.15s ease;
+    }
+    .calendar-date-btn.available {
+        border-color: rgba(212,175,55,0.4); color: var(--maroon-700);
+        background: rgba(212,175,55,0.1); cursor: pointer;
+    }
+    .calendar-date-btn.available:hover {
+        background: rgba(212,175,55,0.2); border-color: var(--gold-400);
+    }
+    .calendar-date-btn.selected {
+        background: var(--maroon-700); color: white; border-color: var(--maroon-700);
+    }
+    .calendar-status {
+        margin-top: 0.5rem; font-size: 0.7rem; color: var(--text-muted);
+    }
+    .calendar-status.success { color: #065f46; }
+    .calendar-status.error { color: #b91c1c; }
+
+    /* Time slots */
+    .time-slots-grid {
+        display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.5rem;
+    }
+    @media (min-width: 768px) { .time-slots-grid { grid-template-columns: repeat(3, 1fr); } }
+    .time-slot-btn {
+        padding: 0.6rem 0.75rem; border-radius: 0.5rem;
+        border: 2px solid var(--border-soft); background: white;
+        font-size: 0.75rem; font-weight: 500; color: var(--text-primary);
+        text-align: center; cursor: pointer; transition: all 0.15s ease;
+    }
+    .time-slot-btn:hover { border-color: var(--maroon-700); background: rgba(254,249,231,0.6); }
+    .time-slot-btn.selected {
+        border-color: var(--maroon-700); background: rgba(212,175,55,0.15);
+        color: var(--maroon-800); font-weight: 600;
+    }
+    .time-slot-placeholder {
+        padding: 1rem; border: 2px dashed var(--border-soft);
+        border-radius: 0.5rem; text-align: center;
+        font-size: 0.75rem; color: var(--text-muted);
+    }
+
+    /* Consent Modal - adapted to design system */
+    .modal-overlay {
+        position: fixed; inset: 0; background: rgba(44,36,32,0.5);
+        display: flex; align-items: center; justify-content: center;
+        z-index: 50; padding: 1rem;
+    }
+    .modal-overlay.hidden { display: none; }
+    .modal-card {
+        background: white; border-radius: 0.75rem; border: 1px solid var(--border-soft);
+        box-shadow: 0 8px 32px rgba(44,36,32,0.12); max-width: 42rem; width: 100%;
+        overflow: hidden; display: flex; flex-direction: column; max-height: 90vh;
+    }
+    .modal-header {
+        display: flex; align-items: center; justify-content: space-between;
+        padding: 0.85rem 1.25rem; border-bottom: 1px solid var(--border-soft);
+        background: rgba(250,248,245,0.6); flex-shrink: 0;
+    }
+    .modal-title { font-size: 0.9rem; font-weight: 700; color: var(--text-primary); }
+    .modal-close {
+        background: none; border: none; color: var(--text-muted);
+        font-size: 1.1rem; cursor: pointer; transition: color 0.15s ease;
+        width: 2rem; height: 2rem; display: flex; align-items: center; justify-content: center;
+        border-radius: 999px;
+    }
+    .modal-close:hover { background: rgba(254,249,231,0.7); color: var(--maroon-700); }
+    .modal-body {
+        padding: 1rem 1.25rem; overflow-y: auto; flex: 1;
+        font-size: 0.8rem; color: var(--text-primary); line-height: 1.6;
+    }
+    .modal-body h3 {
+        font-size: 0.85rem; font-weight: 700; color: var(--text-primary);
+        margin: 1rem 0 0.5rem;
+    }
+    .modal-body ol { padding-left: 1.25rem; margin: 0.5rem 0; }
+    .modal-body li { margin: 0.25rem 0; }
+    .scroll-indicator {
+        position: sticky; bottom: 0; padding: 0.5rem;
+        background: rgba(254,249,231,0.95); border: 1px solid rgba(212,175,55,0.3);
+        border-radius: 0.5rem; text-align: center; font-size: 0.7rem;
+        color: var(--maroon-800); font-weight: 600;
+    }
+    .modal-footer {
+        padding: 0.85rem 1.25rem; border-top: 1px solid var(--border-soft);
+        background: rgba(250,248,245,0.6); flex-shrink: 0;
+        display: flex; flex-direction: column; gap: 0.75rem;
+    }
+    .modal-footer-row {
+        display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between;
+        gap: 0.75rem;
+    }
+    .modal-hint {
+        font-size: 0.7rem; color: var(--text-muted); text-align: center;
+    }
+    .modal-hint.success { color: #065f46; }
+
+    /* Helper text */
+    .field-help {
+        font-size: 0.7rem; color: var(--text-muted); margin-top: 0.35rem;
+    }
+    .field-help.error { color: #b91c1c; }
+    .field-help.success { color: #065f46; }
+
+    /* Loading state */
+    .loading-text {
+        font-size: 0.75rem; color: var(--maroon-700); font-weight: 500;
+    }
+
+    @media (max-width: 639px) {
+        .panel-header { padding: 0.75rem 1rem; }
+        .input-field, .select-field, .textarea-field { padding: 0.6rem 0.75rem; font-size: 0.85rem; }
+        .primary-btn, .secondary-btn { width: 100%; justify-content: center; padding: 0.7rem; font-size: 0.75rem; }
+        .btn-row-mobile { flex-direction: column; gap: 0.75rem !important; }
+        .hero-card { padding: 1rem !important; }
+        .hero-icon { width: 2.25rem; height: 2.25rem; }
+        .calendar-date-btn { width: 1.75rem; height: 1.75rem; font-size: 0.7rem; }
+        .time-slots-grid { grid-template-columns: 1fr 1fr; }
+        .modal-footer-row { flex-direction: column; align-items: stretch; }
+        .checkbox-label { font-size: 0.75rem; }
+    }
+</style>
+
+<div class="min-h-screen booking-shell">
+    <div class="booking-glow one"></div>
+    <div class="booking-glow two"></div>
+
+    <div class="relative max-w-4xl mx-auto px-4 sm:px-6 py-5 md:py-8">
+        <!-- Header -->
+        <div class="mb-5 sm:mb-6">
+            <div class="hero-card">
+                <div class="relative p-4 sm:p-5 flex items-start gap-3">
+                    <div class="hero-icon">
+                        <i class="fas fa-calendar-plus text-base sm:text-lg"></i>
+                    </div>
+                    <div class="min-w-0">
+                        <div class="hero-badge">
+                            <span class="hero-badge-dot"></span>
+                            New Appointment
+                        </div>
+                        <h1 class="text-lg sm:text-xl lg:text-2xl font-semibold tracking-tight text-[#2c2420] mt-2">Book an Appointment</h1>
+                        <p class="text-[#6b5e57] text-xs sm:text-sm mt-1.5 max-w-2xl">
+                            Schedule a counseling session with our guidance team.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-card">
+            <form id="appointmentForm" action="{{ route('appointments.store') }}" method="POST" class="p-4 sm:p-6">
                 @csrf
 
                 <!-- Counselor Selection -->
                 <div class="mb-6">
-                    <label class="block text-gray-700 font-semibold mb-2">Counselor</label>
+                    <label class="field-label">Counselor</label>
 
                     <!-- Counselor Type Selection -->
                     <div class="mb-4" id="counselorTypeWrapper">
-                        <label class="inline-flex items-center">
+                        <label class="radio-label">
                             <input type="radio" name="counselor_type" value="college" checked
-                                   class="counselor-type-radio text-[#F00000] focus:ring-[#F00000]">
-                            <span class="ml-2">{{ ($allowAllCounselors ?? false) ? 'Counselors from all colleges' : 'Counselors from my college' }}</span>
+                                   class="counselor-type-radio">
+                            <span>{{ ($allowAllCounselors ?? false) ? 'Counselors from all colleges' : 'Counselors from my college' }}</span>
                         </label>
-                        <label class="inline-flex items-center ml-6" id="referredCounselorOption">
+                        <label class="radio-label ml-4 sm:ml-6" id="referredCounselorOption">
                             <input type="radio" name="counselor_type" value="referred"
-                                   class="counselor-type-radio text-[#F00000] focus:ring-[#F00000]">
-                            <span class="ml-2">Previously referred counselors</span>
+                                   class="counselor-type-radio">
+                            <span>Previously referred counselors</span>
                         </label>
                     </div>
 
-                    <select name="counselor_id" id="counselorSelect"
-                            class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#F00000] focus:border-[#F00000]" required>
+                    <select name="counselor_id" id="counselorSelect" class="select-field" required>
                         <option value="">Choose a counselor</option>
                         <!-- Options will be populated by JavaScript -->
                     </select>
                     <input type="hidden" name="counselor_id" id="counselorAutoAssignedInput">
-                    <p id="counselorAutoAssigned" class="hidden mt-2 text-sm text-gray-600"></p>
+                    <p id="counselorAutoAssigned" class="hidden mt-2 text-[0.75rem] text-[#6b5e57]"></p>
 
                     <!-- Loading indicator -->
-                    <div id="counselorLoading" class="hidden mt-2 text-[#F00000]">
-                        Loading counselors...
+                    <div id="counselorLoading" class="hidden mt-2 loading-text">
+                        <i class="fas fa-spinner fa-spin mr-1"></i> Loading counselors...
                     </div>
                 </div>
 
                 <!-- Booking Type -->
                 <div class="mb-6">
-                    <label class="block text-gray-700 font-semibold mb-2">Type of Booking</label>
-                    <select name="booking_type" id="bookingType"
-                            class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#F00000] focus:border-[#F00000]" required>
+                    <label class="field-label">Type of Booking</label>
+                    <select name="booking_type" id="bookingType" class="select-field" required>
                         <option value="">Choose a booking type</option>
                         <option value="Initial Interview" id="bookingTypeInitial" {{ ($hasInitialInterviewAppointment ?? false) ? 'disabled hidden' : '' }}>Initial Interview</option>
                         <option value="Counseling">Counseling</option>
                         <option value="Consultation">Consultation</option>
                     </select>
-                    <p class="mt-2 text-sm text-gray-500" id="bookingTypeHelp">
+                    <p class="field-help" id="bookingTypeHelp">
                         Select the reason for your appointment.
                     </p>
                 </div>
 
-                <!-- Rest of the form remains the same -->
                 <!-- Date Selection -->
                 <div class="mb-6">
-                    <label class="block text-gray-700 font-semibold mb-2">Select Date</label>
-                    <div id="appointmentCalendar" class="border border-gray-200 rounded-xl bg-white p-4 shadow-sm">
-                        <div class="flex items-center justify-between mb-4">
-                            <button type="button" id="calendarPrev"
-                                    class="h-9 w-9 rounded-full border border-gray-200 text-gray-600 hover:bg-gray-50 transition">
+                    <label class="field-label">Select Date</label>
+                    <div id="appointmentCalendar" class="calendar-card">
+                        <div class="calendar-header">
+                            <button type="button" id="calendarPrev" class="calendar-nav-btn" aria-label="Previous month">
                                 ‹
                             </button>
-                            <h3 id="calendarMonthLabel" class="text-lg font-semibold text-gray-800"></h3>
-                            <button type="button" id="calendarNext"
-                                    class="h-9 w-9 rounded-full border border-gray-200 text-gray-600 hover:bg-gray-50 transition">
+                            <h3 id="calendarMonthLabel" class="calendar-month"></h3>
+                            <button type="button" id="calendarNext" class="calendar-nav-btn" aria-label="Next month">
                                 ›
                             </button>
                         </div>
-                        <div class="grid grid-cols-7 text-xs font-semibold text-gray-500 mb-2">
-                            <span class="text-center">Sun</span>
-                            <span class="text-center">Mon</span>
-                            <span class="text-center">Tue</span>
-                            <span class="text-center">Wed</span>
-                            <span class="text-center">Thu</span>
-                            <span class="text-center">Fri</span>
-                            <span class="text-center">Sat</span>
+                        <div class="calendar-days">
+                            <span class="calendar-day-header">Sun</span>
+                            <span class="calendar-day-header">Mon</span>
+                            <span class="calendar-day-header">Tue</span>
+                            <span class="calendar-day-header">Wed</span>
+                            <span class="calendar-day-header">Thu</span>
+                            <span class="calendar-day-header">Fri</span>
+                            <span class="calendar-day-header">Sat</span>
                         </div>
-                        <div id="calendarGrid" class="grid grid-cols-7 gap-2 text-sm"></div>
-                        <p id="calendarStatus" class="mt-3 text-sm text-gray-500">
+                        <div id="calendarGrid" class="calendar-grid"></div>
+                        <p id="calendarStatus" class="calendar-status">
                             Select a counselor to load available dates.
                         </p>
                     </div>
@@ -94,9 +380,9 @@
 
                 <!-- Time Slots -->
                 <div class="mb-6">
-                    <label class="block text-gray-700 font-semibold mb-2">Available Time Slots</label>
-                    <div id="timeSlots" class="grid grid-cols-2 md:grid-cols-3 gap-3">
-                        <div class="text-gray-500 text-center p-4 border-2 border-dashed border-gray-300 rounded-lg">
+                    <label class="field-label">Available Time Slots</label>
+                    <div id="timeSlots" class="time-slots-grid">
+                        <div class="time-slot-placeholder">
                             Select a counselor and date to see available time slots
                         </div>
                     </div>
@@ -105,22 +391,19 @@
 
                 <!-- Concern -->
                 <div class="mb-6">
-                    <label class="block text-gray-700 font-semibold mb-2">Presenting Problem</label>
-                    <textarea name="concern" rows="4"
-                              class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#F00000] focus:border-[#F00000]"
-                              placeholder="Reason for booking for appointment" required></textarea>
+                    <label class="field-label">Presenting Problem</label>
+                    <textarea name="concern" rows="4" class="textarea-field"
+                              placeholder="Briefly describe the reason for your appointment" required></textarea>
                 </div>
 
                 <!-- Submit Button - Now triggers consent modal -->
-                <div class="flex justify-end space-x-4">
-                    <a href="{{ route('appointments.index') }}"
-                       class="px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition">
+                <div class="flex justify-end space-x-3 sm:space-x-4 btn-row-mobile">
+                    <a href="{{ route('appointments.index') }}" class="secondary-btn px-5 py-2.5 text-xs sm:text-sm">
                         Cancel
                     </a>
-                    <button type="button"
-                            id="openConsentModal"
-                            class="px-6 py-3 bg-[#F00000] text-white rounded-lg hover:bg-[#D40000] transition">
-                        Book Now
+                    <button type="button" id="openConsentModal" class="primary-btn px-5 py-2.5 text-xs sm:text-sm">
+                        <i class="fas fa-calendar-check mr-1.5 text-[9px] sm:text-xs"></i>
+                        <span>Book Now</span>
                     </button>
                 </div>
             </form>
@@ -129,112 +412,103 @@
 </div>
 
 <!-- Informed Consent Modal -->
-<div id="consentModal" class="fixed inset-0 z-50 hidden overflow-y-auto">
-    <div class="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
-        <!-- Background overlay -->
-        <div class="fixed inset-0 bg-gray-900/60 transition-opacity" data-consent-close></div>
-
-        <!-- Modal panel -->
-        <div class="inline-block align-bottom bg-white rounded-xl text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-3xl sm:w-full">
-            <div class="flex items-center justify-between px-6 py-4 border-b border-gray-200">
-                <h2 class="text-xl font-semibold text-gray-800">INFORMED CONSENT FOR COUNSELING</h2>
-                <button type="button" class="text-gray-500 hover:text-gray-700 transition" data-consent-close>
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                    </svg>
-                </button>
-            </div>
+<div id="consentModal" class="modal-overlay hidden">
+    <div class="modal-card">
+        <div class="modal-header">
+            <h2 class="modal-title">INFORMED CONSENT FOR COUNSELING</h2>
+            <button type="button" class="modal-close" data-consent-close aria-label="Close">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        
+        <div id="consentContent" class="modal-body">
+            <p>
+                COUNSELING is a confidential process designed to help you address your concerns, come to a better understanding
+                of yourself, and learn effective personal and interpersonal coping strategies. It involves a relationship between
+                you and a trained Counselor who has the desire and willingness to help you accomplish your individual goals.
+            </p>
+            <p>
+                Counseling involves sharing sensitive, personal, and private information that may at times be distressing. During
+                the course of counseling, there may be periods of increased anxiety or confusion. The outcome of counseling is
+                often positive; however, the level of satisfaction for any individual is not predictable. Your counselor is
+                available to support you throughout the counseling process.
+            </p>
+            <h3>CONFIDENTIALITY</h3>
+            <p>
+                All interactions with the counseling services of the Office of Guidance and Counseling (OGC), including scheduling
+                of or attendance at appointments, content of your sessions, progress in counseling, and your records are confidential.
+                No record of counseling is contained in any academic, educational or job placement file. You may request in writing
+                that the counselor releases specific information about your counseling to persons you designate.
+            </p>
+            <h3>EXCEPTIONS TO CONFIDENTIALITY</h3>
+            <p>Under the following circumstances can only there be a breach in confidentiality:</p>
+            <ol class="list-decimal list-inside space-y-2">
+                <li>
+                    The counseling staff works as a team. Your counselor may consult with other counselors to provide the best possible
+                    care. These case consultation/case conferences are for professional training purposes; and do not usually include
+                    any identifiers of the client.
+                </li>
+                <li>
+                    If there is evidence of clear and imminent danger or harm to yourself and/or others, a Counselor is legally required
+                    to report this information to the authorities responsible for ensuring safety.
+                </li>
+                <li>
+                    The staff of the Office of Guidance and Counseling who learn of, or strongly suspect physical or sexual abuse or neglect
+                    of a person under 18 years of age, must report this information to local authorities for child protection services (RA 7610).
+                </li>
+                <li>
+                    A court order, issued by a competent judge, may require the counselor to release information contained in records and/or
+                    require a counselor to testify in court hearing.
+                </li>
+            </ol>
+            <h3>CLIENT'S ROLES</h3>
+            <ol class="list-decimal list-inside space-y-2">
+                <li>
+                    The client further agrees to willingly cooperate in attending scheduled/booked counseling sessions, follow-up and/or
+                    tutorial sessions, and accomplish assigned homework/s as agreed by both parties.
+                </li>
+                <li>
+                    The client understands that as he/she seeks professional help, the counseling relationship established shall come to a
+                    termination or closure after careful evaluation and discretion of the attending counselor. There is NO FEE for counseling
+                    services availed by students within the Institute.
+                </li>
+            </ol>
+            <h3>REFERRAL TO EXPERTS</h3>
+            <p>
+                If you are referred off campus to health, mental health or substance abuse professionals, you are responsible for their charges,
+                except when referred to clinicians who have memorandum of understanding/MOU with the Institute.
+            </p>
             
-            <div id="consentContent" class="px-6 py-4 max-h-[60vh] overflow-y-auto text-gray-700 space-y-4">
-                <p>
-                    COUNSELING is a confidential process designed to help you address your concerns, come to a better understanding
-                    of yourself, and learn effective personal and interpersonal coping strategies. It involves a relationship between
-                    you and a trained Counselor who has the desire and willingness to help you accomplish your individual goals.
-                </p>
-                <p>
-                    Counseling involves sharing sensitive, personal, and private information that may at times be distressing. During
-                    the course of counseling, there may be periods of increased anxiety or confusion. The outcome of counseling is
-                    often positive; however, the level of satisfaction for any individual is not predictable. Your counselor is
-                    available to support you throughout the counseling process.
-                </p>
-                <h3 class="text-lg font-semibold text-gray-800">CONFIDENTIALITY</h3>
-                <p>
-                    All interactions with the counseling services of the Office of Guidance and Counseling (OGC), including scheduling
-                    of or attendance at appointments, content of your sessions, progress in counseling, and your records are confidential.
-                    No record of counseling is contained in any academic, educational or job placement file. You may request in writing
-                    that the counselor releases specific information about your counseling to persons you designate.
-                </p>
-                <h3 class="text-lg font-semibold text-gray-800">EXCEPTIONS TO CONFIDENTIALITY</h3>
-                <p>Under the following circumstances can only there be a breach in confidentiality:</p>
-                <ol class="list-decimal list-inside space-y-2">
-                    <li>
-                        The counseling staff works as a team. Your counselor may consult with other counselors to provide the best possible
-                        care. These case consultation/case conferences are for professional training purposes; and do not usually include
-                        any identifiers of the client.
-                    </li>
-                    <li>
-                        If there is evidence of clear and imminent danger or harm to yourself and/or others, a Counselor is legally required
-                        to report this information to the authorities responsible for ensuring safety.
-                    </li>
-                    <li>
-                        The staff of the Office of Guidance and Counseling who learn of, or strongly suspect physical or sexual abuse or neglect
-                        of a person under 18 years of age, must report this information to local authorities for child protection services (RA 7610).
-                    </li>
-                    <li>
-                        A court order, issued by a competent judge, may require the counselor to release information contained in records and/or
-                        require a counselor to testify in court hearing.
-                    </li>
-                </ol>
-                <h3 class="text-lg font-semibold text-gray-800">CLIENT'S ROLES</h3>
-                <ol class="list-decimal list-inside space-y-2">
-                    <li>
-                        The client further agrees to willingly cooperate in attending scheduled/booked counseling sessions, follow-up and/or
-                        tutorial sessions, and accomplish assigned homework/s as agreed by both parties.
-                    </li>
-                    <li>
-                        The client understands that as he/she seeks professional help, the counseling relationship established shall come to a
-                        termination or closure after careful evaluation and discretion of the attending counselor. There is NO FEE for counseling
-                        services availed by students within the Institute.
-                    </li>
-                </ol>
-                <h3 class="text-lg font-semibold text-gray-800">REFERRAL TO EXPERTS</h3>
-                <p>
-                    If you are referred off campus to health, mental health or substance abuse professionals, you are responsible for their charges,
-                    except when referred to clinicians who have memorandum of understanding/MOU with the Institute.
-                </p>
+            <!-- Scroll indicator -->
+            <div id="scrollIndicator" class="scroll-indicator">
+                ↓ Scroll to bottom to enable confirmation ↓
+            </div>
+        </div>
+        
+        <div class="modal-footer">
+            <div class="modal-footer-row">
+                <label class="checkbox-label">
+                    <input type="checkbox" id="consentAcknowledged" disabled>
+                    <span>I have read and understood the Informed Consent for Counseling.</span>
+                </label>
                 
-                <!-- Scroll indicator -->
-                <div id="scrollIndicator" class="sticky bottom-0 py-2 text-center bg-[#FFF9E6] text-[#D40000] rounded-lg border border-[#FFE100]">
-                    ↓ Scroll to bottom to enable confirmation ↓
+                <div class="flex space-x-3">
+                    <button type="button" 
+                            class="secondary-btn px-4 py-2 text-xs"
+                            data-consent-close>
+                        Cancel
+                    </button>
+                    <button type="button"
+                            id="confirmBooking"
+                            class="primary-btn px-5 py-2 text-xs"
+                            disabled>
+                        Confirm Booking
+                    </button>
                 </div>
             </div>
-            
-            <div class="px-6 py-4 border-t border-gray-200 bg-gray-50">
-                <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
-                    <label class="inline-flex items-center text-gray-700">
-                        <input type="checkbox" id="consentAcknowledged"
-                               class="text-[#F00000] focus:ring-[#F00000] rounded" disabled>
-                        <span class="ml-2">I have read and understood the Informed Consent for Counseling.</span>
-                    </label>
-                    
-                    <div class="flex space-x-3">
-                        <button type="button" 
-                                class="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition"
-                                data-consent-close>
-                            Cancel
-                        </button>
-                        <button type="button"
-                                id="confirmBooking"
-                                class="px-6 py-2 bg-[#F00000] text-white rounded-lg hover:bg-[#D40000] transition disabled:opacity-50 disabled:cursor-not-allowed"
-                                disabled>
-                            Confirm Booking
-                        </button>
-                    </div>
-                </div>
-                <p id="consentHint" class="mt-2 text-sm text-gray-500 text-center sm:text-left">
-                    Please scroll through the entire document to enable the checkbox.
-                </p>
-            </div>
+            <p id="consentHint" class="modal-hint">
+                Please scroll through the entire document to enable the checkbox.
+            </p>
         </div>
     </div>
 </div>
@@ -349,8 +623,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         
         consentHint.textContent = 'Please scroll through the entire document to enable the checkbox.';
-        consentHint.classList.remove('text-green-600', 'text-red-600');
-        consentHint.classList.add('text-gray-500');
+        consentHint.classList.remove('success', 'error');
     }
 
     function closeModal() {
@@ -369,8 +642,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 scrollIndicator.style.display = 'none';
             }
             consentHint.textContent = 'You can now acknowledge and confirm your booking.';
-            consentHint.classList.remove('text-gray-500', 'text-red-600');
-            consentHint.classList.add('text-green-600');
+            consentHint.classList.add('success');
         }
     });
 
@@ -411,7 +683,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Close modal when clicking outside
     consentModal?.addEventListener('click', function(event) {
-        if (event.target.classList.contains('bg-gray-900/60')) {
+        if (event.target.classList.contains('modal-overlay')) {
             closeModal();
         }
     });
@@ -442,13 +714,11 @@ document.addEventListener('DOMContentLoaded', function() {
     function setCalendarStatus(message, tone = 'muted') {
         if (!calendarStatus) return;
         calendarStatus.textContent = message;
-        calendarStatus.classList.remove('text-gray-500', 'text-green-600', 'text-red-600');
+        calendarStatus.classList.remove('success', 'error');
         if (tone === 'success') {
-            calendarStatus.classList.add('text-green-600');
+            calendarStatus.classList.add('success');
         } else if (tone === 'error') {
-            calendarStatus.classList.add('text-red-600');
-        } else {
-            calendarStatus.classList.add('text-gray-500');
+            calendarStatus.classList.add('error');
         }
     }
 
@@ -480,17 +750,14 @@ document.addEventListener('DOMContentLoaded', function() {
             button.type = 'button';
             button.textContent = day;
             button.disabled = isDisabled;
-            button.className = 'h-10 w-10 md:h-11 md:w-11 rounded-lg border text-sm font-medium transition';
+            button.className = 'calendar-date-btn';
 
-            if (isDisabled) {
-                button.classList.add('border-transparent', 'text-gray-300', 'cursor-not-allowed');
-            } else {
-                button.classList.add('border-[#F00000]/30', 'text-[#F00000]', 'hover:bg-[#F00000]/10');
+            if (!isDisabled) {
+                button.classList.add('available');
             }
 
             if (selectedDate && isSameDay(selectedDate, date)) {
-                button.classList.remove('border-[#F00000]/30', 'text-[#F00000]', 'hover:bg-[#F00000]/10');
-                button.classList.add('bg-[#F00000]', 'text-white', 'border-[#F00000]');
+                button.classList.add('selected');
             }
 
             button.addEventListener('click', () => {
@@ -734,24 +1001,24 @@ document.addEventListener('DOMContentLoaded', function() {
         const date = dateSelect.value;
 
         if (!counselorId || !date) {
-            timeSlots.innerHTML = '<div class="text-gray-500 text-center p-4 border-2 border-dashed border-gray-300 rounded-lg">Select a counselor and date to see available time slots</div>';
+            timeSlots.innerHTML = '<div class="time-slot-placeholder">Select a counselor and date to see available time slots</div>';
             selectedTime.value = '';
             return;
         }
 
-        timeSlots.innerHTML = '<div class="text-gray-500 text-center p-4 border-2 border-dashed border-gray-300 rounded-lg">Loading available slots...</div>';
+        timeSlots.innerHTML = '<div class="time-slot-placeholder"><i class="fas fa-spinner fa-spin mr-1"></i>Loading available slots...</div>';
 
         fetch(`/appointments/available-slots?counselor_id=${counselorId}&date=${date}`)
             .then(response => response.json())
             .then(data => {
                 if (data.message) {
-                    timeSlots.innerHTML = `<div class="text-red-500 text-center p-4 border-2 border-dashed border-red-300 rounded-lg">${data.message}</div>`;
+                    timeSlots.innerHTML = `<div class="time-slot-placeholder" style="border-color:#fecaca;color:#b91c1c">${data.message}</div>`;
                     selectedTime.value = '';
                     return;
                 }
 
                 if (data.available_slots.length === 0 && data.booked_slots.length === 0) {
-                    timeSlots.innerHTML = '<div class="text-red-500 text-center p-4 border-2 border-dashed border-red-300 rounded-lg">No working hours for this date. Please choose another date.</div>';
+                    timeSlots.innerHTML = '<div class="time-slot-placeholder" style="border-color:#fecaca;color:#b91c1c">No working hours for this date. Please choose another date.</div>';
                     selectedTime.value = '';
                     return;
                 }
@@ -763,7 +1030,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 );
 
                 if (availableSlots.length === 0) {
-                    timeSlots.innerHTML = '<div class="text-yellow-700 text-center p-4 bg-yellow-50 border border-yellow-200 rounded-lg">No available time slots for this date. Please choose another date or counselor.</div>';
+                    timeSlots.innerHTML = '<div class="time-slot-placeholder" style="border-color:#fde68a;color:#92400e;background:#fffbeb">No available time slots for this date. Please choose another date or counselor.</div>';
                     selectedTime.value = '';
                     return;
                 }
@@ -771,17 +1038,15 @@ document.addEventListener('DOMContentLoaded', function() {
                 availableSlots.forEach(slot => {
                     const slotElement = document.createElement('button');
                     slotElement.type = 'button';
-                    slotElement.className = 'time-slot p-4 border-2 border-gray-200 rounded-lg text-center hover:border-[#F00000] hover:bg-[#FFE100] transition cursor-pointer';
+                    slotElement.className = 'time-slot-btn';
                     slotElement.textContent = slot.display;
 
                     slotElement.addEventListener('click', function() {
-                        document.querySelectorAll('.time-slot').forEach(s => {
-                            s.classList.remove('border-[#F00000]', 'bg-gray-100', 'text-[#D40000]');
-                            s.classList.add('border-gray-200', 'text-gray-700');
+                        document.querySelectorAll('.time-slot-btn').forEach(s => {
+                            s.classList.remove('selected');
                         });
 
-                        this.classList.remove('border-gray-200', 'text-gray-700');
-                        this.classList.add('border-[#F00000]', 'bg-gray-100', 'text-[#D40000]');
+                        this.classList.add('selected');
 
                         selectedTime.value = slot.start;
                         currentSelectedSlot = slot.start;
@@ -795,7 +1060,7 @@ document.addEventListener('DOMContentLoaded', function() {
             })
             .catch(error => {
                 console.error('Error:', error);
-                timeSlots.innerHTML = '<div class="text-red-500 text-center p-4 border-2 border-dashed border-red-300 rounded-lg">Error loading time slots. Please try again.</div>';
+                timeSlots.innerHTML = '<div class="time-slot-placeholder" style="border-color:#fecaca;color:#b91c1c">Error loading time slots. Please try again.</div>';
             });
     }
 
@@ -804,7 +1069,7 @@ document.addEventListener('DOMContentLoaded', function() {
         radio.addEventListener('change', function() {
             if (this.checked) {
                 loadCounselors(this.value);
-                timeSlots.innerHTML = '<div class="text-gray-500 text-center p-4 border-2 border-dashed border-gray-300 rounded-lg">Select a counselor and date to see available time slots</div>';
+                timeSlots.innerHTML = '<div class="time-slot-placeholder">Select a counselor and date to see available time slots</div>';
                 selectedTime.value = '';
                 selectedDate = null;
                 dateSelect.value = '';
