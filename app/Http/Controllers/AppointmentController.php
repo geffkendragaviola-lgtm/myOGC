@@ -150,14 +150,12 @@ class AppointmentController extends Controller
                 }
             }
         } catch (\Throwable $exception) {
-            Log::error('Failed to check Google Calendar availability for counselor follow-up booking', [
+            Log::warning('Google Calendar check skipped for follow-up booking  falling back to DB-only', [
                 'appointment_id' => $appointment->id,
                 'counselor_id' => $counselor->id,
                 'calendar_ids' => $calendarIds,
                 'error' => $exception->getMessage(),
             ]);
-
-            return redirect()->back()->with('error', 'Unable to verify counselor availability. Please try again later.');
         }
 
         $student = $appointment->student()->with('user')->first();
@@ -195,13 +193,22 @@ class AppointmentController extends Controller
                 'endDateTime' => $slotEndDateTime,
             ];
 
-            $event = $calendarService->createAppointmentEvent($eventData, $counselor->google_calendar_id);
-            $followupAppointment->update(['google_calendar_event_id' => $event->id]);
+            if ($counselor->google_calendar_id) {
+                try {
+                    $event = $calendarService->createAppointmentEvent($eventData, $counselor->google_calendar_id);
+                    $followupAppointment->update(['google_calendar_event_id' => $event->id]);
+                } catch (\Throwable $calendarException) {
+                    Log::warning('Google Calendar event skipped for follow-up appointment', [
+                        'counselor_id' => $counselor->id,
+                        'error' => $calendarException->getMessage(),
+                    ]);
+                }
+            }
 
             DB::commit();
         } catch (\Throwable $exception) {
             DB::rollBack();
-            Log::error('Failed to create counselor follow-up appointment with Google Calendar event', [
+            Log::error('Failed to create counselor follow-up appointment', [
                 'appointment_id' => $appointment->id,
                 'counselor_id' => $counselor->id,
                 'student_id' => $appointment->student_id,
@@ -403,14 +410,12 @@ public function storeByCounselor(Request $request)
             }
         }
     } catch (\Throwable $exception) {
-        Log::error('Failed to check Google Calendar availability for counselor booking', [
+        Log::warning('Google Calendar check skipped for counselor booking � falling back to DB-only', [
             'counselor_id' => $counselor->id,
             'student_id' => $student->id,
             'calendar_ids' => $calendarIds,
             'error' => $exception->getMessage(),
         ]);
-
-        return redirect()->back()->with('error', 'Unable to verify counselor availability. Please try again later.');
     }
 
     DB::beginTransaction();
@@ -434,13 +439,22 @@ public function storeByCounselor(Request $request)
             'endDateTime' => $slotEndDateTime,
         ];
 
-        $event = $calendarService->createAppointmentEvent($eventData, $counselor->google_calendar_id);
-        $appointment->update(['google_calendar_event_id' => $event->id]);
+        if ($counselor->google_calendar_id) {
+            try {
+                $event = $calendarService->createAppointmentEvent($eventData, $counselor->google_calendar_id);
+                $appointment->update(['google_calendar_event_id' => $event->id]);
+            } catch (\Throwable $calendarException) {
+                Log::warning('Google Calendar event skipped for counselor-booked appointment', [
+                    'counselor_id' => $counselor->id,
+                    'error' => $calendarException->getMessage(),
+                ]);
+            }
+        }
 
         DB::commit();
     } catch (\Throwable $exception) {
         DB::rollBack();
-        Log::error('Failed to create counselor-booked appointment with Google Calendar event', [
+        Log::error('Failed to create counselor-booked appointment', [
             'counselor_id' => $counselor->id,
             'student_id' => $student->id,
             'error' => $exception->getMessage(),
@@ -946,7 +960,7 @@ public function store(Request $request)
             'error' => $exception->getMessage(),
         ]);
 
-        return redirect()->back()->with('error', 'Unable to verify counselor availability. Please try again later.');
+        // Calendar unavailable  proceeding with DB-only slot validation
     }
 
     DB::beginTransaction();
@@ -970,11 +984,17 @@ public function store(Request $request)
             'endDateTime' => $slotEndDateTime,
         ];
 
-        $event = $calendarService->createAppointmentEvent($eventData, $counselor->google_calendar_id);
-
-        $appointment->update([
-            'google_calendar_event_id' => $event->id
-        ]);
+        if ($counselor->google_calendar_id) {
+            try {
+                $event = $calendarService->createAppointmentEvent($eventData, $counselor->google_calendar_id);
+                $appointment->update(['google_calendar_event_id' => $event->id]);
+            } catch (\Throwable $calendarException) {
+                Log::warning('Google Calendar event skipped for student-booked appointment', [
+                    'counselor_id' => $counselor->id,
+                    'error' => $calendarException->getMessage(),
+                ]);
+            }
+        }
 
         DB::commit();
     } catch (\Throwable $exception) {
@@ -1171,7 +1191,7 @@ public function reschedule(Request $request, Appointment $appointment)
             'error' => $exception->getMessage(),
         ]);
 
-        return redirect()->back()->with('error', 'Unable to verify counselor availability. Please try again later.');
+        // Calendar unavailable  proceeding with DB-only slot validation
     }
 
     $rescheduleNote = "RESCHEDULE REQUESTED by {$counselor->user->first_name} {$counselor->user->last_name} on " .
@@ -1195,10 +1215,19 @@ public function reschedule(Request $request, Appointment $appointment)
             'endDateTime' => $slotEndDateTime,
         ];
 
-        $newEvent = $calendarService->createAppointmentEvent($eventData, $counselor->google_calendar_id);
-
-        if ($oldEventId) {
-            $calendarService->deleteEvent($oldEventId, $counselor->google_calendar_id);
+        if ($counselor->google_calendar_id) {
+            try {
+                $newEvent = $calendarService->createAppointmentEvent($eventData, $counselor->google_calendar_id);
+                if ($oldEventId) {
+                    $calendarService->deleteEvent($oldEventId, $counselor->google_calendar_id);
+                }
+            } catch (\Throwable $calendarException) {
+                Log::warning('Google Calendar event skipped for reschedule request', [
+                    'counselor_id' => $counselor->id,
+                    'appointment_id' => $appointment->id,
+                    'error' => $calendarException->getMessage(),
+                ]);
+            }
         }
 
         $appointment->update([
@@ -1209,24 +1238,20 @@ public function reschedule(Request $request, Appointment $appointment)
             'reschedule_reason' => $request->input('reason'),
             'reschedule_requested_at' => now(),
             'notes' => ($appointment->notes ? $appointment->notes . "\n\n" : '') . $rescheduleNote,
-            'google_calendar_event_id' => $newEvent->id,
+            'google_calendar_event_id' => $newEvent?->id ?? $appointment->google_calendar_event_id,
         ]);
 
         DB::commit();
     } catch (\Throwable $exception) {
         DB::rollBack();
 
-        if ($newEvent && $counselor->google_calendar_id) {
-            $calendarService->deleteEvent($newEvent->id, $counselor->google_calendar_id);
-        }
-
-        Log::error('Failed to update Google Calendar event for reschedule request', [
+        Log::error('Failed to process reschedule request', [
             'counselor_id' => $counselor->id,
             'appointment_id' => $appointment->id,
             'error' => $exception->getMessage(),
         ]);
 
-        return redirect()->back()->with('error', 'Failed to update schedule on Google Calendar. Please try again.');
+        return redirect()->back()->with('error', 'Failed to process reschedule request. Please try again.');
     }
 
     return redirect()->back()->with('success', 'Reschedule request sent to the student.');
@@ -1284,29 +1309,26 @@ public function refer(Request $request, Appointment $appointment)
     }
 
     $calendarIds = $this->getCounselorCalendarIds($referredCounselorIds);
-    if (empty($calendarIds)) {
-        return redirect()->back()->with('error', 'Referred counselor calendar is not configured.');
-    }
 
     $calendarService = new GoogleCalendarService();
     $timezone = $this->getCalendarTimezone();
     $slotStartDateTime = Carbon::createFromFormat('Y-m-d H:i', $date->toDateString() . ' ' . $request->start_time, $timezone);
     $slotEndDateTime = Carbon::createFromFormat('Y-m-d H:i', $date->toDateString() . ' ' . $endTime, $timezone);
 
-    try {
-        foreach ($calendarIds as $calendarId) {
-            if (!$calendarService->isSlotAvailable($calendarId, $slotStartDateTime, $slotEndDateTime)) {
-                return redirect()->back()->with('error', 'Selected time is no longer available for the referred counselor.');
+    if (!empty($calendarIds)) {
+        try {
+            foreach ($calendarIds as $calendarId) {
+                if (!$calendarService->isSlotAvailable($calendarId, $slotStartDateTime, $slotEndDateTime)) {
+                    return redirect()->back()->with('error', 'Selected time is no longer available for the referred counselor.');
+                }
             }
+        } catch (\Throwable $exception) {
+            Log::warning('Google Calendar check skipped for referral � falling back to DB-only', [
+                'counselor_id' => $referredCounselor->id,
+                'appointment_id' => $appointment->id,
+                'error' => $exception->getMessage(),
+            ]);
         }
-    } catch (\Throwable $exception) {
-        Log::error('Failed to check Google Calendar availability for referral', [
-            'counselor_id' => $referredCounselor->id,
-            'appointment_id' => $appointment->id,
-            'error' => $exception->getMessage(),
-        ]);
-
-        return redirect()->back()->with('error', 'Unable to verify counselor availability. Please try again later.');
     }
 
     $referralNote = "REFERRAL REQUESTED by {$counselor->user->first_name} {$counselor->user->last_name} on " .
@@ -1330,10 +1352,25 @@ public function refer(Request $request, Appointment $appointment)
             'endDateTime' => $slotEndDateTime,
         ];
 
-        $newEvent = $calendarService->createAppointmentEvent($eventData, $referredCounselor->google_calendar_id);
+        // Try to create calendar event — non-fatal if calendar not configured
+        if ($referredCounselor->google_calendar_id) {
+            try {
+                $newEvent = $calendarService->createAppointmentEvent($eventData, $referredCounselor->google_calendar_id);
+            } catch (\Throwable $calendarException) {
+                Log::warning('Google Calendar event creation skipped for referral', [
+                    'counselor_id' => $referredCounselor->id,
+                    'appointment_id' => $appointment->id,
+                    'error' => $calendarException->getMessage(),
+                ]);
+            }
+        }
 
         if ($oldEventId && $appointment->counselor && $appointment->counselor->google_calendar_id) {
-            $calendarService->deleteEvent($oldEventId, $appointment->counselor->google_calendar_id);
+            try {
+                $calendarService->deleteEvent($oldEventId, $appointment->counselor->google_calendar_id);
+            } catch (\Throwable $e) {
+                Log::warning('Failed to delete old calendar event during referral', ['error' => $e->getMessage()]);
+            }
         }
 
         $appointment->update([
@@ -1350,24 +1387,20 @@ public function refer(Request $request, Appointment $appointment)
             'proposed_start_time' => $request->start_time,
             'proposed_end_time' => $endTime,
             'notes' => ($appointment->notes ? $appointment->notes . "\n\n" : '') . $referralNote,
-            'google_calendar_event_id' => $newEvent->id,
+            'google_calendar_event_id' => $newEvent?->id,
         ]);
 
         DB::commit();
     } catch (\Throwable $exception) {
         DB::rollBack();
 
-        if ($newEvent && $referredCounselor->google_calendar_id) {
-            $calendarService->deleteEvent($newEvent->id, $referredCounselor->google_calendar_id);
-        }
-
-        Log::error('Failed to update Google Calendar event for referral request', [
+        Log::error('Failed to process referral request', [
             'counselor_id' => $counselor->id,
             'appointment_id' => $appointment->id,
             'error' => $exception->getMessage(),
         ]);
 
-        return redirect()->back()->with('error', 'Failed to update schedule on Google Calendar. Please try again.');
+        return redirect()->back()->with('error', 'Failed to process referral. Please try again.');
     }
 
     return redirect()->back()->with('success', 'Referral request sent to the student.');
@@ -1430,7 +1463,7 @@ public function acceptReschedule(Request $request, Appointment $appointment)
             'error' => $exception->getMessage(),
         ]);
 
-        return redirect()->back()->with('error', 'Unable to verify counselor availability. Please try again later.');
+        // Calendar unavailable  proceeding with DB-only slot validation
     }
 
     $acceptNote = "RESCHEDULE ACCEPTED by student on " . now()->toDateTimeString() .
@@ -1535,32 +1568,28 @@ public function acceptReferralByCounselor(Request $request, Appointment $appoint
         return redirect()->back()->with('error', 'This time slot is already booked. Please choose another time.');
     }
 
-    if (!$counselor->google_calendar_id) {
-        return redirect()->back()->with('error', 'Counselor calendar is not configured.');
-    }
-
     $calendarService = new GoogleCalendarService();
     $timezone = $this->getCalendarTimezone();
     $slotStartDateTime = Carbon::parse($date->toDateString() . ' ' . $startTime, $timezone);
     $slotEndDateTime = Carbon::parse($date->toDateString() . ' ' . $endTime, $timezone);
 
-    try {
-        if (!$calendarService->isSlotAvailable(
-            $counselor->google_calendar_id,
-            $slotStartDateTime,
-            $slotEndDateTime,
-            $appointment->google_calendar_event_id
-        )) {
-            return redirect()->back()->with('error', 'Selected time is no longer available.');
+    if ($counselor->google_calendar_id) {
+        try {
+            if (!$calendarService->isSlotAvailable(
+                $counselor->google_calendar_id,
+                $slotStartDateTime,
+                $slotEndDateTime,
+                $appointment->google_calendar_event_id
+            )) {
+                return redirect()->back()->with('error', 'Selected time is no longer available.');
+            }
+        } catch (\Throwable $exception) {
+            Log::warning('Google Calendar check skipped for referral accept  falling back to DB-only', [
+                'counselor_id' => $counselor->id,
+                'appointment_id' => $appointment->id,
+                'error' => $exception->getMessage(),
+            ]);
         }
-    } catch (\Throwable $exception) {
-        Log::error('Failed to check Google Calendar availability for referral accept', [
-            'counselor_id' => $counselor->id,
-            'appointment_id' => $appointment->id,
-            'error' => $exception->getMessage(),
-        ]);
-
-        return redirect()->back()->with('error', 'Unable to verify counselor availability. Please try again later.');
     }
 
     DB::beginTransaction();
@@ -1702,23 +1731,23 @@ public function acceptReferral(Request $request, Appointment $appointment)
     $slotStartDateTime = Carbon::parse($date->toDateString() . ' ' . $startTime, $timezone);
     $slotEndDateTime = Carbon::parse($date->toDateString() . ' ' . $endTime, $timezone);
 
-    try {
-        if (!$calendarService->isSlotAvailable(
-            $referredCounselor->google_calendar_id,
-            $slotStartDateTime,
-            $slotEndDateTime,
-            $appointment->google_calendar_event_id
-        )) {
-            return redirect()->back()->with('error', 'The proposed time is no longer available.');
+    if ($referredCounselor->google_calendar_id) {
+        try {
+            if (!$calendarService->isSlotAvailable(
+                $referredCounselor->google_calendar_id,
+                $slotStartDateTime,
+                $slotEndDateTime,
+                $appointment->google_calendar_event_id
+            )) {
+                return redirect()->back()->with('error', 'The proposed time is no longer available.');
+            }
+        } catch (\Throwable $exception) {
+            Log::warning('Google Calendar check skipped for referral accept � falling back to DB-only', [
+                'counselor_id' => $referredCounselor->id,
+                'appointment_id' => $appointment->id,
+                'error' => $exception->getMessage(),
+            ]);
         }
-    } catch (\Throwable $exception) {
-        Log::error('Failed to check Google Calendar availability for referral accept', [
-            'counselor_id' => $referredCounselor->id,
-            'appointment_id' => $appointment->id,
-            'error' => $exception->getMessage(),
-        ]);
-
-        return redirect()->back()->with('error', 'Unable to verify counselor availability. Please try again later.');
     }
 
     $acceptNote = "REFERRAL ACCEPTED by student on " . now()->toDateTimeString() .
