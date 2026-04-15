@@ -3,35 +3,46 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="{{ asset('images/msu-iit-logo.png') }}">
+    <link rel="shortcut icon" type="image/png" href="{{ asset('images/msu-iit-logo.png') }}">
     <title>Profile - Office of Guidance and Counseling</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
         :root {
-            --myiit-red: #C41E3A;
-            --myiit-red-dark: #A01830;
-            --myiit-gray-dark: #4A4A4A;
-            --myiit-gray-light: #F5F5F5;
-            --myiit-white: #FFFFFF;
-            --myiit-danger: #DC3545;
-            --myiit-border: #E5E7EB;
-            --myiit-text: #1F2937;
-            --myiit-text-muted: #6B7280;
-            --myiit-shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
-            --myiit-shadow-soft: 0 6px 18px rgba(15, 23, 42, 0.05);
-            --myiit-radius: 18px;
+            --primary-red: #8f1d1d;
+            --primary-red-dark: #6f1414;
+            --primary-red-deep: #5b0f0f;
+            --accent-gold: #d4af37;
+            --accent-gold-soft: #e7c766;
+            --bg-light: #f6f1ea;
+            --bg-soft: #fbf7f2;
+            --bg-white: #fffdfb;
+            --text-dark: #2f2522;
+            --text-secondary: #766864;
+            --text-muted: #a09490;
+            --border-soft: #e8ddd2;
+            --danger-red: #dc3545;
+            --shadow-soft: 0 10px 30px rgba(91, 15, 15, 0.08);
+            --shadow-medium: 0 16px 40px rgba(91, 15, 15, 0.12);
+            --shadow-strong: 0 20px 46px rgba(91, 15, 15, 0.18);
+            --radius-lg: 24px;
+            --radius-md: 18px;
+            --radius-sm: 14px;
         }
 
         * {
             scroll-behavior: smooth;
+            box-sizing: border-box;
         }
 
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background:
-                radial-gradient(circle at top left, rgba(196, 30, 58, 0.06), transparent 28%),
-                linear-gradient(180deg, #FAFAFA 0%, #F5F5F5 100%);
-            color: var(--myiit-text);
+                radial-gradient(circle at top left, rgba(143, 29, 29, 0.06), transparent 24%),
+                radial-gradient(circle at top right, rgba(212, 175, 55, 0.08), transparent 20%),
+                linear-gradient(180deg, #faf6f0 0%, #f6f1ea 100%);
+            color: var(--text-dark);
         }
 
         .profile-container {
@@ -42,29 +53,40 @@
             position: sticky;
             top: 0;
             z-index: 40;
-            background: linear-gradient(90deg, var(--myiit-red) 0%, var(--myiit-red-dark) 100%);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.12);
-            box-shadow: 0 8px 24px rgba(160, 24, 48, 0.22);
+            background: linear-gradient(90deg, var(--primary-red-deep), var(--primary-red), #a11f2f);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 8px 24px rgba(91, 15, 15, 0.18);
             backdrop-filter: blur(12px);
         }
 
         .brand-badge {
-            width: 3rem;
-            height: 3rem;
+            min-width: 112px;
+            height: 58px;
+            padding: 0 16px;
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            border-radius: 14px;
-            background: rgba(255, 255, 255, 0.16);
-            border: 1px solid rgba(255, 255, 255, 0.18);
-            box-shadow: inset 0 1px 0 rgba(255,255,255,0.15);
+            border-radius: 18px;
+            background: rgba(255, 248, 240, 0.12);
+            border: 1px solid rgba(255, 240, 220, 0.18);
+            box-shadow: inset 0 1px 0 rgba(255,255,255,0.14);
+        }
+
+        .brand-text {
+            color: #FFFFFF;
+            font-size: 1.35rem;
+            font-weight: 800;
+            line-height: 1;
+            text-align: center;
+            white-space: nowrap;
+            display: block;
         }
 
         .glass-link {
             display: inline-flex;
             align-items: center;
             gap: 0.5rem;
-            padding: 0.7rem 1rem;
+            padding: 0.72rem 1rem;
             border-radius: 999px;
             color: #fff;
             font-weight: 600;
@@ -72,23 +94,24 @@
         }
 
         .glass-link:hover {
-            background: rgba(255,255,255,0.14);
+            background: rgba(255, 248, 240, 0.12);
             transform: translateY(-1px);
         }
 
         .section-shell {
-            background: rgba(255,255,255,0.72);
+            background: rgba(255, 253, 251, 0.82);
             backdrop-filter: blur(10px);
-            border: 1px solid rgba(255,255,255,0.8);
-            border-radius: 24px;
-            box-shadow: var(--myiit-shadow);
+            border: 1px solid rgba(255, 250, 246, 0.85);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-soft);
         }
 
         .hero-card {
             position: relative;
             overflow: hidden;
-            background: linear-gradient(135deg, rgba(196, 30, 58, 0.98) 0%, rgba(160, 24, 48, 0.98) 100%);
+            background: linear-gradient(135deg, rgba(91, 15, 15, 0.96) 0%, rgba(143, 29, 29, 0.94) 55%, rgba(167, 37, 47, 0.92) 100%);
             color: white;
+            box-shadow: var(--shadow-strong);
         }
 
         .hero-card::before {
@@ -96,47 +119,82 @@
             position: absolute;
             inset: 0;
             background:
-                radial-gradient(circle at top right, rgba(255,255,255,0.18), transparent 28%),
-                radial-gradient(circle at bottom left, rgba(255,255,255,0.12), transparent 26%);
+                radial-gradient(circle at top right, rgba(255,255,255,0.16), transparent 26%),
+                radial-gradient(circle at bottom left, rgba(212,175,55,0.18), transparent 24%);
             pointer-events: none;
         }
 
+        .hero-card::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to bottom, rgba(255,255,255,0.02), rgba(0,0,0,0.08));
+            pointer-events: none;
+        }
+
+        .hero-badge-soft {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.45rem;
+            padding: 0.5rem 0.9rem;
+            border-radius: 999px;
+            background: rgba(255, 248, 240, 0.12);
+            border: 1px solid rgba(255, 240, 220, 0.18);
+            color: rgba(255,255,255,0.9);
+            font-size: 0.76rem;
+            font-weight: 700;
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+        }
+
+        .hero-side-summary {
+            background: rgba(255, 248, 240, 0.12);
+            border: 1px solid rgba(255, 240, 220, 0.18);
+            border-radius: 18px;
+            padding: 1rem 1.15rem;
+            min-width: 220px;
+            backdrop-filter: blur(8px);
+        }
+
         .profile-card {
-            border-radius: var(--myiit-radius);
-            border: 1px solid rgba(229, 231, 235, 0.9);
-            box-shadow: var(--myiit-shadow-soft);
+            background: linear-gradient(180deg, #fffdfb, #faf6f0);
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border-soft);
+            box-shadow: var(--shadow-soft);
             transition: transform 0.28s ease, box-shadow 0.28s ease, border-color 0.28s ease;
         }
 
         .profile-card:hover {
             transform: translateY(-3px);
-            box-shadow: var(--myiit-shadow);
-            border-color: rgba(196, 30, 58, 0.18);
+            box-shadow: var(--shadow-medium);
+            border-color: rgba(143, 29, 29, 0.18);
         }
 
         .tabs-wrap {
             border-radius: 18px;
             overflow: hidden;
-            border: 1px solid rgba(229, 231, 235, 0.9);
-            box-shadow: var(--myiit-shadow-soft);
+            border: 1px solid var(--border-soft);
+            box-shadow: var(--shadow-soft);
+            background: linear-gradient(180deg, #fffdfb, #faf6f0);
         }
 
         .tab-button {
             position: relative;
             padding: 1rem 1.4rem;
-            color: var(--myiit-text-muted);
-            font-weight: 600;
+            color: var(--text-secondary);
+            font-weight: 700;
             transition: all 0.25s ease;
+            background: transparent;
         }
 
         .tab-button:hover {
-            color: var(--myiit-red);
-            background: rgba(196, 30, 58, 0.04);
+            color: var(--primary-red);
+            background: rgba(143, 29, 29, 0.04);
         }
 
         .tab-active {
-            color: var(--myiit-red) !important;
-            background: linear-gradient(180deg, rgba(196, 30, 58, 0.08), rgba(196, 30, 58, 0.02));
+            color: var(--primary-red) !important;
+            background: linear-gradient(180deg, rgba(143, 29, 29, 0.08), rgba(212, 175, 55, 0.03));
         }
 
         .tab-active::after {
@@ -147,7 +205,7 @@
             bottom: 0;
             height: 3px;
             border-radius: 999px;
-            background: linear-gradient(90deg, var(--myiit-red), var(--myiit-red-dark));
+            background: linear-gradient(90deg, var(--accent-gold), var(--primary-red));
         }
 
         .section-title {
@@ -155,8 +213,8 @@
             align-items: center;
             gap: 0.75rem;
             font-size: 1.25rem;
-            font-weight: 700;
-            color: var(--myiit-text);
+            font-weight: 800;
+            color: var(--text-dark);
             margin-bottom: 1.5rem;
         }
 
@@ -167,12 +225,13 @@
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            color: var(--myiit-red);
-            background: rgba(196, 30, 58, 0.08);
+            color: var(--primary-red);
+            background: rgba(212, 175, 55, 0.12);
+            box-shadow: inset 0 0 0 1px rgba(212, 175, 55, 0.18);
         }
 
         .label-text {
-            color: #374151;
+            color: #4b3f3b;
             font-size: 0.875rem;
             font-weight: 700;
             margin-bottom: 0.55rem;
@@ -182,46 +241,47 @@
         .form-select,
         .form-textarea {
             width: 100%;
-            border: 1px solid #D1D5DB;
-            background: #FFFFFF;
-            color: #111827;
+            border: 1px solid #d9cec3;
+            background: #fffdfa;
+            color: #2f2522;
             border-radius: 14px;
-            padding: 0.78rem 1rem;
+            padding: 0.82rem 1rem;
             transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease, background 0.2s ease;
-            box-shadow: inset 0 1px 2px rgba(15, 23, 42, 0.03);
+            box-shadow: inset 0 1px 2px rgba(91, 15, 15, 0.03);
         }
 
         .form-input:hover,
         .form-select:hover,
         .form-textarea:hover {
-            border-color: #C4C9D1;
+            border-color: #cdb8a6;
         }
 
         .form-input:focus,
         .form-select:focus,
         .form-textarea:focus {
             outline: none;
-            border-color: var(--myiit-red);
-            box-shadow: 0 0 0 4px rgba(196, 30, 58, 0.12);
+            border-color: var(--primary-red);
+            box-shadow: 0 0 0 4px rgba(143, 29, 29, 0.10);
+            background: #fffefd;
         }
 
         .form-input[disabled],
         .form-select[disabled],
         .form-textarea[disabled],
         .form-input[readonly] {
-            background: #F3F4F6;
-            color: #6B7280;
+            background: #f3eee8;
+            color: #8a7d77;
             cursor: not-allowed;
         }
 
         .helper-text {
             font-size: 0.75rem;
-            color: var(--myiit-text-muted);
+            color: var(--text-secondary);
             margin-top: 0.45rem;
         }
 
         .error-text {
-            color: #DC2626;
+            color: #b91c1c;
             font-size: 0.8rem;
             margin-top: 0.45rem;
             font-weight: 600;
@@ -235,61 +295,67 @@
             justify-content: center;
             gap: 0.55rem;
             border-radius: 14px;
-            padding: 0.85rem 1.35rem;
+            padding: 0.88rem 1.35rem;
             font-weight: 700;
             transition: all 0.25s ease;
-            box-shadow: 0 10px 20px rgba(15, 23, 42, 0.08);
+            box-shadow: 0 10px 20px rgba(91, 15, 15, 0.08);
         }
 
         .btn-primary {
-            background: linear-gradient(135deg, var(--myiit-red) 0%, var(--myiit-red-dark) 100%);
+            background: linear-gradient(135deg, var(--primary-red) 0%, var(--primary-red-dark) 100%);
             color: white;
         }
 
         .btn-primary:hover {
             transform: translateY(-1px);
-            box-shadow: 0 14px 26px rgba(160, 24, 48, 0.25);
+            box-shadow: 0 14px 26px rgba(91, 15, 15, 0.24);
         }
 
         .btn-secondary {
-            background: white;
-            color: var(--myiit-gray-dark);
-            border: 1px solid #D1D5DB;
+            background: #fffdfa;
+            color: var(--text-dark);
+            border: 1px solid #d9cec3;
         }
 
         .btn-secondary:hover {
-            background: var(--myiit-gray-light);
+            background: #f8f1e8;
         }
 
         .btn-danger {
-            background: linear-gradient(135deg, #DC3545 0%, #B91C1C 100%);
+            background: linear-gradient(135deg, #dc3545 0%, #b91c1c 100%);
             color: white;
         }
 
         .status-card {
             border-radius: 16px;
             border: 1px solid transparent;
-            box-shadow: var(--myiit-shadow-soft);
+            box-shadow: var(--shadow-soft);
         }
 
         .status-success {
-            background: #ECFDF3;
+            background: #eefaf2;
             color: #166534;
-            border-color: #BBF7D0;
+            border-color: #bfe5c8;
         }
 
         .status-warning {
-            background: #FFF7ED;
-            color: #9A3412;
-            border-color: #FED7AA;
+            background: #fff5e8;
+            color: #9a3412;
+            border-color: #f3d2aa;
         }
 
         .checkbox-accent {
-            accent-color: var(--myiit-red);
+            accent-color: var(--primary-red);
+        }
+
+        .feature-callout {
+            border-radius: 16px;
+            background: linear-gradient(180deg, #fffdfb, #f9f3eb);
+            border: 1px solid var(--border-soft);
         }
 
         .footer-shell {
-            background: linear-gradient(180deg, var(--myiit-gray-dark) 0%, #373737 100%);
+            background: linear-gradient(180deg, #4d1212 0%, #3f0e0e 100%);
             border-top: 1px solid rgba(255,255,255,0.06);
         }
 
@@ -303,10 +369,13 @@
 </head>
 <body>
     <div class="profile-container">
-        <nav class="profile-navbar py-4">
+       <nav class="profile-navbar py-4">
             <div class="container mx-auto px-4 md:px-6 flex justify-between items-center gap-4">
                 <div class="flex items-center gap-4 md:gap-6">
-                    <div class="brand-badge text-white font-extrabold text-lg">my.OGC</div>
+                    <div class="brand-badge">
+                        <span class="brand-text">my.OGC</span>
+                    </div>
+
                     <div class="hidden md:flex items-center gap-2">
                         <a href="{{ route('dashboard') }}" class="glass-link">
                             <i class="fas fa-arrow-left"></i>
@@ -330,18 +399,21 @@
             <div class="hero-card section-shell rounded-[24px] p-6 md:p-8 mb-6">
                 <div class="relative flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
                     <div>
-                        <p class="uppercase tracking-[0.22em] text-white/70 text-xs font-bold mb-3">Account Center</p>
+                        <div class="hero-badge-soft mb-3">Account Center</div>
                         <h1 class="text-3xl md:text-4xl font-extrabold leading-tight">Profile Settings</h1>
-                        <p class="text-white/80 mt-3 max-w-2xl">Manage your account information, role details, and password with a cleaner MyIIT-inspired interface.</p>
+                        <p class="text-white/80 mt-3 max-w-2xl">
+                            Manage your account information, role details, and password with the same warm maroon,
+                            cream, and gold experience used across the updated OGC pages.
+                        </p>
                     </div>
-                    <div class="bg-white/10 border border-white/15 rounded-2xl px-5 py-4 min-w-[220px]">
+                    <div class="hero-side-summary">
                         <div class="text-white text-lg font-bold">{{ Auth::user()->first_name }} {{ Auth::user()->last_name }}</div>
                         <div class="text-white/75 text-sm mt-1 capitalize">{{ Auth::user()->role }}</div>
                     </div>
                 </div>
             </div>
 
-            <div class="bg-white tabs-wrap mb-6">
+            <div class="tabs-wrap mb-6">
                 <div class="flex flex-col md:flex-row">
                     <button id="personal-tab" class="tab-button tab-active">Personal Information</button>
                     <button id="role-tab" class="tab-button">{{ ucfirst(Auth::user()->role) }} Profile</button>
@@ -374,7 +446,7 @@
             @endif
 
             <div id="personal-content" class="tab-content">
-                <div class="bg-white p-6 md:p-7 profile-card">
+                <div class="p-6 md:p-7 profile-card">
                     <h2 class="section-title"><i class="fas fa-user"></i> Personal Information</h2>
 
                     @php
@@ -488,7 +560,7 @@
             </div>
 
             <div id="role-content" class="tab-content hidden">
-                <div class="bg-white p-6 md:p-7 profile-card">
+                <div class="p-6 md:p-7 profile-card">
                     <h2 class="section-title"><i class="fas fa-id-badge"></i> {{ ucfirst(Auth::user()->role) }} Profile Information</h2>
 
                     @if(Auth::user()->role === 'student')
@@ -577,9 +649,9 @@
                                 </div>
 
                                 <div class="md:col-span-2">
-                                    <label class="flex items-center gap-3 rounded-2xl border border-gray-200 bg-gray-50 px-4 py-4">
+                                    <label class="flex items-center gap-3 rounded-2xl border border-[var(--border-soft)] bg-[#faf4ec] px-4 py-4">
                                         <input type="checkbox" name="is_head" value="1" {{ old('is_head', $counselorProfile->is_head ?? '') ? 'checked' : '' }} disabled class="checkbox-accent w-4 h-4">
-                                        <span class="text-sm font-medium text-gray-700">Head Counselor</span>
+                                        <span class="text-sm font-medium text-[var(--text-dark)]">Head Counselor</span>
                                     </label>
                                     @error('is_head') <p class="error-text">{{ $message }}</p> @enderror
                                 </div>
@@ -596,7 +668,7 @@
             </div>
 
             <div id="password-content" class="tab-content hidden">
-                <div class="bg-white p-6 md:p-7 profile-card">
+                <div class="p-6 md:p-7 profile-card">
                     <h2 class="section-title"><i class="fas fa-shield-alt"></i> Change Password</h2>
 
                     <form method="POST" action="{{ route('profile.password.update') }}">

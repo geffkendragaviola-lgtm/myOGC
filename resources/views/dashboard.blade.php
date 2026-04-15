@@ -4,21 +4,28 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard - Office of Guidance and Counseling</title>
+    <link rel="icon" type="image/png" href="{{ asset('images/msu-iit-logo.png') }}">
+    <link rel="shortcut icon" type="image/png" href="{{ asset('images/msu-iit-logo.png') }}">
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
 
     <style>
         :root {
-            --primary-red: #C41E3A;
-            --primary-red-dark: #A01830;
-            --sidebar-gray: #4A4A4A;
-            --bg-light: #F5F5F5;
-            --bg-white: #FFFFFF;
-            --text-dark: #2f2f2f;
-            --text-secondary: #6b7280;
-            --text-muted: #9ca3af;
-            --border-soft: #e5e7eb;
-            --danger-red: #DC3545;
+            --primary-red: #8f1d1d;
+            --primary-red-dark: #6f1414;
+            --primary-red-deep: #5b0f0f;
+            --accent-gold: #d4af37;
+            --accent-gold-soft: #e7c766;
+            --bg-light: #f6f1ea;
+            --bg-soft: #fbf7f2;
+            --bg-white: #fffdfb;
+            --text-dark: #2f2522;
+            --text-secondary: #766864;
+            --text-muted: #a09490;
+            --border-soft: #e8ddd2;
+            --shadow-soft: 0 10px 30px rgba(91, 15, 15, 0.08);
+            --shadow-medium: 0 16px 40px rgba(91, 15, 15, 0.12);
+            --shadow-strong: 0 18px 46px rgba(91, 15, 15, 0.18);
         }
 
         * {
@@ -28,10 +35,11 @@
         body {
             background: var(--bg-light);
             color: var(--text-dark);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
 
         .dashboard-container {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            min-height: 100vh;
         }
 
         .dashboard-navbar {
@@ -40,16 +48,15 @@
             left: 0;
             right: 0;
             z-index: 1000;
-            background: rgba(196, 30, 58, 0.96);
+            background: linear-gradient(90deg, var(--primary-red-deep), var(--primary-red), #a11f2f);
             backdrop-filter: blur(10px);
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+            box-shadow: 0 8px 24px rgba(91, 15, 15, 0.18);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
             transition: all 0.3s ease;
         }
 
         .dashboard-navbar.scrolled {
-            background: rgba(196, 30, 58, 0.98);
-            box-shadow: 0 12px 28px rgba(0, 0, 0, 0.18);
+            box-shadow: 0 12px 28px rgba(91, 15, 15, 0.24);
         }
 
         .nav-link {
@@ -59,7 +66,50 @@
         }
 
         .nav-link:hover {
-            color: rgba(255, 255, 255, 0.82);
+            color: rgba(255, 245, 235, 0.88);
+        }
+
+        .dashboard-profile-dropdown {
+            position: relative;
+        }
+
+        .dashboard-profile-dropdown-content {
+            position: absolute;
+            right: 0;
+            top: calc(100% + 10px);
+            background: var(--bg-white);
+            box-shadow: var(--shadow-medium);
+            border-radius: 16px;
+            padding: 1rem;
+            min-width: 220px;
+            z-index: 1001;
+            border: 1px solid var(--border-soft);
+        }
+
+        .dropdown-panel {
+            position: absolute;
+            top: calc(100% + 10px);
+            left: 0;
+            background: var(--bg-white);
+            box-shadow: var(--shadow-medium);
+            border-radius: 16px;
+            padding: 0.5rem;
+            width: 220px;
+            z-index: 1001;
+            border: 1px solid var(--border-soft);
+        }
+
+        .dropdown-link {
+            display: block;
+            padding: 0.75rem 0.9rem;
+            border-radius: 12px;
+            color: var(--text-dark);
+            transition: all 0.2s ease;
+        }
+
+        .dropdown-link:hover {
+            color: var(--primary-red);
+            background: #f8f1e8;
         }
 
         .dashboard-hero {
@@ -68,7 +118,7 @@
             padding: 5.5rem 0 4.5rem;
             padding-top: calc(5.5rem + 4.5rem);
             background:
-                linear-gradient(135deg, rgba(196, 30, 58, 0.78), rgba(74, 74, 74, 0.72)),
+                linear-gradient(135deg, rgba(91, 15, 15, 0.72), rgba(143, 29, 29, 0.58)),
                 url('{{ asset('images/dashboard-header.jpg') }}');
             background-size: cover;
             background-position: center;
@@ -81,7 +131,7 @@
             inset: 0;
             background:
                 radial-gradient(circle at top left, rgba(255,255,255,0.12), transparent 24%),
-                linear-gradient(to bottom, rgba(255,255,255,0.04), rgba(0,0,0,0.18));
+                linear-gradient(to bottom, rgba(255,255,255,0.03), rgba(0,0,0,0.18));
             pointer-events: none;
         }
 
@@ -101,9 +151,9 @@
             display: inline-flex;
             align-items: center;
             gap: 0.5rem;
-            background: rgba(255,255,255,0.12);
-            color: #fff;
-            border: 1px solid rgba(255,255,255,0.18);
+            background: rgba(255, 248, 240, 0.12);
+            color: white;
+            border: 1px solid rgba(255, 240, 220, 0.18);
             border-radius: 999px;
             padding: 0.55rem 1rem;
             font-size: 0.88rem;
@@ -113,8 +163,8 @@
         }
 
         .hero-title {
-            font-size: clamp(2.2rem, 5vw, 4.1rem);
-            line-height: 1.02;
+            font-size: clamp(2.2rem, 5vw, 4.15rem);
+            line-height: 1.03;
             font-weight: 800;
             color: white;
             letter-spacing: -0.03em;
@@ -123,7 +173,7 @@
         }
 
         .hero-description {
-            font-size: 1.02rem;
+            font-size: 1.03rem;
             line-height: 1.8;
             color: rgba(255,255,255,0.92);
             max-width: 700px;
@@ -142,8 +192,8 @@
             gap: 0.5rem;
             padding: 0.7rem 1rem;
             border-radius: 999px;
-            background: rgba(255,255,255,0.12);
-            border: 1px solid rgba(255,255,255,0.16);
+            background: rgba(255, 248, 240, 0.12);
+            border: 1px solid rgba(255, 240, 220, 0.18);
             color: white;
             font-size: 0.9rem;
             font-weight: 600;
@@ -151,11 +201,11 @@
         }
 
         .hero-side-card {
-            background: rgba(255,255,255,0.14);
-            border: 1px solid rgba(255,255,255,0.18);
+            background: rgba(255, 248, 240, 0.12);
+            border: 1px solid rgba(255, 240, 220, 0.18);
             border-radius: 24px;
             padding: 1.4rem;
-            box-shadow: 0 20px 45px rgba(0,0,0,0.16);
+            box-shadow: 0 20px 45px rgba(91, 15, 15, 0.18);
             backdrop-filter: blur(12px);
         }
 
@@ -168,7 +218,7 @@
 
         .hero-quote-author {
             margin-top: 1rem;
-            color: rgba(255,255,255,0.86);
+            color: #f3d991;
             font-size: 0.85rem;
             font-weight: 700;
             letter-spacing: 0.08em;
@@ -183,14 +233,14 @@
         }
 
         .hero-stat {
-            background: rgba(255,255,255,0.12);
-            border: 1px solid rgba(255,255,255,0.14);
+            background: rgba(255, 248, 240, 0.12);
+            border: 1px solid rgba(255, 240, 220, 0.18);
             border-radius: 18px;
             padding: 1rem;
         }
 
         .hero-stat-label {
-            color: rgba(255,255,255,0.72);
+            color: rgba(255, 245, 235, 0.72);
             font-size: 0.78rem;
             text-transform: uppercase;
             letter-spacing: 0.08em;
@@ -205,10 +255,10 @@
         }
 
         .section-card {
-            background: var(--bg-white);
+            background: linear-gradient(180deg, #fffdfb, #faf6f0);
             border: 1px solid var(--border-soft);
             border-radius: 20px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06);
+            box-shadow: var(--shadow-soft);
         }
 
         .section-title-row {
@@ -221,7 +271,7 @@
             width: 6px;
             height: 34px;
             border-radius: 999px;
-            background: linear-gradient(to bottom, var(--primary-red), var(--sidebar-gray));
+            background: linear-gradient(to bottom, var(--accent-gold), var(--primary-red));
             margin-right: 0.85rem;
         }
 
@@ -230,22 +280,47 @@
             margin-right: 0.75rem;
         }
 
-        .dashboard-profile-dropdown {
-            position: relative;
+        .btn-brand {
+            background: linear-gradient(135deg, var(--primary-red), var(--primary-red-dark));
+            color: white;
+            transition: all 0.25s ease;
+            box-shadow: 0 8px 20px rgba(143, 29, 29, 0.18);
         }
 
-        .dashboard-profile-dropdown-content {
-            position: absolute;
-            right: 0;
-            top: 100%;
-            background: white;
-            box-shadow: 0 10px 24px rgba(0, 0, 0, 0.12);
-            border-radius: 14px;
-            padding: 1rem;
-            min-width: 220px;
-            z-index: 1001;
-            margin-top: 0.5rem;
+        .btn-brand:hover {
+            background: linear-gradient(135deg, #a32121, var(--primary-red-deep));
+            transform: translateY(-1px);
+            box-shadow: 0 12px 26px rgba(143, 29, 29, 0.24);
+        }
+
+        .outline-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.45rem;
+            padding: 0.4rem 0.8rem;
+            border-radius: 999px;
+            font-size: 0.78rem;
+            font-weight: 700;
+            border: 1px solid #ead8bf;
+            background: #fbf4ea;
+            color: var(--primary-red);
+        }
+
+        .announcement-image-container {
+            position: relative;
+            width: 100%;
+            overflow: hidden;
+            border-radius: 16px;
+            background: #f8f4ee;
             border: 1px solid var(--border-soft);
+        }
+
+        .announcement-image {
+            width: 100%;
+            height: auto;
+            max-height: 500px;
+            object-fit: cover;
+            display: block;
         }
 
         .dashboard-announcements-container {
@@ -269,58 +344,41 @@
             position: relative;
         }
 
+        .service-card-custom,
         .dashboard-staff-card {
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            background: linear-gradient(180deg, #fffdfb, #faf6f0);
             border: 1px solid var(--border-soft);
+            border-radius: 18px;
+            box-shadow: var(--shadow-soft);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
         }
 
+        .service-card-custom:hover,
         .dashboard-staff-card:hover {
             transform: translateY(-4px);
-            box-shadow: 0 14px 28px rgba(0, 0, 0, 0.08);
-            border-color: rgba(196, 30, 58, 0.22);
+            box-shadow: var(--shadow-medium);
+            border-color: rgba(143, 29, 29, 0.16);
         }
 
         .dashboard-divider {
             height: 1px;
-            background: linear-gradient(to right, transparent, rgba(196,30,58,0.35), rgba(74,74,74,0.25), transparent);
+            background: linear-gradient(
+                to right,
+                transparent,
+                rgba(212, 175, 55, 0.55),
+                rgba(143, 29, 29, 0.22),
+                transparent
+            );
             margin: 3rem 0;
         }
 
-        .announcement-image-container {
-            position: relative;
-            width: 100%;
-            overflow: hidden;
-            border-radius: 16px;
-            background: #f8fafc;
-            border: 1px solid var(--border-soft);
+        .soft-ring {
+            box-shadow: 0 0 0 4px rgba(212, 175, 55, 0.12);
         }
 
-        .announcement-image {
-            width: 100%;
-            height: auto;
-            max-height: 500px;
-            object-fit: cover;
-            display: block;
-        }
-
-        .btn-brand {
-            background: var(--primary-red);
+        footer.dashboard-footer {
+            background: linear-gradient(to right, #5b0f0f, #7b1717, #8f1d1d);
             color: white;
-            transition: all 0.25s ease;
-        }
-
-        .btn-brand:hover {
-            background: var(--primary-red-dark);
-            transform: translateY(-1px);
-        }
-
-        .dropdown-link:hover {
-            color: var(--primary-red);
-            background: var(--bg-light);
-        }
-
-        .brand-soft-bg {
-            background: var(--bg-light);
         }
 
         @media (max-width: 1024px) {
@@ -363,7 +421,7 @@
         }
 
         ::-webkit-scrollbar-track {
-            background: #f1f1f1;
+            background: #f1ece5;
         }
 
         ::-webkit-scrollbar-thumb {
@@ -388,34 +446,28 @@
                     <div class="hidden md:flex space-x-8">
                         @if(Auth::user()->role === 'counselor')
                         <div class="relative" id="counselor-dropdown">
-                            <button
-                                class="nav-link flex items-center"
-                                id="counselor-dropdown-btn"
-                            >
+                            <button class="nav-link flex items-center" id="counselor-dropdown-btn">
                                 Counselor
                                 <i class="fas fa-chevron-down ml-1 text-sm"></i>
                             </button>
 
-                            <div
-                                class="absolute hidden bg-white rounded-xl shadow-lg mt-1 w-52 z-50 border border-[var(--border-soft)]"
-                                id="counselor-dropdown-menu"
-                            >
-                                <a href="{{ route('counselor.dashboard') }}" class="dropdown-link block px-4 py-2 text-gray-800 rounded-t-xl">
+                            <div class="dropdown-panel hidden" id="counselor-dropdown-menu">
+                                <a href="{{ route('counselor.dashboard') }}" class="dropdown-link">
                                     <i class="fas fa-tachometer-alt mr-2"></i> Dashboard
                                 </a>
-                                <a href="{{ route('counselor.resources.index') }}" class="dropdown-link block px-4 py-2 text-gray-800">
+                                <a href="{{ route('counselor.resources.index') }}" class="dropdown-link">
                                     <i class="fas fa-box-open mr-2"></i> Resources
                                 </a>
-                                <a href="{{ route('counselor.announcements.index') }}" class="dropdown-link block px-4 py-2 text-gray-800">
+                                <a href="{{ route('counselor.announcements.index') }}" class="dropdown-link">
                                     <i class="fas fa-bullhorn mr-2"></i> Manage Announcements
                                 </a>
-                                <a href="{{ route('counselor.events.index') }}" class="dropdown-link block px-4 py-2 text-gray-800">
+                                <a href="{{ route('counselor.events.index') }}" class="dropdown-link">
                                     <i class="fas fa-calendar-alt mr-2"></i> Manage Events
                                 </a>
-                                <a href="{{ route('counselor.calendar') }}" class="dropdown-link block px-4 py-2 text-gray-800">
+                                <a href="{{ route('counselor.calendar') }}" class="dropdown-link">
                                     <i class="fas fa-calendar mr-2"></i> Calendar
                                 </a>
-                                <a href="{{ route('counselor.appointments') }}" class="dropdown-link block px-4 py-2 text-gray-800 rounded-b-xl">
+                                <a href="{{ route('counselor.appointments') }}" class="dropdown-link">
                                     <i class="fas fa-list mr-2"></i> Appointments
                                 </a>
                             </div>
@@ -424,34 +476,28 @@
 
                         @if(Auth::user()->role === 'admin')
                         <div class="relative" id="admin-dropdown">
-                            <button
-                                class="nav-link flex items-center"
-                                id="admin-dropdown-btn"
-                            >
+                            <button class="nav-link flex items-center" id="admin-dropdown-btn">
                                 Admin
                                 <i class="fas fa-chevron-down ml-1 text-sm"></i>
                             </button>
 
-                            <div
-                                class="absolute hidden bg-white rounded-xl shadow-lg mt-1 w-52 z-50 border border-[var(--border-soft)]"
-                                id="admin-dropdown-menu"
-                            >
-                                <a href="{{ route('admin.dashboard') }}" class="dropdown-link block px-4 py-2 text-gray-800 rounded-t-xl">
+                            <div class="dropdown-panel hidden" id="admin-dropdown-menu">
+                                <a href="{{ route('admin.dashboard') }}" class="dropdown-link">
                                     <i class="fas fa-tachometer-alt mr-2"></i> Dashboard
                                 </a>
-                                <a href="{{ route('admin.users') }}" class="dropdown-link block px-4 py-2 text-gray-800">
+                                <a href="{{ route('admin.users') }}" class="dropdown-link">
                                     <i class="fas fa-users mr-2"></i> Manage Users
                                 </a>
-                                <a href="{{ route('admin.events') }}" class="dropdown-link block px-4 py-2 text-gray-800">
+                                <a href="{{ route('admin.events') }}" class="dropdown-link">
                                     <i class="fas fa-calendar-alt mr-2"></i> Manage Events
                                 </a>
-                                <a href="{{ route('admin.users.create') }}" class="dropdown-link block px-4 py-2 text-gray-800">
+                                <a href="{{ route('admin.users.create') }}" class="dropdown-link">
                                     <i class="fas fa-user-plus mr-2"></i> Create User
                                 </a>
-                                <a href="{{ route('admin.students') }}" class="dropdown-link block px-4 py-2 text-gray-800">
+                                <a href="{{ route('admin.students') }}" class="dropdown-link">
                                     <i class="fas fa-user-graduate mr-2"></i> Students
                                 </a>
-                                <a href="{{ route('admin.counselors') }}" class="dropdown-link block px-4 py-2 text-gray-800 rounded-b-xl">
+                                <a href="{{ route('admin.counselors') }}" class="dropdown-link">
                                     <i class="fas fa-user-md mr-2"></i> Counselors
                                 </a>
                             </div>
@@ -473,9 +519,9 @@
                                 <button class="nav-link flex items-center" id="services-dropdown-btn">
                                     Services <i class="fas fa-chevron-down ml-1 text-sm"></i>
                                 </button>
-                                <div class="absolute hidden bg-white rounded-xl shadow-lg py-2 mt-1 w-52 z-50 border border-[var(--border-soft)]" id="services-dropdown-menu">
-                                    <a href="{{ route('bap') }}" class="dropdown-link block px-4 py-2 text-gray-800">Book an Appointment</a>
-                                    <a href="{{ route('mhc') }}" class="dropdown-link block px-4 py-2 text-gray-800">Mental Health Corner</a>
+                                <div class="dropdown-panel hidden" id="services-dropdown-menu">
+                                    <a href="{{ route('bap') }}" class="dropdown-link">Book an Appointment</a>
+                                    <a href="{{ route('mhc') }}" class="dropdown-link">Mental Health Corner</a>
                                 </div>
                             </div>
 
@@ -602,16 +648,16 @@
                         use Carbon\Carbon;
                         $userCollegeId = Auth::user()->student->college_id ?? null;
                         $announcements = \App\Models\Announcement::with(['user', 'colleges'])
-                        ->active()
-                        ->when($userCollegeId, function($query) use ($userCollegeId) {
-                            return $query->forCollege($userCollegeId);
-                        })
-                        ->orderBy('created_at', 'desc')
-                        ->get()
-                        ->unique(function ($announcement) {
-                            return strtolower(trim($announcement->title . '|' . $announcement->content));
-                        })
-                        ->values();
+                            ->active()
+                            ->when($userCollegeId, function($query) use ($userCollegeId) {
+                                return $query->forCollege($userCollegeId);
+                            })
+                            ->orderBy('created_at', 'desc')
+                            ->get()
+                            ->unique(function ($announcement) {
+                                return strtolower(trim($announcement->title . '|' . $announcement->content));
+                            })
+                            ->values();
                     @endphp
 
                     <div class="section-card p-6">
@@ -628,17 +674,17 @@
                                             <div class="flex items-center space-x-3">
                                                 <div class="flex flex-wrap gap-2">
                                                     @if($announcement->for_all_colleges)
-                                                        <span class="bg-[#C41E3A] text-white text-xs px-3 py-1 rounded-full font-medium">
+                                                        <span class="bg-gradient-to-r from-[#8f1d1d] to-[#6f1414] text-white text-xs px-3 py-1 rounded-full font-medium">
                                                             <i class="fas fa-globe mr-1"></i> All Colleges
                                                         </span>
                                                     @else
                                                         @foreach($announcement->colleges->take(3) as $college)
-                                                            <span class="bg-[#F5F5F5] text-[#C41E3A] text-xs px-3 py-1 rounded-full font-medium border border-gray-200">
+                                                            <span class="bg-[#fbf4ea] text-[#8f1d1d] text-xs px-3 py-1 rounded-full font-medium border border-[#ead8bf]">
                                                                 <i class="fas fa-university mr-1"></i> {{ $college->name }}
                                                             </span>
                                                         @endforeach
                                                         @if($announcement->colleges->count() > 3)
-                                                            <span class="bg-[#F5F5F5] text-[#C41E3A] text-xs px-3 py-1 rounded-full font-medium border border-gray-200">
+                                                            <span class="bg-[#fbf4ea] text-[#8f1d1d] text-xs px-3 py-1 rounded-full font-medium border border-[#ead8bf]">
                                                                 +{{ $announcement->colleges->count() - 3 }} more
                                                             </span>
                                                         @endif
@@ -735,12 +781,14 @@
                                 </h3>
                             </div>
 
-                            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                                 @foreach($services as $service)
-                                    <div class="bg-white rounded-xl shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden border border-[var(--border-soft)] group">
-                                        <img src="{{ $service->image_url }}"
-                                             alt="{{ $service->title }}"
-                                             class="w-full h-48 object-cover group-hover:scale-105 transition duration-500">
+                                    <div class="service-card-custom overflow-hidden group">
+                                        @if($service->image_url)
+                                            <img src="{{ $service->image_url }}"
+                                                 alt="{{ $service->title }}"
+                                                 class="w-full h-48 object-cover group-hover:scale-105 transition duration-500">
+                                        @endif
 
                                         <div class="p-6">
                                             <h3 class="text-xl font-bold text-[var(--text-dark)] mb-3">
@@ -789,8 +837,8 @@
                     @endphp
 
                     @if($headCounselor)
-                    <div class="bg-white rounded-xl shadow-lg p-8 mb-8 flex flex-col md:flex-row items-center border-l-4 border-[#C41E3A] hover:shadow-xl transition">
-                        <div class="w-32 h-32 bg-gradient-to-br from-[#F5F5F5] to-[#e5e7eb] rounded-full overflow-hidden mb-4 md:mb-0 md:mr-6 shadow-lg ring-4 ring-[#C41E3A]/20">
+                    <div class="section-card p-8 mb-8 flex flex-col md:flex-row items-center border-l-4 border-[#d4af37] hover:shadow-xl transition">
+                        <div class="w-32 h-32 bg-gradient-to-br from-[#f8f1e8] to-[#efe3d4] rounded-full overflow-hidden mb-4 md:mb-0 md:mr-6 shadow-lg soft-ring">
                             <img src="https://images.unsplash.com/photo-1560250097-0b93528c311a?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80" alt="Head Counselor" class="w-full h-full object-cover">
                         </div>
                         <div>
@@ -799,15 +847,15 @@
                                 {{ $headCounselor->user->middle_name ? $headCounselor->user->middle_name . ' ' : '' }}
                                 {{ $headCounselor->user->last_name }}
                             </h3>
-                            <p class="text-[#C41E3A] font-semibold text-lg">Head of the Office of Guidance and Counseling</p>
+                            <p class="text-[var(--primary-red)] font-semibold text-lg">Head of the Office of Guidance and Counseling</p>
                             <p class="text-[var(--text-secondary)]">{{ $headCounselor->position }} • {{ $headCounselor->credentials }}</p>
                             <p class="text-[var(--text-secondary)]">
-                                <i class="fas fa-university mr-2 text-[#C41E3A]"></i>{{ $headCounselor->college->name ?? 'N/A' }}
+                                <i class="fas fa-university mr-2 text-[var(--accent-gold)]"></i>{{ $headCounselor->college->name ?? 'N/A' }}
                             </p>
                             <p class="text-[var(--text-secondary)] mt-2">
-                                <i class="fas fa-envelope mr-2 text-[#C41E3A]"></i>{{ $headCounselor->user->email }}
+                                <i class="fas fa-envelope mr-2 text-[var(--accent-gold)]"></i>{{ $headCounselor->user->email }}
                             </p>
-                            <p class="text-[var(--text-secondary)] mt-2">
+                            <p class="text-[var(--text-secondary)] mt-2 leading-relaxed">
                                 As the Head Counselor, {{ $headCounselor->user->first_name }} provides leadership and direction
                                 for all guidance and counseling services. With credentials in {{ $headCounselor->credentials }},
                                 {{ $headCounselor->user->first_name }} ensures the office delivers comprehensive support to students.
@@ -829,8 +877,8 @@
                                 $counselor = $userCounselors->first();
                                 $colleges = $userCounselors->pluck('college.name')->filter()->implode(', ');
                             @endphp
-                            <div class="dashboard-staff-card bg-white rounded-xl shadow-md p-6 text-center">
-                                <div class="w-24 h-24 bg-gradient-to-br from-[#F5F5F5] to-[#e5e7eb] rounded-full overflow-hidden mx-auto mb-4 ring-2 ring-[#C41E3A]/20">
+                            <div class="dashboard-staff-card p-6 text-center">
+                                <div class="w-24 h-24 bg-gradient-to-br from-[#f8f1e8] to-[#efe3d4] rounded-full overflow-hidden mx-auto mb-4 soft-ring">
                                     <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80" alt="Counselor" class="w-full h-full object-cover">
                                 </div>
                                 <h4 class="text-lg font-semibold text-[var(--text-dark)]">
@@ -838,7 +886,7 @@
                                     {{ $counselor->user->middle_name ? substr($counselor->user->middle_name, 0, 1) . '. ' : '' }}
                                     {{ $counselor->user->last_name }}
                                 </h4>
-                                <p class="text-[#C41E3A] font-medium">{{ $counselor->position }}</p>
+                                <p class="text-[var(--primary-red)] font-medium">{{ $counselor->position }}</p>
                                 <p class="text-[var(--text-secondary)] text-sm mt-1">{{ $colleges }}</p>
                                 <p class="text-[var(--text-muted)] text-sm mt-1">{{ $counselor->credentials }}</p>
                             </div>
@@ -848,10 +896,10 @@
             </div>
         </div>
 
-        <footer class="bg-[#4A4A4A] text-white py-8 mt-8">
+        <footer class="dashboard-footer py-8 mt-8">
             <div class="container mx-auto px-6 text-center">
-                <p class="text-gray-200">&copy; 2025 Office of Guidance and Counseling. All rights reserved.</p>
-                <p class="text-sm text-gray-300 mt-2">Committed to student support, wellness, and accessible guidance services</p>
+                <p class="text-[#f3e8df]">&copy; 2025 Office of Guidance and Counseling. All rights reserved.</p>
+                <p class="text-sm text-[#e5caa9] mt-2">Committed to student support, wellness, and accessible guidance services</p>
             </div>
         </footer>
     </div>
@@ -869,26 +917,32 @@
                 });
             }
 
-            function setupDropdown(dropdownId, btnId, menuId) {
+            function setupDropdown(btnId, menuId) {
                 const btn = document.getElementById(btnId);
                 const menu = document.getElementById(menuId);
                 if (!btn || !menu) return;
 
                 btn.addEventListener('click', function(e) {
                     e.stopPropagation();
+
                     document.querySelectorAll('[id$="-dropdown-menu"]').forEach(m => {
                         if (m !== menu) m.classList.add('hidden');
                     });
+
+                    const profileMenu = document.getElementById('profile-dropdown-menu');
+                    if (profileMenu) profileMenu.classList.add('hidden');
+
                     menu.classList.toggle('hidden');
                 });
             }
 
-            setupDropdown('counselor-dropdown', 'counselor-dropdown-btn', 'counselor-dropdown-menu');
-            setupDropdown('student-dropdown', 'student-dropdown-btn', 'student-dropdown-menu');
-            setupDropdown('services-dropdown', 'services-dropdown-btn', 'services-dropdown-menu');
+            setupDropdown('counselor-dropdown-btn', 'counselor-dropdown-menu');
+            setupDropdown('admin-dropdown-btn', 'admin-dropdown-menu');
+            setupDropdown('services-dropdown-btn', 'services-dropdown-menu');
 
             const profileBtn = document.getElementById('profile-dropdown-btn');
             const profileMenu = document.getElementById('profile-dropdown-menu');
+
             if (profileBtn && profileMenu) {
                 profileBtn.addEventListener('click', function(e) {
                     e.stopPropagation();
@@ -937,17 +991,6 @@
                         showAnnouncement(currentIndex);
                     }
                 }, 8000);
-            }
-
-            const adminDropdownBtn = document.getElementById('admin-dropdown-btn');
-            const adminDropdownMenu = document.getElementById('admin-dropdown-menu');
-            if (adminDropdownBtn && adminDropdownMenu) {
-                adminDropdownBtn.addEventListener('click', function(e) {
-                    e.stopPropagation();
-                    adminDropdownMenu.classList.toggle('hidden');
-                });
-                document.addEventListener('click', () => adminDropdownMenu.classList.add('hidden'));
-                adminDropdownMenu.addEventListener('click', (e) => e.stopPropagation());
             }
 
             document.querySelectorAll('.announcement-image').forEach(img => {
