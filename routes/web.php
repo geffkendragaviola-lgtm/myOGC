@@ -17,6 +17,7 @@ use App\Http\Controllers\AdminController;
 use App\Http\Controllers\StudentController;
 use App\Http\Controllers\AdminResourceController;
 use App\Http\Controllers\AdminFAQController;
+use App\Http\Controllers\AnalyticsController;
 
 Route::get('/', function () {
     return redirect()->route('login');
@@ -136,6 +137,9 @@ Route::middleware('auth')->group(function () {
         Route::get('/feedback/export', [FeedbackController::class, 'export'])->name('counselor.feedback.export');
         Route::get('/availability', [ProfileController::class, 'editAvailability'])->name('counselor.availability.edit');
         Route::patch('/availability', [ProfileController::class, 'updateAvailability'])->name('counselor.availability.update');
+
+        // Analytics
+        Route::get('/analytics', [AnalyticsController::class, 'counselor'])->name('counselor.analytics');
 
         // Events management routes
         Route::get('/events', [EventController::class, 'index'])->name('counselor.events.index');
@@ -267,6 +271,9 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
     Route::get('/feedback', [FeedbackController::class, 'index'])->name('feedback.index');
     Route::get('/feedback/{feedback}', [FeedbackController::class, 'show'])->name('feedback.show');
     Route::get('/feedback/export', [FeedbackController::class, 'export'])->name('feedback.export');
+
+    // Analytics
+    Route::get('/analytics', [AnalyticsController::class, 'index'])->name('analytics');
     // Counselor event registration management
 Route::post('/counselor/events/{event}/registrations/{registration}/reregister', [EventController::class, 'reRegisterStudent'])
     ->name('counselor.events.re-register-student');

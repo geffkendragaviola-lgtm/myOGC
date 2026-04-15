@@ -109,7 +109,6 @@
     .input-field:focus, .select-field:focus, .textarea-field:focus { border-color: var(--maroon-700); box-shadow: 0 0 0 3px rgba(92,26,26,0.08); }
     .input-field:disabled, .select-field:disabled { background: rgba(245,240,235,0.6); color: var(--text-muted); cursor: not-allowed; }
 
-    /* Radio/Checkbox styling */
     .radio-label, .checkbox-label {
         display: inline-flex; align-items: center; gap: 0.4rem;
         font-size: 0.8rem; color: var(--text-primary); cursor: pointer;
@@ -118,7 +117,6 @@
         width: 1rem; height: 1rem; accent-color: var(--maroon-700);
     }
 
-    /* Calendar styles - adapted to design system */
     .calendar-card {
         border: 1px solid var(--border-soft); border-radius: 0.75rem;
         background: white; padding: 1rem;
@@ -169,7 +167,6 @@
     .calendar-status.success { color: #065f46; }
     .calendar-status.error { color: #b91c1c; }
 
-    /* Time slots */
     .time-slots-grid {
         display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.5rem;
     }
@@ -191,7 +188,6 @@
         font-size: 0.75rem; color: var(--text-muted);
     }
 
-    /* Consent Modal - adapted to design system */
     .modal-overlay {
         position: fixed; inset: 0; background: rgba(44,36,32,0.5);
         display: flex; align-items: center; justify-content: center;
@@ -246,14 +242,12 @@
     }
     .modal-hint.success { color: #065f46; }
 
-    /* Helper text */
     .field-help {
         font-size: 0.7rem; color: var(--text-muted); margin-top: 0.35rem;
     }
     .field-help.error { color: #b91c1c; }
     .field-help.success { color: #065f46; }
 
-    /* Loading state */
     .loading-text {
         font-size: 0.75rem; color: var(--maroon-700); font-weight: 500;
     }
@@ -347,6 +341,48 @@
                     </p>
                 </div>
 
+                <!-- Reason / Concern Category -->
+                <div class="mb-6">
+                    <label class="field-label">Reason / Concern Category</label>
+                    <select name="concern_category" id="concernCategory" class="select-field" required>
+                        <option value="">Choose a reason or concern</option>
+                        <option value="Academic Stress">Academic Stress</option>
+                        <option value="Personal Problem">Personal Problem</option>
+                        <option value="Family Concern">Family Concern</option>
+                        <option value="Relationship Concern">Relationship Concern</option>
+                        <option value="Emotional / Mental Well-being">Emotional / Mental Well-being</option>
+                        <option value="Peer / Social Concern">Peer / Social Concern</option>
+                        <option value="Career / Future Uncertainty">Career / Future Uncertainty</option>
+                        <option value="Financial Stress">Financial Stress</option>
+                        <option value="Self-esteem / Confidence">Self-esteem / Confidence</option>
+                        <option value="Other">Other</option>
+                    </select>
+                    <p class="field-help">
+                        Static dropdown for future use. Students can choose the closest reason for booking.
+                    </p>
+                </div>
+
+                <!-- Mood Rating -->
+                <div class="mb-6">
+                    <label class="field-label">How are you feeling today?</label>
+                    <select name="mood_rating" id="moodRating" class="select-field" required>
+                        <option value="">Choose your current mood</option>
+                        <option value="1 - Very Overwhelmed">1 - Very Overwhelmed</option>
+                        <option value="2 - Struggling">2 - Struggling</option>
+                        <option value="3 - Not Okay">3 - Not Okay</option>
+                        <option value="4 - A Little Down">4 - A Little Down</option>
+                        <option value="5 - Neutral">5 - Neutral</option>
+                        <option value="6 - A Bit Better">6 - A Bit Better</option>
+                        <option value="7 - Doing Fine">7 - Doing Fine</option>
+                        <option value="8 - Good">8 - Good</option>
+                        <option value="9 - Very Good">9 - Very Good</option>
+                        <option value="10 - Great">10 - Great</option>
+                    </select>
+                    <p class="field-help">
+                        Static mood check-in for future reporting or triage use.
+                    </p>
+                </div>
+
                 <!-- Date Selection -->
                 <div class="mb-6">
                     <label class="field-label">Select Date</label>
@@ -396,7 +432,7 @@
                               placeholder="Briefly describe the reason for your appointment" required></textarea>
                 </div>
 
-                <!-- Submit Button - Now triggers consent modal -->
+                <!-- Submit Button -->
                 <div class="flex justify-end space-x-3 sm:space-x-4 btn-row-mobile">
                     <a href="{{ route('appointments.index') }}" class="secondary-btn px-5 py-2.5 text-xs sm:text-sm">
                         Cancel
@@ -479,7 +515,6 @@
                 except when referred to clinicians who have memorandum of understanding/MOU with the Institute.
             </p>
             
-            <!-- Scroll indicator -->
             <div id="scrollIndicator" class="scroll-indicator">
                 ↓ Scroll to bottom to enable confirmation ↓
             </div>
@@ -515,7 +550,6 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // Original form functionality variables
     const counselorTypeRadios = document.querySelectorAll('.counselor-type-radio');
     const counselorSelect = document.getElementById('counselorSelect');
     const counselorTypeWrapper = document.getElementById('counselorTypeWrapper');
@@ -534,8 +568,9 @@ document.addEventListener('DOMContentLoaded', function() {
     const bookingTypeInitial = document.getElementById('bookingTypeInitial');
     const bookingTypeHelp = document.getElementById('bookingTypeHelp');
     const referredCounselorOption = document.getElementById('referredCounselorOption');
+    const concernCategorySelect = document.getElementById('concernCategory');
+    const moodRatingSelect = document.getElementById('moodRating');
 
-    // Consent modal variables
     const openConsentModal = document.getElementById('openConsentModal');
     const consentModal = document.getElementById('consentModal');
     const consentContent = document.getElementById('consentContent');
@@ -570,10 +605,11 @@ document.addEventListener('DOMContentLoaded', function() {
         ];
     })) !!};
 
-    // Form validation function
     function validateForm() {
         const counselorId = getActiveCounselorId();
         const bookingType = bookingTypeSelect.value;
+        const concernCategory = concernCategorySelect.value;
+        const moodRating = moodRatingSelect.value;
         const date = dateSelect.value;
         const time = selectedTime.value;
         const concern = document.querySelector('textarea[name="concern"]').value.trim();
@@ -584,6 +620,14 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         if (!bookingType) {
             alert('Please select a booking type');
+            return false;
+        }
+        if (!concernCategory) {
+            alert('Please select a reason or concern category');
+            return false;
+        }
+        if (!moodRating) {
+            alert('Please select how you are feeling today');
             return false;
         }
         if (!date) {
@@ -601,7 +645,6 @@ document.addEventListener('DOMContentLoaded', function() {
         return true;
     }
 
-    // Consent modal functions
     function openModal() {
         if (!validateForm()) {
             return;
@@ -613,7 +656,6 @@ document.addEventListener('DOMContentLoaded', function() {
             consentContent.scrollTop = 0;
         }
         
-        // Reset modal state
         consentCheckbox.checked = false;
         consentCheckbox.disabled = true;
         confirmBooking.disabled = true;
@@ -631,7 +673,6 @@ document.addEventListener('DOMContentLoaded', function() {
         document.body.classList.remove('overflow-hidden');
     }
 
-    // Scroll handler for consent content
     consentContent?.addEventListener('scroll', function() {
         const scrollThreshold = this.scrollHeight - this.clientHeight - 10;
         const isAtBottom = this.scrollTop >= scrollThreshold;
@@ -646,49 +687,40 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // Checkbox change handler
     consentCheckbox?.addEventListener('change', function() {
         confirmBooking.disabled = !this.checked;
     });
 
-    // Confirm booking handler
     confirmBooking?.addEventListener('click', function() {
         if (consentCheckbox.checked) {
-            // Create hidden consent field and submit form
             const consentInput = document.createElement('input');
             consentInput.type = 'hidden';
             consentInput.name = 'consent_acknowledged';
             consentInput.value = '1';
             appointmentForm.appendChild(consentInput);
             
-            // Submit the form
             appointmentForm.submit();
         }
     });
 
-    // Open modal when Book Now is clicked
     openConsentModal?.addEventListener('click', openModal);
 
-    // Close modal handlers
     consentCloseButtons.forEach(button => {
         button.addEventListener('click', closeModal);
     });
 
-    // Close modal on escape key
     document.addEventListener('keydown', function(event) {
         if (event.key === 'Escape' && !consentModal?.classList.contains('hidden')) {
             closeModal();
         }
     });
 
-    // Close modal when clicking outside
     consentModal?.addEventListener('click', function(event) {
         if (event.target.classList.contains('modal-overlay')) {
             closeModal();
         }
     });
 
-    // Original form functions remain the same
     function formatDateValue(date) {
         const year = date.getFullYear();
         const month = String(date.getMonth() + 1).padStart(2, '0');
@@ -1064,7 +1096,6 @@ document.addEventListener('DOMContentLoaded', function() {
             });
     }
 
-    // Event listeners
     counselorTypeRadios.forEach(radio => {
         radio.addEventListener('change', function() {
             if (this.checked) {
@@ -1090,7 +1121,6 @@ document.addEventListener('DOMContentLoaded', function() {
         counselorTypeWrapper?.classList.add('hidden');
     }
 
-    // Initial load
     loadCounselors('college');
     updateBookingTypeOptions();
     checkReferredCounselorsAvailability();

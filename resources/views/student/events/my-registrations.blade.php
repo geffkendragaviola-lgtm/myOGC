@@ -66,6 +66,59 @@
     .stat-icon.attended { background: rgba(16,185,129,0.1); color: #10b981; }
     .stat-icon.cancelled { background: rgba(249,115,22,0.1); color: #f97316; }
 
+    .stat-card {
+        width: 100%;
+        text-align: left;
+        cursor: pointer;
+        border: 1px solid var(--border-soft);
+        appearance: none;
+    }
+
+    .stat-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 18px rgba(44,36,32,0.08);
+    }
+
+    .stat-card:focus-visible {
+        outline: 2px solid var(--gold-400);
+        outline-offset: 2px;
+    }
+
+    .stat-card-active {
+        border-color: rgba(122,42,42,0.25);
+        background: linear-gradient(135deg, rgba(254,249,231,0.95) 0%, rgba(255,255,255,1) 100%);
+        box-shadow: 0 8px 22px rgba(92,26,26,0.10);
+    }
+
+    .stat-card-active::after {
+        content: "";
+        position: absolute;
+        inset-inline: 0;
+        bottom: 0;
+        height: 3px;
+        background: linear-gradient(90deg, var(--maroon-800) 0%, var(--gold-400) 100%);
+    }
+
+    .stat-card-active .stat-icon.total {
+        background: rgba(122,42,42,0.18);
+        color: var(--maroon-800);
+    }
+
+    .stat-card-active .stat-icon.active {
+        background: rgba(212,175,55,0.22);
+        color: var(--gold-500);
+    }
+
+    .stat-card-active .stat-icon.attended {
+        background: rgba(16,185,129,0.18);
+        color: #059669;
+    }
+
+    .stat-card-active .stat-icon.cancelled {
+        background: rgba(249,115,22,0.18);
+        color: #ea580c;
+    }
+
     .hero-badge {
         display: inline-flex; align-items: center; gap: 0.4rem; border-radius: 999px;
         border: 1px solid rgba(212,175,55,0.3); background: rgba(254,249,231,0.9);
@@ -115,27 +168,6 @@
     .panel-icon { width: 2rem; height: 2rem; border-radius: 0.6rem; display: flex; align-items: center; justify-content: center; background: rgba(254,249,231,0.7); color: var(--maroon-700); }
     .panel-title { font-size: 0.8rem; font-weight: 600; color: var(--text-primary); }
     .panel-subtitle { font-size: 0.68rem; color: var(--text-muted); margin-top: 0.1rem; }
-
-    /* Tabs - adapted to design system */
-    .tabs-nav {
-        display: flex; border-bottom: 1px solid var(--border-soft);
-        overflow-x: auto; -webkit-overflow-scrolling: touch;
-    }
-    .tab-btn {
-        padding: 0.75rem 1.25rem; font-size: 0.75rem; font-weight: 600;
-        color: var(--text-muted); border-bottom: 2px solid transparent;
-        white-space: nowrap; transition: all 0.2s ease;
-        background: transparent; border: none; cursor: pointer;
-        display: flex; align-items: center; gap: 0.4rem;
-    }
-    .tab-btn:hover { color: var(--maroon-700); background: rgba(254,249,231,0.4); }
-    .tab-active {
-        color: var(--maroon-700) !important;
-        border-bottom-color: var(--gold-400) !important;
-        background: rgba(254,249,231,0.6);
-    }
-    .tab-content { display: block; }
-    .tab-content.hidden { display: none; }
 
     /* Event Card Specific Styles */
     .event-image {
@@ -238,6 +270,62 @@
     }
     .back-link:hover { color: var(--maroon-900); transform: translateX(-2px); }
 
+    /* Total Count in Header */
+    .header-total {
+        margin-left: auto;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        background: linear-gradient(135deg, rgba(122,42,42,0.08) 0%, rgba(212,175,55,0.08) 100%);
+        padding: 0.5rem 1rem;
+        border-radius: 0.75rem;
+        border: 1px solid rgba(212,175,55,0.2);
+    }
+    .header-total-icon {
+        width: 2rem;
+        height: 2rem;
+        border-radius: 0.5rem;
+        background: linear-gradient(135deg, var(--maroon-800) 0%, var(--maroon-700) 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+    }
+    .header-total-info {
+        text-align: right;
+    }
+    .header-total-label {
+        font-size: 0.7rem;
+        color: var(--text-secondary);
+        letter-spacing: 0.05em;
+    }
+    .header-total-number {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: var(--maroon-700);
+        line-height: 1.2;
+    }
+
+    /* Section Headers */
+    .section-header {
+        margin-bottom: 1.5rem;
+        padding-bottom: 0.75rem;
+        border-bottom: 2px solid var(--gold-400);
+        display: inline-block;
+    }
+    .section-header h2 {
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: var(--text-primary);
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    .section-header h2 i {
+        color: var(--maroon-700);
+        font-size: 1rem;
+    }
+
     /* Responsive Utilities */
     @media (max-width: 639px) {
         .panel-header { padding: 0.75rem 1rem; }
@@ -251,9 +339,17 @@
         .event-badge { font-size: 0.6rem; padding: 0.12rem 0.4rem; }
         .event-badge.completed, .event-badge.cancelled-overlay span { font-size: 0.65rem; padding: 0.15rem 0.5rem; }
         .event-detail { font-size: 0.7rem; }
-        .tabs-nav { padding: 0 0.5rem; }
-        .tab-btn { padding: 0.65rem 1rem; font-size: 0.7rem; }
         .stat-grid-mobile { grid-template-columns: 1fr 1fr !important; gap: 0.75rem !important; }
+        .header-total {
+            padding: 0.35rem 0.75rem;
+        }
+        .header-total-icon {
+            width: 1.75rem;
+            height: 1.75rem;
+        }
+        .header-total-number {
+            font-size: 1.25rem;
+        }
     }
 </style>
 
@@ -262,23 +358,38 @@
     <div class="dashboard-glow two"></div>
 
     <div class="relative max-w-7xl mx-auto px-4 sm:px-6 py-5 md:py-8">
-        <!-- Page Header -->
+        <!-- Page Header with Total on the Right -->
         <div class="mb-5 sm:mb-6">
             <div class="hero-card">
-                <div class="relative p-4 sm:p-5 flex items-start gap-3">
-                    <div class="hero-icon">
-                        <i class="fas fa-calendar-check text-base sm:text-lg"></i>
-                    </div>
-                    <div class="min-w-0">
-                        <div class="hero-badge">
-                            <span class="hero-badge-dot"></span>
-                            My Registrations
+                <div class="relative p-4 sm:p-5 flex items-start justify-between gap-3">
+                    <div class="flex items-start gap-3">
+                        <div class="hero-icon">
+                            <i class="fas fa-calendar-check text-base sm:text-lg"></i>
                         </div>
-                        <h1 class="text-lg sm:text-xl lg:text-2xl font-semibold tracking-tight text-[#2c2420] mt-2">My Event Registrations</h1>
-                        <p class="text-[#6b5e57] text-xs sm:text-sm mt-1.5 max-w-2xl">
-                            View and manage your mental health event registrations.
-                        </p>
+                        <div class="min-w-0">
+                            <div class="hero-badge">
+                                <span class="hero-badge-dot"></span>
+                                My Registrations
+                            </div>
+                            <h1 class="text-lg sm:text-xl lg:text-2xl font-semibold tracking-tight text-[#2c2420] mt-2">My Event Registrations</h1>
+                            <p class="text-[#6b5e57] text-xs sm:text-sm mt-1.5 max-w-2xl">
+                                View and manage your mental health event registrations.
+                            </p>
+                        </div>
                     </div>
+                    
+                    <!-- Total Count Display -->
+                    @if($student)
+                    <div class="header-total">
+                        <div class="header-total-icon">
+                            <i class="fas fa-chart-line text-xs sm:text-sm"></i>
+                        </div>
+                        <div class="header-total-info">
+                            <div class="header-total-label">Total Registrations</div>
+                            <div class="header-total-number">{{ $registrations->count() }}</div>
+                        </div>
+                    </div>
+                    @endif
                 </div>
             </div>
         </div>
@@ -299,21 +410,10 @@
                 </a>
             </div>
         @else
-            <!-- Stats Cards -->
+            <!-- Stats Cards (Filter Buttons) -->
             <div class="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6 mb-6 sm:mb-8 stat-grid-mobile">
-                <div class="stat-card">
-                    <div class="p-4 flex items-center gap-3">
-                        <div class="stat-icon total">
-                            <i class="fas fa-calendar"></i>
-                        </div>
-                        <div class="min-w-0">
-                            <p class="text-[0.7rem] text-[#6b5e57]">Total</p>
-                            <p class="text-lg font-bold text-[#2c2420] leading-tight">{{ $registrations->count() }}</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="stat-card">
-                    <div class="p-4 flex items-center gap-3">
+                <button type="button" id="active-card" class="stat-card">
+                    <div class="p-4 flex items-center gap-3 w-full text-left">
                         <div class="stat-icon active">
                             <i class="fas fa-play-circle"></i>
                         </div>
@@ -322,9 +422,10 @@
                             <p class="text-lg font-bold text-[#2c2420] leading-tight">{{ $registrations->where('status', 'registered')->count() }}</p>
                         </div>
                     </div>
-                </div>
-                <div class="stat-card">
-                    <div class="p-4 flex items-center gap-3">
+                </button>
+
+                <button type="button" id="attended-card" class="stat-card">
+                    <div class="p-4 flex items-center gap-3 w-full text-left">
                         <div class="stat-icon attended">
                             <i class="fas fa-check-circle"></i>
                         </div>
@@ -333,9 +434,10 @@
                             <p class="text-lg font-bold text-[#2c2420] leading-tight">{{ $registrations->where('status', 'attended')->count() }}</p>
                         </div>
                     </div>
-                </div>
-                <div class="stat-card">
-                    <div class="p-4 flex items-center gap-3">
+                </button>
+
+                <button type="button" id="cancelled-card" class="stat-card">
+                    <div class="p-4 flex items-center gap-3 w-full text-left">
                         <div class="stat-icon cancelled">
                             <i class="fas fa-times-circle"></i>
                         </div>
@@ -344,29 +446,19 @@
                             <p class="text-lg font-bold text-[#2c2420] leading-tight">{{ $registrations->where('status', 'cancelled')->count() }}</p>
                         </div>
                     </div>
-                </div>
-            </div>
-
-            <!-- Tabs -->
-            <div class="panel-card mb-5 sm:mb-6">
-                <div class="tabs-nav">
-                    <button id="active-tab" class="tab-btn tab-active">
-                        <i class="fas fa-calendar-check text-[9px]"></i>
-                        Active ({{ $registrations->where('status', 'registered')->count() }})
-                    </button>
-                    <button id="cancelled-tab" class="tab-btn">
-                        <i class="fas fa-history text-[9px]"></i>
-                        Cancelled ({{ $registrations->where('status', 'cancelled')->count() }})
-                    </button>
-                    <button id="attended-tab" class="tab-btn">
-                        <i class="fas fa-check-double text-[9px]"></i>
-                        Attended ({{ $registrations->where('status', 'attended')->count() }})
-                    </button>
-                </div>
+                </button>
             </div>
 
             <!-- Active Registrations Section -->
             <div id="active-section" class="tab-content">
+                <div class="section-header">
+                    <h2>
+                        <i class="fas fa-calendar-check"></i>
+                        Active Registrations
+                        <span class="text-sm font-normal text-[#6b5e57] ml-2">({{ $registrations->where('status', 'registered')->count() }})</span>
+                    </h2>
+                </div>
+                
                 @if($registrations->where('status', 'registered')->isEmpty())
                     <div class="glass-card empty-state mb-6">
                         <div class="empty-state-icon">
@@ -392,6 +484,14 @@
 
             <!-- Cancelled Registrations Section -->
             <div id="cancelled-section" class="tab-content hidden">
+                <div class="section-header">
+                    <h2>
+                        <i class="fas fa-history"></i>
+                        Cancelled Registrations
+                        <span class="text-sm font-normal text-[#6b5e57] ml-2">({{ $registrations->where('status', 'cancelled')->count() }})</span>
+                    </h2>
+                </div>
+                
                 @if($registrations->where('status', 'cancelled')->isEmpty())
                     <div class="glass-card empty-state mb-6">
                         <div class="empty-state-icon">
@@ -403,17 +503,6 @@
                         </p>
                     </div>
                 @else
-                    <div class="panel-card mb-5">
-                        <div class="panel-topline"></div>
-                        <div class="panel-header">
-                            <div class="panel-icon"><i class="fas fa-history text-[9px] sm:text-xs"></i></div>
-                            <div>
-                                <h3 class="panel-title">Your Cancelled Registrations</h3>
-                                <p class="panel-subtitle hidden sm:block">Events you previously registered for but cancelled.</p>
-                            </div>
-                        </div>
-                    </div>
-
                     <div class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-5 sm:gap-6">
                         @foreach($registrations->where('status', 'cancelled') as $registration)
                             <div class="event-card" style="border-left: 3px solid #f97316; opacity: 0.95;">
@@ -553,6 +642,14 @@
 
             <!-- Attended Events Section -->
             <div id="attended-section" class="tab-content hidden">
+                <div class="section-header">
+                    <h2>
+                        <i class="fas fa-check-double"></i>
+                        Attended Events
+                        <span class="text-sm font-normal text-[#6b5e57] ml-2">({{ $registrations->where('status', 'attended')->count() }})</span>
+                    </h2>
+                </div>
+                
                 @if($registrations->where('status', 'attended')->isEmpty())
                     <div class="glass-card empty-state mb-6">
                         <div class="empty-state-icon">
@@ -649,23 +746,49 @@
         element.classList.toggle('hidden');
     }
 
-    // Tab functionality
-    document.addEventListener('DOMContentLoaded', function() {
-        const tabs = document.querySelectorAll('.tab-btn');
-        const contents = document.querySelectorAll('.tab-content');
+    document.addEventListener('DOMContentLoaded', function () {
+        const statCards = document.querySelectorAll('.stat-card');
+        const sections = {
+            'total-card': ['active-section', 'cancelled-section', 'attended-section'],
+            'active-card': ['active-section'],
+            'cancelled-card': ['cancelled-section'],
+            'attended-card': ['attended-section']
+        };
 
-        tabs.forEach(tab => {
-            tab.addEventListener('click', function() {
-                // Remove active class from all tabs
-                tabs.forEach(t => t.classList.remove('tab-active'));
-                contents.forEach(c => c.classList.add('hidden'));
+        function clearStatCards() {
+            statCards.forEach(card => card.classList.remove('stat-card-active'));
+        }
 
-                // Add active class to clicked tab
-                this.classList.add('tab-active');
+        function showSections(sectionIds) {
+            // Hide all sections first
+            document.querySelectorAll('.tab-content').forEach(section => {
+                section.classList.add('hidden');
+            });
+            
+            // Show selected sections
+            sectionIds.forEach(sectionId => {
+                const section = document.getElementById(sectionId);
+                if (section) section.classList.remove('hidden');
+            });
+        }
 
-                // Show corresponding content
-                const tabId = this.id.replace('-tab', '-section');
-                document.getElementById(tabId).classList.remove('hidden');
+        function activateCard(cardId) {
+            clearStatCards();
+            const card = document.getElementById(cardId);
+            if (card) {
+                card.classList.add('stat-card-active');
+                
+                // Show corresponding sections
+                if (sections[cardId]) {
+                    showSections(sections[cardId]);
+                }
+            }
+        }
+
+        // Add click handlers to stat cards
+        statCards.forEach(card => {
+            card.addEventListener('click', function() {
+                activateCard(this.id);
             });
         });
     });

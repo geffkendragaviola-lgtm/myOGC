@@ -611,9 +611,43 @@
                         </form>
 
                     @elseif(Auth::user()->role === 'counselor')
-                        <form method="POST" action="{{ route('profile.counselor.update') }}">
+                        <form method="POST" action="{{ route('profile.counselor.update') }}" enctype="multipart/form-data">
                             @csrf
                             @method('patch')
+
+                            {{-- Profile Picture --}}
+                            <div class="mb-6 flex flex-col sm:flex-row items-center gap-5">
+                                <div class="relative flex-shrink-0">
+                                    @if(Auth::user()->profile_picture)
+                                        <img id="pic-preview"
+                                             src="{{ asset('storage/' . Auth::user()->profile_picture) }}"
+                                             alt="Profile Picture"
+                                             class="w-24 h-24 rounded-full object-cover border-4"
+                                             style="border-color: var(--accent-gold);">
+                                    @else
+                                        <div id="pic-placeholder"
+                                             class="w-24 h-24 rounded-full flex items-center justify-center text-3xl font-bold text-white"
+                                             style="background: linear-gradient(135deg, var(--primary-red), var(--primary-red-dark));">
+                                            {{ strtoupper(substr(Auth::user()->first_name, 0, 1)) }}
+                                        </div>
+                                        <img id="pic-preview" src="" alt="Preview" class="w-24 h-24 rounded-full object-cover border-4 hidden"
+                                             style="border-color: var(--accent-gold);">
+                                    @endif
+                                </div>
+                                <div class="flex-1">
+                                    <label class="block label-text mb-1">Profile Picture</label>
+                                    <label for="profile_picture"
+                                           class="inline-flex items-center gap-2 cursor-pointer px-4 py-2 rounded-xl text-sm font-semibold transition"
+                                           style="background: var(--bg-light); border: 1px solid var(--border-soft); color: var(--text-dark);">
+                                        <i class="fas fa-camera"></i> Choose Photo
+                                    </label>
+                                    <input type="file" id="profile_picture" name="profile_picture"
+                                           accept="image/jpeg,image/png,image/jpg,image/gif,image/webp"
+                                           class="hidden" onchange="previewPic(this)">
+                                    <p class="helper-text mt-1">JPG, PNG, GIF or WebP. Max 4MB.</p>
+                                    @error('profile_picture') <p class="error-text">{{ $message }}</p> @enderror
+                                </div>
+                            </div>
 
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div>
@@ -712,6 +746,20 @@
     </div>
 
     <script>
+        function previewPic(input) {
+            const preview = document.getElementById('pic-preview');
+            const placeholder = document.getElementById('pic-placeholder');
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = e => {
+                    preview.src = e.target.result;
+                    preview.classList.remove('hidden');
+                    if (placeholder) placeholder.classList.add('hidden');
+                };
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
         document.addEventListener('DOMContentLoaded', function() {
             const tabs = {
                 'personal-tab': 'personal-content',

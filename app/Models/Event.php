@@ -27,6 +27,7 @@ class Event extends Model
         'is_active',
         'is_required',
         'for_all_colleges',
+        'year_levels',
         'image'
     ];
 
@@ -36,6 +37,7 @@ class Event extends Model
         'is_active' => 'boolean',
         'is_required' => 'boolean',
         'for_all_colleges' => 'boolean',
+        'year_levels' => 'array',
     ];
 
     protected $appends = [
@@ -279,11 +281,21 @@ public function getCancellationCutoffTime(): string
      */
     public function isAvailableForStudent(Student $student): bool
     {
-        if ($this->for_all_colleges) {
-            return true;
+        // Check college restriction
+        if (!$this->for_all_colleges) {
+            if (!$this->colleges()->where('college_id', $student->college_id)->exists()) {
+                return false;
+            }
         }
 
-        return $this->colleges()->where('college_id', $student->college_id)->exists();
+        // Check year level restriction
+        if (!empty($this->year_levels)) {
+            if (!in_array($student->year_level, $this->year_levels)) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     /**
@@ -295,11 +307,18 @@ public function getCancellationCutoffTime(): string
             return false;
         }
 
-        if ($this->for_all_colleges) {
-            return true;
-        }
+        return $this->isAvailableForStudent($student);
+    }
 
-        return $this->colleges()->where('college_id', $student->college_id)->exists();
+    /**
+     * Check if a year level is targeted by this event
+     */
+    public function isForYearLevel(?string $yearLevel): bool
+    {
+        if (empty($this->year_levels)) {
+            return true; // no restriction = all year levels
+        }
+        return in_array($yearLevel, $this->year_levels);
     }
 
     /**

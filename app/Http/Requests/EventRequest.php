@@ -28,6 +28,8 @@ class EventRequest extends FormRequest
             'for_all_colleges' => 'boolean',
             'colleges' => 'required_if:for_all_colleges,false|array',
             'colleges.*' => 'exists:colleges,id',
+            'year_levels' => 'nullable|array',
+            'year_levels.*' => 'string|in:1st Year,2nd Year,3rd Year,4th Year,5th Year',
         ];
 
         // Add image validation for create and update

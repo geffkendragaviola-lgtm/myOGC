@@ -535,8 +535,8 @@
                 <img src="{{ asset('images/msu-iit-logo.png') }}" alt="MSU-IIT" class="h-8 w-8 object-contain" onerror="this.style.display='none'">
             </div>
             <span class="ogc-brand-text text-white font-bold text-sm hidden md:block">
-                MSU-IIT<br>
-                <span class="sub font-medium text-xs">Guidance & Counseling</span>
+                my.OGC<br>
+                <span class="sub font-medium text-xs">MSU-IIT Office of Guidance & Counseling</span>
             </span>
         </div>
 
@@ -574,8 +574,14 @@
             <div class="sidebar-user-section">
                 <div class="sidebar-user-card">
                     <div class="flex items-center gap-3">
-                        <div class="sidebar-user-avatar">
-                            <i class="fas fa-user-tie text-white text-sm"></i>
+                        <div class="sidebar-user-avatar" style="{{ Auth::user()->profile_picture ? 'background:none;padding:0;overflow:hidden;' : '' }}">
+                            @if(Auth::user()->profile_picture)
+                                <img src="{{ asset('storage/' . Auth::user()->profile_picture) }}"
+                                     alt="Profile"
+                                     style="width:100%;height:100%;object-fit:cover;border-radius:1rem;">
+                            @else
+                                <i class="fas fa-user-tie text-white text-sm"></i>
+                            @endif
                         </div>
                         <div class="flex-1 min-w-0">
                             <div class="sidebar-user-name truncate">{{ Auth::user()->first_name }} {{ Auth::user()->last_name }}</div>
@@ -632,6 +638,11 @@
                 <a href="{{ route('counselor.availability.edit') }}" class="sidebar-link {{ request()->routeIs('counselor.availability.*') ? 'active' : '' }}">
                     <i class="fas fa-calendar-check"></i>
                     <span>Availability</span>
+                </a>
+
+                <a href="{{ route('counselor.analytics') }}" class="sidebar-link {{ request()->routeIs('counselor.analytics') ? 'active' : '' }}">
+                    <i class="fas fa-chart-bar"></i>
+                    <span>Analytics</span>
                 </a>
             </div>
         </div>

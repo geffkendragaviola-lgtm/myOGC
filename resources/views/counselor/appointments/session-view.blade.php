@@ -198,6 +198,28 @@
                                 <span class="detail-label">Case Number</span>
                                 <div class="detail-value muted">{{ $appointment->case_number ?: '—' }}</div>
                             </div>
+                            {{-- Referred By --}}
+                            <div>
+                                <span class="detail-label">Referred By</span>
+                                <div class="detail-value muted">
+                                    @if($appointment->originalCounselor && $appointment->originalCounselor->user)
+                                        {{ $appointment->originalCounselor->user->first_name }} {{ $appointment->originalCounselor->user->last_name }}
+                                    @else
+                                        N/A
+                                    @endif
+                                </div>
+                            </div>
+                            {{-- Referred To --}}
+                            <div>
+                                <span class="detail-label">Referred To</span>
+                                <div class="detail-value muted">
+                                    @if($appointment->referredCounselor && $appointment->referredCounselor->user)
+                                        {{ $appointment->referredCounselor->user->first_name }} {{ $appointment->referredCounselor->user->last_name }}
+                                    @else
+                                        N/A
+                                    @endif
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>

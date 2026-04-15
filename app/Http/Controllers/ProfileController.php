@@ -153,6 +153,7 @@ class ProfileController extends Controller
         try {
             $request->validate([
                 'google_calendar_id' => ['nullable', 'string', 'max:255'],
+                'profile_picture'    => ['nullable', 'image', 'mimes:jpeg,png,jpg,gif,webp', 'max:4096'],
             ]);
 
             $user = $request->user();
@@ -164,6 +165,17 @@ class ProfileController extends Controller
             $counselorProfiles = Counselor::where('user_id', $user->id)->get();
             if ($counselorProfiles->isEmpty()) {
                 return back()->withErrors(['error' => 'Counselor profile not found.']);
+            }
+
+            // Handle profile picture upload
+            if ($request->hasFile('profile_picture')) {
+                // Delete old picture if exists
+                if ($user->profile_picture) {
+                    \Illuminate\Support\Facades\Storage::disk('public')->delete($user->profile_picture);
+                }
+                $path = $request->file('profile_picture')->store('profile-pictures', 'public');
+                $user->profile_picture = $path;
+                $user->save();
             }
 
             Counselor::where('user_id', $user->id)->update([

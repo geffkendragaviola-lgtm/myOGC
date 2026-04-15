@@ -625,7 +625,7 @@
                             {{ $student->phone_number ?: 'Not provided' }}
                         </div>
                         <div>
-                            <strong>Address:</strong><br>
+                            <strong>Current Address (<i>in Iligan City</i>):</strong><br>
                             {{ $student->user->address ?? 'Not provided' }}
                         </div>
                         <div>

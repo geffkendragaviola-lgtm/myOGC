@@ -350,6 +350,27 @@
                         @enderror
                     </div>
 
+                    <!-- Year Level Restriction -->
+                    <div class="md:col-span-2">
+                        <label class="section-title">Year Level Restriction</label>
+                        <p class="text-xs mb-2" style="color:var(--text-muted)">Leave all unchecked to allow all year levels. Check specific year levels to restrict visibility.</p>
+                        @php $savedYearLevels = old('year_levels', $event->year_levels ?? []); @endphp
+                        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-2">
+                            @foreach(['1st Year','2nd Year','3rd Year','4th Year','5th Year'] as $yl)
+                            <div class="flex items-center gap-2 p-2 rounded-lg border border-[var(--border-soft)] bg-[rgba(250,248,245,0.6)]">
+                                <input type="checkbox" id="yl_{{ Str::slug($yl) }}" name="year_levels[]"
+                                       value="{{ $yl }}"
+                                       {{ in_array($yl, $savedYearLevels) ? 'checked' : '' }}
+                                       class="custom-checkbox">
+                                <label for="yl_{{ Str::slug($yl) }}" class="custom-control-label text-xs">{{ $yl }}</label>
+                            </div>
+                            @endforeach
+                        </div>
+                        @error('year_levels')
+                            <p class="error-msg">{{ $message }}</p>
+                        @enderror
+                    </div>
+
                     <!-- Start Date -->
                     <div>
                         <label for="event_start_date" class="section-title">Start Date *</label>
