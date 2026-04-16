@@ -519,6 +519,54 @@
 </style>
 
     @stack('styles')
+
+    {{-- ── Counselor content scale-up ── --}}
+    <style>
+    #ogcMainContent > * { font-size: 1rem; }
+    #ogcMainContent .max-w-7xl { max-width: 90rem; }
+    #ogcMainContent .max-w-6xl { max-width: 80rem; }
+    #ogcMainContent .max-w-5xl { max-width: 72rem; }
+    #ogcMainContent .max-w-4xl { max-width: 64rem; }
+    #ogcMainContent .py-5    { padding-top: 1.75rem; padding-bottom: 1.75rem; }
+    #ogcMainContent .py-6    { padding-top: 2rem;    padding-bottom: 2rem; }
+    #ogcMainContent .md\:py-8 { padding-top: 2.5rem; padding-bottom: 2.5rem; }
+    #ogcMainContent .px-4    { padding-left: 1.5rem;  padding-right: 1.5rem; }
+    #ogcMainContent .sm\:px-6 { padding-left: 2rem;   padding-right: 2rem; }
+    #ogcMainContent h1.text-lg   { font-size: 1.35rem; }
+    #ogcMainContent h1.text-xl   { font-size: 1.5rem; }
+    #ogcMainContent h1.text-2xl  { font-size: 1.75rem; }
+    #ogcMainContent h1.lg\:text-2xl { font-size: 1.75rem; }
+    #ogcMainContent .text-xs  { font-size: 0.82rem; }
+    #ogcMainContent .text-sm  { font-size: 0.925rem; }
+    #ogcMainContent .text-base { font-size: 1.05rem; }
+    #ogcMainContent table td,
+    #ogcMainContent table th { padding-top: 0.85rem; padding-bottom: 0.85rem; }
+    #ogcMainContent .stat-value   { font-size: 2rem; }
+    #ogcMainContent .summary-value { font-size: 1.75rem; }
+    #ogcMainContent .panel-card .p-3   { padding: 1.1rem; }
+    #ogcMainContent .panel-card .p-4   { padding: 1.35rem; }
+    #ogcMainContent .panel-card .sm\:p-4 { padding: 1.35rem; }
+    #ogcMainContent .panel-card .sm\:p-5 { padding: 1.5rem; }
+    #ogcMainContent .panel-card .p-5   { padding: 1.5rem; }
+    #ogcMainContent .hero-icon { width: 3.25rem; height: 3.25rem; font-size: 1.2rem; }
+    #ogcMainContent .panel-icon,
+    #ogcMainContent .panel-header-icon { width: 2.4rem; height: 2.4rem; }
+    #ogcMainContent .input-field,
+    #ogcMainContent .select-field,
+    #ogcMainContent .filter-input { padding: 0.65rem 0.9rem; font-size: 0.9rem; }
+    #ogcMainContent .primary-btn,
+    #ogcMainContent .search-btn { padding: 0.65rem 1.35rem; font-size: 0.9rem; }
+    #ogcMainContent .gap-3 { gap: 1rem; }
+    #ogcMainContent .gap-4 { gap: 1.25rem; }
+    #ogcMainContent .sm\:gap-4 { gap: 1.25rem; }
+    #ogcMainContent .sm\:gap-6 { gap: 1.75rem; }
+    #ogcMainContent .gap-6 { gap: 1.75rem; }
+    #ogcMainContent .avatar-badge { width: 2.75rem; height: 2.75rem; font-size: 0.85rem; border-radius: 0.75rem; }
+    #ogcMainContent .panel-header { padding: 1rem 1.5rem; }
+    #ogcMainContent .table-header-bar { padding: 0.9rem 1.5rem; }
+    #ogcMainContent .pagination-shell,
+    #ogcMainContent .table-footer { padding: 0.9rem 1.5rem; }
+    </style>
 </head>
 <body>
 
@@ -570,31 +618,31 @@
 
     {{-- ── SIDEBAR (Counselor) ── --}}
     <nav id="ogcSidebar" class="ogc-sidebar fixed top-16 left-0 h-[calc(100vh-4rem)] w-64 flex flex-col z-30">
-        <div class="overflow-y-auto">
-            <div class="sidebar-user-section">
-                <div class="sidebar-user-card">
-                    <div class="flex items-center gap-3">
-                        <div class="sidebar-user-avatar" style="{{ Auth::user()->profile_picture ? 'background:none;padding:0;overflow:hidden;' : '' }}">
-                            @if(Auth::user()->profile_picture)
-                                <img src="{{ asset('storage/' . Auth::user()->profile_picture) }}"
-                                     alt="Profile"
-                                     style="width:100%;height:100%;object-fit:cover;border-radius:1rem;">
-                            @else
-                                <i class="fas fa-user-tie text-white text-sm"></i>
-                            @endif
-                        </div>
-                        <div class="flex-1 min-w-0">
-                            <div class="sidebar-user-name truncate">{{ Auth::user()->first_name }} {{ Auth::user()->last_name }}</div>
-                            <div class="sidebar-user-email truncate">{{ Auth::user()->email }}</div>
-                        </div>
+        <div class="sidebar-user-section">
+            <div class="sidebar-user-card">
+                <div class="flex items-center gap-3">
+                    <div class="sidebar-user-avatar" style="{{ Auth::user()->profile_picture ? 'background:none;padding:0;overflow:hidden;' : '' }}">
+                        @if(Auth::user()->profile_picture)
+                            <img src="{{ asset('storage/' . Auth::user()->profile_picture) }}"
+                                 alt="Profile"
+                                 style="width:100%;height:100%;object-fit:cover;border-radius:1rem;">
+                        @else
+                            <i class="fas fa-user-tie text-white text-sm"></i>
+                        @endif
                     </div>
-                    <span class="sidebar-role-pill">
-                        <i class="fas fa-stethoscope text-[10px]"></i> Counselor
-                    </span>
+                    <div class="flex-1 min-w-0">
+                        <div class="sidebar-user-name truncate">{{ Auth::user()->first_name }} {{ Auth::user()->last_name }}</div>
+                        <div class="sidebar-user-email truncate">{{ Auth::user()->email }}</div>
+                    </div>
                 </div>
+                <span class="sidebar-role-pill">
+                    <i class="fas fa-stethoscope text-[10px]"></i> Counselor
+                </span>
             </div>
+        </div>
 
-            <div class="px-3 pb-4 pt-2">
+        <div class="flex-1 overflow-y-auto px-3 pb-3">
+            <div class="space-y-0.5 pt-2">
                 <a href="{{ route('counselor.dashboard') }}" class="sidebar-link {{ request()->routeIs('counselor.dashboard') ? 'active' : '' }}">
                     <i class="fas fa-tachometer-alt"></i>
                     <span>Dashboard</span>

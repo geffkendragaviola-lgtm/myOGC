@@ -291,6 +291,10 @@
                                     {{ $resource->button_text }}
                                 </button>
                             @endif
+                            <a href="{{ route('student.resources.show', [$category, $resource]) }}"
+                               class="mt-2 text-center text-xs font-semibold text-[var(--maroon-700)] hover:text-[var(--maroon-900)] transition block">
+                                View full details →
+                            </a>
                         </div>
                     </div>
                 @endforeach

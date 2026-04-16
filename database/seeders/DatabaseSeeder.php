@@ -20,8 +20,10 @@ class DatabaseSeeder extends Seeder
              EventSeeder::class,
       
                 FAQSeeder::class,
-
-
+            ResourceSeeder::class,
+            YoutubeResourceSeeder::class,
+            EbookResourceSeeder::class,
+            OgcResourceSeeder::class,
         ]);
     }
 }

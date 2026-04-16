@@ -337,5 +337,8 @@ Route::get('/oauth2callback', function (\Illuminate\Http\Request $request) {
 Route::get('/mental-health-corner/{category}', [ResourceController::class, 'showCategory'])
     ->name('student.resources.category');
 
+Route::get('/mental-health-corner/{category}/{resource}', [ResourceController::class, 'showResource'])
+    ->name('student.resources.show');
+
 Route::get('/appointments/referred-counselors', [AppointmentController::class, 'getReferredCounselors'])->name('appointments.referred-counselors');
 require __DIR__.'/auth.php';

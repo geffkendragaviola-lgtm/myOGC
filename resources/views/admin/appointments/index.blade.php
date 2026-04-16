@@ -160,15 +160,6 @@
                             </select>
                         </div>
 
-                        <div>
-                            <label class="filter-label">Session Notes</label>
-                            <select name="has_session_notes" class="filter-input bg-white">
-                                <option value="">All Appointments</option>
-                                <option value="yes" {{ request('has_session_notes') === 'yes' ? 'selected' : '' }}>Has Session Notes</option>
-                                <option value="no" {{ request('has_session_notes') === 'no' ? 'selected' : '' }}>No Session Notes</option>
-                            </select>
-                        </div>
-
                         <div class="flex items-end gap-2 sm:gap-3">
                             <button type="submit" class="flex-1 inline-flex items-center justify-center gap-2 px-3 sm:px-4 py-2 sm:py-2.5 rounded-lg bg-gradient-to-r from-[#5c1a1a] to-[#7a2a2a] text-white font-medium shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 text-xs sm:text-sm">
                                 <i class="fas fa-search text-[10px] sm:text-xs"></i>
@@ -568,65 +559,6 @@
                 })
                 .then(data => {
                     let sessionNotesHtml = '';
-                    if (data.session_notes && data.session_notes.length > 0) {
-                        sessionNotesHtml = `
-                            <div class="border-t border-[#e5e0db]/60 pt-5 mt-4">
-                                <div class="flex items-center gap-2 mb-4">
-                                    <div class="w-8 h-8 bg-[#ecfdf5] rounded-lg flex items-center justify-center">
-                                        <i class="fas fa-clipboard-list text-[#059669] text-sm"></i>
-                                    </div>
-                                    <h4 class="text-base font-medium text-[#2c2420]">Session Notes (${data.session_notes.length})</h4>
-                                </div>
-                                <div class="space-y-3 max-h-80 overflow-y-auto pr-2">
-                                    ${data.session_notes.map(note => `
-                                        <div class="bg-[#faf8f5] rounded-lg p-3.5 sm:p-4 border border-[#e5e0db]/60 hover:border-[#d4af37]/30 transition">
-                                            <div class="flex justify-between items-start mb-2 sm:mb-3">
-                                                <div>
-                                                    <span class="text-sm font-medium text-[#2c2420]">
-                                                        ${note.session_date}
-                                                    </span>
-                                                    <span class="text-xs text-[#8b7e76] ml-1.5 sm:ml-2">
-                                                        • ${note.session_type_label}
-                                                    </span>
-                                                </div>
-                                                ${note.mood_level ? `
-                                                <span class="text-xs px-2 py-0.5 rounded-full font-medium
-                                                    ${note.mood_level === 'very_good' ? 'bg-[#ecfdf5] text-[#059669]' :
-                                                    note.mood_level === 'good' ? 'bg-[#f0f9ff] text-[#0284c7]' :
-                                                    note.mood_level === 'neutral' ? 'bg-[#fef9e7] text-[#9a7b0a]' :
-                                                    note.mood_level === 'low' ? 'bg-[#fff7ed] text-[#ea580c]' :
-                                                    'bg-[#fdf2f2] text-[#b91c1c]'}">
-                                                    <i class="fas fa-face-smile mr-1 text-xs"></i> ${note.mood_level_label}
-                                                </span>
-                                                ` : ''}
-                                            </div>
-                                            <p class="text-sm text-[#4a3f3a] whitespace-pre-line leading-relaxed">${note.notes}</p>
-                                            ${note.follow_up_actions ? `
-                                            <div class="mt-2.5 pt-2.5 border-t border-[#e5e0db]/50">
-                                                <p class="text-xs font-semibold text-[#8b7e76] mb-1 uppercase tracking-wide">Follow-up Actions</p>
-                                                <p class="text-sm text-[#4a3f3a] whitespace-pre-line">${note.follow_up_actions}</p>
-                                                ${note.next_session_date ? `
-                                                <p class="text-xs text-[#8b7e76] mt-1.5">
-                                                    <i class="fas fa-calendar-alt mr-1"></i> Next Session: ${note.next_session_date}
-                                                </p>
-                                                ` : ''}
-                                            </div>
-                                            ` : ''}
-                                        </div>
-                                    `).join('')}
-                                </div>
-                            </div>
-                        `;
-                    } else {
-                        sessionNotesHtml = `
-                            <div class="border-t border-[#e5e0db]/60 pt-5 mt-4">
-                                <div class="bg-[#faf8f5] rounded-lg p-4 sm:p-6 text-center">
-                                    <i class="fas fa-clipboard-list text-[#c4b8b1] text-2xl sm:text-3xl mb-2"></i>
-                                    <p class="text-sm text-[#8b7e76]">No session notes available for this appointment.</p>
-                                </div>
-                            </div>
-                        `;
-                    }
 
                     details.innerHTML = `
                         <div class="space-y-4 sm:space-y-5">
@@ -733,8 +665,6 @@
                                 </div>
                             </div>
                             ` : ''}
-
-                            ${sessionNotesHtml}
 
                             <!-- Action Buttons -->
                             <div class="flex flex-wrap justify-end gap-2.5 sm:gap-3 pt-3 sm:pt-4 border-t border-[#e5e0db]/60">

@@ -184,6 +184,32 @@ class ResourceController extends Controller
     }
 
     /**
+     * Display a single resource detail page for students
+     */
+    public function showResource($category, Resource $resource)
+    {
+        $categories = Resource::getCategories();
+
+        if (!array_key_exists($category, $categories) || $resource->category !== $category) {
+            abort(404);
+        }
+
+        if (!$resource->is_active) {
+            abort(404);
+        }
+
+        // Related resources: same category, excluding current
+        $related = Resource::byCategory($category)
+            ->active()
+            ->ordered()
+            ->where('id', '!=', $resource->id)
+            ->limit(3)
+            ->get();
+
+        return view('student.resources.show', compact('resource', 'category', 'categories', 'related'));
+    }
+
+    /**
      * Update resource status
      */
     public function updateStatus(Request $request, Resource $resource)

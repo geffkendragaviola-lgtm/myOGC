@@ -154,6 +154,7 @@ class ProfileController extends Controller
             $request->validate([
                 'google_calendar_id' => ['nullable', 'string', 'max:255'],
                 'profile_picture'    => ['nullable', 'image', 'mimes:jpeg,png,jpg,gif,webp', 'max:4096'],
+                'facebook_link'      => ['nullable', 'url', 'max:255'],
             ]);
 
             $user = $request->user();
@@ -180,6 +181,7 @@ class ProfileController extends Controller
 
             Counselor::where('user_id', $user->id)->update([
                 'google_calendar_id' => $request->input('google_calendar_id'),
+                'facebook_link'      => $request->input('facebook_link') ?: null,
             ]);
 
             return Redirect::route('profile.edit')->with('status', 'counselor-profile-updated');

@@ -264,9 +264,9 @@
             </div>
         </div>
 
-        <!-- Stats -->
+        <!-- Stats (clickable filters) -->
         <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 mb-6">
-            <div class="stat-card">
+            <a href="{{ route('counselor.events.index') }}" class="stat-card">
                 <div class="relative p-3 sm:p-4 flex items-center gap-2 sm:gap-3">
                     <div class="stat-icon flex-shrink-0">
                         <i class="fas fa-calendar text-[10px] sm:text-sm"></i>
@@ -276,9 +276,9 @@
                         <p class="stat-value">{{ $events->count() }}</p>
                     </div>
                 </div>
-            </div>
+            </a>
 
-            <div class="stat-card">
+            <a href="{{ route('counselor.events.index') }}?filter=active" class="stat-card">
                 <div class="relative p-3 sm:p-4 flex items-center gap-2 sm:gap-3">
                     <div class="stat-icon flex-shrink-0" style="background: rgba(254,249,231,0.9); color: #c9a227;">
                         <i class="fas fa-play-circle text-[10px] sm:text-sm"></i>
@@ -288,9 +288,9 @@
                         <p class="stat-value">{{ $events->where('is_active', true)->count() }}</p>
                     </div>
                 </div>
-            </div>
+            </a>
 
-            <div class="stat-card">
+            <a href="{{ route('counselor.events.index') }}?filter=upcoming" class="stat-card">
                 <div class="relative p-3 sm:p-4 flex items-center gap-2 sm:gap-3">
                     <div class="stat-icon flex-shrink-0" style="background: rgba(254,249,231,0.9); color: var(--maroon-700);">
                         <i class="fas fa-users text-[10px] sm:text-sm"></i>
@@ -300,9 +300,9 @@
                         <p class="stat-value">{{ $events->where('event_start_date', '>=', now()->toDateString())->count() }}</p>
                     </div>
                 </div>
-            </div>
+            </a>
 
-            <div class="stat-card">
+            <a href="{{ route('counselor.events.index') }}?filter=required" class="stat-card">
                 <div class="relative p-3 sm:p-4 flex items-center gap-2 sm:gap-3">
                     <div class="stat-icon flex-shrink-0" style="background: rgba(255,244,229,0.9); color: #92400e;">
                         <i class="fas fa-exclamation-circle text-[10px] sm:text-sm"></i>
@@ -312,7 +312,7 @@
                         <p class="stat-value">{{ $events->where('is_required', true)->count() }}</p>
                     </div>
                 </div>
-            </div>
+            </a>
         </div>
 
         <!-- Status Messages -->
@@ -476,39 +476,6 @@
                 @endforeach
             </div>
 
-            <!-- Quick Stats Footer -->
-            <div class="mt-6 sm:mt-8">
-                <div class="panel-card">
-                    <div class="panel-topline"></div>
-                    <div class="p-4 sm:p-5">
-                        <h3 class="panel-title mb-3 sm:mb-4">Event Overview</h3>
-                        <div class="overview-grid">
-                            <div class="overview-item active">
-                                <div class="overview-value active">{{ $events->where('is_active', true)->count() }}</div>
-                                <div class="overview-label">Active Events</div>
-                            </div>
-                            <div class="overview-item upcoming">
-                                <div class="overview-value upcoming">
-                                    {{ $events->where('event_start_date', '>=', now()->toDateString())->count() }}
-                                </div>
-                                <div class="overview-label">Upcoming</div>
-                            </div>
-                            <div class="overview-item required">
-                                <div class="overview-value required">
-                                    {{ $events->where('is_required', true)->count() }}
-                                </div>
-                                <div class="overview-label">Required</div>
-                            </div>
-                            <div class="overview-item registrations">
-                                <div class="overview-value registrations">
-                                    {{ $events->sum('registered_count') }}
-                                </div>
-                                <div class="overview-label">Total Registrations</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
         @endif
     </div>
 </div>

@@ -21,6 +21,7 @@ class Counselor extends Model
         'availability',
         'google_calendar_id',
         'daily_booking_limit',
+        'facebook_link',
     ];
 
     protected $casts = [

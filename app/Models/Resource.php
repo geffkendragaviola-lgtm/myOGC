@@ -73,7 +73,7 @@ class Resource extends Model
         return [
             'youtube' => 'YouTube Videos',
             'ebooks' => 'eBooks',
-            'private' => 'Private Videos',
+            'private' => 'Curated Videos',
             'ogc' => 'OGC Resources',
 
         ];

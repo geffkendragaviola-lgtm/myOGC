@@ -384,119 +384,39 @@
             </div>
         </div>
 
-        <!-- Quick Stats Section - Updated -->
-<div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 xl:grid-cols-9 gap-3 sm:gap-4 mb-6">
-    <!-- Total -->
-    <a href="{{ route('counselor.appointments') }}?{{ http_build_query(request()->except('page', 'status', 'referral_direction')) }}&status=all"
-       class="stat-card group">
-        <div class="relative p-3 sm:p-4">
-            <div class="flex items-center gap-2 sm:gap-3">
-                <div class="stat-icon flex-shrink-0">
-                    <i class="fas fa-calendar-check text-[10px] sm:text-sm"></i>
-                </div>
-                <div class="min-w-0">
-                    <p class="stat-label">Total</p>
-                    <p class="stat-value">{{ $stats['total'] ?? $appointments->total() }}</p>
-                </div>
-            </div>
-        </div>
-    </a>
-
-    <!-- Cancelled -->
-    <a href="{{ route('counselor.appointments') }}?{{ http_build_query(request()->except('page', 'status')) }}&status=cancelled"
-       class="stat-card group">
-        <div class="relative p-3 sm:p-4">
-            <div class="flex items-center gap-2 sm:gap-3">
-                <div class="stat-icon flex-shrink-0">
-                    <i class="fas fa-ban text-[10px] sm:text-sm"></i>
-                </div>
-                <div class="min-w-0">
-                    <p class="stat-label">Cancelled</p>
-                    <p class="stat-value">{{ $stats['cancelled'] ?? $appointments->where('status', 'cancelled')->count() }}</p>
-                </div>
-            </div>
-        </div>
-    </a>
-
-    <!-- Pending -->
-    <a href="{{ route('counselor.appointments') }}?{{ http_build_query(request()->except('page', 'status')) }}&status=pending"
-       class="stat-card group">
-        <div class="relative p-3 sm:p-4">
-            <div class="flex items-center gap-2 sm:gap-3">
-                <div class="stat-icon flex-shrink-0" style="background: rgba(254,249,231,0.9); color: #c9a227;">
-                    <i class="fas fa-clock text-[10px] sm:text-sm"></i>
-                </div>
-                <div class="min-w-0">
-                    <p class="stat-label">Pending</p>
-                    <p class="stat-value">{{ $stats['pending'] ?? $appointments->where('status', 'pending')->count() }}</p>
-                </div>
-            </div>
-        </div>
-    </a>
-
-    <!-- Approved -->
-    <a href="{{ route('counselor.appointments') }}?{{ http_build_query(request()->except('page', 'status')) }}&status=approved"
-       class="stat-card group">
-        <div class="relative p-3 sm:p-4">
-            <div class="flex items-center gap-2 sm:gap-3">
-                <div class="stat-icon flex-shrink-0" style="background: rgba(240,253,244,0.9); color: #065f46;">
-                    <i class="fas fa-check-circle text-[10px] sm:text-sm"></i>
-                </div>
-                <div class="min-w-0">
-                    <p class="stat-label">Approved</p>
-                    <p class="stat-value">{{ $stats['approved'] ?? $appointments->where('status', 'approved')->count() }}</p>
-                </div>
-            </div>
-        </div>
-    </a>
-
-    <!-- Completed -->
-    <a href="{{ route('counselor.appointments') }}?{{ http_build_query(request()->except('page', 'status')) }}&status=completed"
-       class="stat-card group">
-        <div class="relative p-3 sm:p-4">
-            <div class="flex items-center gap-2 sm:gap-3">
-                <div class="stat-icon flex-shrink-0" style="background: rgba(245,240,235,0.9); color: var(--maroon-700);">
-                    <i class="fas fa-flag-checkered text-[10px] sm:text-sm"></i>
-                </div>
-                <div class="min-w-0">
-                    <p class="stat-label">Completed</p>
-                    <p class="stat-value">{{ $stats['completed'] ?? $appointments->where('status', 'completed')->count() }}</p>
-                </div>
-            </div>
-        </div>
-    </a>
-
-    <!-- Referred In -->
-    <a href="{{ route('counselor.appointments') }}?{{ http_build_query(request()->except('page', 'referral_direction')) }}&referral_direction={{ ($referralDirection ?? request('referral_direction')) === 'in' ? '' : 'in' }}"
-       class="stat-card group">
-        <div class="relative p-3 sm:p-4">
-            <div class="flex items-center gap-2 sm:gap-3">
-                <div class="stat-icon flex-shrink-0" style="background: rgba(254,249,231,0.9); color: var(--maroon-700);">
-                    <i class="fas fa-reply text-[10px] sm:text-sm"></i>
-                </div>
-                <div class="min-w-0">
-                    <p class="stat-label">In</p>
-                    <p class="stat-value">{{ $stats['referred_in'] ?? 0 }}</p>
-                </div>
-            </div>
-        </div>
-    </a>
-
-    <!-- Referred Out -->
-    <a href="{{ route('counselor.appointments') }}?{{ http_build_query(request()->except('page', 'referral_direction')) }}&referral_direction={{ ($referralDirection ?? request('referral_direction')) === 'out' ? '' : 'out' }}"
-       class="stat-card group">
-        <div class="relative p-3 sm:p-4">
-            <div class="flex items-center gap-2 sm:gap-3">
-                <div class="stat-icon flex-shrink-0" style="background: rgba(245,235,255,0.9); color: #7c3aed;">
-                    <i class="fas fa-share text-[10px] sm:text-sm"></i>
-                </div>
-                <div class="min-w-0">
-                    <p class="stat-label">Out</p>
-                    <p class="stat-value">{{ $stats['referred_out'] ?? 0 }}</p>
-                </div>
-            </div>
-        </div>
-    </a>
+        <!-- Status Filter Chips -->
+<div class="flex flex-wrap gap-2 mb-6">
+    @php
+        $currentStatus = request('status', 'all');
+        $currentDir    = request('referral_direction', '');
+        $baseParams    = request()->except('page', 'status', 'referral_direction');
+        $chips = [
+            ['label' => 'All',        'status' => 'all',       'dir' => '',    'count' => $stats['total'] ?? 0,        'color' => 'var(--maroon-soft)'],
+            ['label' => 'Pending',    'status' => 'pending',   'dir' => '',    'count' => $stats['pending'] ?? 0,      'color' => '#c9a227'],
+            ['label' => 'Approved',   'status' => 'approved',  'dir' => '',    'count' => $stats['approved'] ?? 0,     'color' => '#2d7a4f'],
+            ['label' => 'Completed',  'status' => 'completed', 'dir' => '',    'count' => $stats['completed'] ?? 0,    'color' => '#2a5a7a'],
+            ['label' => 'Cancelled',  'status' => 'cancelled', 'dir' => '',    'count' => $stats['cancelled'] ?? 0,    'color' => '#b91c1c'],
+            ['label' => 'Rejected',   'status' => 'rejected',  'dir' => '',    'count' => $stats['rejected'] ?? 0,     'color' => '#7c3aed'],
+            ['label' => 'Referred In','status' => 'all',       'dir' => 'in',  'count' => $stats['referred_in'] ?? 0,  'color' => '#c9a227'],
+            ['label' => 'Referred Out','status'=> 'all',       'dir' => 'out', 'count' => $stats['referred_out'] ?? 0, 'color' => '#7c3aed'],
+        ];
+    @endphp
+    @foreach($chips as $chip)
+        @php
+            $isActive = ($currentStatus === $chip['status'] && $currentDir === $chip['dir']);
+            $url = route('counselor.appointments') . '?' . http_build_query(array_merge($baseParams, ['status' => $chip['status'], 'referral_direction' => $chip['dir']]));
+        @endphp
+        <a href="{{ $url }}"
+           style="{{ $isActive ? 'background:'.($chip['color']).';color:#fff;border-color:'.($chip['color']).';' : 'background:#fff;color:var(--text-secondary);border-color:var(--border-soft);' }}"
+           class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-xs font-semibold transition-all hover:shadow-sm"
+           style="{{ $isActive ? '' : '' }}">
+            {{ $chip['label'] }}
+            <span class="inline-flex items-center justify-center min-w-[1.2rem] h-5 px-1 rounded-full text-[10px] font-bold"
+                  style="{{ $isActive ? 'background:rgba(255,255,255,0.25);color:#fff;' : 'background:var(--bg-warm);color:var(--text-primary);' }}">
+                {{ $chip['count'] }}
+            </span>
+        </a>
+    @endforeach
 </div>
 
         <!-- Search and Filters Section -->
@@ -572,54 +492,6 @@
                     </div>
                 </div>
             </form>
-        </div>
-
-        <!-- Status Filter -->
-        <div class="panel-card mb-6">
-            <div class="p-4 sm:p-5">
-                <div class="flex flex-wrap gap-2">
-                    <a href="{{ route('counselor.appointments') }}?{{ http_build_query(request()->except('status', 'page')) }}&status=all"
-                    class="filter-chip {{ ($status === 'all' || !request('status')) ? 'active' : 'inactive' }}">
-                        All
-                    </a>
-                    <a href="{{ route('counselor.appointments') }}?{{ http_build_query(request()->except('status', 'page')) }}&status=pending"
-                    class="filter-chip {{ $status === 'pending' ? 'active' : 'inactive' }}">
-                        Pending
-                    </a>
-                    <a href="{{ route('counselor.appointments') }}?{{ http_build_query(request()->except('status', 'page')) }}&status=approved"
-                    class="filter-chip {{ $status === 'approved' ? 'active' : 'inactive' }}">
-                        Approved
-                    </a>
-                    <a href="{{ route('counselor.appointments') }}?{{ http_build_query(request()->except('status', 'page')) }}&status=completed"
-                    class="filter-chip {{ $status === 'completed' ? 'active' : 'inactive' }}">
-                        Completed
-                    </a>
-                    <a href="{{ route('counselor.appointments') }}?{{ http_build_query(request()->except('status', 'page')) }}&status=reschedule_requested"
-                    class="filter-chip {{ $status === 'reschedule_requested' ? 'active' : 'inactive' }}">
-                        Reschedule Req.
-                    </a>
-                    <a href="{{ route('counselor.appointments') }}?{{ http_build_query(request()->except('status', 'page')) }}&status=rescheduled"
-                    class="filter-chip {{ $status === 'rescheduled' ? 'active' : 'inactive' }}">
-                        Rescheduled
-                    </a>
-                    <a href="{{ route('counselor.appointments') }}?{{ http_build_query(request()->except('status', 'page')) }}&status=reschedule_rejected"
-                    class="filter-chip {{ $status === 'reschedule_rejected' ? 'active' : 'inactive' }}">
-                        Rejected by Student
-                    </a>
-                    <a href="{{ route('counselor.appointments') }}?{{ http_build_query(request()->except('referral_direction', 'page')) }}&referral_direction=in"
-                    class="filter-chip {{ ($referralDirection ?? request('referral_direction')) === 'in' ? 'active' : 'inactive' }}">
-                        Referred In
-                    </a>
-                    <a href="{{ route('counselor.appointments') }}?{{ http_build_query(request()->except('referral_direction', 'page')) }}&referral_direction=out"
-                    class="filter-chip {{ ($referralDirection ?? request('referral_direction')) === 'out' ? 'active' : 'inactive' }}">
-                        Referred Out
-                    </a>
-                    <a href="{{ route('counselor.appointments') }}?{{ http_build_query(request()->except('status', 'page')) }}&status=cancelled"
-                    class="filter-chip {{ $status === 'cancelled' ? 'active' : 'inactive' }}">
-                        Cancelled
-                    </a>
-                </div>
-            </div>
         </div>
 
         <!-- Appointments Table -->

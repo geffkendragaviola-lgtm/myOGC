@@ -355,16 +355,29 @@
             size: A4;
         }
 
+        /* Hide sidebar, navbar, and non-content elements */
+        .ogc-navbar,
+        #ogcSidebar,
+        .sidebar-footer,
+        .no-print,
+        .btn,
+        .tabs-nav,
+        .alert-warning {
+            display: none !important;
+        }
+
+        /* Reset main content margin so it fills the page */
+        #ogcMainContent {
+            margin-left: 0 !important;
+            padding-top: 0 !important;
+            width: 100% !important;
+        }
+
         body {
             background: white !important;
             color: #000 !important;
             font-size: 11pt;
             line-height: 1.4;
-        }
-
-        /* Hide UI elements */
-        .btn, .tabs-nav, .alert-warning, .no-print {
-            display: none !important;
         }
 
         /* Show all tab content for print */
