@@ -128,6 +128,11 @@ public function updateRegistrationStatus(Request $request, Event $event, EventRe
             ['user_id' => Auth::id()]
         );
 
+        // Normalize year_levels: null means all year levels
+        if (empty($data['year_levels'])) {
+            $data['year_levels'] = null;
+        }
+
         // Handle image upload
         if ($request->hasFile('image')) {
             $imagePath = $request->file('image')->store('events', 'public');
@@ -160,6 +165,11 @@ public function updateRegistrationStatus(Request $request, Event $event, EventRe
         $previousColleges = $event->colleges->pluck('id')->toArray();
 
         $data = $request->validated();
+
+        // Normalize year_levels: null means all year levels
+        if (empty($data['year_levels'])) {
+            $data['year_levels'] = null;
+        }
 
         // Handle image upload
         if ($request->hasFile('image')) {

@@ -440,7 +440,7 @@
             <div class="container mx-auto px-6 flex justify-between items-center">
                 <div class="flex items-center">
                     <div class="text-white font-bold text-2xl mr-10 tracking-wide">
-                        <span>OGC</span>
+                        <span>my.OGC</span>
                     </div>
 
                     <div class="hidden md:flex space-x-8">

@@ -601,8 +601,8 @@
                 <img src="{{ asset('images/msu-iit-logo.png') }}" alt="MSU-IIT" class="h-8 w-8 object-contain" onerror="this.style.display='none'">
             </div>
             <span class="ogc-brand-text text-white font-bold text-sm hidden md:block">
-                MSU-IIT<br>
-                <span class="sub font-medium text-xs">Student Portal</span>
+                my.OGC<br>
+                <span class="sub font-medium text-xs">MSU-IIT Office of Guidance & Counseling</span>
             </span>
         </div>
 

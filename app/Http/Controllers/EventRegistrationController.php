@@ -126,7 +126,8 @@ class EventRegistrationController extends Controller
             ->active()
             ->orderBy('event_start_date')
             ->orderBy('start_time')
-            ->get();
+            ->get()
+            ->filter(fn($event) => $event->isAvailableForStudent($student));
 
         return view('student.events.available-events', compact('events', 'student'));
     }

@@ -295,6 +295,28 @@
                                 <span class="detail-label">Date of Referral</span>
                                 <div class="detail-value muted">{{ $appointment->referral_requested_at ? $appointment->referral_requested_at->format('F j, Y g:i A') : '—' }}</div>
                             </div>
+                            {{-- Referred By --}}
+                            <div>
+                                <span class="detail-label">Referred By</span>
+                                <div class="detail-value muted">
+                                    @if($appointment->originalCounselor && $appointment->originalCounselor->user)
+                                        {{ $appointment->originalCounselor->user->first_name }} {{ $appointment->originalCounselor->user->last_name }}
+                                    @else
+                                        N/A
+                                    @endif
+                                </div>
+                            </div>
+                            {{-- Referred To --}}
+                            <div>
+                                <span class="detail-label">Referred To</span>
+                                <div class="detail-value muted">
+                                    @if($appointment->referredCounselor && $appointment->referredCounselor->user)
+                                        {{ $appointment->referredCounselor->user->first_name }} {{ $appointment->referredCounselor->user->last_name }}
+                                    @else
+                                        N/A
+                                    @endif
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -402,6 +424,55 @@
                                 @error('appointment_type')
                                     <p class="error-text">{{ $message }}</p>
                                 @enderror
+                            </div>
+                        </div>
+
+                        {{-- Referred By / Referred To --}}
+                        <div class="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            {{-- Referred By --}}
+                            <div class="rounded-lg border p-3" style="border-color:var(--border-soft);background:rgba(250,248,245,0.6);">
+                                <label class="flex items-center gap-2 cursor-pointer select-none mb-2">
+                                    <input type="checkbox" id="chk_referred_by"
+                                           class="custom-checkbox"
+                                           {{ old('referred_by_source', $latestSessionNote->referred_by_source ?? '') ? 'checked' : '' }}
+                                           onchange="toggleReferral('referred_by_source', this.checked)">
+                                    <span class="text-xs font-semibold" style="color:var(--maroon-800)">Referred By</span>
+                                </label>
+                                <div id="referred_by_box" class="{{ old('referred_by_source', $latestSessionNote->referred_by_source ?? '') ? '' : 'hidden' }}">
+                                    <input type="text"
+                                           id="referred_by_source"
+                                           name="referred_by_source"
+                                           value="{{ old('referred_by_source', $latestSessionNote->referred_by_source ?? '') }}"
+                                           placeholder="e.g. Teacher, Professor, Parent, Friend"
+                                           class="input-field text-xs"
+                                           maxlength="255">
+                                    @error('referred_by_source')
+                                        <p class="error-text">{{ $message }}</p>
+                                    @enderror
+                                </div>
+                            </div>
+
+                            {{-- Referred To --}}
+                            <div class="rounded-lg border p-3" style="border-color:var(--border-soft);background:rgba(250,248,245,0.6);">
+                                <label class="flex items-center gap-2 cursor-pointer select-none mb-2">
+                                    <input type="checkbox" id="chk_referred_to"
+                                           class="custom-checkbox"
+                                           {{ old('referred_to_destination', $latestSessionNote->referred_to_destination ?? '') ? 'checked' : '' }}
+                                           onchange="toggleReferral('referred_to_destination', this.checked)">
+                                    <span class="text-xs font-semibold" style="color:var(--maroon-800)">Referred To</span>
+                                </label>
+                                <div id="referred_to_box" class="{{ old('referred_to_destination', $latestSessionNote->referred_to_destination ?? '') ? '' : 'hidden' }}">
+                                    <input type="text"
+                                           id="referred_to_destination"
+                                           name="referred_to_destination"
+                                           value="{{ old('referred_to_destination', $latestSessionNote->referred_to_destination ?? '') }}"
+                                           placeholder="e.g. Outside mental health professional"
+                                           class="input-field text-xs"
+                                           maxlength="255">
+                                    @error('referred_to_destination')
+                                        <p class="error-text">{{ $message }}</p>
+                                    @enderror
+                                </div>
                             </div>
                         </div>
 
@@ -598,6 +669,18 @@
                 buttonEl.classList.add('selected');
             }
             updateFollowupSubmitState();
+        }
+
+        function toggleReferral(fieldId, show) {
+            const boxId = fieldId === 'referred_by_source' ? 'referred_by_box' : 'referred_to_box';
+            const box = document.getElementById(boxId);
+            const input = document.getElementById(fieldId);
+            if (show) {
+                box.classList.remove('hidden');
+            } else {
+                box.classList.add('hidden');
+                if (input) input.value = '';
+            }
         }
 
         async function loadFollowupSlots() {

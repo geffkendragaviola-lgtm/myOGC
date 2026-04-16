@@ -422,6 +422,26 @@
                                     <p class="error-text">{{ $message }}</p>
                                 @enderror
                             </div>
+
+                            <!-- Year Level Restriction -->
+                            <div>
+                                <label class="field-label">Year Level Restriction</label>
+                                <p class="helper-text mb-2">Leave all unchecked to allow all year levels.</p>
+                                @php $oldYearLevels = old('year_levels', []); @endphp
+                                <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-2">
+                                    @foreach(['1st Year','2nd Year','3rd Year','4th Year','5th Year'] as $yl)
+                                    <label class="option-card cursor-pointer" style="gap:0.5rem;padding:0.5rem 0.75rem;">
+                                        <input type="checkbox" name="year_levels[]" value="{{ $yl }}"
+                                               {{ in_array($yl, $oldYearLevels) ? 'checked' : '' }}
+                                               class="w-4 h-4 text-[#7a2a2a] border-[#e5e0db] rounded focus:ring-[#7a2a2a] flex-shrink-0">
+                                        <span class="text-xs font-medium text-[#4a3f3a]">{{ $yl }}</span>
+                                    </label>
+                                    @endforeach
+                                </div>
+                                @error('year_levels')
+                                    <p class="error-text">{{ $message }}</p>
+                                @enderror
+                            </div>
                         </div>
                     </div>
 

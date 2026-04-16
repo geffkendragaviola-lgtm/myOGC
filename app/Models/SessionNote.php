@@ -22,7 +22,9 @@ class SessionNote extends Model
         'appointment_type',
         'mood_level',
         'requires_follow_up',
-        'next_session_date'
+        'next_session_date',
+        'referred_by_source',
+        'referred_to_destination',
     ];
 
     protected $casts = [

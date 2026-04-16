@@ -686,6 +686,10 @@
                     <i class="fas fa-comments"></i>
                     <span>Feedback</span>
                 </a>
+                <a href="{{ route('admin.analytics') }}" class="sidebar-link {{ request()->routeIs('admin.analytics') ? 'active' : '' }}">
+                    <i class="fas fa-chart-bar"></i>
+                    <span>Analytics</span>
+                </a>
 
                 <div class="sidebar-divider"></div>
 

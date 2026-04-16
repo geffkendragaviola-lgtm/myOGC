@@ -904,6 +904,8 @@ public function storeAppointmentSession(Request $request, Appointment $appointme
         'follow_up_actions' => 'nullable|string',
         'root_causes' => 'nullable|array',
         'root_causes.*' => 'in:' . implode(',', $rootCauseKeys),
+        'referred_by_source'      => 'nullable|string|max:255',
+        'referred_to_destination' => 'nullable|string|max:255',
     ]);
 
     SessionNote::create([
@@ -916,6 +918,8 @@ public function storeAppointmentSession(Request $request, Appointment $appointme
         'session_date' => $appointment->appointment_date,
         'session_type' => 'regular',
         'appointment_type' => $validated['appointment_type'],
+        'referred_by_source'      => $validated['referred_by_source'] ?? null,
+        'referred_to_destination' => $validated['referred_to_destination'] ?? null,
     ]);
 
     if ($appointment->status !== 'cancelled') {

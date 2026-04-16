@@ -38,6 +38,7 @@ class User extends Authenticatable
         'email',
         'password',
         'role',
+        'profile_picture',
     ];
 
     /**
@@ -175,6 +176,17 @@ class User extends Authenticatable
     public function getFullNameAttribute(): string
     {
         return trim("{$this->first_name} {$this->middle_name} {$this->last_name}");
+    }
+
+    /**
+     * Get profile picture URL (falls back to null if none set).
+     */
+    public function getProfilePictureUrlAttribute(): ?string
+    {
+        if ($this->profile_picture) {
+            return asset('storage/' . $this->profile_picture);
+        }
+        return null;
     }
 
     /**
