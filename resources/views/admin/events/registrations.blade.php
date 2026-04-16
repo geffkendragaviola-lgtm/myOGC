@@ -170,9 +170,9 @@
                             <h1 class="text-lg sm:text-xl lg:text-2xl font-semibold tracking-tight text-[#2c2420] mt-2">Event Registrations</h1>
                             <p class="text-[#4a3f3a] mt-1.5 font-medium text-sm truncate">{{ $event->title }}</p>
                             <p class="text-[#8b7e76] text-[10px] sm:text-xs mt-1.5 flex flex-wrap gap-x-2">
-                                <span><i class="far fa-calendar mr-1"></i> {{ $event->date_range }}</span>
-                                <span><i class="far fa-clock mr-1"></i> {{ $event->time_range }}</span>
-                                <span class="hidden sm:inline"><i class="far fa-map-marker-alt mr-1"></i> {{ $event->location }}</span>
+                                <span><i class="fas fa-calendar-days mr-1"></i> {{ $event->date_range }}</span>
+                                <span><i class="fas fa-clock mr-1"></i> {{ $event->time_range }}</span>
+                                <span class="hidden sm:inline"><i class="far fa-location-dot mr-1"></i> {{ $event->location }}</span>
                             </p>
                         </div>
                     </div>
@@ -274,7 +274,7 @@
             <div class="panel-topline"></div>
             <div class="panel-header">
                 <div class="panel-icon">
-                    <i class="fas fa-list-check text-[9px] sm:text-xs"></i>
+                    <i class="fas fa-clipboard-list text-[9px] sm:text-xs"></i>
                 </div>
                 <div>
                     <h2 class="panel-title">Student Registrations</h2>
@@ -370,14 +370,14 @@
                                                     <button type="submit"
                                                             class="action-icon-btn text-[#059669] hover:text-[#047857]"
                                                             title="Mark as Attended">
-                                                        <i class="fas fa-check-circle text-[10px] sm:text-sm"></i>
+                                                        <i class="fas fa-circle-check text-[10px] sm:text-sm"></i>
                                                     </button>
                                                 </form>
                                             @endif
 
                                             @if($registration->status === 'attended')
                                                 <span class="text-[#059669]" title="Attended">
-                                                    <i class="fas fa-check-double text-[10px] sm:text-sm"></i>
+                                                    <i class="fas fa-circle-dot text-[10px] sm:text-sm"></i>
                                                 </span>
                                             @endif
 
@@ -389,7 +389,7 @@
                                                             class="action-icon-btn text-[#b91c1c] hover:text-[#991b1b]"
                                                             onclick="return confirm('Are you sure you want to cancel this registration?')"
                                                             title="Cancel Registration">
-                                                        <i class="fas fa-times-circle text-[10px] sm:text-sm"></i>
+                                                        <i class="fas fa-circle-xmark text-[10px] sm:text-sm"></i>
                                                     </button>
                                                 </form>
                                             @endif

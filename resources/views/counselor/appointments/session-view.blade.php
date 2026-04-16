@@ -142,7 +142,7 @@
                 <div class="relative p-4 sm:p-5 flex flex-col md:flex-row md:items-start md:justify-between gap-4">
                     <div class="flex items-start gap-3">
                         <div class="hero-icon">
-                            <i class="fas fa-clipboard-list text-base sm:text-lg"></i>
+                            <i class="fas fa-notes-medical text-base sm:text-lg"></i>
                         </div>
                         <div class="min-w-0">
                             <div class="hero-badge">

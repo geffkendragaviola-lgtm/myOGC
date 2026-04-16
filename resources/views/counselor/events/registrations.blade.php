@@ -202,14 +202,14 @@
                     <p class="text-[var(--text-secondary)] mt-1 font-medium">{{ $event->title }}</p>
                     
                     <div class="event-meta">
-                        <span><i class="far fa-calendar"></i> {{ $event->date_range }}</span>
-                        <span><i class="far fa-clock"></i> {{ $event->time_range }}</span>
-                        <span><i class="far fa-map-marker-alt"></i> {{ $event->location }}</span>
+                        <span><i class="fas fa-calendar-days"></i> {{ $event->date_range }}</span>
+                        <span><i class="fas fa-clock"></i> {{ $event->time_range }}</span>
+                        <span><i class="far fa-location-dot"></i> {{ $event->location }}</span>
                     </div>
 
                     @if($event->is_required)
                         <span class="badge-required">
-                            <i class="fas fa-exclamation-circle"></i> Required Event
+                            <i class="fas fa-circle-exclamation"></i> Required Event
                         </span>
                     @endif
                 </div>
@@ -359,7 +359,7 @@
                                             </span>
                                             @if($registration->wasOverriddenByCounselor())
                                                 <span class="override-badge" title="Overridden by counselor">
-                                                    <i class="fas fa-user-shield"></i>
+                                                    <i class="fas fa-shield-halved"></i>
                                                 </span>
                                             @endif
                                         </div>
@@ -391,7 +391,7 @@
                                                 </form>
                                             @else
                                                 <span class="action-btn action-done" title="Already Attended">
-                                                    <i class="fas fa-check-double"></i>
+                                                    <i class="fas fa-circle-dot"></i>
                                                 </span>
                                             @endif
 
@@ -405,7 +405,7 @@
                                                             class="action-btn action-cancel"
                                                             title="Cancel Registration"
                                                             onclick="return confirm('Cancel this registration?')">
-                                                        <i class="fas fa-times-circle"></i>
+                                                        <i class="fas fa-circle-xmark"></i>
                                                     </button>
                                                 </form>
                                             @endif

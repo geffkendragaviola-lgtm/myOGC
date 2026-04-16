@@ -638,7 +638,7 @@
         <div class="modal-header">
             <h2 class="modal-title">INFORMED CONSENT FOR COUNSELING</h2>
             <button type="button" class="modal-close" data-consent-close aria-label="Close">
-                <i class="fas fa-times"></i>
+                <i class="fas fa-xmark"></i>
             </button>
         </div>
         
@@ -810,7 +810,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 <div class="system-alert-message">${message}</div>
             </div>
             <button type="button" class="system-alert-close" aria-label="Dismiss notification">
-                <i class="fas fa-times"></i>
+                <i class="fas fa-xmark"></i>
             </button>
             <div class="system-alert-progress">
                 <div class="system-alert-progress-bar"></div>

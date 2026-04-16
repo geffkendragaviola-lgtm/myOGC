@@ -49,7 +49,7 @@
 
 <div class="auth-overlay">
     <div class="auth-modal">
-        <a href="{{ route('login') }}" class="auth-modal-close"><i class="fas fa-times"></i></a>
+        <a href="{{ route('login') }}" class="auth-modal-close"><i class="fas fa-xmark"></i></a>
 
         <div class="auth-modal-icon"><i class="fas fa-lock"></i></div>
         <h2>Forgot password?</h2>

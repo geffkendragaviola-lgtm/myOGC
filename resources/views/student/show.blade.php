@@ -626,7 +626,7 @@
 
             <!-- Contact Information -->
             <div class="card lg:col-span-2">
-                <div class="card-header"><i class="fas fa-address-card"></i> Contact Information</div>
+                <div class="card-header"><i class="fas fa-id-card"></i> Contact Information</div>
                 <div class="card-body contact-list">
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
@@ -658,7 +658,7 @@
                 <button class="tab-btn" data-tab="academic"><i class="fas fa-graduation-cap"></i> Academic</button>
                 <button class="tab-btn" data-tab="learning"><i class="fas fa-laptop"></i> Learning</button>
                 <button class="tab-btn" data-tab="psychosocial"><i class="fas fa-brain"></i> Psychosocial</button>
-                <button class="tab-btn" data-tab="needs"><i class="fas fa-clipboard-list"></i> Needs</button>
+                <button class="tab-btn" data-tab="needs"><i class="fas fa-notes-medical"></i> Needs</button>
             </div>
 
             <div class="card-body">
@@ -1070,7 +1070,7 @@
         @endphp
         @if($hasUrgentNeeds || count($counselingConcerns) > 0)
         <div class="card counseling-card">
-            <div class="card-header"><i class="fas fa-exclamation-circle"></i> Counseling Information</div>
+            <div class="card-header"><i class="fas fa-circle-exclamation"></i> Counseling Information</div>
             <div class="card-body">
                 @if($hasUrgentNeeds)
                     <div class="alert alert-danger mb-3">

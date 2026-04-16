@@ -121,7 +121,7 @@
         <div class="grid grid-cols-1 xl:grid-cols-[1fr_auto] gap-4 items-stretch">
             <div class="hero-card">
                 <div class="relative p-4 sm:p-5 flex items-start gap-3">
-                    <div class="hero-icon"><i class="fas fa-tachometer-alt text-base sm:text-lg"></i></div>
+                    <div class="hero-icon"><i class="fas fa-gauge-high text-base sm:text-lg"></i></div>
                     <div class="min-w-0">
                         <div class="hero-badge"><span class="hero-badge-dot"></span>Admin Panel</div>
                         <h1 class="text-lg sm:text-xl lg:text-2xl font-semibold tracking-tight text-[#2c2420] mt-2">Dashboard</h1>
@@ -137,7 +137,7 @@
 
             <div class="summary-card">
                 <div class="relative h-full flex items-center gap-3 px-5 py-4">
-                    <div class="summary-icon"><i class="fas fa-calendar-alt text-sm"></i></div>
+                    <div class="summary-icon"><i class="fas fa-calendar-days text-sm"></i></div>
                     <div>
                         <p class="summary-label">This Month</p>
                         <p class="summary-value">{{ $stats['total_events'] ?? 0 }}</p>
@@ -151,10 +151,10 @@
         @php
             $cards = [
                 ['label'=>'Total Users',  'value'=>$stats['total_users'],      'icon'=>'fa-users',          'bg'=>'background:linear-gradient(135deg,#7a2a2a,#5c1a1a);color:#fef9e7;', 'bar'=>'background:linear-gradient(90deg,#7a2a2a,#d4af37);', 'w'=>'100%'],
-                ['label'=>'Students',     'value'=>$stats['total_students'],   'icon'=>'fa-graduation-cap', 'bg'=>'background:rgba(254,249,231,0.8);color:#7a5a1a;',                  'bar'=>'background:linear-gradient(90deg,#c9a227,#f0cd63);',  'w'=>'75%'],
-                ['label'=>'Counselors',   'value'=>$stats['total_counselors'], 'icon'=>'fa-user-tie',       'bg'=>'background:rgba(240,253,244,0.8);color:#065f46;',                  'bar'=>'background:linear-gradient(90deg,#2d7a4f,#4ade80);',  'w'=>'60%'],
-                ['label'=>'Admins',       'value'=>$stats['total_admins'],     'icon'=>'fa-user-shield',    'bg'=>'background:rgba(245,240,235,0.8);color:#6b5e57;',                  'bar'=>'background:linear-gradient(90deg,#8b7e76,#c4b8b1);',  'w'=>'40%'],
-                ['label'=>'Active Events','value'=>$stats['active_events'],    'icon'=>'fa-calendar-alt',   'bg'=>'background:rgba(254,249,231,0.8);color:#7a2a2a;',                  'bar'=>'background:linear-gradient(90deg,#d4af37,#f0cd63);',  'w'=>'55%'],
+                ['label'=>'Students',     'value'=>$stats['total_students'],   'icon'=>'fa-user-graduate',  'bg'=>'background:rgba(254,249,231,0.8);color:#7a5a1a;',                  'bar'=>'background:linear-gradient(90deg,#c9a227,#f0cd63);',  'w'=>'75%'],
+                ['label'=>'Counselors',   'value'=>$stats['total_counselors'], 'icon'=>'fa-user-doctor',    'bg'=>'background:rgba(240,253,244,0.8);color:#065f46;',                  'bar'=>'background:linear-gradient(90deg,#2d7a4f,#4ade80);',  'w'=>'60%'],
+                ['label'=>'Admins',       'value'=>$stats['total_admins'],     'icon'=>'fa-shield-halved',  'bg'=>'background:rgba(245,240,235,0.8);color:#6b5e57;',                  'bar'=>'background:linear-gradient(90deg,#8b7e76,#c4b8b1);',  'w'=>'40%'],
+                ['label'=>'Active Events','value'=>$stats['active_events'],    'icon'=>'fa-calendar-days',  'bg'=>'background:rgba(254,249,231,0.8);color:#7a2a2a;',                  'bar'=>'background:linear-gradient(90deg,#d4af37,#f0cd63);',  'w'=>'55%'],
             ];
         @endphp
         <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4">
@@ -194,10 +194,10 @@
                         @php
                             $quickLinks = [
                                 ['href'=>route('admin.users.create'),  'icon'=>'fa-user-plus',     'label'=>'Add New User',      'sub'=>'Create a new account',          'ic_bg'=>'background:rgba(253,242,242,0.8);color:#7a2a2a;', 'ic_hover'=>'background:#7a2a2a;color:#fef9e7;'],
-                                ['href'=>route('admin.students'),      'icon'=>'fa-graduation-cap','label'=>'Student Records',   'sub'=>'Browse all students',           'ic_bg'=>'background:rgba(254,249,231,0.8);color:#7a5a1a;', 'ic_hover'=>'background:#c9a227;color:#3a0c0c;'],
-                                ['href'=>route('admin.counselors'),    'icon'=>'fa-user-tie',      'label'=>'Counselors',        'sub'=>'View counselor directory',      'ic_bg'=>'background:rgba(240,253,244,0.8);color:#065f46;', 'ic_hover'=>'background:#2d7a4f;color:#fff;'],
+                                ['href'=>route('admin.students'),      'icon'=>'fa-user-graduate', 'label'=>'Student Records',   'sub'=>'Browse all students',           'ic_bg'=>'background:rgba(254,249,231,0.8);color:#7a5a1a;', 'ic_hover'=>'background:#c9a227;color:#3a0c0c;'],
+                                ['href'=>route('admin.counselors'),    'icon'=>'fa-user-doctor',   'label'=>'Counselors',        'sub'=>'View counselor directory',      'ic_bg'=>'background:rgba(240,253,244,0.8);color:#065f46;', 'ic_hover'=>'background:#2d7a4f;color:#fff;'],
                                 ['href'=>route('admin.appointments'),  'icon'=>'fa-calendar-check','label'=>'Appointments',      'sub'=>'Manage all appointments',       'ic_bg'=>'background:rgba(245,240,235,0.8);color:#6b5e57;', 'ic_hover'=>'background:#5c1a1a;color:#fef9e7;'],
-                                ['href'=>route('admin.analytics'),     'icon'=>'fa-chart-bar',     'label'=>'Analytics',         'sub'=>'View system analytics',         'ic_bg'=>'background:rgba(254,249,231,0.8);color:#7a2a2a;', 'ic_hover'=>'background:#d4af37;color:#3a0c0c;'],
+                                ['href'=>route('admin.analytics'),     'icon'=>'fa-chart-column',  'label'=>'Analytics',         'sub'=>'View system analytics',         'ic_bg'=>'background:rgba(254,249,231,0.8);color:#7a2a2a;', 'ic_hover'=>'background:#d4af37;color:#3a0c0c;'],
                             ];
                         @endphp
                         @foreach($quickLinks as $ql)
@@ -261,9 +261,9 @@
                                                 default     => 'background:#ecfdf5;color:#059669;border:1px solid rgba(16,185,129,0.25);',
                                             };
                                             $roleIcon = match($user->role) {
-                                                'admin'     => 'fa-user-shield',
-                                                'counselor' => 'fa-user-tie',
-                                                default     => 'fa-graduation-cap',
+                                                'admin'     => 'fa-shield-halved',
+                                                'counselor' => 'fa-user-doctor',
+                                                default     => 'fa-user-graduate',
                                             };
                                         @endphp
                                         <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-semibold" style="{{ $roleStyle }}">
@@ -279,7 +279,7 @@
                                 <tr>
                                     <td colspan="3" class="px-4 py-10 text-center">
                                         <div class="flex flex-col items-center gap-2 text-[#8b7e76]">
-                                            <i class="fas fa-folder-open text-2xl opacity-30"></i>
+                                            <i class="fas fa-inbox text-2xl opacity-30"></i>
                                             <p class="text-xs">No recent users found</p>
                                         </div>
                                     </td>
@@ -307,7 +307,7 @@
         <div class="panel-card overflow-hidden">
             <div class="panel-topline"></div>
             <div class="panel-header">
-                <div class="panel-icon"><i class="fas fa-calendar-alt text-xs"></i></div>
+                <div class="panel-icon"><i class="fas fa-calendar-days text-xs"></i></div>
                 <div>
                     <p class="panel-title">Recent Events</p>
                     <p class="panel-subtitle hidden sm:block">Latest events added to the system</p>
@@ -321,7 +321,7 @@
                 <div class="rounded-lg border border-[#e5e0db] bg-[#faf8f5]/60 p-3 hover:border-[rgba(212,175,55,0.4)] hover:bg-[rgba(254,249,231,0.4)] transition">
                     <p class="text-xs font-semibold text-[#2c2420] truncate">{{ $event->title }}</p>
                     <p class="text-[10px] text-[#8b7e76] mt-1 flex items-center gap-1">
-                        <i class="fas fa-calendar text-[9px] text-[#c4b8b1]"></i>
+                        <i class="fas fa-calendar-days text-[9px] text-[#c4b8b1]"></i>
                         {{ \Carbon\Carbon::parse($event->event_start_date)->format('M j, Y') }}
                     </p>
                     <span class="inline-flex items-center mt-2 px-2 py-0.5 rounded-full text-[9px] font-semibold

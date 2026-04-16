@@ -114,7 +114,7 @@
     <div class="flex flex-wrap items-start justify-between gap-3 no-print">
         <div>
             <h1 class="text-xl font-bold" style="color:var(--text-primary)">
-                <i class="fas fa-chart-bar mr-2" style="color:var(--maroon-soft)"></i>Analytics
+                <i class="fas fa-chart-column mr-2" style="color:var(--maroon-soft)"></i>Analytics
             </h1>
             <p class="text-sm" style="color:var(--text-secondary)">Per-college counseling insights</p>
         </div>
@@ -142,14 +142,14 @@
                 <label class="block text-xs font-semibold mb-1" style="color:var(--text-secondary)">Date To</label>
                 <input type="date" name="date_to" value="{{ $dateTo }}">
             </div>
-            <button type="submit" class="btn-maroon"><i class="fas fa-filter mr-1"></i>Apply</button>
-            <a href="{{ route('counselor.analytics') }}" class="btn-outline"><i class="fas fa-times"></i>Reset</a>
+            <button type="submit" class="btn-maroon"><i class="fas fa-magnifying-glass mr-1"></i>Apply</button>
+            <a href="{{ route('counselor.analytics') }}" class="btn-outline"><i class="fas fa-rotate-left"></i>Reset</a>
         </form>
     </div>
 
     @if(empty($collegeAnalytics))
         <div class="an-card">
-            <div class="empty-state"><i class="fas fa-chart-bar"></i>No data found for the selected filters.</div>
+            <div class="empty-state"><i class="fas fa-chart-column"></i>No data found for the selected filters.</div>
         </div>
     @else
 
@@ -182,10 +182,10 @@
                 <div class="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-3 mb-5">
                     <div class="stat-card"><div class="stat-icon si-maroon"><i class="fas fa-calendar-check"></i></div><div><div class="stat-value">{{ number_format($ca['totalAppointments']) }}</div><div class="stat-label">Total</div></div></div>
                     <div class="stat-card"><div class="stat-icon si-gold"><i class="fas fa-user-graduate"></i></div><div><div class="stat-value">{{ number_format($ca['totalStudents']) }}</div><div class="stat-label">Students</div></div></div>
-                    <div class="stat-card"><div class="stat-icon si-green"><i class="fas fa-check-circle"></i></div><div><div class="stat-value">{{ number_format($ca['completedCount']) }}</div><div class="stat-label">Completed</div></div></div>
-                    <div class="stat-card"><div class="stat-icon si-blue"><i class="fas fa-clock"></i></div><div><div class="stat-value">{{ number_format($ca['pendingCount']) }}</div><div class="stat-label">Pending</div></div></div>
-                    <div class="stat-card"><div class="stat-icon si-purple"><i class="fas fa-share-square"></i></div><div><div class="stat-value">{{ number_format($ca['referralCount']) }}</div><div class="stat-label">Referrals</div></div></div>
-                    <div class="stat-card"><div class="stat-icon si-red"><i class="fas fa-times-circle"></i></div><div><div class="stat-value">{{ number_format($ca['cancelledCount']) }}</div><div class="stat-label">Cancelled</div></div></div>
+                    <div class="stat-card"><div class="stat-icon si-green"><i class="fas fa-circle-check"></i></div><div><div class="stat-value">{{ number_format($ca['completedCount']) }}</div><div class="stat-label">Completed</div></div></div>
+                    <div class="stat-card"><div class="stat-icon si-blue"><i class="fas fa-hourglass-half"></i></div><div><div class="stat-value">{{ number_format($ca['pendingCount']) }}</div><div class="stat-label">Pending</div></div></div>
+                    <div class="stat-card"><div class="stat-icon si-purple"><i class="fas fa-arrow-right-arrow-left"></i></div><div><div class="stat-value">{{ number_format($ca['referralCount']) }}</div><div class="stat-label">Referrals</div></div></div>
+                    <div class="stat-card"><div class="stat-icon si-red"><i class="fas fa-circle-xmark"></i></div><div><div class="stat-value">{{ number_format($ca['cancelledCount']) }}</div><div class="stat-label">Cancelled</div></div></div>
                 </div>
 
                 {{-- Monthly chart --}}
@@ -201,7 +201,7 @@
                 {{-- Status doughnut + progress bars --}}
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-5 mb-5">
                     <div class="an-card">
-                        <div class="sec-title"><i class="fas fa-tags"></i>Status Breakdown</div>
+                        <div class="sec-title"><i class="fas fa-tag"></i>Status Breakdown</div>
                         @if(collect($ca['statusData'])->sum('count') > 0)
                             <div style="position:relative;height:240px"><canvas id="status_{{ $cid }}"></canvas></div>
                         @else
@@ -209,7 +209,7 @@
                         @endif
                     </div>
                     <div class="an-card">
-                        <div class="sec-title"><i class="fas fa-list-ul"></i>Status Detail</div>
+                        <div class="sec-title"><i class="fas fa-list"></i>Status Detail</div>
                         @php
                             $barColors=['pending'=>'#f0c040','approved'=>'#2d7a4f','completed'=>'#2a5a7a','cancelled'=>'#dc3545','rejected'=>'#c0392b','referred'=>'#7c3aed','rescheduled'=>'#17a2b8','reschedule_requested'=>'#e67e22','reschedule_rejected'=>'#e74c3c'];
                             $maxC = max(1, collect($ca['statusData'])->max('count'));

@@ -368,19 +368,19 @@
             <div class="quick-filter-bar">
                 <a href="{{ route('appointments.index') }}"
                    class="btn-filter {{ !request('status') && !request('search_date') ? 'active' : '' }}">
-                    <i class="fas fa-list"></i> All
+                    <i class="fas fa-bars-staggered"></i> All
                 </a>
                 <a href="{{ route('appointments.index', ['status' => 'pending']) }}"
                    class="btn-filter {{ request('status') == 'pending' ? 'active' : '' }}">
-                    <i class="fas fa-clock"></i> Pending
+                    <i class="fas fa-hourglass-half"></i> Pending
                 </a>
                 <a href="{{ route('appointments.index', ['status' => 'approved']) }}"
                    class="btn-filter {{ request('status') == 'approved' ? 'active' : '' }}">
-                    <i class="fas fa-check"></i> Approved
+                    <i class="fas fa-circle-check"></i> Approved
                 </a>
                 <a href="{{ route('appointments.index', ['status' => 'reschedule_requested']) }}"
                    class="btn-filter {{ request('status') == 'reschedule_requested' ? 'active' : '' }}">
-                    <i class="fas fa-calendar-alt"></i> Reschedule Req.
+                    <i class="fas fa-calendar-pen"></i> Reschedule Req.
                 </a>
                 <a href="{{ route('appointments.index', ['status' => 'rescheduled']) }}"
                    class="btn-filter {{ request('status') == 'rescheduled' ? 'active' : '' }}">
@@ -388,19 +388,15 @@
                 </a>
                 <a href="{{ route('appointments.index', ['status' => 'reschedule_rejected']) }}"
                    class="btn-filter {{ request('status') == 'reschedule_rejected' ? 'active' : '' }}">
-                    <i class="fas fa-times"></i> Rejected by Me
+                    <i class="fas fa-circle-xmark"></i> Rejected by Me
                 </a>
                 <a href="{{ route('appointments.index', ['status' => 'completed']) }}"
                    class="btn-filter {{ request('status') == 'completed' ? 'active' : '' }}">
-                    <i class="fas fa-check-double"></i> Completed
+                    <i class="fas fa-circle-dot"></i> Completed
                 </a>
                 <a href="{{ route('appointments.index', ['status' => 'referred']) }}"
                    class="btn-filter {{ request('status') == 'referred' ? 'active' : '' }}">
-                    <i class="fas fa-exchange-alt"></i> Referred
-                </a>
-                <a href="{{ route('appointments.index', ['status' => 'rejected']) }}"
-                   class="btn-filter {{ request('status') == 'rejected' ? 'active' : '' }}">
-                    <i class="fas fa-times-circle"></i> Rejected
+                    <i class="fas fa-arrow-right-arrow-left"></i> Referred
                 </a>
                 <a href="{{ route('appointments.index', ['status' => 'cancelled']) }}"
                    class="btn-filter {{ request('status') == 'cancelled' ? 'active' : '' }}">
@@ -412,7 +408,7 @@
         {{-- Search and Filters Section --}}
         <div class="panel-card mb-6">
             <div class="panel-header">
-                <div class="panel-icon"><i class="fas fa-sliders-h"></i></div>
+                <div class="panel-icon"><i class="fas fa-sliders"></i></div>
                 <div>
                     <h3 class="panel-title">Search & Filter</h3>
                     <p class="panel-subtitle">Find appointments by date or status</p>
@@ -439,7 +435,6 @@
                                 <option value="reschedule_rejected" {{ request('status') == 'reschedule_rejected' ? 'selected' : '' }}>Rejected by Student</option>
                                 <option value="completed" {{ request('status') == 'completed' ? 'selected' : '' }}>Completed</option>
                                 <option value="referred" {{ request('status') == 'referred' ? 'selected' : '' }}>Referred</option>
-                                <option value="rejected" {{ request('status') == 'rejected' ? 'selected' : '' }}>Rejected</option>
                                 <option value="cancelled" {{ request('status') == 'cancelled' ? 'selected' : '' }}>Cancelled</option>
                             </select>
                         </div>
@@ -451,7 +446,7 @@
                             <span>Search</span>
                         </button>
                         <a href="{{ route('appointments.index') }}" class="btn-secondary">
-                            <i class="fas fa-rotate"></i>
+                            <i class="fas fa-rotate-left"></i>
                             <span>Reset</span>
                         </a>
                     </div>
@@ -466,7 +461,7 @@
                             @if(request('search_date'))
                                 <span class="filter-chip">
                                     Date: {{ \Carbon\Carbon::parse(request('search_date'))->format('M j, Y') }}
-                                    <a href="{{ request()->fullUrlWithQuery(['search_date' => null]) }}"><i class="fas fa-times"></i></a>
+                                    <a href="{{ request()->fullUrlWithQuery(['search_date' => null]) }}"><i class="fas fa-xmark"></i></a>
                                 </span>
                             @endif
                             @if(request('status'))
@@ -479,7 +474,7 @@
                                         ];
                                     @endphp
                                     Status: {{ $filterStatusLabels[request('status')] ?? ucwords(str_replace('_', ' ', request('status'))) }}
-                                    <a href="{{ request()->fullUrlWithQuery(['status' => null]) }}"><i class="fas fa-times"></i></a>
+                                    <a href="{{ request()->fullUrlWithQuery(['status' => null]) }}"><i class="fas fa-xmark"></i></a>
                                 </span>
                             @endif
                         </div>
@@ -497,7 +492,7 @@
             @if($appointments->isEmpty())
                 <div class="empty-state">
                     <div class="empty-icon">
-                        <i class="fas fa-calendar-times"></i>
+                        <i class="fas fa-calendar-xmark"></i>
                     </div>
                     <h3 class="text-lg font-semibold text-[#2c2420] mb-2">No Appointments Found</h3>
                     <p class="text-sm text-[#6b5e57] mb-4 max-w-md mx-auto">
@@ -509,7 +504,7 @@
                     </p>
                     @if(request()->anyFilled(['search_date', 'status']))
                         <a href="{{ route('appointments.index') }}" class="btn-secondary mb-3">
-                            <i class="fas fa-filter"></i>
+                            <i class="fas fa-magnifying-glass"></i>
                             <span>Clear Filters</span>
                         </a>
                     @endif
@@ -594,7 +589,7 @@
                                         </div>
                                         @if($appointment->is_referred && $appointment->original_counselor_id)
                                             <div class="text-xs text-[#7a2a2a] mt-1 referral-info">
-                                                <i class="fas fa-exchange-alt"></i>
+                                                <i class="fas fa-arrow-right-arrow-left"></i>
                                                 Originally: {{ $appointment->originalCounselor->user->first_name }}
                                             </div>
                                         @endif
@@ -631,11 +626,11 @@
                                         @if($appointment->status === 'referred' && $appointment->is_referred)
                                             <div class="referral-info">
                                                 <div class="font-medium">
-                                                    <i class="fas fa-user-md"></i>
+                                                    <i class="fas fa-user-doctor"></i>
                                                     {{ $appointment->referredCounselor->user->first_name }}
                                                 </div>
                                                 <div class="text-[#6b5e57] mt-0.5">
-                                                    <i class="fas fa-university"></i>
+                                                    <i class="fas fa-building-columns"></i>
                                                     {{ Str::limit($appointment->referredCounselor->college->name ?? 'N/A', 15) }}
                                                 </div>
                                                 @if($appointment->referral_reason)
@@ -647,7 +642,7 @@
                                                                 {{ $appointment->student->college_id != $appointment->referredCounselor->college_id ? 'true' : 'false' }}
                                                             )"
                                                             class="text-[#c9a227] hover:text-[#7a2a2a] mt-1 inline-flex items-center gap-1">
-                                                        <i class="fas fa-info-circle"></i>
+                                                        <i class="fas fa-circle-info"></i>
                                                         View reason
                                                     </button>
                                                 @endif
@@ -667,7 +662,7 @@
                                                             '{{ addslashes($counselorPhone) }}',
                                                             '{{ addslashes($counselorFbLink) }}'
                                                         )">
-                                                    <i class="fas fa-address-card"></i> Counselor Info
+                                                    <i class="fas fa-id-card"></i> Counselor Info
                                                 </button>
                                             @endif
 
@@ -676,14 +671,14 @@
                                                     @csrf @method('PATCH')
                                                     <button type="submit" class="action-btn accept"
                                                             onclick="return confirm('Accept the new appointment time?')">
-                                                        <i class="fas fa-check"></i> Accept
+                                                        <i class="fas fa-circle-check"></i> Accept
                                                     </button>
                                                 </form>
                                                 <form action="{{ route('appointments.reschedule.reject', $appointment) }}" method="POST" class="inline">
                                                     @csrf @method('PATCH')
                                                     <button type="submit" class="action-btn reject"
                                                             onclick="return confirm('Reject the proposed time and keep the original schedule?')">
-                                                        <i class="fas fa-times"></i> Reject
+                                                        <i class="fas fa-circle-xmark"></i> Reject
                                                     </button>
                                                 </form>
                                             @elseif(in_array($appointment->status, ['pending', 'approved', 'rescheduled'], true) && Auth::user()->role === 'student')
@@ -691,7 +686,7 @@
                                                     @csrf
                                                     <button type="submit" class="action-btn cancel"
                                                             onclick="return confirm('Are you sure you want to cancel this appointment? The time slot will become available for others.')">
-                                                        <i class="fas fa-times"></i> Cancel
+                                                        <i class="fas fa-xmark"></i> Cancel
                                                     </button>
                                                 </form>
                                             @elseif($appointment->status === 'referred' && Auth::user()->role === 'student')
@@ -700,14 +695,14 @@
                                                         @csrf @method('PATCH')
                                                         <button type="submit" class="action-btn accept"
                                                                 onclick="return confirm('Accept the referral schedule with the new counselor?')">
-                                                            <i class="fas fa-check"></i> Accept
+                                                            <i class="fas fa-circle-check"></i> Accept
                                                         </button>
                                                     </form>
                                                     <form action="{{ route('appointments.referral.reject', $appointment) }}" method="POST" class="inline">
                                                         @csrf @method('PATCH')
                                                         <button type="submit" class="action-btn reject"
                                                                 onclick="return confirm('Reject this referral? This appointment will be closed and you will need to create a new request if you still want counseling.')">
-                                                            <i class="fas fa-times"></i> Reject
+                                                            <i class="fas fa-circle-xmark"></i> Reject
                                                         </button>
                                                     </form>
                                                 @else
@@ -731,10 +726,10 @@
     <div class="modal-container">
         <div class="modal-header">
             <h3 class="modal-title">
-                <i class="fas fa-info-circle"></i>Referral Reason
+                <i class="fas fa-circle-info"></i>Referral Reason
             </h3>
             <button onclick="closeReferralReasonModal()" class="modal-close" aria-label="Close">
-                <i class="fas fa-times"></i>
+                <i class="fas fa-xmark"></i>
             </button>
         </div>
         <div class="modal-body">
@@ -745,7 +740,7 @@
         </div>
         <div class="modal-footer">
             <button onclick="closeReferralReasonModal()" class="btn-secondary px-4 py-2 text-xs">
-                <i class="fas fa-times"></i>Close
+                <i class="fas fa-xmark"></i>Close
             </button>
         </div>
     </div>
@@ -756,10 +751,10 @@
     <div class="modal-container">
         <div class="modal-header">
             <h3 class="modal-title">
-                <i class="fas fa-address-card"></i>Counselor Information
+                <i class="fas fa-id-card"></i>Counselor Information
             </h3>
             <button onclick="closeCounselorInfoModal()" class="modal-close" aria-label="Close">
-                <i class="fas fa-times"></i>
+                <i class="fas fa-xmark"></i>
             </button>
         </div>
         <div class="modal-body">
@@ -770,7 +765,7 @@
             <div class="contact-card">
                 <div class="contact-row">
                     <div class="contact-icon">
-                        <i class="fas fa-user"></i>
+                        <i class="fas fa-circle-user"></i>
                     </div>
                     <div>
                         <div class="contact-label">Counselor</div>
@@ -780,7 +775,7 @@
 
                 <div class="contact-row">
                     <div class="contact-icon">
-                        <i class="fas fa-briefcase"></i>
+                        <i class="fas fa-building"></i>
                     </div>
                     <div>
                         <div class="contact-label">Position</div>
@@ -790,7 +785,7 @@
 
                 <div class="contact-row">
                     <div class="contact-icon">
-                        <i class="fas fa-phone"></i>
+                        <i class="fas fa-phone-flip"></i>
                     </div>
                     <div>
                         <div class="contact-label">Phone Number</div>
@@ -816,7 +811,7 @@
         </div>
         <div class="modal-footer">
             <button onclick="closeCounselorInfoModal()" class="btn-secondary px-4 py-2 text-xs">
-                <i class="fas fa-times"></i>Close
+                <i class="fas fa-xmark"></i>Close
             </button>
         </div>
     </div>

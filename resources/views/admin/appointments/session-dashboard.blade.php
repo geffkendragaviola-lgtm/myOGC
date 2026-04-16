@@ -16,7 +16,7 @@
                         <div class="relative px-4 sm:px-5 py-4 sm:py-5">
                             <div class="flex items-start gap-3 sm:gap-4">
                                 <div class="w-10 h-10 sm:w-11 sm:h-11 rounded-lg bg-gradient-to-br from-[#5c1a1a] to-[#7a2a2a] text-[#d4af37] shadow-sm flex items-center justify-center shrink-0">
-                                    <i class="fas fa-clipboard-list text-base sm:text-lg"></i>
+                                    <i class="fas fa-notes-medical text-base sm:text-lg"></i>
                                 </div>
                                 <div class="min-w-0">
                                     <div class="inline-flex items-center gap-1.5 sm:gap-2 rounded-full border border-[#d4af37]/20 bg-[#fef9e7]/70 px-2 sm:px-2.5 py-0.5 text-[9px] sm:text-[10px] font-semibold uppercase tracking-[0.2em] text-[#7a2a2a] mb-1.5 sm:mb-2">
@@ -58,7 +58,7 @@
                 <div class="px-4 sm:px-5 py-3 border-b border-[#e5e0db]/60">
                     <div class="flex items-center gap-2.5">
                         <div class="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-[#fef9e7] flex items-center justify-center text-[#9a7b0a]">
-                            <i class="fas fa-sliders-h text-[10px] sm:text-xs"></i>
+                            <i class="fas fa-sliders text-[10px] sm:text-xs"></i>
                         </div>
                         <div>
                             <p class="text-sm font-medium text-[#2c2420]">Filter Session Notes</p>
@@ -123,7 +123,7 @@
                 @if($appointments->isEmpty())
                     <div class="text-center py-10 sm:py-12 px-4 sm:px-5">
                         <div class="mx-auto w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-[#f5f0eb] flex items-center justify-center shadow-inner">
-                            <i class="fas fa-clipboard-list text-xl sm:text-2xl text-[#a89f97]"></i>
+                            <i class="fas fa-notes-medical text-xl sm:text-2xl text-[#a89f97]"></i>
                         </div>
                         <p class="text-[#6b5e57] text-base font-semibold mt-4">No session notes found.</p>
                         <p class="text-[#8b7e76] text-xs mt-1">Appointments will appear here once session notes are created.</p>
@@ -154,7 +154,7 @@
 
                                                     <div class="mt-1.5 flex flex-wrap items-center gap-x-3 gap-y-1 text-[10px] sm:text-xs text-[#8b7e76]">
                                                         <span class="inline-flex items-center">
-                                                            <i class="fas fa-calendar-alt mr-1.5 text-[#a89f97]"></i>
+                                                            <i class="fas fa-calendar-days mr-1.5 text-[#a89f97]"></i>
                                                             {{ $appointment->appointment_date->format('M j, Y') }}
                                                         </span>
                                                         <span class="inline-flex items-center">
@@ -162,7 +162,7 @@
                                                             {{ \Carbon\Carbon::parse($appointment->start_time)->format('g:i A') }} - {{ \Carbon\Carbon::parse($appointment->end_time)->format('g:i A') }}
                                                         </span>
                                                         <span class="inline-flex items-center">
-                                                            <i class="fas fa-user-tie mr-1.5 text-[#a89f97]"></i>
+                                                            <i class="fas fa-user-doctor mr-1.5 text-[#a89f97]"></i>
                                                             {{ $appointment->counselor?->user?->first_name ?? 'N/A' }} {{ $appointment->counselor?->user?->last_name ?? '' }}
                                                         </span>
                                                     </div>

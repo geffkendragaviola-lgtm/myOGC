@@ -96,7 +96,7 @@
 
             <div class="panel-header">
                 <div class="panel-header-icon">
-                    <i class="fas fa-sliders-h text-[10px] sm:text-xs"></i>
+                    <i class="fas fa-sliders text-[10px] sm:text-xs"></i>
                 </div>
                 <div>
                     <h2 class="panel-title">Search and Filter</h2>
@@ -152,7 +152,7 @@
 
                 <div class="flex items-center gap-2">
                     <span class="table-live-pill">
-                        <i class="far fa-clock mr-1 text-[9px]"></i> Live data
+                        <i class="fas fa-clock mr-1 text-[9px]"></i> Live data
                     </span>
                 </div>
             </div>
@@ -205,7 +205,7 @@
                                     @endphp
                                     <div class="text-xs sm:text-sm font-semibold text-[#2c2420] truncate max-w-[140px]">{{ $student->college->name ?? 'N/A' }}</div>
                                     <div class="text-[10px] sm:text-[11px] text-[#8b7e76] mt-0.5 inline-flex items-center">
-                                        <i class="fas fa-user-tie text-[#c4b8b1] text-[9px] sm:text-[10px] mr-1.5"></i>
+                                        <i class="fas fa-user-doctor text-[#c4b8b1] text-[9px] sm:text-[10px] mr-1.5"></i>
                                         <span class="truncate max-w-[120px]">{{ $headCounselor ? ($headCounselor->user->first_name . ' ' . $headCounselor->user->last_name) : 'N/A' }}</span>
                                     </div>
                                 </td>
@@ -213,7 +213,7 @@
                                 <td class="px-3 sm:px-4 py-2.5 sm:py-3">
                                     <div class="text-xs sm:text-sm font-semibold text-[#2c2420] truncate max-w-[140px]">{{ $student->course }}</div>
                                     <div class="text-[10px] sm:text-[11px] text-[#8b7e76] mt-0.5 inline-flex items-center">
-                                        <i class="far fa-calendar-alt text-[#c4b8b1] text-[9px] sm:text-[10px] mr-1.5"></i>
+                                        <i class="fas fa-calendar-days-days text-[#c4b8b1] text-[9px] sm:text-[10px] mr-1.5"></i>
                                         Year {{ $student->year_level }}
                                     </div>
                                 </td>
@@ -221,7 +221,7 @@
                                 <td class="px-3 sm:px-4 py-2.5 sm:py-3 whitespace-nowrap">
                                     <div class="inline-flex items-center gap-1.5 text-xs sm:text-sm text-[#6b5e57]">
                                         <span class="mini-icon bg-[#fdf2f2] text-[#7a2a2a]/50">
-                                            <i class="far fa-clock text-[9px] sm:text-[10px]"></i>
+                                            <i class="fas fa-clock text-[9px] sm:text-[10px]"></i>
                                         </span>
                                         {{ $student->lastSessionNote?->session_date?->format('M j, Y') ?? 'N/A' }}
                                     </div>
@@ -233,7 +233,7 @@
                                            ($student->student_status == 'transferee' ? 'bg-[#eff6ff] text-[#0284c7] border border-[#0ea5e9]/30' : 
                                            ($student->student_status == 'returnee' ? 'bg-[#fffbeb] text-[#b45309] border border-[#f59e0b]/30' : 
                                            'bg-[#f5f0eb] text-[#6b5e57] border border-[#e5e0db]/70')) }}">
-                                        <i class="fas {{ $student->student_status == 'new' ? 'fa-star' : ($student->student_status == 'transferee' ? 'fa-exchange-alt' : ($student->student_status == 'returnee' ? 'fa-undo' : 'fa-user')) }} mr-1 text-[9px] sm:text-[10px]"></i>
+                                        <i class="fas {{ $student->student_status == 'new' ? 'fa-star' : ($student->student_status == 'transferee' ? 'fa-arrow-right-arrow-left' : ($student->student_status == 'returnee' ? 'fa-undo' : 'fa-user')) }} mr-1 text-[9px] sm:text-[10px]"></i>
                                         {{ ucfirst($student->student_status ?? 'new') }}
                                     </span>
                                 </td>
@@ -243,7 +243,7 @@
                                         <a href="{{ route('admin.students.edit', $student) }}" 
                                            class="action-link" 
                                            title="Edit Student">
-                                            <i class="fas fa-edit text-sm"></i>
+                                            <i class="fas fa-pen-to-square text-sm"></i>
                                         </a>
                                     </div>
                                 </td>
@@ -253,7 +253,7 @@
                                 <td colspan="8" class="px-4 py-8 sm:py-10 text-center">
                                     <div class="flex flex-col items-center justify-center">
                                         <div class="empty-state-icon mb-3">
-                                            <i class="fas fa-user-slash text-[#a89f97] text-lg"></i>
+                                            <i class="fas fa-user-xmark text-[#a89f97] text-lg"></i>
                                         </div>
                                         <p class="text-xs sm:text-sm font-medium text-[#6b5e57]">No students found.</p>
                                         <p class="text-[10px] sm:text-xs text-[#8b7e76] mt-1">Try adjusting your search or filter criteria</p>
@@ -310,7 +310,7 @@
             @else
             <div class="px-4 sm:px-5 py-3 sm:py-3.5 border-t border-[#e5e0db]/60 bg-[#faf8f5]/40">
                 <div class="flex items-center justify-center gap-2 text-[10px] sm:text-xs text-[#8b7e76]">
-                    <i class="fas fa-check-circle text-[#059669]"></i>
+                    <i class="fas fa-circle-check text-[#059669]"></i>
                     <span>Showing all <span class="font-semibold text-[#2c2420]">{{ $students->total() }}</span> students</span>
                 </div>
             </div>

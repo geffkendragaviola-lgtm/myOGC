@@ -119,7 +119,7 @@
                         {{ $sessionNote->student->college->name ?? 'N/A' }} • {{ $sessionNote->student->year_level }}
                     </div>
                     <div class="session-date-badge">
-                        <i class="fas fa-calendar-alt"></i>
+                        <i class="fas fa-calendar-days"></i>
                         Session Date: {{ $sessionNote->session_date->format('F j, Y') }}
                     </div>
                 </div>

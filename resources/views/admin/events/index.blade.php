@@ -180,7 +180,7 @@
                 <div class="hero-card">
                     <div class="relative p-4 sm:p-5 flex items-start gap-3">
                         <div class="hero-icon">
-                            <i class="fas fa-calendar-alt text-base sm:text-lg"></i>
+                            <i class="fas fa-calendar-days text-base sm:text-lg"></i>
                         </div>
 
                         <div class="min-w-0">
@@ -238,7 +238,7 @@
                         <p class="text-xl sm:text-2xl font-semibold text-[#2c2420] mt-1.5">{{ $events->where('is_active', true)->count() }}</p>
                     </div>
                     <div class="stats-icon bg-[#ecfdf5]">
-                        <i class="fas fa-play-circle text-emerald-600 text-sm sm:text-base"></i>
+                        <i class="fas fa-circle-play text-emerald-600 text-sm sm:text-base"></i>
                     </div>
                 </div>
                 <div class="mt-3 mini-progress">
@@ -270,7 +270,7 @@
                         <p class="text-xl sm:text-2xl font-semibold text-[#2c2420] mt-1.5">{{ $counselors->count() }}</p>
                     </div>
                     <div class="stats-icon bg-[#fdf2f2]">
-                        <i class="fas fa-user-tie text-[#7a2a2a] text-sm sm:text-base"></i>
+                        <i class="fas fa-user-doctor text-[#7a2a2a] text-sm sm:text-base"></i>
                     </div>
                 </div>
                 <div class="mt-3 mini-progress">
@@ -287,7 +287,7 @@
 
             <div class="panel-header">
                 <div class="panel-icon">
-                    <i class="fas fa-sliders-h text-[9px] sm:text-xs"></i>
+                    <i class="fas fa-sliders text-[9px] sm:text-xs"></i>
                 </div>
                 <div>
                     <h2 class="panel-title">Filter Events</h2>
@@ -372,7 +372,7 @@
                                     </span>
                                     <h3 class="text-sm sm:text-base font-semibold leading-tight truncate">{{ $event->title }}</h3>
                                     <p class="text-[10px] sm:text-xs text-white/80 mt-1 truncate">
-                                        <i class="fas fa-user-tie mr-1"></i>
+                                        <i class="fas fa-user-doctor mr-1"></i>
                                         {{ $event->user->first_name }} {{ $event->user->last_name }}
                                     </p>
                                 </div>
@@ -389,21 +389,21 @@
                             <div class="space-y-2 mb-3">
                                 <div class="event-meta-row">
                                     <span class="event-meta-icon bg-[#eff6ff] text-sky-500">
-                                        <i class="far fa-calendar text-[9px] sm:text-xs"></i>
+                                        <i class="fas fa-calendar-days text-[9px] sm:text-xs"></i>
                                     </span>
                                     <span class="text-xs sm:text-sm truncate">{{ $event->date_range }}</span>
                                 </div>
 
                                 <div class="event-meta-row">
                                     <span class="event-meta-icon bg-[#fffbeb] text-amber-500">
-                                        <i class="far fa-clock text-[9px] sm:text-xs"></i>
+                                        <i class="fas fa-clock text-[9px] sm:text-xs"></i>
                                     </span>
                                     <span class="text-xs sm:text-sm truncate">{{ $event->time_range }}</span>
                                 </div>
 
                                 <div class="event-meta-row">
                                     <span class="event-meta-icon bg-[#fdf2f2] text-[#7a2a2a]/60">
-                                        <i class="fas fa-map-marker-alt text-[9px] sm:text-xs"></i>
+                                        <i class="fas fa-location-dot text-[9px] sm:text-xs"></i>
                                     </span>
                                     <span class="text-xs sm:text-sm truncate">{{ $event->location }}</span>
                                 </div>
@@ -434,7 +434,7 @@
 
                                 <a href="{{ route('admin.events.edit', $event) }}"
                                    class="action-btn-soft bg-[#f5f0eb] text-[#6b5e57] hover:bg-[#e5e0db] text-center">
-                                    <i class="fas fa-edit mr-1.5 text-[9px]"></i> Edit
+                                    <i class="fas fa-pen-to-square mr-1.5 text-[9px]"></i> Edit
                                 </a>
 
                                 <form action="{{ route('admin.events.toggle-status', $event) }}" method="POST" class="contents">
@@ -453,14 +453,14 @@
                                     @method('DELETE')
                                     <button type="submit"
                                             class="action-btn-soft bg-[#fdf2f2] text-[#b91c1c] hover:bg-[#fce4e4] text-center w-full">
-                                        <i class="fas fa-trash-alt mr-1.5 text-[9px]"></i> Delete
+                                        <i class="fas fa-trash-can-alt mr-1.5 text-[9px]"></i> Delete
                                     </button>
                                 </form>
                             </div>
 
                             <div class="pt-2.5 border-t border-[#e5e0db]/60 mt-auto">
                                 <p class="text-[10px] text-[#8b7e76]">
-                                    <i class="far fa-clock mr-1"></i>
+                                    <i class="fas fa-clock mr-1"></i>
                                     Created: {{ $event->created_at->format('M j, Y g:i A') }}
                                 </p>
                             </div>
@@ -502,7 +502,7 @@
             @else
             <div class="mt-5 sm:mt-6 glass-card p-4">
                 <div class="flex items-center justify-center gap-2 text-[10px] sm:text-xs text-[#8b7e76]">
-                    <i class="fas fa-check-circle text-[#059669]"></i>
+                    <i class="fas fa-circle-check text-[#059669]"></i>
                     <span>Showing all <span class="font-semibold text-[#2c2420]">{{ $events->total() }}</span> events</span>
                 </div>
             </div>

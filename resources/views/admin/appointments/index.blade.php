@@ -83,7 +83,7 @@
                     <div class="stat-card-pattern"></div>
                     <div class="relative flex items-center gap-2.5 sm:gap-3">
                         <div class="stat-icon bg-[#ecfdf5] text-[#059669] group-hover:bg-[#d1fae5]">
-                            <i class="fas fa-check-circle text-sm sm:text-base"></i>
+                            <i class="fas fa-circle-check text-sm sm:text-base"></i>
                         </div>
                         <div>
                             <p class="stat-label">Approved</p>
@@ -97,7 +97,7 @@
                     <div class="stat-card-pattern"></div>
                     <div class="relative flex items-center gap-2.5 sm:gap-3">
                         <div class="stat-icon bg-[#f8fafc] text-[#475569] group-hover:bg-[#f1f5f9]">
-                            <i class="fas fa-flag-checkered text-sm sm:text-base"></i>
+                            <i class="fas fa-circle-dot text-sm sm:text-base"></i>
                         </div>
                         <div>
                             <p class="stat-label">Completed</p>
@@ -111,7 +111,7 @@
                     <div class="stat-card-pattern"></div>
                     <div class="relative flex items-center gap-2.5 sm:gap-3">
                         <div class="stat-icon bg-[#fdf2f2] text-[#b91c1c] group-hover:bg-[#fce4e4]">
-                            <i class="fas fa-times-circle text-sm sm:text-base"></i>
+                            <i class="fas fa-circle-xmark text-sm sm:text-base"></i>
                         </div>
                         <div>
                             <p class="stat-label">Rejected</p>
@@ -127,7 +127,7 @@
                 <div class="px-4 sm:px-5 py-3 border-b border-[#e5e0db]/60">
                     <div class="flex items-center gap-2.5">
                         <div class="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-[#fef9e7] flex items-center justify-center text-[#9a7b0a]">
-                            <i class="fas fa-sliders-h text-[10px] sm:text-xs"></i>
+                            <i class="fas fa-sliders text-[10px] sm:text-xs"></i>
                         </div>
                         <div>
                             <p class="text-sm font-medium text-[#2c2420]">Filter Appointments</p>
@@ -166,7 +166,7 @@
                                 <span>Apply</span>
                             </button>
                             <a href="{{ route('admin.appointments') }}" class="inline-flex items-center justify-center px-3 sm:px-4 py-2 sm:py-2.5 rounded-lg bg-[#f5f0eb] text-[#6b5e57] hover:bg-[#e5e0db] transition font-medium text-xs sm:text-sm">
-                                <i class="fas fa-undo-alt"></i>
+                                <i class="fas fa-rotate-left"></i>
                             </a>
                         </div>
                     </form>
@@ -248,7 +248,7 @@
                                     <td class="px-3 sm:px-4 py-2.5 sm:py-3">
                                         <div class="flex items-center gap-2 sm:gap-2.5">
                                             <div class="w-8 h-8 rounded-md bg-[#f5f0eb] flex items-center justify-center shadow-inner">
-                                                <i class="fas fa-user-tie text-[#8b7e76] text-[10px] sm:text-xs"></i>
+                                                <i class="fas fa-user-doctor text-[#8b7e76] text-[10px] sm:text-xs"></i>
                                             </div>
                                             <div class="min-w-0">
                                                 <p class="text-xs sm:text-sm font-medium text-[#2c2420] truncate">{{ $appointment->counselor->user->first_name ?? 'N/A' }} {{ $appointment->counselor->user->last_name ?? '' }}</p>
@@ -329,7 +329,7 @@
                                             </div>
                                         @else
                                             <div class="inline-flex items-center gap-1.5 rounded-full bg-[#f8fafc] border border-[#e5e0db]/60 px-2 py-0.5">
-                                                <i class="fas fa-clipboard text-[#a89f97] text-[10px] sm:text-xs"></i>
+                                                <i class="fas fa-file-lines text-[#a89f97] text-[10px] sm:text-xs"></i>
                                                 <span class="text-[10px] sm:text-xs text-[#8b7e76]">None</span>
                                             </div>
                                         @endif
@@ -348,7 +348,7 @@
                                     <td colspan="8" class="px-4 py-12 text-center">
                                         <div class="flex flex-col items-center gap-3">
                                             <div class="w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-[#f5f0eb] flex items-center justify-center shadow-inner">
-                                                <i class="fas fa-calendar-times text-[#a89f97] text-xl sm:text-2xl"></i>
+                                                <i class="fas fa-calendar-xmark text-[#a89f97] text-xl sm:text-2xl"></i>
                                             </div>
                                             <div>
                                                 <p class="text-[#6b5e57] font-medium text-sm">No appointments found</p>
@@ -382,7 +382,7 @@
                                 </div>
                             </div>
                             <button onclick="closeAppointmentModal()" class="w-7 h-7 sm:w-8 sm:h-8 bg-[#f5f0eb] rounded-lg flex items-center justify-center text-[#6b5e57] hover:bg-[#e5e0db] transition">
-                                <i class="fas fa-times text-xs"></i>
+                                <i class="fas fa-xmark text-xs"></i>
                             </button>
                         </div>
                     </div>
@@ -582,7 +582,7 @@
                                 <div class="bg-gradient-to-br from-[#f5f0eb]/60 to-transparent rounded-lg p-3.5 sm:p-4 border border-[#e5e0db]/60">
                                     <div class="flex items-center gap-2 mb-2.5 sm:mb-3">
                                         <div class="w-7 h-7 sm:w-8 sm:h-8 bg-[#f5f0eb] rounded-md flex items-center justify-center">
-                                            <i class="fas fa-user-tie text-[#6b5e57] text-xs sm:text-sm"></i>
+                                            <i class="fas fa-user-doctor text-[#6b5e57] text-xs sm:text-sm"></i>
                                         </div>
                                         <h4 class="text-sm font-medium text-[#4a3f3a]">Counselor Information</h4>
                                     </div>
@@ -597,7 +597,7 @@
                             <div class="bg-[#faf8f5] rounded-lg p-3.5 sm:p-4 border border-[#e5e0db]/60">
                                 <div class="flex items-center gap-2 mb-2.5 sm:mb-3">
                                     <div class="w-7 h-7 sm:w-8 sm:h-8 bg-[#fdf2f2] rounded-md flex items-center justify-center">
-                                        <i class="fas fa-calendar-alt text-[#7a2a2a] text-xs sm:text-sm"></i>
+                                        <i class="fas fa-calendar-days text-[#7a2a2a] text-xs sm:text-sm"></i>
                                     </div>
                                     <h4 class="text-sm font-medium text-[#4a3f3a]">Appointment Details</h4>
                                 </div>
@@ -653,7 +653,7 @@
                             <div class="bg-[#fef9e7] rounded-lg p-3.5 sm:p-4 border border-[#d4af37]/30">
                                 <div class="flex items-center gap-2 mb-2.5 sm:mb-3">
                                     <div class="w-7 h-7 sm:w-8 sm:h-8 bg-[#d4af37]/20 rounded-md flex items-center justify-center">
-                                        <i class="fas fa-exchange-alt text-[#9a7b0a] text-xs sm:text-sm"></i>
+                                        <i class="fas fa-arrow-right-arrow-left text-[#9a7b0a] text-xs sm:text-sm"></i>
                                     </div>
                                     <h4 class="text-sm font-medium text-[#9a7b0a]">Referral Details</h4>
                                 </div>
@@ -677,7 +677,7 @@
                                 ` : ''}
                                 <button onclick="closeAppointmentModal()"
                                         class="inline-flex items-center gap-2 px-3 sm:px-4 py-2 bg-[#f5f0eb] text-[#6b5e57] rounded-lg hover:bg-[#e5e0db] transition text-xs sm:text-sm font-medium">
-                                    <i class="fas fa-times text-xs sm:text-sm"></i>
+                                    <i class="fas fa-xmark text-xs sm:text-sm"></i>
                                     Close
                                 </button>
                             </div>

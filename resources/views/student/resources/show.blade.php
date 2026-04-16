@@ -122,6 +122,11 @@
         .hero-banner { height: 13rem; }
         .hero-content { padding: 1.5rem 1.25rem 1.25rem; }
         .hero-title { font-size: 1.25rem; }
+        .topbar { padding: 0.65rem 1rem; }
+        .topbar-brand { font-size: 0.875rem; }
+        .topbar-back { padding: 0.35rem 0.75rem; font-size: 0.75rem; }
+        .content-grid { padding: 1.25rem 0 2.5rem; }
+        .max-w-screen-xl { padding-left: 1rem; padding-right: 1rem; }
     }
 
     /* ── Article card ── */
@@ -299,7 +304,7 @@
                         <div class="meta-row">
                             @if($resource->user)
                             <span class="meta-chip">
-                                <i class="fas fa-user-tie"></i>
+                                <i class="fas fa-user-doctor"></i>
                                 {{ $resource->user->first_name }} {{ $resource->user->last_name }}
                             </span>
                             @endif
@@ -308,7 +313,7 @@
                                 {{ $categories[$category] }}
                             </span>
                             <span class="meta-chip">
-                                <i class="fas fa-calendar-alt"></i>
+                                <i class="fas fa-calendar-days"></i>
                                 {{ $resource->created_at->format('F j, Y') }}
                             </span>
                         </div>
@@ -322,7 +327,7 @@
                             <div class="disclaimer-box" onclick="toggleDisclaimer()">
                                 <div class="disclaimer-header">
                                     <div class="flex items-center gap-2">
-                                        <i class="fas fa-exclamation-circle text-amber-500"></i>
+                                        <i class="fas fa-circle-exclamation text-amber-500"></i>
                                         Content Disclaimer
                                     </div>
                                     <i class="fas fa-chevron-down text-orange-600 transition-transform duration-200" id="disc-icon"></i>
@@ -373,7 +378,7 @@
                         <div class="flex items-start gap-3">
                             <div class="w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0"
                                  style="background:rgba(254,249,231,0.8);color:var(--maroon-700);">
-                                <i class="fas fa-user-tie text-sm"></i>
+                                <i class="fas fa-user-doctor text-sm"></i>
                             </div>
                             <div>
                                 <p class="text-[0.68rem] font-semibold uppercase tracking-wider text-[var(--text-muted)]">Added by</p>

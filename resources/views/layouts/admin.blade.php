@@ -346,6 +346,27 @@
         width: 5.5rem;
     }
 
+    /* Pre-collapsed: same as collapsed but no transition (prevents flash) */
+    html.sidebar-pre-collapsed .ogc-sidebar,
+    html.sidebar-pre-collapsed #ogcMainContent {
+        transition: none !important;
+    }
+    html.sidebar-pre-collapsed .ogc-sidebar { width: 5.5rem; }
+    html.sidebar-pre-collapsed #ogcMainContent { margin-left: 5.5rem; }
+    html.sidebar-pre-collapsed .sidebar-user-name,
+    html.sidebar-pre-collapsed .sidebar-user-email,
+    html.sidebar-pre-collapsed .sidebar-link span,
+    html.sidebar-pre-collapsed .logout-link span,
+    html.sidebar-pre-collapsed .sidebar-section-header {
+        opacity: 0; width: 0; max-width: 0; overflow: hidden;
+        white-space: nowrap; pointer-events: none;
+    }
+    html.sidebar-pre-collapsed .sidebar-role-pill { display: none; }
+    html.sidebar-pre-collapsed .sidebar-link,
+    html.sidebar-pre-collapsed .logout-link { justify-content: center; gap: 0; padding: 0.85rem 0.5rem; }
+    html.sidebar-pre-collapsed .sidebar-link i,
+    html.sidebar-pre-collapsed .logout-link i { width: auto; margin: 0; font-size: 1rem; }
+
     body.sidebar-collapsed #ogcMainContent {
         margin-left: 5.5rem;
     }
@@ -530,52 +551,124 @@
         background-color: var(--bg-warm);
     }
 
-    /* Responsive */
-    @media (max-width: 1024px) {
-        .ogc-sidebar {
-            width: 16rem;
-        }
-
-        .ml-64,
-        #ogcMainContent {
-            margin-left: 16rem;
-        }
-
-        body.sidebar-collapsed .ogc-sidebar {
-            width: 5.5rem;
-        }
-
-        body.sidebar-collapsed #ogcMainContent {
-            margin-left: 5.5rem;
-        }
+    /* ── Sidebar overlay backdrop (mobile) ── */
+    #ogcSidebarOverlay {
+        display: none;
+        position: fixed;
+        inset: 0;
+        z-index: 29;
+        background: rgba(30, 8, 8, 0.5);
+        backdrop-filter: blur(2px);
+        -webkit-backdrop-filter: blur(2px);
+        transition: opacity 0.3s ease;
+    }
+    body.sidebar-mobile-open #ogcSidebarOverlay {
+        display: block;
     }
 
-    @media (max-width: 768px) {
+    /* ── Responsive breakpoints ── */
+    @media (max-width: 1024px) {
+        .ogc-sidebar { width: 16rem; }
+        .ml-64, #ogcMainContent { margin-left: 16rem; }
+        body.sidebar-collapsed .ogc-sidebar { width: 5.5rem; }
+        body.sidebar-collapsed #ogcMainContent { margin-left: 5.5rem; }
+    }
+
+    /* Tablet: auto-collapse sidebar to icon-only */
+    @media (max-width: 900px) {
+        .ogc-sidebar { width: 5.5rem; }
+        .ml-64, #ogcMainContent { margin-left: 5.5rem; }
+
+        .sidebar-user-name,
+        .sidebar-user-email,
+        .sidebar-link span,
+        .logout-link span,
+        .sidebar-section-header {
+            opacity: 0; width: 0; max-width: 0;
+            overflow: hidden; white-space: nowrap; pointer-events: none;
+        }
+        .sidebar-role-pill { display: none; }
+        .sidebar-link, .logout-link {
+            justify-content: center; gap: 0; padding: 0.85rem 0.5rem;
+        }
+        .sidebar-link i, .logout-link i { width: auto; margin: 0; font-size: 1rem; }
+        .sidebar-link.active::before { left: 0.35rem; }
+        .sidebar-user-card { padding: 0.8rem 0.5rem; flex-direction: column; align-items: center; text-align: center; }
+        .sidebar-user-card .flex { flex-direction: column; align-items: center; justify-content: center; gap: 0.55rem; }
+        .sidebar-user-section { padding: 1rem 0.65rem 0.85rem; }
+        .sidebar-footer { padding: 0.9rem 0.55rem; }
+
+        /* When toggle is clicked on tablet, expand to full width */
+        body.sidebar-expanded .ogc-sidebar { width: 16rem; }
+        body.sidebar-expanded #ogcMainContent { margin-left: 16rem; }
+        body.sidebar-expanded .sidebar-user-name,
+        body.sidebar-expanded .sidebar-user-email,
+        body.sidebar-expanded .sidebar-link span,
+        body.sidebar-expanded .logout-link span,
+        body.sidebar-expanded .sidebar-section-header {
+            opacity: 1; width: auto; max-width: none; pointer-events: auto;
+        }
+        body.sidebar-expanded .sidebar-role-pill { display: inline-flex; }
+        body.sidebar-expanded .sidebar-link,
+        body.sidebar-expanded .logout-link { justify-content: flex-start; gap: 0.8rem; padding: 0.8rem 0.9rem; }
+        body.sidebar-expanded .sidebar-link i,
+        body.sidebar-expanded .logout-link i { width: 1.2rem; }
+        body.sidebar-expanded .sidebar-user-card { padding: 0.9rem; flex-direction: column; align-items: flex-start; }
+        body.sidebar-expanded .sidebar-user-card .flex { flex-direction: row; align-items: center; gap: 0.75rem; }
+        body.sidebar-expanded .sidebar-user-section { padding: 1.15rem 1rem 1rem; }
+        body.sidebar-expanded .sidebar-footer { padding: 0.9rem 0.75rem; }
+    }
+
+    /* Mobile: sidebar becomes overlay drawer */
+    @media (max-width: 640px) {
         .ogc-navbar {
-            padding-left: 1rem !important;
-            padding-right: 1rem !important;
+            padding-left: 0.85rem !important;
+            padding-right: 0.85rem !important;
         }
 
+        /* Sidebar hidden off-screen by default */
         .ogc-sidebar {
-            width: 15rem;
+            width: 16rem !important;
+            transform: translateX(-100%);
+            transition: transform 0.3s ease, width 0.3s ease !important;
+            z-index: 40;
         }
 
-        .ml-64,
-        #ogcMainContent {
-            margin-left: 15rem;
+        /* Main content takes full width */
+        .ml-64, #ogcMainContent {
+            margin-left: 0 !important;
         }
 
-        body.sidebar-collapsed .ogc-sidebar {
-            width: 5rem;
+        /* Sidebar open state */
+        body.sidebar-mobile-open .ogc-sidebar {
+            transform: translateX(0);
         }
 
-        body.sidebar-collapsed #ogcMainContent {
-            margin-left: 5rem;
+        /* Restore text visibility when open on mobile */
+        body.sidebar-mobile-open .sidebar-user-name,
+        body.sidebar-mobile-open .sidebar-user-email,
+        body.sidebar-mobile-open .sidebar-link span,
+        body.sidebar-mobile-open .logout-link span,
+        body.sidebar-mobile-open .sidebar-section-header {
+            opacity: 1; width: auto; max-width: none; pointer-events: auto;
+            white-space: normal; transform: none;
         }
+        body.sidebar-mobile-open .sidebar-role-pill { display: inline-flex; }
+        body.sidebar-mobile-open .sidebar-link,
+        body.sidebar-mobile-open .logout-link { justify-content: flex-start; gap: 0.8rem; padding: 0.8rem 0.9rem; }
+        body.sidebar-mobile-open .sidebar-link i,
+        body.sidebar-mobile-open .logout-link i { width: 1.2rem; }
+        body.sidebar-mobile-open .sidebar-user-card { padding: 0.9rem; }
+        body.sidebar-mobile-open .sidebar-user-card .flex { flex-direction: row; align-items: center; gap: 0.75rem; }
+        body.sidebar-mobile-open .sidebar-user-section { padding: 1.15rem 1rem 1rem; }
+        body.sidebar-mobile-open .sidebar-footer { padding: 0.9rem 0.75rem; }
+        body.sidebar-mobile-open .sidebar-link.active::before { left: 0.45rem; }
 
-        .sidebar-user-email {
-            max-width: 100%;
-        }
+        /* Prevent body scroll when sidebar open */
+        body.sidebar-mobile-open { overflow: hidden; }
+
+        /* Content responsive adjustments */
+        #ogcMainContent { padding-left: 0; padding-right: 0; }
     }
 </style>
 
@@ -686,7 +779,272 @@
     #ogcMainContent .table-footer {
         padding: 0.9rem 1.5rem;
     }
+
+    /* ── Global design enhancements ── */
+
+    /* Smoother body background */
+    body {
+        background-image:
+            radial-gradient(ellipse at 0% 0%, rgba(212,175,55,0.06) 0%, transparent 40%),
+            radial-gradient(ellipse at 100% 100%, rgba(122,42,42,0.06) 0%, transparent 40%);
+    }
+
+    /* Refined card base */
+    #ogcMainContent .hero-card,
+    #ogcMainContent .panel-card,
+    #ogcMainContent .glass-card,
+    #ogcMainContent .an-card,
+    #ogcMainContent .stat-card {
+        border-radius: 1rem;
+        border-color: rgba(229,224,219,0.7);
+        box-shadow: 0 1px 3px rgba(44,36,32,0.04), 0 4px 16px rgba(44,36,32,0.05);
+        transition: box-shadow 0.22s ease, transform 0.22s ease;
+    }
+    #ogcMainContent .panel-card:hover,
+    #ogcMainContent .hero-card:hover {
+        box-shadow: 0 2px 6px rgba(44,36,32,0.05), 0 8px 24px rgba(44,36,32,0.08);
+    }
+
+    /* Refined panel topline */
+    #ogcMainContent .panel-topline {
+        height: 2px;
+        background: linear-gradient(90deg, var(--maroon-medium) 0%, var(--gold-primary) 50%, var(--maroon-medium) 100%);
+        opacity: 0.7;
+    }
+
+    /* Better table styling */
+    #ogcMainContent table {
+        border-collapse: separate;
+        border-spacing: 0;
+    }
+    #ogcMainContent table thead tr th {
+        background: rgba(250,248,245,0.9);
+        font-size: 0.7rem;
+        font-weight: 700;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: var(--text-muted);
+        border-bottom: 1px solid rgba(229,224,219,0.8);
+        padding-top: 0.9rem;
+        padding-bottom: 0.9rem;
+    }
+    #ogcMainContent table tbody tr td {
+        border-bottom: 1px solid rgba(229,224,219,0.45);
+        vertical-align: middle;
+    }
+    #ogcMainContent table tbody tr:last-child td {
+        border-bottom: none;
+    }
+    #ogcMainContent .table-row:hover td {
+        background: rgba(254,249,231,0.3);
+    }
+
+    /* Refined input fields */
+    #ogcMainContent .input-field,
+    #ogcMainContent .select-field,
+    #ogcMainContent .filter-input,
+    #ogcMainContent .textarea-field {
+        border-radius: 0.65rem;
+        border-color: rgba(229,224,219,0.9);
+        background: rgba(255,255,255,0.95);
+        transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    #ogcMainContent .input-field:focus,
+    #ogcMainContent .select-field:focus,
+    #ogcMainContent .filter-input:focus,
+    #ogcMainContent .textarea-field:focus {
+        border-color: var(--maroon-soft);
+        box-shadow: 0 0 0 3px rgba(122,42,42,0.08);
+        outline: none;
+    }
+
+    /* Refined primary button */
+    #ogcMainContent .primary-btn,
+    #ogcMainContent .search-btn {
+        border-radius: 0.65rem;
+        letter-spacing: 0.01em;
+        box-shadow: 0 2px 8px rgba(92,26,26,0.18);
+        transition: all 0.2s ease;
+    }
+    #ogcMainContent .primary-btn:hover,
+    #ogcMainContent .search-btn:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 14px rgba(92,26,26,0.25);
+    }
+    #ogcMainContent .primary-btn:active,
+    #ogcMainContent .search-btn:active {
+        transform: translateY(0);
+        box-shadow: 0 1px 4px rgba(92,26,26,0.15);
+    }
+
+    /* Refined hero icon */
+    #ogcMainContent .hero-icon {
+        border-radius: 0.85rem;
+        box-shadow: 0 4px 14px rgba(92,26,26,0.18);
+    }
+
+    /* Refined avatar badge */
+    #ogcMainContent .avatar-badge {
+        background: linear-gradient(135deg, #fef9e7 0%, #f5e6b8 100%);
+        border: 1px solid rgba(212,175,55,0.35);
+        box-shadow: 0 1px 4px rgba(44,36,32,0.06);
+    }
+
+    /* Refined hero badge */
+    #ogcMainContent .hero-badge {
+        background: rgba(254,249,231,0.9);
+        border-color: rgba(212,175,55,0.35);
+        letter-spacing: 0.14em;
+    }
+
+    /* Refined summary card */
+    #ogcMainContent .summary-card {
+        border-radius: 1rem;
+        box-shadow: 0 4px 20px rgba(58,12,12,0.18);
+    }
+
+    /* Refined action links */
+    #ogcMainContent .action-link {
+        width: 2rem;
+        height: 2rem;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 0.5rem;
+        transition: all 0.18s ease;
+        color: var(--text-muted);
+    }
+    #ogcMainContent .action-link:hover {
+        background: rgba(254,249,231,0.8);
+        color: var(--maroon-soft);
+        transform: translateY(-1px);
+    }
+
+    /* Refined status badges */
+    #ogcMainContent .status-badge,
+    #ogcMainContent [class*="status-chip"] {
+        border-radius: 999px;
+        font-weight: 600;
+        letter-spacing: 0.02em;
+    }
+
+    /* Refined empty states */
+    #ogcMainContent .empty-state-icon {
+        background: linear-gradient(135deg, rgba(254,249,231,0.8), rgba(245,240,235,0.6));
+        border: 1.5px dashed rgba(212,175,55,0.4);
+    }
+
+    /* Refined panel header */
+    #ogcMainContent .panel-header {
+        background: rgba(250,248,245,0.5);
+    }
+
+    /* Refined table header bar */
+    #ogcMainContent .table-header-bar {
+        background: rgba(250,248,245,0.6);
+        border-bottom-color: rgba(229,224,219,0.6);
+    }
+
+    /* Smooth page transitions */
+    #ogcMainContent {
+        animation: contentFadeIn 0.18s ease-out;
+    }
+    @keyframes contentFadeIn {
+        from { opacity: 0.85; transform: translateY(3px); }
+        to   { opacity: 1;    transform: translateY(0); }
+    }
     </style>
+
+    {{-- ── Responsive content improvements ── --}}
+    <style>
+    /* Tables: horizontal scroll on small screens */
+    @media (max-width: 900px) {
+        #ogcMainContent .overflow-x-auto,
+        #ogcMainContent table { display: block; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+        #ogcMainContent table { display: table; min-width: 600px; }
+        #ogcMainContent .overflow-x-auto { width: 100%; }
+
+        /* Reduce padding on mobile */
+        #ogcMainContent .px-4    { padding-left: 1rem; padding-right: 1rem; }
+        #ogcMainContent .sm\:px-6 { padding-left: 1rem; padding-right: 1rem; }
+        #ogcMainContent .py-5    { padding-top: 1.25rem; padding-bottom: 1.25rem; }
+        #ogcMainContent .py-6    { padding-top: 1.5rem; padding-bottom: 1.5rem; }
+
+        /* Stat grids: 2 columns on tablet */
+        #ogcMainContent .grid-cols-5 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+        #ogcMainContent .grid-cols-4 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+        #ogcMainContent .grid-cols-3 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+
+        /* Hero card: stack on tablet */
+        #ogcMainContent .hero-card .flex.items-start { flex-direction: column; gap: 1rem; }
+
+        /* Filter rows: wrap */
+        #ogcMainContent .filter-row { flex-wrap: wrap; gap: 0.75rem; }
+        #ogcMainContent .filter-row > * { flex: 1 1 calc(50% - 0.375rem); min-width: 0; }
+
+        /* Reduce stat values */
+        #ogcMainContent .stat-value { font-size: 1.5rem; }
+        #ogcMainContent .summary-value { font-size: 1.35rem; }
+    }
+
+    @media (max-width: 640px) {
+        /* Full-width padding on mobile */
+        #ogcMainContent .px-4    { padding-left: 0.85rem; padding-right: 0.85rem; }
+        #ogcMainContent .sm\:px-6 { padding-left: 0.85rem; padding-right: 0.85rem; }
+        #ogcMainContent .py-5    { padding-top: 1rem; padding-bottom: 1rem; }
+        #ogcMainContent .py-6    { padding-top: 1.25rem; padding-bottom: 1.25rem; }
+
+        /* Single column grids on mobile */
+        #ogcMainContent .grid-cols-5,
+        #ogcMainContent .grid-cols-4,
+        #ogcMainContent .grid-cols-3,
+        #ogcMainContent .grid-cols-2,
+        #ogcMainContent .sm\:grid-cols-2,
+        #ogcMainContent .sm\:grid-cols-3,
+        #ogcMainContent .md\:grid-cols-2,
+        #ogcMainContent .md\:grid-cols-3,
+        #ogcMainContent .lg\:grid-cols-2,
+        #ogcMainContent .lg\:grid-cols-3,
+        #ogcMainContent .lg\:grid-cols-4 { grid-template-columns: repeat(1, minmax(0, 1fr)); }
+
+        /* Two-column layouts: stack */
+        #ogcMainContent .lg\:grid-cols-3.xl\:grid-cols-4 { grid-template-columns: 1fr; }
+
+        /* Filter rows: full width on mobile */
+        #ogcMainContent .filter-row > * { flex: 1 1 100%; }
+
+        /* Hero card adjustments */
+        #ogcMainContent .hero-card { padding: 1rem; }
+        #ogcMainContent .hero-icon { width: 2.5rem; height: 2.5rem; font-size: 1rem; }
+
+        /* Panel header: stack on mobile */
+        #ogcMainContent .panel-header { flex-wrap: wrap; gap: 0.5rem; padding: 0.85rem 1rem; }
+        #ogcMainContent .table-header-bar { flex-wrap: wrap; gap: 0.5rem; padding: 0.75rem 1rem; }
+
+        /* Buttons: full width on mobile */
+        #ogcMainContent .primary-btn,
+        #ogcMainContent .search-btn { width: 100%; justify-content: center; }
+
+        /* Stat values */
+        #ogcMainContent .stat-value { font-size: 1.35rem; }
+        #ogcMainContent .summary-value { font-size: 1.2rem; }
+
+        /* Modal: full screen on mobile */
+        .modal-card { width: calc(100vw - 1.5rem) !important; max-width: none !important; margin: 0.75rem !important; }
+
+        /* Reduce font sizes on mobile */
+        #ogcMainContent .text-xs  { font-size: 0.75rem; }
+        #ogcMainContent .text-sm  { font-size: 0.85rem; }
+    }
+    </style>
+
+    {{-- Prevent sidebar collapse flash on page load --}}
+    <script>
+        (function(){
+            var k = 'ogcAdminSidebarCollapsed';
+            if(localStorage.getItem(k) === 'true') document.documentElement.classList.add('sidebar-pre-collapsed');
+        })();
+    </script>
 </head>
 <body>
 
@@ -714,7 +1072,7 @@
             </button>
             <div class="ogc-profile-dropdown">
                 <button class="ogc-nav-icon transition" id="profile-dropdown-btn">
-                    <i class="fas fa-user-circle text-lg"></i>
+                    <i class="fas fa-circle-user text-lg"></i>
                 </button>
                 <div class="ogc-profile-menu hidden" id="profile-dropdown-menu">
                     <div class="ogc-profile-summary">
@@ -723,12 +1081,12 @@
                         <span class="ogc-profile-role capitalize">{{ Auth::user()->role }}</span>
                     </div>
                     <a href="{{ route('profile.edit') }}">
-                        <i class="fas fa-user-circle mr-3 text-[var(--maroon-soft)]"></i> Profile Settings
+                        <i class="fas fa-circle-user mr-3 text-[var(--maroon-soft)]"></i> Profile Settings
                     </a>
                     <form method="POST" action="{{ route('logout') }}">
                         @csrf
                         <button type="submit" onclick="return confirm('Are you sure you want to log out?')">
-                            <i class="fas fa-sign-out-alt mr-3 text-[var(--maroon-soft)]"></i> Logout
+                            <i class="fas fa-arrow-right-from-bracket mr-3 text-[var(--maroon-soft)]"></i> Logout
                         </button>
                     </form>
                 </div>
@@ -742,7 +1100,7 @@
             <div class="sidebar-user-card">
                 <div class="flex items-center gap-3">
                     <div class="sidebar-user-avatar">
-                        <i class="fas fa-user-shield text-white text-sm"></i>
+                        <i class="fas fa-shield-halved text-white text-sm"></i>
                     </div>
                     <div class="flex-1 min-w-0">
                         <div class="sidebar-user-name truncate">{{ Auth::user()->first_name }} {{ Auth::user()->last_name }}</div>
@@ -750,7 +1108,7 @@
                     </div>
                 </div>
                 <span class="sidebar-role-pill">
-                    <i class="fas fa-shield-alt text-[10px]"></i> Administrator
+                    <i class="fas fa-shield-halved text-[10px]"></i> Administrator
                 </span>
             </div>
         </div>
@@ -758,11 +1116,11 @@
         <div class="flex-1 overflow-y-auto px-3 pb-3">
             <div class="space-y-0.5 pt-2">
                 <a href="{{ route('admin.dashboard') }}" class="sidebar-link {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}">
-                    <i class="fas fa-tachometer-alt"></i>
+                    <i class="fas fa-gauge-high"></i>
                     <span>Dashboard</span>
                 </a>
                 <a href="{{ route('admin.users') }}" class="sidebar-link {{ request()->routeIs('admin.users') && !request()->routeIs('admin.users.create') ? 'active' : '' }}">
-                    <i class="fas fa-users"></i>
+                    <i class="fas fa-users-gear"></i>
                     <span>User Management</span>
                 </a>
                 <a href="{{ route('admin.students') }}" class="sidebar-link {{ request()->routeIs('admin.students') ? 'active' : '' }}">
@@ -770,7 +1128,7 @@
                     <span>Students</span>
                 </a>
                 <a href="{{ route('admin.counselors') }}" class="sidebar-link {{ request()->routeIs('admin.counselors') ? 'active' : '' }}">
-                    <i class="fas fa-user-tie"></i>
+                    <i class="fas fa-user-doctor"></i>
                     <span>Counselors</span>
                 </a>
                 <a href="{{ route('admin.appointments') }}" class="sidebar-link {{ request()->routeIs('admin.appointments') ? 'active' : '' }}">
@@ -782,19 +1140,19 @@
                     <span>Resources</span>
                 </a>
                 <a href="{{ route('admin.faqs.index') }}" class="sidebar-link {{ request()->routeIs('admin.faqs.*') ? 'active' : '' }}">
-                    <i class="fas fa-question-circle"></i>
+                    <i class="fas fa-circle-question"></i>
                     <span>FAQs</span>
                 </a>
                 <a href="{{ route('admin.events') }}" class="sidebar-link {{ request()->routeIs('admin.events') && !request()->routeIs('admin.events.create') ? 'active' : '' }}">
-                    <i class="fas fa-calendar-alt"></i>
+                    <i class="fas fa-calendar-days"></i>
                     <span>Events</span>
                 </a>
                 <a href="{{ route('admin.feedback.index') }}" class="sidebar-link {{ request()->routeIs('admin.feedback.*') ? 'active' : '' }}">
-                    <i class="fas fa-comments"></i>
+                    <i class="fas fa-message"></i>
                     <span>Feedback</span>
                 </a>
                 <a href="{{ route('admin.analytics') }}" class="sidebar-link {{ request()->routeIs('admin.analytics') ? 'active' : '' }}">
-                    <i class="fas fa-chart-bar"></i>
+                    <i class="fas fa-chart-column"></i>
                     <span>Analytics</span>
                 </a>
 
@@ -819,7 +1177,7 @@
             <form method="POST" action="{{ route('logout') }}">
                 @csrf
                 <button type="submit" class="logout-link border-0" onclick="return confirm('Are you sure you want to log out?')">
-                    <i class="fas fa-sign-out-alt"></i>
+                    <i class="fas fa-arrow-right-from-bracket"></i>
                     <span>Logout</span>
                 </button>
             </form>
@@ -829,6 +1187,9 @@
     <div id="ogcMainContent" class="ml-64 pt-16 min-h-screen ogc-main-shell">
         @yield('content')
     </div>
+
+    {{-- Mobile sidebar overlay backdrop --}}
+    <div id="ogcSidebarOverlay"></div>
 
 @else
     <main class="min-h-screen">
@@ -865,17 +1226,69 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Sidebar toggle
     if (sidebarToggleBtn) {
-        const sidebarState = localStorage.getItem('ogcAdminSidebarCollapsed');
+        const MOBILE_BP  = 640;
+        const TABLET_BP  = 900;
+        const ADMIN_KEY  = 'ogcAdminSidebarCollapsed';
 
-        if (sidebarState === 'true') {
-            document.body.classList.add('sidebar-collapsed');
+        function isMobile()  { return window.innerWidth <= MOBILE_BP; }
+        function isTablet()  { return window.innerWidth > MOBILE_BP && window.innerWidth <= TABLET_BP; }
+
+        // Restore desktop collapsed state
+        if (!isMobile() && !isTablet()) {
+            if (localStorage.getItem(ADMIN_KEY) === 'true') {
+                document.body.classList.add('sidebar-collapsed');
+            }
         }
 
-        sidebarToggleBtn.addEventListener('click', function () {
-            document.body.classList.toggle('sidebar-collapsed');
+        // Remove pre-collapsed class after first paint
+        requestAnimationFrame(function() {
+            requestAnimationFrame(function() {
+                document.documentElement.classList.remove('sidebar-pre-collapsed');
+            });
+        });
 
-            const isCollapsed = document.body.classList.contains('sidebar-collapsed');
-            localStorage.setItem('ogcAdminSidebarCollapsed', isCollapsed ? 'true' : 'false');
+        const overlay = document.getElementById('ogcSidebarOverlay');
+
+        function closeMobileSidebar() {
+            document.body.classList.remove('sidebar-mobile-open');
+        }
+
+        if (overlay) {
+            overlay.addEventListener('click', closeMobileSidebar);
+        }
+
+        // Close mobile sidebar when a nav link is clicked
+        document.querySelectorAll('#ogcSidebar .sidebar-link, #ogcSidebar .logout-link').forEach(function(link) {
+            link.addEventListener('click', function() {
+                if (isMobile()) closeMobileSidebar();
+            });
+        });
+
+        sidebarToggleBtn.addEventListener('click', function () {
+            if (isMobile()) {
+                // Mobile: toggle overlay drawer
+                document.body.classList.toggle('sidebar-mobile-open');
+            } else if (isTablet()) {
+                // Tablet: toggle expanded state
+                document.body.classList.toggle('sidebar-expanded');
+            } else {
+                // Desktop: toggle collapsed state
+                document.body.classList.toggle('sidebar-collapsed');
+                const isCollapsed = document.body.classList.contains('sidebar-collapsed');
+                localStorage.setItem(ADMIN_KEY, isCollapsed ? 'true' : 'false');
+            }
+        });
+
+        // On resize, clean up state
+        window.addEventListener('resize', function() {
+            if (isMobile()) {
+                document.body.classList.remove('sidebar-collapsed', 'sidebar-expanded');
+            } else if (isTablet()) {
+                document.body.classList.remove('sidebar-collapsed', 'sidebar-mobile-open');
+            } else {
+                document.body.classList.remove('sidebar-mobile-open', 'sidebar-expanded');
+                document.body.style.overflow = '';
+            }
         });
     }
 });
@@ -1059,7 +1472,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 <div class="system-alert-message">${message}</div>
             </div>
             <button type="button" class="system-alert-close" aria-label="Dismiss">
-                <i class="fas fa-times"></i>
+                <i class="fas fa-xmark"></i>
             </button>
             <div class="system-alert-progress">
                 <div class="system-alert-progress-bar"></div>

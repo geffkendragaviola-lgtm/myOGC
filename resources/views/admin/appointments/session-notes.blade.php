@@ -55,7 +55,7 @@
                 <div class="px-4 sm:px-5 py-3 border-b border-[#e5e0db]/60">
                     <div class="flex items-center gap-2.5">
                         <div class="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-[#fdf2f2] flex items-center justify-center text-[#7a2a2a]">
-                            <i class="fas fa-address-card text-[10px] sm:text-xs"></i>
+                            <i class="fas fa-id-card text-[10px] sm:text-xs"></i>
                         </div>
                         <div>
                             <p class="text-sm font-medium text-[#2c2420]">Appointment Information</p>
@@ -81,7 +81,7 @@
 
                         <div class="info-card">
                             <div class="info-card-icon bg-[#f5f0eb] text-[#6b5e57]">
-                                <i class="fas fa-user-tie text-xs sm:text-sm"></i>
+                                <i class="fas fa-user-doctor text-xs sm:text-sm"></i>
                             </div>
                             <div>
                                 <h2 class="info-title">Counselor</h2>
@@ -94,7 +94,7 @@
 
                         <div class="info-card">
                             <div class="info-card-icon bg-[#fef9e7] text-[#9a7b0a]">
-                                <i class="fas fa-calendar-alt text-xs sm:text-sm"></i>
+                                <i class="fas fa-calendar-days text-xs sm:text-sm"></i>
                             </div>
                             <div>
                                 <h2 class="info-title">Date &amp; Time</h2>
@@ -129,7 +129,7 @@
                 <div class="px-4 sm:px-5 py-3 border-b border-[#e5e0db]/60 bg-[#faf8f5]/50">
                     <div class="flex items-center gap-2.5">
                         <div class="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-[#fdf2f2] flex items-center justify-center text-[#7a2a2a]">
-                            <i class="fas fa-clipboard-list text-[10px] sm:text-xs"></i>
+                            <i class="fas fa-notes-medical text-[10px] sm:text-xs"></i>
                         </div>
                         <div>
                             <h2 class="text-base font-medium text-[#2c2420]">Notes ({{ $sessionNotes->count() }})</h2>

@@ -228,7 +228,7 @@
 
         @if($errors->any())
             <div class="glass-card error-alert mb-5">
-                <i class="fas fa-exclamation-circle text-sm"></i>
+                <i class="fas fa-circle-exclamation text-sm"></i>
                 <div>
                     <span class="font-semibold">Please fix the errors below.</span>
                 </div>

@@ -377,7 +377,7 @@
                         </a>
                         <a href="{{ route('counselor.calendar') }}"
                         class="primary-btn px-4 py-2 text-xs sm:text-sm">
-                            <i class="fas fa-calendar-alt mr-1.5 text-[9px] sm:text-xs"></i>View Calendar
+                            <i class="fas fa-calendar-days mr-1.5 text-[9px] sm:text-xs"></i>View Calendar
                         </a>
                     </div>
                 </div>
@@ -396,7 +396,6 @@
             ['label' => 'Approved',   'status' => 'approved',  'dir' => '',    'count' => $stats['approved'] ?? 0,     'color' => '#2d7a4f'],
             ['label' => 'Completed',  'status' => 'completed', 'dir' => '',    'count' => $stats['completed'] ?? 0,    'color' => '#2a5a7a'],
             ['label' => 'Cancelled',  'status' => 'cancelled', 'dir' => '',    'count' => $stats['cancelled'] ?? 0,    'color' => '#b91c1c'],
-            ['label' => 'Rejected',   'status' => 'rejected',  'dir' => '',    'count' => $stats['rejected'] ?? 0,     'color' => '#7c3aed'],
             ['label' => 'Referred In','status' => 'all',       'dir' => 'in',  'count' => $stats['referred_in'] ?? 0,  'color' => '#c9a227'],
             ['label' => 'Referred Out','status'=> 'all',       'dir' => 'out', 'count' => $stats['referred_out'] ?? 0, 'color' => '#7c3aed'],
         ];
@@ -423,7 +422,7 @@
         <div class="panel-card mb-6">
             <div class="panel-topline"></div>
             <div class="panel-header">
-                <div class="panel-icon"><i class="fas fa-sliders-h text-[9px] sm:text-xs"></i></div>
+                <div class="panel-icon"><i class="fas fa-sliders text-[9px] sm:text-xs"></i></div>
                 <div>
                     <h2 class="panel-title">Search and Filter</h2>
                     <p class="panel-subtitle hidden sm:block">Find appointments by student, date, or college</p>
@@ -484,10 +483,10 @@
                     <div class="flex flex-wrap gap-2">
                         <a href="{{ route('counselor.appointments') }}"
                         class="secondary-btn px-4 py-2 text-xs sm:text-sm">
-                            <i class="fas fa-rotate mr-1.5 text-[9px] sm:text-xs"></i>Reset
+                            <i class="fas fa-rotate-left mr-1.5 text-[9px] sm:text-xs"></i>Reset
                         </a>
                         <button type="submit" class="primary-btn px-4 py-2 text-xs sm:text-sm">
-                            <i class="fas fa-filter mr-1.5 text-[9px] sm:text-xs"></i>Apply Filters
+                            <i class="fas fa-magnifying-glass mr-1.5 text-[9px] sm:text-xs"></i>Apply Filters
                         </button>
                     </div>
                 </div>
@@ -499,7 +498,7 @@
             @if($appointments->isEmpty())
                 <div class="empty-state">
                     <div class="empty-state-icon">
-                        <i class="fas fa-calendar-times"></i>
+                        <i class="fas fa-calendar-xmark"></i>
                     </div>
                     <p class="text-sm sm:text-base font-medium text-[#2c2420]">No appointments found.</p>
                     <p class="text-xs sm:text-sm text-[#8b7e76] mt-1">When students book appointments, they will appear here.</p>
@@ -552,18 +551,18 @@
                                     <td class="px-4 sm:px-6 py-3.5">
                                         <div class="flex items-center gap-2.5 sm:gap-3">
                                             <div class="avatar-badge">
-                                                <i class="fas fa-user text-[9px] sm:text-xs"></i>
+                                                <i class="fas fa-user-graduate text-[9px] sm:text-xs"></i>
                                             </div>
                                             <div class="min-w-0">
                                                 <div class="text-xs sm:text-sm font-semibold text-[#2c2420] truncate max-w-[140px] sm:max-w-[180px]">
                                                     {{ $appointment->student->user->first_name }} {{ $appointment->student->user->last_name }}
                                                     @if($appointment->is_referred_out)
                                                         <span class="ml-2 text-[10px] sm:text-xs bg-[#fff9e6] text-[#7a2a2a] px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-full">
-                                                            <i class="fas fa-share text-[8px] sm:text-[9px]"></i> Out
+                                                            <i class="fas fa-arrow-up-right-from-square text-[8px] sm:text-[9px]"></i> Out
                                                         </span>
                                                     @elseif($appointment->is_referred_in)
                                                         <span class="ml-2 text-[10px] sm:text-xs bg-[#f5f0eb] text-[#7a2a2a] px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-full">
-                                                            <i class="fas fa-reply text-[8px] sm:text-[9px]"></i> In
+                                                            <i class="fas fa-arrow-turn-down text-[8px] sm:text-[9px]"></i> In
                                                         </span>
                                                     @endif
                                                 </div>
@@ -663,14 +662,14 @@
                                                                     class="action-icon success"
                                                                     onclick="return confirm('Approve this appointment?')"
                                                                     title="Approve Appointment">
-                                                                <i class="fas fa-check"></i>
+                                                                <i class="fas fa-circle-check"></i>
                                                             </button>
                                                         </form>
                                                         <!-- Transfer buttons
                                                         <button onclick="showRejectionOptions({{ $appointment->id }})"
                                                                 class="action-icon danger"
                                                                 title="Reject or Transfer Appointment">
-                                                            <i class="fas fa-times"></i>
+                                                            <i class="fas fa-xmark"></i>
                                                         </button> -->
                                                     @elseif(in_array($appointment->status, ['approved', 'rescheduled'], true))
                                                         <!-- Complete and Cancel buttons -->
@@ -682,7 +681,7 @@
                                                                     class="action-icon" style="color: var(--maroon-700);"
                                                                     onclick="return confirm('Mark this appointment as completed?')"
                                                                     title="Mark as Completed">
-                                                                <i class="fas fa-flag-checkered"></i>
+                                                                <i class="fas fa-circle-dot"></i>
                                                             </button>
                                                         </form>
 
@@ -694,7 +693,7 @@
                                                                     class="action-icon warning"
                                                                     onclick="return confirm('Mark this appointment as No Show?')"
                                                                     title="No Show / Did Not Show Up">
-                                                                <i class="fas fa-user-slash"></i>
+                                                                <i class="fas fa-user-xmark"></i>
                                                             </button>
                                                         </form>
                                                     @elseif($appointment->status === 'referred' && in_array($appointment->referred_to_counselor_id, $counselorIdList, true))
@@ -706,7 +705,7 @@
                                                                     class="action-icon success"
                                                                     onclick="return confirm('Accept this referred appointment and schedule it?')"
                                                                     title="Accept Referred Appointment">
-                                                                <i class="fas fa-check"></i>
+                                                                <i class="fas fa-circle-check"></i>
                                                             </button>
                                                         </form>
                                                     @endif
@@ -717,7 +716,7 @@
                                                     <button onclick="showRescheduleModal({{ $appointment->id }}, {{ $appointment->getEffectiveCounselorId() }}, '{{ $appointment->appointment_date->format('Y-m-d') }}')"
                                                             class="action-icon warning"
                                                             title="Reschedule Appointment">
-                                                        <i class="fas fa-calendar-alt"></i>
+                                                        <i class="fas fa-calendar-days"></i>
                                                     </button>
                                                 @endif
                                                 <!-- Referral option for current counselor -->
@@ -725,7 +724,7 @@
                                                     <button onclick="showReferralModal({{ $appointment->id }}, '{{ $appointment->appointment_date->format('Y-m-d') }}', {{ $appointment->student_id }}, {{ $appointment->counselor_id }})"
                                                             class="action-icon" style="color: var(--maroon-700);"
                                                             title="Refer to Another Counselor">
-                                                        <i class="fas fa-share"></i>
+                                                        <i class="fas fa-arrow-right-arrow-left"></i>
                                                     </button>
                                                 @endif
                                             </div>
@@ -750,7 +749,7 @@
                 <div class="modal-header">
                     <h3 class="text-sm font-semibold text-[#2c2420]">Appointment Details</h3>
                     <button onclick="closeAppointmentModal()" class="modal-close" title="Close">
-                        <i class="fas fa-times"></i>
+                        <i class="fas fa-xmark"></i>
                     </button>
                 </div>
                 <div id="appointmentDetails" class="modal-body">
@@ -765,7 +764,7 @@
                 <div class="modal-header">
                     <h3 class="text-sm font-semibold text-[#2c2420]">Reject Appointment</h3>
                     <button onclick="closeRejectionModal()" class="modal-close" title="Close">
-                        <i class="fas fa-times"></i>
+                        <i class="fas fa-xmark"></i>
                     </button>
                 </div>
                 <div class="modal-body">
@@ -781,7 +780,7 @@
                                 style="border-color: rgba(185,28,28,0.3);">
                             <div class="flex items-center gap-3">
                                 <div class="p-2 rounded-lg" style="background: rgba(253,242,242,0.9);">
-                                    <i class="fas fa-times" style="color: #7a2a2a;"></i>
+                                    <i class="fas fa-xmark" style="color: #7a2a2a;"></i>
                                 </div>
                                 <div>
                                     <h4 class="font-semibold text-[#7a2a2a]">Reject Appointment</h4>
@@ -800,7 +799,7 @@
                 <div class="modal-header">
                     <h3 class="text-sm font-semibold text-[#2c2420]">Refer Appointment</h3>
                     <button onclick="closeReferralModal()" class="modal-close" title="Close">
-                        <i class="fas fa-times"></i>
+                        <i class="fas fa-xmark"></i>
                     </button>
                 </div>
                 <div class="modal-body">
@@ -880,7 +879,7 @@
                 <div class="modal-header">
                     <h3 class="text-sm font-semibold text-[#2c2420]">Reschedule Appointment</h3>
                     <button onclick="closeRescheduleModal()" class="modal-close" title="Close">
-                        <i class="fas fa-times"></i>
+                        <i class="fas fa-xmark"></i>
                     </button>
                 </div>
                 <div class="modal-body">
@@ -1791,12 +1790,12 @@
                                     ${data.appointment.session_url ? `
                                     <a href="${data.appointment.session_url}"
                                        class="primary-btn px-4 py-2 text-xs" style="background: linear-gradient(135deg, var(--maroon-800) 0%, var(--maroon-700) 100%);">
-                                        <i class="fas fa-clipboard mr-1.5 text-[9px]"></i> Open Session
+                                        <i class="fas fa-file-lines mr-1.5 text-[9px]"></i> Open Session
                                     </a>
                                     ` : ''}
                                     <a href="${data.student.profile_url}"
                                        class="primary-btn px-4 py-2 text-xs">
-                                        <i class="fas fa-user mr-1.5 text-[9px]"></i> View Profile
+                                        <i class="fas fa-id-card mr-1.5 text-[9px]"></i> View Profile
                                     </a>
                                 </div>
                             </div>

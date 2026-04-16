@@ -165,7 +165,7 @@
                 <div class="hero-card">
                     <div class="relative p-4 sm:p-5 flex items-start gap-3">
                         <div class="hero-icon">
-                            <i class="fas fa-question-circle text-base sm:text-lg"></i>
+                            <i class="fas fa-circle-question text-base sm:text-lg"></i>
                         </div>
                         <div class="min-w-0">
                             <div class="hero-badge">
@@ -206,7 +206,7 @@
             <div class="panel-topline"></div>
             <div class="panel-header">
                 <div class="panel-icon">
-                    <i class="fas fa-sliders-h text-[9px] sm:text-xs"></i>
+                    <i class="fas fa-sliders text-[9px] sm:text-xs"></i>
                 </div>
                 <div>
                     <h2 class="panel-title">Search and Filter</h2>
@@ -252,7 +252,7 @@
             @if($faqs->isEmpty())
                 <div class="p-6 sm:p-8 text-center">
                     <div class="empty-state-icon mb-3">
-                        <i class="fas fa-question-circle text-[#a89f97] text-xl sm:text-2xl"></i>
+                        <i class="fas fa-circle-question text-[#a89f97] text-xl sm:text-2xl"></i>
                     </div>
                     <h3 class="text-base sm:text-lg font-semibold text-[#4a3f3a] mb-1.5">No FAQs Yet</h3>
                     <p class="text-[#8b7e76] text-xs sm:text-sm">Create your first FAQ to help users.</p>
@@ -266,7 +266,7 @@
                 <div class="table-header-bar">
                     <div class="flex items-center gap-2.5">
                         <div class="table-header-icon">
-                            <i class="fas fa-question-circle text-[#7a2a2a] text-[9px] sm:text-xs"></i>
+                            <i class="fas fa-circle-question text-[#7a2a2a] text-[9px] sm:text-xs"></i>
                         </div>
                         <div>
                             <h2 class="text-sm font-medium text-[#2c2420]">FAQ Library</h2>
@@ -275,7 +275,7 @@
                     </div>
                     <div class="flex items-center gap-2">
                         <span class="table-live-pill">
-                            <i class="far fa-clock mr-1 text-[9px]"></i> Live data
+                            <i class="fas fa-clock mr-1 text-[9px]"></i> Live data
                         </span>
                     </div>
                 </div>
@@ -311,7 +311,7 @@
                                     <td class="px-3 sm:px-4 py-2.5 sm:py-3.5 whitespace-nowrap">
                                         <span class="inline-flex items-center px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-full text-[10px] sm:text-xs font-semibold 
                                             {{ $faq->is_active ? 'bg-[#ecfdf5] text-[#059669] border border-[#10b981]/30' : 'bg-[#f5f0eb] text-[#6b5e57] border border-[#e5e0db]/70' }}">
-                                            <i class="fas {{ $faq->is_active ? 'fa-check-circle' : 'fa-circle' }} mr-1.5 text-[9px] sm:text-[10px]"></i>
+                                            <i class="fas {{ $faq->is_active ? 'fa-circle-check' : 'fa-circle' }} mr-1.5 text-[9px] sm:text-[10px]"></i>
                                             {{ $faq->is_active ? 'Active' : 'Inactive' }}
                                         </span>
                                     </td>
@@ -328,7 +328,7 @@
                                             <a href="{{ route('admin.faqs.edit', $faq) }}" 
                                                class="action-link" 
                                                title="Edit FAQ">
-                                                <i class="fas fa-edit text-[10px] sm:text-sm"></i>
+                                                <i class="fas fa-pen-to-square text-[10px] sm:text-sm"></i>
                                             </a>
                                             <form action="{{ route('admin.faqs.destroy', $faq) }}" method="POST" class="inline">
                                                 @csrf
@@ -337,7 +337,7 @@
                                                         class="delete-link"
                                                         onclick="return confirm('Are you sure you want to delete this FAQ?')" 
                                                         title="Delete FAQ">
-                                                    <i class="fas fa-trash-alt text-[10px] sm:text-sm"></i>
+                                                    <i class="fas fa-trash-can-alt text-[10px] sm:text-sm"></i>
                                                 </button>
                                             </form>
                                         </div>
@@ -393,7 +393,7 @@
                 @else
                 <div class="px-4 sm:px-5 py-3 sm:py-3.5 border-t border-[#e5e0db]/60 bg-[#faf8f5]/40">
                     <div class="flex items-center justify-center gap-2 text-[10px] sm:text-xs text-[#8b7e76]">
-                        <i class="fas fa-check-circle text-[#059669]"></i>
+                        <i class="fas fa-circle-check text-[#059669]"></i>
                         <span>Showing all <span class="font-semibold text-[#2c2420]">{{ $faqs->total() }}</span> FAQs</span>
                     </div>
                 </div>

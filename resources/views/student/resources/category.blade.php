@@ -178,6 +178,12 @@
     .back-link:hover { color: var(--maroon-900); transform: translateX(-2px); }
 
     /* Responsive Utilities */
+    @media (max-width: 900px) {
+        .grid.grid-cols-3 { grid-template-columns: repeat(2, 1fr); }
+        .grid.grid-cols-4 { grid-template-columns: repeat(2, 1fr); }
+        .grid.lg\:grid-cols-3 { grid-template-columns: repeat(2, 1fr); }
+        .grid.lg\:grid-cols-4 { grid-template-columns: repeat(2, 1fr); }
+    }
     @media (max-width: 639px) {
         .panel-header { padding: 0.75rem 1rem; }
         .primary-btn, .secondary-btn, .resource-btn { width: 100%; justify-content: center; padding: 0.7rem; font-size: 0.75rem; }
@@ -191,6 +197,10 @@
         .disclaimer-header { font-size: 0.65rem; }
         .disclaimer-content { font-size: 0.65rem; }
         .resources-grid-mobile { grid-template-columns: 1fr !important; gap: 1rem !important; }
+        .grid.grid-cols-3,
+        .grid.grid-cols-4,
+        .grid.lg\:grid-cols-3,
+        .grid.lg\:grid-cols-4 { grid-template-columns: 1fr; }
     }
 </style>
 
@@ -266,7 +276,7 @@
                                     <div class="disclaimer-box" onclick="toggleDisclaimer({{ $resource->id }})">
                                         <div class="disclaimer-header">
                                             <div class="flex items-center">
-                                                <i class="fas fa-exclamation-circle"></i>
+                                                <i class="fas fa-circle-exclamation"></i>
                                                 <span>Disclaimer</span>
                                             </div>
                                             <i class="fas fa-chevron-down disclaimer-icon" id="disclaimer-icon-{{ $resource->id }}"></i>

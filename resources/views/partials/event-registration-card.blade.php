@@ -23,7 +23,7 @@
                     </span>
                     @if($isRequiredEvent)
                         <span class="required-badge text-xs backdrop-blur-sm bg-red-600/90">
-                            <i class="fas fa-exclamation-circle mr-1"></i> Required
+                            <i class="fas fa-circle-exclamation mr-1"></i> Required
                         </span>
                     @endif
                 </div>
@@ -43,7 +43,7 @@
                 </span>
             @else
                 <span class="college-badge text-xs backdrop-blur-sm bg-[#F00000]/90">
-                    <i class="fas fa-university mr-1"></i> {{ $event->colleges->count() }} Colleges
+                    <i class="fas fa-building-columns mr-1"></i> {{ $event->colleges->count() }} Colleges
                 </span>
             @endif
         </div>
@@ -54,19 +54,19 @@
         <!-- Date and Time -->
         <div class="space-y-2 mb-4">
             <div class="flex items-center text-sm text-gray-600">
-                <i class="far fa-calendar mr-2 text-[#F8650C]"></i>
+                <i class="fas fa-calendar-days mr-2 text-[#F8650C]"></i>
                 <span>{{ $event->date_range }}</span>
             </div>
             <div class="flex items-center text-sm text-gray-600">
-                <i class="far fa-clock mr-2 text-green-500"></i>
+                <i class="fas fa-clock mr-2 text-green-500"></i>
                 <span>{{ $event->time_range }}</span>
             </div>
             <div class="flex items-center text-sm text-gray-600">
-                <i class="far fa-map-marker-alt mr-2 text-red-500"></i>
+                <i class="far fa-location-dot mr-2 text-red-500"></i>
                 <span class="line-clamp-1">{{ $event->location }}</span>
             </div>
             <div class="flex items-center text-sm text-gray-600">
-                <i class="far fa-calendar-check mr-2 text-[#820000]"></i>
+                <i class="fas fa-calendar-days-check mr-2 text-[#820000]"></i>
                 <span>Registered: {{ $registration->registered_at->format('M j, Y') }}</span>
             </div>
         </div>
@@ -112,19 +112,19 @@
                         <button type="submit"
                                 class="w-full bg-red-100 text-red-700 text-sm px-3 py-2 rounded-lg hover:bg-red-200 transition flex items-center justify-center"
                                 onclick="return confirm('Are you sure you want to cancel your registration for this event?')">
-                            <i class="fas fa-times-circle mr-1"></i>
+                            <i class="fas fa-circle-xmark mr-1"></i>
                             <span class="hidden sm:inline">Cancel</span>
                         </button>
                     </form>
                 @endif
             @elseif($registration->status === 'attended')
                 <span class="flex-1 bg-green-100 text-green-700 text-sm px-3 py-2 rounded-lg flex items-center justify-center">
-                    <i class="fas fa-check-double mr-1"></i>
+                    <i class="fas fa-circle-dot mr-1"></i>
                     <span class="hidden sm:inline">Attended</span>
                 </span>
             @elseif(!$event->is_upcoming)
                 <span class="flex-1 bg-gray-100 text-gray-600 text-sm px-3 py-2 rounded-lg flex items-center justify-center">
-                    <i class="fas fa-calendar-times mr-1"></i>
+                    <i class="fas fa-calendar-xmark mr-1"></i>
                     <span class="hidden sm:inline">Event Ended</span>
                 </span>
             @endif
@@ -132,7 +132,7 @@
             <!-- View Details Button -->
             <button onclick="toggleDetails('details-{{ $registration->id }}')"
                     class="flex-1 bg-gray-100 text-[#D40000] text-sm px-3 py-2 rounded-lg hover:bg-[#FFF9E6] transition flex items-center justify-center">
-                <i class="fas fa-info-circle mr-1"></i>
+                <i class="fas fa-circle-info mr-1"></i>
                 <span class="hidden sm:inline">Details</span>
             </button>
         </div>
@@ -151,7 +151,7 @@
                         </span>
                     @else
                         <span class="bg-gray-100 text-gray-600 px-2 py-1 rounded-full">
-                            <i class="fas fa-history mr-1"></i> Past
+                            <i class="fas fa-clock-rotate-left mr-1"></i> Past
                         </span>
                     @endif
                 </div>
@@ -189,7 +189,7 @@
                 @if($isRequiredEvent)
                     <div class="bg-red-50 border border-red-200 rounded-lg p-3">
                         <div class="flex items-center">
-                            <i class="fas fa-info-circle text-red-500 mr-2"></i>
+                            <i class="fas fa-circle-info text-red-500 mr-2"></i>
                             <span class="text-red-800 font-medium text-sm">Required Event</span>
                         </div>
                         <p class="text-red-700 text-xs mt-1">
@@ -202,7 +202,7 @@
                 @if(!$isRequiredEvent && $event->is_upcoming && $registration->status === 'registered')
                     <div class="bg-[#FFF9E6] border border-[#FFE100] rounded-lg p-3">
                         <div class="flex items-center">
-                            <i class="fas fa-info-circle text-[#F8650C] mr-2"></i>
+                            <i class="fas fa-circle-info text-[#F8650C] mr-2"></i>
                             <span class="text-[#820000] font-medium text-sm">Cancellation Policy</span>
                         </div>
                         <p class="text-[#D40000] text-xs mt-1">

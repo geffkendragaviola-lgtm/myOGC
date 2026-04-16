@@ -454,6 +454,25 @@
         .section-head {
             align-items: flex-start;
         }
+
+        .container { padding-left: 1rem !important; padding-right: 1rem !important; }
+        .grid.lg\:grid-cols-3 { grid-template-columns: repeat(2, 1fr); }
+        .grid.md\:grid-cols-2 { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 640px) {
+        .mhc-page-header { padding: 4rem 0 5rem; }
+        .hero-title { font-size: 2rem; }
+        .container { padding-left: 0.85rem !important; padding-right: 0.85rem !important; }
+        .grid.lg\:grid-cols-3,
+        .grid.md\:grid-cols-2,
+        .grid.grid-cols-2 { grid-template-columns: 1fr; }
+        /* Navbar: hide center links on mobile */
+        .hidden.md\:flex { display: none !important; }
+        /* Card padding */
+        .mhc-card { border-radius: 1rem; }
+        .p-6 { padding: 1rem; }
+        .p-8 { padding: 1.25rem; }
     }
 </style>
 </head>
@@ -505,13 +524,13 @@
                         </div>
 
                         <a href="" class="block py-2 text-[var(--text-dark)] hover:text-[var(--primary-red)] transition">
-                            <i class="fas fa-user-circle mr-2"></i> Profile
+                            <i class="fas fa-circle-user mr-2"></i> Profile
                         </a>
 
                         <form method="POST" action="{{ route('logout') }}" class="border-t pt-2 mt-2 border-[var(--border-soft)]">
                             @csrf
                             <button type="submit" class="w-full text-left block py-2 text-[var(--text-dark)] hover:text-[var(--primary-red)] transition">
-                                <i class="fas fa-sign-out-alt mr-2"></i> Logout
+                                <i class="fas fa-arrow-right-from-bracket mr-2"></i> Logout
                             </button>
                         </form>
                     </div>
@@ -586,7 +605,7 @@
                 @elseif($events->isEmpty())
                     <div class="mhc-card p-16 text-center justify-center items-center">
                         <div class="w-24 h-24 bg-[var(--bg-soft)] rounded-full flex items-center justify-center mx-auto mb-6 shadow-inner">
-                            <i class="far fa-calendar-alt text-4xl text-[var(--text-muted)]"></i>
+                            <i class="fas fa-calendar-days-days text-4xl text-[var(--text-muted)]"></i>
                         </div>
                         <p class="text-[var(--text-secondary)] text-lg font-medium">Nothing scheduled just yet for your college.</p>
                         <p class="text-[var(--text-muted)] text-sm mt-3">We'll post new events soon — check back in a bit.</p>
@@ -661,12 +680,12 @@
 
                                     <div class="space-y-3 mb-5 text-sm text-[var(--text-secondary)]">
                                         <div class="flex items-center">
-                                            <i class="far fa-clock mr-3 text-[var(--accent-gold)] w-5 text-center"></i>
+                                            <i class="fas fa-clock mr-3 text-[var(--accent-gold)] w-5 text-center"></i>
                                             <span>{{ $event->time_range }}</span>
                                         </div>
 
                                         <div class="flex items-center">
-                                            <i class="far fa-map-marker-alt mr-3 text-[var(--primary-red)] w-5 text-center"></i>
+                                            <i class="far fa-location-dot mr-3 text-[var(--primary-red)] w-5 text-center"></i>
                                             <span class="truncate">{{ $event->location }}</span>
                                         </div>
 
@@ -694,7 +713,7 @@
                                                     <button type="submit"
                                                             class="w-full bg-red-50 text-red-700 border border-red-100 text-sm px-3 py-3 rounded-[14px] hover:bg-red-100 transition flex items-center justify-center font-medium"
                                                             onclick="return confirm('Cancel your registration?')">
-                                                        <i class="fas fa-times-circle mr-2"></i> Cancel Registration
+                                                        <i class="fas fa-circle-xmark mr-2"></i> Cancel Registration
                                                     </button>
                                                 </form>
                                             @endif
@@ -711,7 +730,7 @@
                                             </form>
                                         @else
                                             <button class="col-span-2 bg-[#f3eee8] text-[#8a7d77] text-sm px-3 py-3 rounded-[14px] cursor-not-allowed flex items-center justify-center font-medium" disabled>
-                                                <i class="fas fa-calendar-times mr-2"></i> Event Full
+                                                <i class="fas fa-calendar-xmark mr-2"></i> Event Full
                                             </button>
                                         @endif
                                     </div>
@@ -731,7 +750,7 @@
                                             isRegistered: {{ json_encode($isRegistered) }}
                                         })"
                                         class="mt-5 text-xs font-bold text-[var(--accent-gold)] hover:text-[var(--primary-red)] transition flex items-center justify-center w-full uppercase tracking-wider">
-                                        <i class="fas fa-info-circle mr-2"></i> View Full Details
+                                        <i class="fas fa-circle-info mr-2"></i> View Full Details
                                     </button>
                                 </div>
                             </div>
@@ -860,7 +879,7 @@
                 <button onclick="closeEventModal()"
                         class="absolute top-4 right-4 w-9 h-9 rounded-full flex items-center justify-center text-white transition"
                         style="background:rgba(0,0,0,0.35);backdrop-filter:blur(6px);">
-                    <i class="fas fa-times text-sm"></i>
+                    <i class="fas fa-xmark text-sm"></i>
                 </button>
 
                 <!-- Type badge -->
@@ -881,15 +900,15 @@
                 <!-- Meta row -->
                 <div class="flex flex-wrap gap-4 mt-4 mb-6 text-sm" style="color:var(--text-secondary);">
                     <div class="flex items-center gap-2">
-                        <i class="far fa-calendar text-[var(--accent-gold)]"></i>
+                        <i class="fas fa-calendar-days text-[var(--accent-gold)]"></i>
                         <span id="modalDate"></span>
                     </div>
                     <div class="flex items-center gap-2">
-                        <i class="far fa-clock text-[var(--accent-gold)]"></i>
+                        <i class="fas fa-clock text-[var(--accent-gold)]"></i>
                         <span id="modalTime"></span>
                     </div>
                     <div class="flex items-center gap-2">
-                        <i class="fas fa-map-marker-alt text-[var(--primary-red)]"></i>
+                        <i class="fas fa-location-dot text-[var(--primary-red)]"></i>
                         <span id="modalLocation"></span>
                     </div>
                     <div id="modalSlotsWrap" class="flex items-center gap-2">
@@ -906,14 +925,14 @@
 
                 <!-- Required note -->
                 <div id="modalRequiredNote" class="hidden mt-5 p-4 rounded-[14px] text-xs border border-red-100 bg-red-50 text-red-800">
-                    <i class="fas fa-info-circle mr-1"></i>
+                    <i class="fas fa-circle-info mr-1"></i>
                     <strong>Heads up:</strong> This event is mandatory for your college.
                 </div>
 
                 <!-- Registered note -->
                 <div id="modalRegisteredNote" class="hidden mt-5 p-4 rounded-[14px] text-xs border flex items-center gap-2"
                      style="background:#eefaf2;border-color:#bfe5c8;color:#166534;">
-                    <i class="fas fa-check-circle"></i>
+                    <i class="fas fa-circle-check"></i>
                     <span>You're already registered for this event.</span>
                 </div>
 

@@ -415,7 +415,7 @@
                 <button type="button" id="active-card" class="stat-card">
                     <div class="p-4 flex items-center gap-3 w-full text-left">
                         <div class="stat-icon active">
-                            <i class="fas fa-play-circle"></i>
+                            <i class="fas fa-circle-play"></i>
                         </div>
                         <div class="min-w-0">
                             <p class="text-[0.7rem] text-[#6b5e57]">Active</p>
@@ -427,7 +427,7 @@
                 <button type="button" id="attended-card" class="stat-card">
                     <div class="p-4 flex items-center gap-3 w-full text-left">
                         <div class="stat-icon attended">
-                            <i class="fas fa-check-circle"></i>
+                            <i class="fas fa-circle-check"></i>
                         </div>
                         <div class="min-w-0">
                             <p class="text-[0.7rem] text-[#6b5e57]">Attended</p>
@@ -439,7 +439,7 @@
                 <button type="button" id="cancelled-card" class="stat-card">
                     <div class="p-4 flex items-center gap-3 w-full text-left">
                         <div class="stat-icon cancelled">
-                            <i class="fas fa-times-circle"></i>
+                            <i class="fas fa-circle-xmark"></i>
                         </div>
                         <div class="min-w-0">
                             <p class="text-[0.7rem] text-[#6b5e57]">Cancelled</p>
@@ -486,7 +486,7 @@
             <div id="cancelled-section" class="tab-content hidden">
                 <div class="section-header">
                     <h2>
-                        <i class="fas fa-history"></i>
+                        <i class="fas fa-clock-rotate-left"></i>
                         Cancelled Registrations
                         <span class="text-sm font-normal text-[#6b5e57] ml-2">({{ $registrations->where('status', 'cancelled')->count() }})</span>
                     </h2>
@@ -525,7 +525,7 @@
 
                                     <!-- Cancelled Overlay -->
                                     <div class="event-badge cancelled-overlay">
-                                        <span><i class="fas fa-times-circle text-[9px]"></i> Cancelled</span>
+                                        <span><i class="fas fa-circle-xmark text-[9px]"></i> Cancelled</span>
                                     </div>
                                 </div>
 
@@ -534,19 +534,19 @@
                                     <!-- Date and Time -->
                                     <div class="space-y-1.5 mb-3">
                                         <div class="event-detail">
-                                            <i class="far fa-calendar" style="color:#c9a227"></i>
+                                            <i class="fas fa-calendar-days" style="color:#c9a227"></i>
                                             <span>{{ $registration->event->date_range }}</span>
                                         </div>
                                         <div class="event-detail">
-                                            <i class="far fa-clock"></i>
+                                            <i class="fas fa-clock"></i>
                                             <span>{{ $registration->event->time_range }}</span>
                                         </div>
                                         <div class="event-detail">
-                                            <i class="far fa-map-marker-alt"></i>
+                                            <i class="far fa-location-dot"></i>
                                             <span class="line-clamp-1">{{ $registration->event->location }}</span>
                                         </div>
                                         <div class="event-detail">
-                                            <i class="far fa-calendar-times" style="color:#f97316"></i>
+                                            <i class="fas fa-calendar-days-times" style="color:#f97316"></i>
                                             <span>Cancelled: {{ $registration->cancelled_at ? $registration->cancelled_at->format('M j, Y g:i A') : 'N/A' }}</span>
                                         </div>
                                     </div>
@@ -578,7 +578,7 @@
                                     @else
                                         <div class="re-register-box unavailable">
                                             <div class="info-title unavailable">
-                                                <i class="fas fa-info-circle text-[9px]"></i>
+                                                <i class="fas fa-circle-info text-[9px]"></i>
                                                 <span>Re-registration not available</span>
                                             </div>
                                             <p class="info-desc">
@@ -597,7 +597,7 @@
                                     <div class="flex flex-wrap gap-2 btn-row-mobile">
                                         <button onclick="toggleDetails('cancelled-details-{{ $registration->id }}')"
                                                 class="action-btn details flex-1 min-w-[100px]">
-                                            <i class="fas fa-info-circle text-[9px]"></i>
+                                            <i class="fas fa-circle-info text-[9px]"></i>
                                             <span class="hidden sm:inline">Details</span>
                                         </button>
                                     </div>
@@ -644,7 +644,7 @@
             <div id="attended-section" class="tab-content hidden">
                 <div class="section-header">
                     <h2>
-                        <i class="fas fa-check-double"></i>
+                        <i class="fas fa-circle-dot"></i>
                         Attended Events
                         <span class="text-sm font-normal text-[#6b5e57] ml-2">({{ $registrations->where('status', 'attended')->count() }})</span>
                     </h2>
@@ -683,7 +683,7 @@
 
                                     <!-- Completed Badge -->
                                     <span class="event-badge completed">
-                                        <i class="fas fa-check-circle text-[8px]"></i> Completed
+                                        <i class="fas fa-circle-check text-[8px]"></i> Completed
                                     </span>
                                 </div>
 
@@ -692,15 +692,15 @@
                                     <!-- Date and Time -->
                                     <div class="space-y-1.5 mb-3">
                                         <div class="event-detail">
-                                            <i class="far fa-calendar" style="color:#c9a227"></i>
+                                            <i class="fas fa-calendar-days" style="color:#c9a227"></i>
                                             <span>{{ $registration->event->date_range }}</span>
                                         </div>
                                         <div class="event-detail">
-                                            <i class="far fa-clock"></i>
+                                            <i class="fas fa-clock"></i>
                                             <span>{{ $registration->event->time_range }}</span>
                                         </div>
                                         <div class="event-detail">
-                                            <i class="far fa-map-marker-alt"></i>
+                                            <i class="far fa-location-dot"></i>
                                             <span class="line-clamp-1">{{ $registration->event->location }}</span>
                                         </div>
                                     </div>
@@ -712,7 +712,7 @@
                                     <div class="flex flex-wrap gap-2 btn-row-mobile">
                                         <button onclick="toggleDetails('attended-details-{{ $registration->id }}')"
                                                 class="action-btn details flex-1 min-w-[100px]">
-                                            <i class="fas fa-info-circle text-[9px]"></i>
+                                            <i class="fas fa-circle-info text-[9px]"></i>
                                             <span class="hidden sm:inline">Details</span>
                                         </button>
                                     </div>

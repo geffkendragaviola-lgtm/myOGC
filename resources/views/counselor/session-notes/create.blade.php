@@ -226,7 +226,7 @@
                     
                     @if($appointment)
                         <div class="info-box mt-3">
-                            <i class="fas fa-calendar-alt info-icon"></i>
+                            <i class="fas fa-calendar-days info-icon"></i>
                             <div>
                                 <div class="info-title">Creating notes for appointment on {{ $appointment->appointment_date->format('F j, Y') }}</div>
                                 <div class="info-sub">Time: {{ \Carbon\Carbon::parse($appointment->start_time)->format('g:i A') }} - {{ \Carbon\Carbon::parse($appointment->end_time)->format('g:i A') }}</div>
@@ -312,7 +312,7 @@
                     </h4>
                     
                     <div class="alert-note">
-                        <i class="fas fa-info-circle alert-icon"></i>
+                        <i class="fas fa-circle-info alert-icon"></i>
                         <div class="alert-text">
                             <span class="alert-title">Note about follow-up appointments:</span>
                             This will schedule a new appointment for the student. Session notes for the follow-up should be created after that appointment occurs.
@@ -550,7 +550,7 @@
                             slotElement.innerHTML = `
                                 <div class="font-medium">${slot.display}</div>
                                 <div class="text-green-600 mt-1">
-                                    <i class="fas fa-check-circle text-xs"></i>
+                                    <i class="fas fa-circle-check text-xs"></i>
                                 </div>
                             `;
 

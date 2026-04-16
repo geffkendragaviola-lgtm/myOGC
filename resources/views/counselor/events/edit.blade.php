@@ -182,7 +182,7 @@
         <div class="mb-6 panel-card p-5 sm:p-6">
             <div class="flex items-start gap-4">
                 <div class="w-12 h-12 rounded-lg bg-gradient-to-br from-maroon-800 to-maroon-700 flex items-center justify-center text-white shadow-sm flex-shrink-0" style="background: linear-gradient(135deg, var(--maroon-800), var(--maroon-700));">
-                    <i class="fas fa-edit text-lg"></i>
+                    <i class="fas fa-pen-to-square text-lg"></i>
                 </div>
                 <div class="page-header">
                     <h1 class="text-xl sm:text-2xl font-bold">Edit Event</h1>
@@ -210,7 +210,7 @@
                                 <div class="current-image-box">
                                     <img src="{{ $event->image_url }}" alt="{{ $event->title }}" class="w-64 h-48 object-cover">
                                     <button type="button" onclick="confirmImageRemoval()" class="remove-img-btn" title="Remove Image">
-                                        <i class="fas fa-times text-xs"></i>
+                                        <i class="fas fa-xmark text-xs"></i>
                                     </button>
                                 </div>
                                 <input type="hidden" name="remove_image" id="remove_image" value="0">
@@ -323,7 +323,7 @@
                                 </div>
                             </div>
                             <p class="text-xs text-[var(--text-muted)] mt-2 flex items-center">
-                                <i class="fas fa-info-circle mr-1.5 text-[var(--gold-500)]"></i>
+                                <i class="fas fa-circle-info mr-1.5 text-[var(--gold-500)]"></i>
                                 Selected colleges will automatically be saved when you update.
                             </p>
                             @error('colleges')

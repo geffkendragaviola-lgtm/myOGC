@@ -160,7 +160,7 @@
                 <div class="hero-card">
                     <div class="relative p-4 sm:p-5 flex items-start gap-3">
                         <div class="hero-icon">
-                            <i class="fas fa-comments text-base sm:text-lg"></i>
+                            <i class="fas fa-message text-base sm:text-lg"></i>
                         </div>
                         <div class="min-w-0">
                             <div class="hero-badge">
@@ -205,7 +205,7 @@
                         <p class="text-xl sm:text-2xl font-semibold text-[#2c2420] mt-1.5">{{ $stats['total'] }}</p>
                     </div>
                     <div class="stats-icon bg-[#f5f0eb]">
-                        <i class="fas fa-comments text-[#7a2a2a] text-sm sm:text-base"></i>
+                        <i class="fas fa-message text-[#7a2a2a] text-sm sm:text-base"></i>
                     </div>
                 </div>
                 <div class="mini-progress">
@@ -268,7 +268,7 @@
             <div class="panel-topline"></div>
             <div class="panel-header">
                 <div class="panel-icon">
-                    <i class="fas fa-sliders-h text-[9px] sm:text-xs"></i>
+                    <i class="fas fa-sliders text-[9px] sm:text-xs"></i>
                 </div>
                 <div>
                     <h2 class="panel-title">Advanced Filters</h2>
@@ -352,7 +352,7 @@
             <div class="table-header-bar">
                 <div class="flex items-center gap-3">
                     <div class="table-header-icon">
-                        <i class="fas fa-comments text-[#7a2a2a] text-[10px] sm:text-xs"></i>
+                        <i class="fas fa-message text-[#7a2a2a] text-[10px] sm:text-xs"></i>
                     </div>
                     <div>
                         <h3 class="text-sm font-medium text-[#2c2420]">All Feedback Submissions</h3>
@@ -363,7 +363,7 @@
                 </div>
                 <div class="flex items-center gap-2">
                     <span class="table-live-pill">
-                        <i class="far fa-clock mr-1 text-[9px]"></i> Live data
+                        <i class="fas fa-clock mr-1 text-[9px]"></i> Live data
                     </span>
                 </div>
             </div>
@@ -476,7 +476,7 @@
                                 <td colspan="5" class="px-4 py-10 sm:py-14 text-center">
                                     <div class="text-slate-500">
                                         <div class="empty-state-icon mb-3 sm:mb-4">
-                                            <i class="fas fa-comments text-[#a89f97] text-xl sm:text-3xl"></i>
+                                            <i class="fas fa-message text-[#a89f97] text-xl sm:text-3xl"></i>
                                         </div>
                                         <p class="text-sm sm:text-base font-semibold text-[#4a3f3a]">No feedback submissions found</p>
                                         <p class="text-[10px] sm:text-xs text-[#8b7e76] mt-1 sm:mt-2">No feedback matches your current search criteria.</p>

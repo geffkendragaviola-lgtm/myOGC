@@ -188,7 +188,7 @@
         <div class="panel-card mb-5 sm:mb-6">
             <div class="panel-topline"></div>
             <div class="panel-header">
-                <div class="panel-icon"><i class="fas fa-sliders-h text-[9px] sm:text-xs"></i></div>
+                <div class="panel-icon"><i class="fas fa-sliders text-[9px] sm:text-xs"></i></div>
                 <div>
                     <h2 class="panel-title">Search and Filter</h2>
                     <p class="panel-subtitle hidden sm:block">Find users by name, email, or role.</p>
@@ -241,7 +241,7 @@
                 </div>
                 <div class="flex items-center gap-2">
                     <span class="table-live-pill">
-                        <i class="far fa-clock mr-1 text-[9px]"></i> Last updated recently
+                        <i class="fas fa-clock mr-1 text-[9px]"></i> Last updated recently
                     </span>
                 </div>
             </div>
@@ -279,7 +279,7 @@
                                     {{ $user->role === 'admin' ? 'bg-[#fdf2f2] text-[#b91c1c] border border-[#b91c1c]/30' :
                                        ($user->role === 'counselor' ? 'bg-[#fffbeb] text-[#7a2a2a] border border-[#d4af37]/30' :
                                        'bg-[#ecfdf5] text-[#059669] border border-[#10b981]/30') }}">
-                                    <i class="fas {{ $user->role === 'admin' ? 'fa-user-shield' : ($user->role === 'counselor' ? 'fa-user-tie' : 'fa-user-graduate') }} mr-1.5 text-[9px] sm:text-xs"></i>
+                                    <i class="fas {{ $user->role === 'admin' ? 'fa-shield-halved' : ($user->role === 'counselor' ? 'fa-user-doctor' : 'fa-user-graduate') }} mr-1.5 text-[9px] sm:text-xs"></i>
                                     {{ ucfirst($user->role) }}
                                 </span>
                             </td>
@@ -307,7 +307,7 @@
 
                             <td class="px-4 sm:px-6 py-3.5 whitespace-nowrap text-xs sm:text-sm text-[#6b5e57]">
                                 <div class="flex items-center gap-1.5">
-                                    <i class="far fa-calendar-alt text-[#7a2a2a]/60 text-[9px] sm:text-xs"></i>
+                                    <i class="fas fa-calendar-days-days text-[#7a2a2a]/60 text-[9px] sm:text-xs"></i>
                                     {{ $user->created_at->format('M j, Y') }}
                                 </div>
                             </td>
@@ -315,13 +315,13 @@
                             <td class="px-4 sm:px-6 py-3.5 whitespace-nowrap">
                                 <div class="flex items-center gap-2 sm:gap-3">
                                     <a href="{{ route('admin.users.edit', $user) }}" class="action-link" title="Edit User">
-                                        <i class="fas fa-edit text-xs sm:text-sm"></i>
+                                        <i class="fas fa-pen-to-square text-xs sm:text-sm"></i>
                                     </a>
                                     <form action="{{ route('admin.users.delete', $user) }}" method="POST" class="inline" onsubmit="return confirm('Are you sure you want to delete this user? This action cannot be undone.')">
                                         @csrf
                                         @method('DELETE')
                                         <button type="submit" class="action-link text-[#b91c1c] hover:text-[#7a2a2a]" title="Delete User">
-                                            <i class="fas fa-trash-alt text-xs sm:text-sm"></i>
+                                            <i class="fas fa-trash-can-alt text-xs sm:text-sm"></i>
                                         </button>
                                     </form>
                                 </div>
@@ -404,7 +404,7 @@
             @else
             <div class="pagination-shell">
                 <div class="flex items-center justify-center gap-2 text-[10px] sm:text-xs text-[#8b7e76]">
-                    <i class="fas fa-check-circle text-[#059669]"></i>
+                    <i class="fas fa-circle-check text-[#059669]"></i>
                     <span>Showing all <span class="font-semibold text-[#2c2420]">{{ $users->total() }}</span> users</span>
                 </div>
             </div>

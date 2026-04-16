@@ -124,7 +124,7 @@
     <div class="flex flex-wrap items-center justify-between gap-3 no-print">
         <div>
             <h1 class="text-xl font-bold" style="color:var(--text-primary)">
-                <i class="fas fa-chart-bar mr-2" style="color:var(--maroon-soft)"></i>Analytics
+                <i class="fas fa-chart-column mr-2" style="color:var(--maroon-soft)"></i>Analytics
             </h1>
             <p class="text-sm mt-0.5" style="color:var(--text-secondary)">Appointment and counseling insights</p>
         </div>
@@ -162,10 +162,10 @@
                 <input type="date" name="date_to" value="{{ $dateTo }}">
             </div>
             <button type="submit" class="btn-maroon">
-                <i class="fas fa-filter mr-1"></i> Apply
+                <i class="fas fa-magnifying-glass mr-1"></i> Apply
             </button>
             <a href="{{ route('admin.analytics') }}" class="btn-outline">
-                <i class="fas fa-times"></i> Reset
+                <i class="fas fa-rotate-left"></i> Reset
             </a>
         </form>
     </div>
@@ -187,14 +187,14 @@
             </div>
         </div>
         <div class="stat-card">
-            <div class="stat-icon green"><i class="fas fa-check-circle"></i></div>
+            <div class="stat-icon green"><i class="fas fa-circle-check"></i></div>
             <div>
                 <div class="stat-value">{{ number_format($completedCount) }}</div>
                 <div class="stat-label">Completed Sessions</div>
             </div>
         </div>
         <div class="stat-card">
-            <div class="stat-icon blue"><i class="fas fa-clock"></i></div>
+            <div class="stat-icon blue"><i class="fas fa-hourglass-half"></i></div>
             <div>
                 <div class="stat-value">{{ number_format($pendingCount) }}</div>
                 <div class="stat-label">Pending / Approved</div>
@@ -207,7 +207,7 @@
 
         {{-- Status breakdown --}}
         <div class="analytics-card">
-            <div class="section-title"><i class="fas fa-tags"></i> Appointment Status Breakdown</div>
+            <div class="section-title"><i class="fas fa-tag"></i> Appointment Status Breakdown</div>
             @php $hasStatus = collect($statusData)->sum('count') > 0; @endphp
             @if($hasStatus)
                 <div class="chart-wrap" style="height:260px">
@@ -250,20 +250,20 @@
 
         {{-- Per-college bar chart --}}
         <div class="analytics-card">
-            <div class="section-title"><i class="fas fa-university"></i> Appointments per College</div>
+            <div class="section-title"><i class="fas fa-building-columns"></i> Appointments per College</div>
             @php $hasCollege = array_sum($collegeAppointmentCounts) > 0; @endphp
             @if($hasCollege)
                 <div class="chart-wrap" style="height:300px">
                     <canvas id="collegeChart"></canvas>
                 </div>
             @else
-                <div class="empty-state"><i class="fas fa-university"></i>No data for this period.</div>
+                <div class="empty-state"><i class="fas fa-building-columns"></i>No data for this period.</div>
             @endif
         </div>
 
         {{-- Status detail list --}}
         <div class="analytics-card">
-            <div class="section-title"><i class="fas fa-list-ul"></i> Status Detail</div>
+            <div class="section-title"><i class="fas fa-list"></i> Status Detail</div>
             @php
                 $statusColors = [
                     'pending'              => ['bg'=>'#fff3cd','text'=>'#856404','bar'=>'#f0c040'],
