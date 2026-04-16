@@ -362,25 +362,6 @@
         </div>
 
         {{-- Alert Messages --}}
-        @if(session('success'))
-            <div class="alert-success mb-5">
-                <i class="fas fa-check-circle"></i>
-                <div>
-                    <p class="font-semibold">Success!</p>
-                    <p class="text-sm mt-0.5">{{ session('success') }}</p>
-                </div>
-            </div>
-        @endif
-
-        @if(session('error'))
-            <div class="alert-error mb-5">
-                <i class="fas fa-exclamation-circle"></i>
-                <div>
-                    <p class="font-semibold">Error!</p>
-                    <p class="text-sm mt-0.5">{{ session('error') }}</p>
-                </div>
-            </div>
-        @endif
 
         {{-- Quick Filter Buttons (Moved to Top After Header) --}}
         <div class="panel-card mb-5">

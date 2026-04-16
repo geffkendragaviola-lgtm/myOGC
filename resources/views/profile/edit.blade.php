@@ -421,30 +421,6 @@
                 </div>
             </div>
 
-            @if(session('status'))
-                <div class="mb-6 p-4 status-card {{ in_array(session('status'), ['profile-updated', 'password-updated', 'student-profile-updated', 'counselor-profile-updated']) ? 'status-success' : 'status-warning' }}">
-                    <div class="flex items-center">
-                        <i class="fas fa-check-circle mr-2"></i>
-                        @switch(session('status'))
-                            @case('profile-updated')
-                                Profile information updated successfully.
-                                @break
-                            @case('password-updated')
-                                Password updated successfully.
-                                @break
-                            @case('student-profile-updated')
-                                Student profile updated successfully.
-                                @break
-                            @case('counselor-profile-updated')
-                                Counselor profile updated successfully.
-                                @break
-                            @default
-                                Profile updated successfully.
-                        @endswitch
-                    </div>
-                </div>
-            @endif
-
             <div id="personal-content" class="tab-content">
                 <div class="p-6 md:p-7 profile-card">
                     <h2 class="section-title"><i class="fas fa-user"></i> Personal Information</h2>

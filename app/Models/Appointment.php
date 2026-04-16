@@ -72,6 +72,7 @@ class Appointment extends Model
             'pending',
             'approved',
             'rejected',
+            'no_show',
             'cancelled',
             'completed',
             'referred',
@@ -221,6 +222,22 @@ class Appointment extends Model
             return "Referred from {$originalCounselorName}{$suffix}";
         }
         return ucfirst($this->status);
+    }
+
+    // Display label for status
+    public function getDisplayStatusAttribute(): string
+    {
+        return [
+            'pending'              => 'Pending',
+            'approved'             => 'Approved',
+            'completed'            => 'Completed',
+            'cancelled'            => 'Cancelled',
+            'no_show'              => 'No Show',
+            'referred'             => 'Referred',
+            'rescheduled'          => 'Rescheduled',
+            'reschedule_requested' => 'Reschedule Requested',
+            'reschedule_rejected'  => 'Rejected by Student',
+        ][$this->status] ?? ucfirst(str_replace('_', ' ', $this->status));
     }
 
     // Helper method to get status with referral context based on counselor perspective

@@ -130,6 +130,7 @@
     .slot-card.completed { background: rgba(245,240,235,0.9); border-color: rgba(212,175,55,0.3); }
     .slot-card.rejected { background: rgba(253,242,242,0.9); border-color: rgba(185,28,28,0.3); }
     .slot-card.cancelled { background: rgba(245,240,235,0.9); border-color: var(--border-soft); }
+    .slot-card.no_show { background: rgba(255,237,213,0.9); border-color: rgba(234,88,12,0.3); }
     .slot-card.busy { background: rgba(254,249,231,0.9); border-color: rgba(212,175,55,0.4); }
     .slot-card.available { background: rgba(250,248,245,0.6); border-color: var(--border-soft); }
 
@@ -144,6 +145,7 @@
     .slot-status.completed { background: rgba(245,240,235,0.9); color: var(--text-secondary); }
     .slot-status.rejected { background: rgba(253,242,242,0.9); color: #7a2a2a; }
     .slot-status.cancelled { background: rgba(245,240,235,0.9); color: var(--text-secondary); }
+    .slot-status.no_show { background: rgba(255,237,213,0.9); color: #9a3412; }
     .slot-status.busy { background: rgba(254,249,231,0.9); color: #7a2a2a; }
     .slot-status.available { background: rgba(245,240,235,0.9); color: var(--text-muted); }
 
@@ -446,11 +448,6 @@
                                                     <input type="hidden" name="status" value="approved">
                                                     <button type="submit" class="slot-btn success">Approve</button>
                                                 </form>
-                                                <form action="{{ route('counselor.appointments.update-status', $appointment) }}" method="POST" class="inline">
-                                                    @csrf @method('PATCH')
-                                                    <input type="hidden" name="status" value="rejected">
-                                                    <button type="submit" class="slot-btn danger">Reject</button>
-                                                </form>
                                             @elseif(in_array($appointment->status, ['approved', 'rescheduled'], true))
                                                 <form action="{{ route('counselor.appointments.update-status', $appointment) }}" method="POST" class="inline">
                                                     @csrf @method('PATCH')
@@ -459,8 +456,8 @@
                                                 </form>
                                                 <form action="{{ route('counselor.appointments.update-status', $appointment) }}" method="POST" class="inline">
                                                     @csrf @method('PATCH')
-                                                    <input type="hidden" name="status" value="cancelled">
-                                                    <button type="submit" class="slot-btn warning">Cancel</button>
+                                                    <input type="hidden" name="status" value="no_show">
+                                                    <button type="submit" class="slot-btn warning">No Show</button>
                                                 </form>
                                             @endif
                                         </div>
@@ -531,11 +528,6 @@
                                                     <input type="hidden" name="status" value="approved">
                                                     <button type="submit" class="slot-btn success">Approve</button>
                                                 </form>
-                                                <form action="{{ route('counselor.appointments.update-status', $appointment) }}" method="POST" class="inline">
-                                                    @csrf @method('PATCH')
-                                                    <input type="hidden" name="status" value="rejected">
-                                                    <button type="submit" class="slot-btn danger">Reject</button>
-                                                </form>
                                             @elseif(in_array($appointment->status, ['approved', 'rescheduled'], true))
                                                 <form action="{{ route('counselor.appointments.update-status', $appointment) }}" method="POST" class="inline">
                                                     @csrf @method('PATCH')
@@ -544,8 +536,8 @@
                                                 </form>
                                                 <form action="{{ route('counselor.appointments.update-status', $appointment) }}" method="POST" class="inline">
                                                     @csrf @method('PATCH')
-                                                    <input type="hidden" name="status" value="cancelled">
-                                                    <button type="submit" class="slot-btn warning">Cancel</button>
+                                                    <input type="hidden" name="status" value="no_show">
+                                                    <button type="submit" class="slot-btn warning">No Show</button>
                                                 </form>
                                             @endif
                                         </div>
@@ -578,7 +570,6 @@
                             <div class="legend-item"><div class="legend-dot pending"></div><span class="legend-label">Pending</span></div>
                             <div class="legend-item"><div class="legend-dot approved"></div><span class="legend-label">Approved</span></div>
                             <div class="legend-item"><div class="legend-dot completed"></div><span class="legend-label">Completed</span></div>
-                            <div class="legend-item"><div class="legend-dot rejected"></div><span class="legend-label">Rejected</span></div>
                             <div class="legend-item"><div class="legend-dot available"></div><span class="legend-label">Available</span></div>
                             <div class="legend-item"><div class="legend-dot busy"></div><span class="legend-label">Google Calendar</span></div>
                         </div>

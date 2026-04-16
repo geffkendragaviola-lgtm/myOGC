@@ -181,13 +181,6 @@
             </div>
         </div>
 
-        @if(session('status') === 'counselor-availability-updated')
-            <div class="mb-6 alert-success">
-                <i class="fas fa-check-circle text-lg"></i>
-                <span>Availability settings updated successfully.</span>
-            </div>
-        @endif
-
         @if($errors->any())
             <div class="mb-6 alert-error">
                 <div>

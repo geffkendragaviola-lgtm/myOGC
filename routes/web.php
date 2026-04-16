@@ -179,8 +179,6 @@ Route::middleware('auth')->group(function () {
         Route::patch('/appointments/{appointment}/refer', [AppointmentController::class, 'refer'])->name('counselor.appointments.refer');
         Route::patch('/appointments/{appointment}/referral/accept', [AppointmentController::class, 'acceptReferralByCounselor'])
             ->name('counselor.appointments.referral.accept');
-        Route::patch('/appointments/{appointment}/referral/reject', [AppointmentController::class, 'rejectReferralByCounselor'])
-            ->name('counselor.appointments.referral.reject');
 
         // API route for getting available counselors (for referrals)
         Route::get('/appointments/available-counselors', [AppointmentController::class, 'getAvailableCounselors'])->name('counselor.appointments.available-counselors');

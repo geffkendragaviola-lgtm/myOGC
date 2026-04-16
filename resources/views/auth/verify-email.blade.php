@@ -42,10 +42,7 @@
         </p>
 
         @if (session('status') == 'verification-link-sent')
-            <div class="alert-success">
-                <i class="fas fa-check-circle"></i>
-                A new verification link has been sent to your email address.
-            </div>
+            <p class="text-sm text-green-600 mb-4">A new verification link has been sent to your email address.</p>
         @endif
 
         <form method="POST" action="{{ route('verification.send') }}">

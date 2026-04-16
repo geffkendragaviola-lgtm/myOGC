@@ -150,6 +150,7 @@
     .status-chip.completed { background: rgba(245,240,235,0.9); color: var(--text-secondary); border: 1px solid var(--border-soft); }
     .status-chip.rejected { background: rgba(253,242,242,0.9); color: #7a2a2a; border: 1px solid rgba(185,28,28,0.25); }
     .status-chip.cancelled { background: rgba(245,240,235,0.9); color: var(--text-secondary); border: 1px solid var(--border-soft); }
+    .status-chip.no_show { background: rgba(255,237,213,0.9); color: #9a3412; border: 1px solid rgba(234,88,12,0.25); }
     .status-chip.reschedule_requested { background: rgba(255,244,229,0.9); color: #92400e; border: 1px solid rgba(234,88,12,0.25); }
     .status-chip.rescheduled { background: rgba(254,249,231,0.9); color: #7a2a2a; border: 1px solid rgba(212,175,55,0.3); }
     .status-chip.reschedule_rejected { background: rgba(255,241,242,0.9); color: #9f1239; border: 1px solid rgba(225,29,72,0.25); }
@@ -401,22 +402,6 @@
         </div>
     </a>
 
-    <!-- Rejected -->
-    <a href="{{ route('counselor.appointments') }}?{{ http_build_query(request()->except('page', 'status')) }}&status=rejected"
-       class="stat-card group">
-        <div class="relative p-3 sm:p-4">
-            <div class="flex items-center gap-2 sm:gap-3">
-                <div class="stat-icon flex-shrink-0" style="background: rgba(253,242,242,0.9); color: #7a2a2a;">
-                    <i class="fas fa-times-circle text-[10px] sm:text-sm"></i>
-                </div>
-                <div class="min-w-0">
-                    <p class="stat-label">Rejected</p>
-                    <p class="stat-value">{{ $stats['rejected'] ?? $appointments->where('status', 'rejected')->count() }}</p>
-                </div>
-            </div>
-        </div>
-    </a>
-
     <!-- Cancelled -->
     <a href="{{ route('counselor.appointments') }}?{{ http_build_query(request()->except('page', 'status')) }}&status=cancelled"
        class="stat-card group">
@@ -629,10 +614,6 @@
                     class="filter-chip {{ ($referralDirection ?? request('referral_direction')) === 'out' ? 'active' : 'inactive' }}">
                         Referred Out
                     </a>
-                    <a href="{{ route('counselor.appointments') }}?{{ http_build_query(request()->except('status', 'page')) }}&status=rejected"
-                    class="filter-chip {{ $status === 'rejected' ? 'active' : 'inactive' }}">
-                        Rejected
-                    </a>
                     <a href="{{ route('counselor.appointments') }}?{{ http_build_query(request()->except('status', 'page')) }}&status=cancelled"
                     class="filter-chip {{ $status === 'cancelled' ? 'active' : 'inactive' }}">
                         Cancelled
@@ -640,20 +621,6 @@
                 </div>
             </div>
         </div>
-
-        @if(session('success'))
-            <div class="alert-success mb-6">
-                <i class="fas fa-check-circle mt-0.5"></i>
-                <span>{{ session('success') }}</span>
-            </div>
-        @endif
-
-        @if(session('error'))
-            <div class="alert-error mb-6">
-                <i class="fas fa-exclamation-circle mt-0.5"></i>
-                <span>{{ session('error') }}</span>
-            </div>
-        @endif
 
         <!-- Appointments Table -->
         <div class="panel-card overflow-hidden">
@@ -687,6 +654,7 @@
                                         'approved' => 'approved',
                                         'rejected' => 'rejected',
                                         'cancelled' => 'cancelled',
+                                        'no_show' => 'no_show',
                                         'completed' => 'completed',
                                         'referred' => 'referred',
                                         'rescheduled' => 'rescheduled',
@@ -826,12 +794,12 @@
                                                                 <i class="fas fa-check"></i>
                                                             </button>
                                                         </form>
-                                                        <!-- Reject/Transfer buttons -->
+                                                        <!-- Transfer buttons
                                                         <button onclick="showRejectionOptions({{ $appointment->id }})"
                                                                 class="action-icon danger"
                                                                 title="Reject or Transfer Appointment">
                                                             <i class="fas fa-times"></i>
-                                                        </button>
+                                                        </button> -->
                                                     @elseif(in_array($appointment->status, ['approved', 'rescheduled'], true))
                                                         <!-- Complete and Cancel buttons -->
                                                         <form action="{{ route('counselor.appointments.update-status', $appointment) }}" method="POST" class="inline">
@@ -849,12 +817,12 @@
                                                         <form action="{{ route('counselor.appointments.update-status', $appointment) }}" method="POST" class="inline">
                                                             @csrf
                                                             @method('PATCH')
-                                                            <input type="hidden" name="status" value="cancelled">
+                                                            <input type="hidden" name="status" value="no_show">
                                                             <button type="submit"
                                                                     class="action-icon warning"
-                                                                    onclick="return confirm('Cancel this appointment?')"
-                                                                    title="Cancel Appointment">
-                                                                <i class="fas fa-ban"></i>
+                                                                    onclick="return confirm('Mark this appointment as No Show?')"
+                                                                    title="No Show / Did Not Show Up">
+                                                                <i class="fas fa-user-slash"></i>
                                                             </button>
                                                         </form>
                                                     @elseif($appointment->status === 'referred' && in_array($appointment->referred_to_counselor_id, $counselorIdList, true))
@@ -867,16 +835,6 @@
                                                                     onclick="return confirm('Accept this referred appointment and schedule it?')"
                                                                     title="Accept Referred Appointment">
                                                                 <i class="fas fa-check"></i>
-                                                            </button>
-                                                        </form>
-                                                        <form action="{{ route('counselor.appointments.referral.reject', $appointment) }}" method="POST" class="inline">
-                                                            @csrf
-                                                            @method('PATCH')
-                                                            <button type="submit"
-                                                                    class="action-icon danger"
-                                                                    onclick="return confirm('Reject this referred appointment?')"
-                                                                    title="Reject Referred Appointment">
-                                                                <i class="fas fa-times"></i>
                                                             </button>
                                                         </form>
                                                     @endif

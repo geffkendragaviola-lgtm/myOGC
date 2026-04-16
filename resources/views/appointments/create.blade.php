@@ -483,7 +483,7 @@
 
                 <!-- Counselor Selection -->
                 <div class="mb-6">
-                    <label class="field-label">Counselor</label>
+                    <label class="field-label">Counselor <span style="color:#dc2626;">*</span></label>
 
                     <!-- Counselor Type Selection -->
                     <div class="mb-4" id="counselorTypeWrapper">
@@ -514,7 +514,7 @@
 
                 <!-- Booking Type -->
                 <div class="mb-6">
-                    <label class="field-label">Type of Booking</label>
+                    <label class="field-label">Type of Booking <span style="color:#dc2626;">*</span></label>
                     <select name="booking_type" id="bookingType" class="select-field" required>
                         <option value="">Choose a booking type</option>
                         <option value="Initial Interview" id="bookingTypeInitial" {{ ($hasInitialInterviewAppointment ?? false) ? 'disabled hidden' : '' }}>Initial Interview</option>
@@ -528,7 +528,7 @@
 
                 <!-- Reason / Concern Category -->
                 <div class="mb-6">
-                    <label class="field-label">Reason / Concern Category</label>
+                    <label class="field-label">Reason / Concern Category <span style="color:#dc2626;">*</span></label>
                     <select name="concern_category" id="concernCategory" class="select-field" required>
                         <option value="">Choose a reason or concern</option>
                         <option value="Academic Stress">Academic Stress</option>
@@ -549,7 +549,7 @@
 
                 <!-- Mood Rating -->
                 <div class="mb-6">
-                    <label class="field-label">How are you feeling today?</label>
+                    <label class="field-label">How are you feeling today? <span style="color:#dc2626;">*</span></label>
                     <select name="mood_rating" id="moodRating" class="select-field" required>
                         <option value="">Choose your current mood</option>
                         <option value="1 - Very Overwhelmed">1 - Very Overwhelmed</option>
@@ -570,7 +570,7 @@
 
                 <!-- Date Selection -->
                 <div class="mb-6">
-                    <label class="field-label">Select Date</label>
+                    <label class="field-label">Select Date <span style="color:#dc2626;">*</span></label>
                     <div id="appointmentCalendar" class="calendar-card">
                         <div class="calendar-header">
                             <button type="button" id="calendarPrev" class="calendar-nav-btn" aria-label="Previous month">
@@ -601,7 +601,7 @@
 
                 <!-- Time Slots -->
                 <div class="mb-6">
-                    <label class="field-label">Available Time Slots</label>
+                    <label class="field-label">Available Time Slots <span style="color:#dc2626;">*</span></label>
                     <div id="timeSlots" class="time-slots-grid">
                         <div class="time-slot-placeholder">
                             Select a counselor and date to see available time slots
@@ -612,7 +612,7 @@
 
                 <!-- Concern -->
                 <div class="mb-6">
-                    <label class="field-label">Presenting Problem</label>
+                    <label class="field-label">Presenting Problem <span style="color:#dc2626;">*</span></label>
                     <textarea name="concern" rows="4" class="textarea-field"
                               placeholder="Briefly describe the reason for your appointment" required></textarea>
                 </div>
@@ -1142,95 +1142,25 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function updateBookingTypeOptions() {
-        const isFirstYear = studentYearLevel === '1st Year';
-        const isSecondYear = studentYearLevel === '2nd Year';
-        const isUpperYear = !isFirstYear && !isSecondYear;
-        const hasCompletedInitialInterview = studentInitialInterviewCompleted === true;
-        const needsInitialInterview = isFirstYear || isSecondYear;
-
-        const counselingOption = bookingTypeSelect.querySelector('option[value="Counseling"]');
-        const consultationOption = bookingTypeSelect.querySelector('option[value="Consultation"]');
-
-        if (hasCompletedInitialInterview) {
-            if (bookingTypeSelect.value === 'Initial Interview') {
-                bookingTypeSelect.value = '';
-            }
-            bookingTypeInitial.disabled = true;
-            bookingTypeInitial.hidden = true;
-            bookingTypeSelect.querySelectorAll('option').forEach(option => {
-                option.disabled = false;
-            });
-            bookingTypeHelp.textContent = 'Initial Interview is already completed.';
-            return;
-        }
-
-        if (hasInitialInterviewAppointment) {
-            if (bookingTypeSelect.value === 'Initial Interview') {
-                bookingTypeSelect.value = '';
-            }
-            bookingTypeInitial.disabled = true;
-            bookingTypeInitial.hidden = true;
-            bookingTypeSelect.querySelectorAll('option').forEach(option => {
-                option.disabled = false;
-            });
-
-            if (needsInitialInterview) {
-                counselingOption && (counselingOption.disabled = true);
-                consultationOption && (consultationOption.disabled = true);
-                if (bookingTypeSelect.value === 'Counseling' || bookingTypeSelect.value === 'Consultation') {
-                    bookingTypeSelect.value = '';
-                }
-                bookingTypeHelp.textContent = 'You can book Counseling or Consultation only after your Initial Interview is completed.';
-                return;
-            }
-
-            bookingTypeHelp.textContent = 'Initial Interview is already booked.';
-            return;
-        }
-
-        if (needsInitialInterview && !hasCompletedInitialInterview) {
-            counselingOption && (counselingOption.disabled = true);
-            consultationOption && (consultationOption.disabled = true);
-            if (bookingTypeSelect.value === 'Counseling' || bookingTypeSelect.value === 'Consultation') {
-                bookingTypeSelect.value = '';
-            }
-
-            if (!isFirstYear) {
-                bookingTypeInitial.disabled = false;
-                bookingTypeInitial.hidden = false;
-                bookingTypeHelp.textContent = 'You can book Counseling or Consultation only after your Initial Interview is completed.';
-                return;
-            }
-        }
-
-        if (isFirstYear) {
-            bookingTypeInitial.disabled = false;
-            bookingTypeInitial.hidden = false;
-            bookingTypeSelect.value = 'Initial Interview';
-            bookingTypeSelect.querySelectorAll('option').forEach(option => {
-                option.disabled = option.value !== 'Initial Interview';
-            });
-            bookingTypeHelp.textContent = 'Initial Interview is required for 1st year students.';
-            return;
-        }
-
+        // All booking types are freely available — no year-level restrictions
         bookingTypeSelect.querySelectorAll('option').forEach(option => {
             option.disabled = false;
+            option.hidden = false;
         });
 
-        if (isUpperYear) {
+        if (studentInitialInterviewCompleted === true || hasInitialInterviewAppointment) {
+            // Hide Initial Interview if already completed or already booked
+            bookingTypeInitial.disabled = true;
+            bookingTypeInitial.hidden = true;
             if (bookingTypeSelect.value === 'Initial Interview') {
                 bookingTypeSelect.value = '';
             }
-            bookingTypeInitial.disabled = true;
-            bookingTypeInitial.hidden = true;
-            bookingTypeHelp.textContent = 'Initial Interview is not available for your year level.';
-            return;
+            bookingTypeHelp.textContent = studentInitialInterviewCompleted
+                ? 'Initial Interview already completed.'
+                : 'Initial Interview already booked.';
+        } else {
+            bookingTypeHelp.textContent = '';
         }
-
-        bookingTypeInitial.disabled = false;
-        bookingTypeInitial.hidden = false;
-        bookingTypeHelp.textContent = 'Initial Interview is available if you have not completed it yet.';
     }
 
     function checkReferredCounselorsAvailability() {

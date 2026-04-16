@@ -280,12 +280,6 @@
         </div>
 
         <div class="survey-container max-w-4xl mx-auto survey-card p-6 sm:p-8 md:p-10">
-            @if(session('success'))
-                <div class="alert-success mb-6 flex items-start">
-                    <i class="fas fa-check-circle mt-1 mr-3 text-lg"></i>
-                    <span>{{ session('success') }}</span>
-                </div>
-            @endif
 
             @if($errors->any())
                 <div class="alert-error mb-6">

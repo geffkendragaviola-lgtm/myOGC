@@ -172,15 +172,6 @@
             </div>
         </div>
 
-        @if(session('success'))
-            <div class="glass-alert success-alert mb-4 sm:mb-6">
-                <div class="flex items-center text-xs sm:text-sm">
-                    <i class="fas fa-check-circle mr-2"></i>
-                    {{ session('success') }}
-                </div>
-            </div>
-        @endif
-
         @if($errors->any())
             <div class="glass-alert error-alert mb-4 sm:mb-6">
                 <div class="flex items-center text-xs sm:text-sm">

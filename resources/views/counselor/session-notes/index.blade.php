@@ -176,13 +176,6 @@
             </div>
         </div>
 
-        @if(session('success'))
-            <div class="alert-success mb-6 fade-in">
-                <i class="fas fa-check-circle text-lg"></i>
-                <span class="font-medium">{{ session('success') }}</span>
-            </div>
-        @endif
-
         <!-- Session Notes List -->
         @if($sessionNotes->isEmpty())
             <div class="panel-card empty-state">

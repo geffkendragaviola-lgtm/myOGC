@@ -187,14 +187,6 @@
         </div>
 
         <!-- Success/Error Messages -->
-        @if(session('success'))
-            <div class="alert-success bg-[#ecfdf5] border-[#10b981]/30 text-[#059669]">
-                <div class="flex items-center text-xs sm:text-sm">
-                    <i class="fas fa-check-circle mr-2 text-emerald-500 text-sm"></i>
-                    {{ session('success') }}
-                </div>
-            </div>
-        @endif
 
         @if($errors->any())
             <div class="alert-error bg-[#fdf2f2] border-[#b91c1c]/30 text-[#b91c1c]">

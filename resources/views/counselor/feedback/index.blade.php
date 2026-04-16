@@ -205,13 +205,6 @@
             </div>
         </div>
 
-        @if(session('success'))
-            <div class="mb-6 alert-success">
-                <i class="fas fa-check-circle text-lg"></i>
-                <span class="font-medium">{{ session('success') }}</span>
-            </div>
-        @endif
-
         <!-- Statistics Cards -->
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
             <div class="stat-card">

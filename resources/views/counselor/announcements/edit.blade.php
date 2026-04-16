@@ -283,12 +283,6 @@
         </div>
 
         <!-- Success Message -->
-        @if(session('success'))
-            <div class="alert-success mb-6">
-                <i class="fas fa-check-circle mt-0.5"></i>
-                <span>{{ session('success') }}</span>
-            </div>
-        @endif
 
         <!-- Error Messages -->
         @if($errors->any())

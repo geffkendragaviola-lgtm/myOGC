@@ -257,13 +257,6 @@
             </div>
         </div>
 
-        @if(session('success'))
-            <div class="alert-success mb-6">
-                <i class="fas fa-check-circle mt-0.5"></i>
-                <span>{{ session('success') }}</span>
-            </div>
-        @endif
-
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
             <!-- Left Sidebar: Details -->
             <div class="lg:col-span-1 space-y-4 sm:space-y-6">
