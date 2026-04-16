@@ -222,12 +222,6 @@
     }
     .modal-body ol { padding-left: 1.25rem; margin: 0.5rem 0; }
     .modal-body li { margin: 0.25rem 0; }
-    .scroll-indicator {
-        position: sticky; bottom: 0; padding: 0.5rem;
-        background: rgba(254,249,231,0.95); border: 1px solid rgba(212,175,55,0.3);
-        border-radius: 0.5rem; text-align: center; font-size: 0.7rem;
-        color: var(--maroon-800); font-weight: 600;
-    }
     .modal-footer {
         padding: 0.85rem 1.25rem; border-top: 1px solid var(--border-soft);
         background: rgba(250,248,245,0.6); flex-shrink: 0;
@@ -252,6 +246,184 @@
         font-size: 0.75rem; color: var(--maroon-700); font-weight: 500;
     }
 
+    /* Alert notifications */
+    .alert-stack {
+        position: fixed;
+        top: 1rem;
+        right: 1rem;
+        z-index: 80;
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+        width: min(24rem, calc(100vw - 2rem));
+        pointer-events: none;
+    }
+
+    .system-alert {
+        position: relative;
+        overflow: hidden;
+        display: flex;
+        align-items: flex-start;
+        gap: 0.8rem;
+        padding: 0.95rem 1rem 0.95rem 0.95rem;
+        border-radius: 0.9rem;
+        border: 1px solid var(--border-soft);
+        background: rgba(255,255,255,0.97);
+        box-shadow: 0 12px 30px rgba(44,36,32,0.14);
+        backdrop-filter: blur(10px);
+        pointer-events: auto;
+        animation: alertSlideIn 0.24s ease;
+    }
+
+    .system-alert::before {
+        content: "";
+        position: absolute;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        width: 4px;
+        border-radius: 999px;
+    }
+
+    .system-alert.success::before {
+        background: linear-gradient(180deg, #15803d, #22c55e);
+    }
+
+    .system-alert.error::before {
+        background: linear-gradient(180deg, #991b1b, #dc2626);
+    }
+
+    .system-alert.warning::before {
+        background: linear-gradient(180deg, var(--gold-500), var(--gold-400));
+    }
+
+    .system-alert.info::before {
+        background: linear-gradient(180deg, var(--maroon-800), var(--maroon-700));
+    }
+
+    .system-alert-icon {
+        width: 2.2rem;
+        height: 2.2rem;
+        min-width: 2.2rem;
+        border-radius: 0.75rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-top: 0.05rem;
+        font-size: 0.9rem;
+    }
+
+    .system-alert.success .system-alert-icon {
+        background: rgba(34,197,94,0.12);
+        color: #15803d;
+    }
+
+    .system-alert.error .system-alert-icon {
+        background: rgba(220,38,38,0.12);
+        color: #b91c1c;
+    }
+
+    .system-alert.warning .system-alert-icon {
+        background: rgba(212,175,55,0.16);
+        color: #9a3412;
+    }
+
+    .system-alert.info .system-alert-icon {
+        background: rgba(92,26,26,0.10);
+        color: var(--maroon-700);
+    }
+
+    .system-alert-content {
+        flex: 1;
+        min-width: 0;
+    }
+
+    .system-alert-title {
+        font-size: 0.78rem;
+        font-weight: 700;
+        color: var(--text-primary);
+        margin-bottom: 0.15rem;
+        letter-spacing: 0.02em;
+    }
+
+    .system-alert-message {
+        font-size: 0.76rem;
+        line-height: 1.5;
+        color: var(--text-secondary);
+    }
+
+    .system-alert-close {
+        width: 1.85rem;
+        height: 1.85rem;
+        min-width: 1.85rem;
+        border: none;
+        background: transparent;
+        color: var(--text-muted);
+        border-radius: 999px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.15s ease;
+    }
+
+    .system-alert-close:hover {
+        background: rgba(254,249,231,0.9);
+        color: var(--maroon-700);
+    }
+
+    .system-alert-progress {
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        height: 3px;
+        background: rgba(44,36,32,0.06);
+        overflow: hidden;
+    }
+
+    .system-alert-progress-bar {
+        width: 100%;
+        height: 100%;
+        transform-origin: left center;
+    }
+
+    .system-alert.success .system-alert-progress-bar {
+        background: linear-gradient(90deg, #15803d, #22c55e);
+    }
+
+    .system-alert.error .system-alert-progress-bar {
+        background: linear-gradient(90deg, #991b1b, #dc2626);
+    }
+
+    .system-alert.warning .system-alert-progress-bar {
+        background: linear-gradient(90deg, var(--gold-500), var(--gold-400));
+    }
+
+    .system-alert.info .system-alert-progress-bar {
+        background: linear-gradient(90deg, var(--maroon-800), var(--maroon-700));
+    }
+
+    @keyframes alertSlideIn {
+        from {
+            opacity: 0;
+            transform: translateY(-10px) translateX(8px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0) translateX(0);
+        }
+    }
+
+    @keyframes alertProgress {
+        from {
+            transform: scaleX(1);
+        }
+        to {
+            transform: scaleX(0);
+        }
+    }
+
     @media (max-width: 639px) {
         .panel-header { padding: 0.75rem 1rem; }
         .input-field, .select-field, .textarea-field { padding: 0.6rem 0.75rem; font-size: 0.85rem; }
@@ -263,10 +435,23 @@
         .time-slots-grid { grid-template-columns: 1fr 1fr; }
         .modal-footer-row { flex-direction: column; align-items: stretch; }
         .checkbox-label { font-size: 0.75rem; }
+
+        .alert-stack {
+            top: 0.75rem;
+            left: 0.75rem;
+            right: 0.75rem;
+            width: auto;
+        }
+
+        .system-alert {
+            padding: 0.85rem 0.9rem 0.85rem 0.9rem;
+        }
     }
 </style>
 
 <div class="min-h-screen booking-shell">
+    <div id="alertStack" class="alert-stack"></div>
+
     <div class="booking-glow one"></div>
     <div class="booking-glow two"></div>
 
@@ -514,10 +699,6 @@
                 If you are referred off campus to health, mental health or substance abuse professionals, you are responsible for their charges,
                 except when referred to clinicians who have memorandum of understanding/MOU with the Institute.
             </p>
-            
-            <div id="scrollIndicator" class="scroll-indicator">
-                ↓ Scroll to bottom to enable confirmation ↓
-            </div>
         </div>
         
         <div class="modal-footer">
@@ -542,7 +723,7 @@
                 </div>
             </div>
             <p id="consentHint" class="modal-hint">
-                Please scroll through the entire document to enable the checkbox.
+                ↓ Scroll to bottom to enable confirmation ↓
             </p>
         </div>
     </div>
@@ -577,9 +758,9 @@ document.addEventListener('DOMContentLoaded', function() {
     const consentCheckbox = document.getElementById('consentAcknowledged');
     const confirmBooking = document.getElementById('confirmBooking');
     const consentHint = document.getElementById('consentHint');
-    const scrollIndicator = document.getElementById('scrollIndicator');
     const consentCloseButtons = document.querySelectorAll('[data-consent-close]');
     const appointmentForm = document.getElementById('appointmentForm');
+    const alertStack = document.getElementById('alertStack');
 
     const studentYearLevel = {!! json_encode(optional($student)->year_level) !!};
     const studentInitialInterviewCompleted = {!! json_encode(optional($student)->initial_interview_completed) !!};
@@ -605,6 +786,60 @@ document.addEventListener('DOMContentLoaded', function() {
         ];
     })) !!};
 
+    function showSystemAlert(message, type = 'warning', title = '') {
+        if (!alertStack) return;
+
+        const config = {
+            success: { icon: 'fa-circle-check', title: title || 'Success' },
+            error: { icon: 'fa-circle-xmark', title: title || 'Something went wrong' },
+            warning: { icon: 'fa-triangle-exclamation', title: title || 'Required information' },
+            info: { icon: 'fa-circle-info', title: title || 'Notice' }
+        };
+
+        const selected = config[type] || config.warning;
+        const duration = type === 'error' ? 5000 : 4200;
+
+        const alertEl = document.createElement('div');
+        alertEl.className = `system-alert ${type}`;
+        alertEl.innerHTML = `
+            <div class="system-alert-icon">
+                <i class="fas ${selected.icon}"></i>
+            </div>
+            <div class="system-alert-content">
+                <div class="system-alert-title">${selected.title}</div>
+                <div class="system-alert-message">${message}</div>
+            </div>
+            <button type="button" class="system-alert-close" aria-label="Dismiss notification">
+                <i class="fas fa-times"></i>
+            </button>
+            <div class="system-alert-progress">
+                <div class="system-alert-progress-bar"></div>
+            </div>
+        `;
+
+        const closeBtn = alertEl.querySelector('.system-alert-close');
+        const progressBar = alertEl.querySelector('.system-alert-progress-bar');
+        if (progressBar) {
+            progressBar.style.animation = `alertProgress ${duration}ms linear forwards`;
+        }
+
+        const removeAlert = () => {
+            if (!alertEl.parentNode) return;
+            alertEl.style.opacity = '0';
+            alertEl.style.transform = 'translateY(-6px)';
+            alertEl.style.transition = 'opacity 0.2s ease, transform 0.2s ease';
+            setTimeout(() => {
+                if (alertEl.parentNode) {
+                    alertEl.remove();
+                }
+            }, 200);
+        };
+
+        closeBtn.addEventListener('click', removeAlert);
+        alertStack.appendChild(alertEl);
+        setTimeout(removeAlert, duration);
+    }
+
     function validateForm() {
         const counselorId = getActiveCounselorId();
         const bookingType = bookingTypeSelect.value;
@@ -615,31 +850,31 @@ document.addEventListener('DOMContentLoaded', function() {
         const concern = document.querySelector('textarea[name="concern"]').value.trim();
 
         if (!counselorId) {
-            alert('Please select a counselor');
+            showSystemAlert('Please select a counselor before proceeding.', 'warning', 'Counselor required');
             return false;
         }
         if (!bookingType) {
-            alert('Please select a booking type');
+            showSystemAlert('Please choose a booking type.', 'warning', 'Booking type required');
             return false;
         }
         if (!concernCategory) {
-            alert('Please select a reason or concern category');
+            showSystemAlert('Please select a reason or concern category.', 'warning', 'Concern category required');
             return false;
         }
         if (!moodRating) {
-            alert('Please select how you are feeling today');
+            showSystemAlert('Please select how you are feeling today.', 'warning', 'Mood rating required');
             return false;
         }
         if (!date) {
-            alert('Please select a date');
+            showSystemAlert('Please select an appointment date.', 'warning', 'Date required');
             return false;
         }
         if (!time) {
-            alert('Please select a time slot');
+            showSystemAlert('Please select an available time slot.', 'warning', 'Time slot required');
             return false;
         }
         if (!concern) {
-            alert('Please describe your presenting problem');
+            showSystemAlert('Please describe your presenting problem.', 'warning', 'Presenting problem required');
             return false;
         }
         return true;
@@ -660,11 +895,7 @@ document.addEventListener('DOMContentLoaded', function() {
         consentCheckbox.disabled = true;
         confirmBooking.disabled = true;
         
-        if (scrollIndicator) {
-            scrollIndicator.style.display = 'block';
-        }
-        
-        consentHint.textContent = 'Please scroll through the entire document to enable the checkbox.';
+        consentHint.textContent = '↓ Scroll to bottom to enable confirmation ↓';
         consentHint.classList.remove('success', 'error');
     }
 
@@ -679,9 +910,6 @@ document.addEventListener('DOMContentLoaded', function() {
         
         if (isAtBottom) {
             consentCheckbox.disabled = false;
-            if (scrollIndicator) {
-                scrollIndicator.style.display = 'none';
-            }
             consentHint.textContent = 'You can now acknowledge and confirm your booking.';
             consentHint.classList.add('success');
         }
@@ -869,6 +1097,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     console.error('Error loading referred counselors:', error);
                     counselorLoading.classList.add('hidden');
                     counselorSelect.innerHTML = '<option value="">Error loading counselors</option>';
+                    showSystemAlert('Unable to load referred counselors right now. Please try again.', 'error', 'Loading failed');
                 });
         }
     }
@@ -1093,6 +1322,7 @@ document.addEventListener('DOMContentLoaded', function() {
             .catch(error => {
                 console.error('Error:', error);
                 timeSlots.innerHTML = '<div class="time-slot-placeholder" style="border-color:#fecaca;color:#b91c1c">Error loading time slots. Please try again.</div>';
+                showSystemAlert('Error loading time slots. Please try again.', 'error', 'Time slots unavailable');
             });
     }
 

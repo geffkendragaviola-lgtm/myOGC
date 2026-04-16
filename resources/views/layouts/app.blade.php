@@ -707,5 +707,129 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 });
 </script>
+
+{{-- Global System Alert Toast --}}
+<div id="layoutAlertStack" style="
+    position:fixed; top:1rem; right:1rem; z-index:9999;
+    display:flex; flex-direction:column; gap:0.75rem;
+    width:min(24rem, calc(100vw - 2rem)); pointer-events:none;
+"></div>
+
+<style>
+    .system-alert {
+        position:relative; overflow:hidden;
+        display:flex; align-items:flex-start; gap:0.8rem;
+        padding:0.95rem 1rem 0.95rem 0.95rem;
+        border-radius:0.9rem; border:1px solid #e5e0db;
+        background:rgba(255,255,255,0.97);
+        box-shadow:0 12px 30px rgba(44,36,32,0.14);
+        backdrop-filter:blur(10px); pointer-events:auto;
+        animation:alertSlideIn 0.24s ease;
+    }
+    .system-alert::before {
+        content:""; position:absolute; left:0; top:0; bottom:0;
+        width:4px; border-radius:999px;
+    }
+    .system-alert.success::before { background:linear-gradient(180deg,#15803d,#22c55e); }
+    .system-alert.error::before   { background:linear-gradient(180deg,#991b1b,#dc2626); }
+    .system-alert.warning::before { background:linear-gradient(180deg,#c9a227,#d4af37); }
+    .system-alert.info::before    { background:linear-gradient(180deg,#5c1a1a,#7a2a2a); }
+    .system-alert-icon {
+        width:2.2rem; height:2.2rem; min-width:2.2rem;
+        border-radius:0.75rem; display:flex; align-items:center;
+        justify-content:center; margin-top:0.05rem; font-size:0.9rem;
+    }
+    .system-alert.success .system-alert-icon { background:rgba(34,197,94,0.12); color:#15803d; }
+    .system-alert.error   .system-alert-icon { background:rgba(220,38,38,0.12); color:#b91c1c; }
+    .system-alert.warning .system-alert-icon { background:rgba(212,175,55,0.16); color:#9a3412; }
+    .system-alert.info    .system-alert-icon { background:rgba(92,26,26,0.10);  color:#7a2a2a; }
+    .system-alert-content { flex:1; min-width:0; }
+    .system-alert-title   { font-size:0.78rem; font-weight:700; color:#2c2420; margin-bottom:0.15rem; letter-spacing:0.02em; }
+    .system-alert-message { font-size:0.76rem; line-height:1.5; color:#6b5e57; }
+    .system-alert-close {
+        width:1.85rem; height:1.85rem; min-width:1.85rem;
+        border:none; background:transparent; color:#8b7e76;
+        border-radius:999px; display:flex; align-items:center;
+        justify-content:center; cursor:pointer; transition:all 0.15s ease;
+    }
+    .system-alert-close:hover { background:rgba(254,249,231,0.9); color:#7a2a2a; }
+    .system-alert-progress { position:absolute; left:0; right:0; bottom:0; height:3px; background:rgba(44,36,32,0.06); overflow:hidden; }
+    .system-alert-progress-bar { width:100%; height:100%; transform-origin:left center; }
+    .system-alert.success .system-alert-progress-bar { background:linear-gradient(90deg,#15803d,#22c55e); }
+    .system-alert.error   .system-alert-progress-bar { background:linear-gradient(90deg,#991b1b,#dc2626); }
+    .system-alert.warning .system-alert-progress-bar { background:linear-gradient(90deg,#c9a227,#d4af37); }
+    .system-alert.info    .system-alert-progress-bar { background:linear-gradient(90deg,#5c1a1a,#7a2a2a); }
+    @keyframes alertSlideIn {
+        from { opacity:0; transform:translateY(-10px) translateX(8px); }
+        to   { opacity:1; transform:translateY(0) translateX(0); }
+    }
+    @keyframes alertProgress {
+        from { transform:scaleX(1); }
+        to   { transform:scaleX(0); }
+    }
+    @media (max-width:639px) {
+        #layoutAlertStack { top:0.75rem; left:0.75rem; right:0.75rem; width:auto; }
+        .system-alert { padding:0.85rem 0.9rem; }
+    }
+</style>
+
+<script>
+    function showLayoutAlert(message, type = 'info', title = '') {
+        const stack = document.getElementById('layoutAlertStack');
+        if (!stack) return;
+        const config = {
+            success: { icon: 'fa-circle-check',        title: title || 'Success' },
+            error:   { icon: 'fa-circle-xmark',        title: title || 'Something went wrong' },
+            warning: { icon: 'fa-triangle-exclamation', title: title || 'Warning' },
+            info:    { icon: 'fa-circle-info',          title: title || 'Notice' }
+        };
+        const cfg = config[type] || config.info;
+        const duration = type === 'error' ? 5000 : 4200;
+        const el = document.createElement('div');
+        el.className = `system-alert ${type}`;
+        el.innerHTML = `
+            <div class="system-alert-icon"><i class="fas ${cfg.icon}"></i></div>
+            <div class="system-alert-content">
+                <div class="system-alert-title">${cfg.title}</div>
+                <div class="system-alert-message">${message}</div>
+            </div>
+            <button type="button" class="system-alert-close" aria-label="Dismiss">
+                <i class="fas fa-times"></i>
+            </button>
+            <div class="system-alert-progress">
+                <div class="system-alert-progress-bar"></div>
+            </div>`;
+        const bar = el.querySelector('.system-alert-progress-bar');
+        if (bar) bar.style.animation = `alertProgress ${duration}ms linear forwards`;
+        const remove = () => {
+            if (!el.parentNode) return;
+            el.style.opacity = '0';
+            el.style.transform = 'translateY(-6px)';
+            el.style.transition = 'opacity 0.2s ease, transform 0.2s ease';
+            setTimeout(() => el.remove(), 200);
+        };
+        el.querySelector('.system-alert-close').addEventListener('click', remove);
+        stack.appendChild(el);
+        setTimeout(remove, duration);
+    }
+</script>
+
+@php
+    $layoutToastType = 'info'; $layoutToastTitle = ''; $layoutToastMsg = '';
+    if (session('success'))    { $layoutToastType = 'success'; $layoutToastTitle = 'Success'; $layoutToastMsg = session('success'); }
+    elseif (session('error'))  { $layoutToastType = 'error';   $layoutToastTitle = 'Error';   $layoutToastMsg = session('error'); }
+    elseif (session('status')) {
+        $layoutToastType = 'success'; $layoutToastTitle = 'Success';
+        $layoutToastMsg = ['profile-updated'=>'Profile updated successfully.','password-updated'=>'Password updated successfully.','student-profile-updated'=>'Student profile updated successfully.','counselor-profile-updated'=>'Counselor profile updated successfully.','counselor-availability-updated'=>'Availability updated successfully.','verification-link-sent'=>'Verification link sent to your email.'][session('status')] ?? session('status');
+    }
+@endphp
+@if($layoutToastMsg)
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        showLayoutAlert(@json($layoutToastMsg), @json($layoutToastType), @json($layoutToastTitle));
+    });
+</script>
+@endif
+
 </body>
 </html>
