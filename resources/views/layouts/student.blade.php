@@ -641,7 +641,7 @@
                     </a>
                     <form method="POST" action="{{ route('logout') }}">
                         @csrf
-                        <button type="submit">
+                        <button type="submit" onclick="return confirm('Are you sure you want to log out?')">
                             <i class="fas fa-sign-out-alt mr-3 text-[var(--maroon-soft)]"></i> Logout
                         </button>
                     </form>
@@ -701,7 +701,7 @@
         <div class="sidebar-footer">
             <form method="POST" action="{{ route('logout') }}">
                 @csrf
-                <button type="submit" class="logout-link border-0">
+                <button type="submit" class="logout-link border-0" onclick="return confirm('Are you sure you want to log out?')">
                     <i class="fas fa-sign-out-alt"></i>
                     <span>Logout</span>
                 </button>
@@ -798,6 +798,106 @@ document.addEventListener('DOMContentLoaded', function () {
     display:flex; flex-direction:column; gap:0.75rem;
     width:min(24rem, calc(100vw - 2rem)); pointer-events:none;
 "></div>
+
+{{-- Global Confirm Modal --}}
+<div id="ogcConfirmOverlay" style="
+    display:none; position:fixed; inset:0; z-index:10000;
+    background:rgba(44,36,32,0.45); backdrop-filter:blur(4px);
+    align-items:center; justify-content:center; padding:24px;">
+    <div style="
+        background:#fff; border-radius:16px; width:100%; max-width:400px;
+        padding:28px 28px 24px; box-shadow:0 24px 60px rgba(44,36,32,0.18);
+        border:1px solid #e5e0db; animation:alertSlideIn 0.22s ease;">
+        <div style="display:flex; align-items:center; gap:12px; margin-bottom:14px;">
+            <div id="ogcConfirmIconWrap" style="
+                width:36px; height:36px; border-radius:10px; flex-shrink:0;
+                background:linear-gradient(135deg,#5c1a1a,#7a2a2a);
+                display:flex; align-items:center; justify-content:center;">
+                <i id="ogcConfirmIcon" class="fas fa-question" style="color:#fef9e7; font-size:14px;"></i>
+            </div>
+            <span id="ogcConfirmTitle" style="font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.15em; color:#5c1a1a;"></span>
+        </div>
+        <p id="ogcConfirmMessage" style="font-size:14px; color:#2c2420; line-height:1.6; margin-bottom:22px;"></p>
+        <div style="display:flex; justify-content:flex-end; gap:10px;">
+            <button id="ogcConfirmCancel" style="
+                padding:9px 22px; border-radius:8px; border:1.5px solid #e5e0db;
+                background:#fff; color:#6b5e57; font-size:13px; font-weight:600;
+                cursor:pointer; font-family:inherit; transition:background 0.15s;">Cancel</button>
+            <button id="ogcConfirmOk" style="
+                padding:9px 22px; border-radius:8px; border:none;
+                background:linear-gradient(135deg,#5c1a1a,#7a2a2a); color:#fff;
+                font-size:13px; font-weight:700; cursor:pointer; font-family:inherit;
+                box-shadow:0 4px 12px rgba(92,26,26,0.25); transition:transform 0.15s;">Confirm</button>
+        </div>
+    </div>
+</div>
+<script>
+    (function() {
+        let _resolve = null;
+        const overlay   = document.getElementById('ogcConfirmOverlay');
+        const msgEl     = document.getElementById('ogcConfirmMessage');
+        const titleEl   = document.getElementById('ogcConfirmTitle');
+        const okBtn     = document.getElementById('ogcConfirmOk');
+        const cancelBtn = document.getElementById('ogcConfirmCancel');
+
+        function showConfirm(message) {
+            titleEl.textContent   = 'Confirm Action';
+            msgEl.textContent     = message || 'Are you sure?';
+            okBtn.textContent     = 'Confirm';
+            overlay.style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+            return new Promise(resolve => { _resolve = resolve; });
+        }
+        window.ogcConfirm = showConfirm;
+
+        function close(result) {
+            overlay.style.display = 'none';
+            document.body.style.overflow = '';
+            if (_resolve) { _resolve(result); _resolve = null; }
+        }
+        okBtn.addEventListener('click',     () => close(true));
+        cancelBtn.addEventListener('click', () => close(false));
+        overlay.addEventListener('click', e => { if (e.target === overlay) close(false); });
+        document.addEventListener('keydown', e => { if (e.key === 'Escape') close(false); });
+
+        // Override native confirm() — catches ALL usages including onsubmit, onclick, and JS calls
+        window.confirm = function(message) {
+            // Synchronous confirm() can't be truly async, so we intercept the triggering element
+            // by deferring the action and returning false to block the default
+            showConfirm(message).then(result => {
+                if (!result) return;
+                // Re-trigger the action that was blocked
+                const active = document._ogcConfirmTrigger;
+                if (!active) return;
+                document._ogcConfirmTrigger = null;
+                if (active.tagName === 'FORM') {
+                    active._ogcSkipConfirm = true;
+                    active.submit();
+                } else if (active.form) {
+                    active.form._ogcSkipConfirm = true;
+                    active.form.submit();
+                } else if (active.href && active.href !== '#') {
+                    window.location.href = active.href;
+                }
+            });
+            return false;
+        };
+
+        // Track which element triggered the confirm
+        document.addEventListener('click', function(e) {
+            const el = e.target.closest('[onclick], button[type="submit"], a[onclick]');
+            if (el) document._ogcConfirmTrigger = el;
+        }, true);
+
+        document.addEventListener('submit', function(e) {
+            if (e.target._ogcSkipConfirm) {
+                e.target._ogcSkipConfirm = false;
+                return;
+            }
+            document._ogcConfirmTrigger = e.target;
+        }, true);
+    })();
+</script>
 
 <style>
     .system-alert {

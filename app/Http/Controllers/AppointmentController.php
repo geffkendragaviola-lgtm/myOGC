@@ -348,9 +348,8 @@ public function storeByCounselor(Request $request)
         abort(403);
     }
 
-    $studentNeedsInitialInterview = in_array($student->year_level, ['1st Year', '2nd Year'], true);
-    if ($studentNeedsInitialInterview && $request->booking_type !== 'Initial Interview' && $student->initial_interview_completed !== true) {
-        return redirect()->back()->with('error', 'This student must complete the Initial Interview first before booking Counseling or Consultation appointments.');
+    $studentNeedsInitialInterview = false; // Initial Interview is optional — students can book Counseling/Consultation freely
+    if (false) {
     }
 
     if ($request->booking_type === 'Initial Interview') {
@@ -893,9 +892,8 @@ public function store(Request $request)
         return redirect()->back()->with('error', 'Student profile not found.');
     }
 
-    $studentNeedsInitialInterview = in_array($student->year_level, ['1st Year', '2nd Year'], true);
-    if ($studentNeedsInitialInterview && $request->booking_type !== 'Initial Interview' && $student->initial_interview_completed !== true) {
-        return redirect()->back()->with('error', 'You must complete the Initial Interview first before booking Counseling or Consultation appointments.');
+    $studentNeedsInitialInterview = false; // Initial Interview is optional — students can book Counseling/Consultation freely
+    if (false) {
     }
 
     if ($request->booking_type === 'Initial Interview') {
@@ -1049,7 +1047,7 @@ public function store(Request $request)
 public function updateStatus(Request $request, Appointment $appointment)
 {
     $request->validate([
-        'status' => 'required|in:approved,rejected,cancelled,completed,referred,rescheduled,reschedule_requested,reschedule_rejected', // removed 'transferred'
+        'status' => 'required|in:approved,cancelled,no_show,completed,referred,rescheduled,reschedule_requested,reschedule_rejected',
         'notes' => 'nullable|string|max:500',
         'referred_to_counselor_id' => 'nullable|exists:counselors,id',
         'referral_reason' => 'nullable|string|max:500'
@@ -1078,7 +1076,7 @@ public function updateStatus(Request $request, Appointment $appointment)
         }
     }
 
-    if (in_array($request->status, ['rejected', 'cancelled'], true)) {
+    if ($request->status === 'cancelled' || $request->status === 'no_show') {
         $calendarService = new GoogleCalendarService();
         if ($appointment->google_calendar_event_id && $appointment->counselor && $appointment->counselor->google_calendar_id) {
             $calendarService->deleteEvent($appointment->google_calendar_event_id, $appointment->counselor->google_calendar_id);
@@ -1094,14 +1092,13 @@ public function updateStatus(Request $request, Appointment $appointment)
         ]);
     }
 
-    // Status messages - only 'referred' no 'transferred'
     $statusMessages = [
-        'approved' => 'Appointment approved successfully.',
-        'rejected' => 'Appointment rejected.',
-        'cancelled' => 'Appointment cancelled.',
-        'completed' => 'Appointment marked as completed.',
-        'referred' => 'Appointment referred to another counselor successfully.',
-        'rescheduled' => 'Appointment rescheduled successfully.'
+        'approved'   => 'Appointment approved successfully.',
+        'no_show'    => 'Appointment marked as no show.',
+        'cancelled'  => 'Appointment cancelled.',
+        'completed'  => 'Appointment marked as completed.',
+        'referred'   => 'Appointment referred to another counselor successfully.',
+        'rescheduled'=> 'Appointment rescheduled successfully.'
     ];
 
     // Safe lookup with fallback
@@ -1650,33 +1647,6 @@ public function acceptReferralByCounselor(Request $request, Appointment $appoint
     return redirect()->back()->with('success', 'Referral accepted. Appointment scheduled successfully.');
 }
 
-public function rejectReferralByCounselor(Request $request, Appointment $appointment)
-{
-    $counselor = Counselor::where('user_id', Auth::id())->first();
-    if (!$counselor) {
-        return redirect()->back()->with('error', 'Counselor profile not found.');
-    }
-
-    if ($appointment->status !== 'referred' || (int) $appointment->referred_to_counselor_id !== (int) $counselor->id) {
-        return redirect()->back()->with('error', 'You can only reject referrals assigned to you.');
-    }
-
-    $rejectNote = "REFERRAL REJECTED by {$counselor->user->first_name} {$counselor->user->last_name} on " . now()->toDateTimeString();
-    $previousStatus = $appointment->referral_previous_status ?: 'pending';
-
-    $appointment->update([
-        'status' => $previousStatus,
-        'notes' => ($appointment->notes ? $appointment->notes . "\n\n" : '') . $rejectNote,
-        'referral_outcome' => 'rejected',
-        'referral_resolved_at' => now(),
-        'referral_resolved_by_counselor_id' => $counselor->id,
-        'proposed_date' => null,
-        'proposed_start_time' => null,
-        'proposed_end_time' => null,
-    ]);
-
-    return redirect()->back()->with('success', 'Referral request rejected. Appointment returned to the original counselor.');
-}
 
 public function acceptReferral(Request $request, Appointment $appointment)
 {

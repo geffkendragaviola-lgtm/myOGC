@@ -350,18 +350,6 @@
             </form>
         </div>
 
-        @if(session('success'))
-            <div class="alert-toast alert-success fade-in">
-                <i class="fas fa-check-circle"></i>{{ session('success') }}
-            </div>
-        @endif
-
-        @if(session('error'))
-            <div class="alert-toast alert-error fade-in">
-                <i class="fas fa-exclamation-circle"></i>{{ session('error') }}
-            </div>
-        @endif
-
         <!-- Session Notes Table -->
         <div class="panel-card overflow-hidden">
             @if($sessionNotes->isEmpty())

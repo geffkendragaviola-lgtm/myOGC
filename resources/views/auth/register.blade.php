@@ -133,7 +133,7 @@
                     </div>
 
                     @if (session('status'))
-                        <div class="alert-success">{{ session('status') }}</div>
+                        {{-- handled by layout toast --}}
                     @endif
 
                     @if ($errors->any())

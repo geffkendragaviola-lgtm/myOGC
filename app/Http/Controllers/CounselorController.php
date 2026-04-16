@@ -339,7 +339,6 @@ public function appointments(Request $request)
         'total' => (clone $statsQuery)->count(),
         'pending' => (clone $statsQuery)->where('status', 'pending')->count(),
         'approved' => (clone $statsQuery)->where('status', 'approved')->count(),
-        'rejected' => (clone $statsQuery)->where('status', 'rejected')->count(),
         'cancelled' => (clone $statsQuery)->where('status', 'cancelled')->count(),
         'completed' => (clone $statsQuery)->where('status', 'completed')->count(),
         'referred' => (clone $statsQuery)->where('status', 'referred')->count(),
@@ -664,11 +663,11 @@ public function calendar(Request $request)
 public function updateAppointmentStatus(Request $request, Appointment $appointment)
 {
     $request->validate([
-        'status' => 'required|in:approved,rejected,completed,cancelled',
+        'status' => 'required|in:approved,completed,cancelled,no_show',
         'notes' => 'nullable|string|max:500'
     ]);
 
-    if (in_array($appointment->status, ['rejected', 'cancelled'], true)) {
+    if (in_array($appointment->status, ['cancelled'], true)) {
         return redirect()->back()->with('error', 'This appointment is closed and can no longer be updated.');
     }
 
@@ -688,9 +687,9 @@ public function updateAppointmentStatus(Request $request, Appointment $appointme
 
     $statusMessages = [
         'approved' => 'Appointment approved successfully.',
-        'rejected' => 'Appointment rejected.',
         'completed' => 'Appointment marked as completed.',
-        'cancelled' => 'Appointment cancelled.'
+        'cancelled' => 'Appointment cancelled.',
+        'no_show' => 'Appointment marked as no show.',
     ];
 
     return redirect()->back()->with('success', $statusMessages[$request->status]);

@@ -316,19 +316,6 @@
         </div>
 
         <!-- Status Messages -->
-        @if(session('success'))
-            <div class="alert-success mb-6">
-                <i class="fas fa-check-circle mt-0.5"></i>
-                <span>{{ session('success') }}</span>
-            </div>
-        @endif
-
-        @if(session('error'))
-            <div class="alert-error mb-6">
-                <i class="fas fa-exclamation-circle mt-0.5"></i>
-                <span>{{ session('error') }}</span>
-            </div>
-        @endif
 
         <!-- Events Grid -->
         @if($events->isEmpty())

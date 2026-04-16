@@ -280,23 +280,6 @@
         </div>
 
         <!-- Status Messages -->
-        @if(session('success'))
-            <div class="mb-4 flash-success bg-[#ecfdf5] text-[#059669] border-[#10b981]/30">
-                <div class="flex items-center text-xs sm:text-sm">
-                    <i class="fas fa-check-circle mr-2 text-emerald-500 text-sm"></i>
-                    {{ session('success') }}
-                </div>
-            </div>
-        @endif
-
-        @if(session('error'))
-            <div class="mb-4 flash-error bg-[#fdf2f2] text-[#b91c1c] border-[#b91c1c]/30">
-                <div class="flex items-center text-xs sm:text-sm">
-                    <i class="fas fa-exclamation-circle mr-2 text-rose-500 text-sm"></i>
-                    {{ session('error') }}
-                </div>
-            </div>
-        @endif
 
         <!-- Filters Card -->
         <div class="panel-card mb-5 sm:mb-6">

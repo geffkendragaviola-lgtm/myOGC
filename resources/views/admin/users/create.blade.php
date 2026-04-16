@@ -191,12 +191,6 @@
             </div>
         </div>
 
-        @if(session('success'))
-            <div class="glass-card success-alert mb-5">
-                {{ session('success') }}
-            </div>
-        @endif
-
         @if($errors->any())
             <div class="glass-card error-alert mb-5">
                 <ul class="list-disc list-inside">

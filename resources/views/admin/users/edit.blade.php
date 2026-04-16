@@ -225,19 +225,6 @@
         </div>
 
         <!-- Status Messages -->
-        @if(session('success'))
-            <div class="glass-card success-alert mb-5">
-                <i class="fas fa-check-circle text-sm"></i>
-                <span>{{ session('success') }}</span>
-            </div>
-        @endif
-
-        @if(session('error'))
-            <div class="glass-card error-alert mb-5">
-                <i class="fas fa-exclamation-circle text-sm"></i>
-                <span>{{ session('error') }}</span>
-            </div>
-        @endif
 
         @if($errors->any())
             <div class="glass-card error-alert mb-5">

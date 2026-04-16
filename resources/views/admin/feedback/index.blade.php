@@ -196,13 +196,6 @@
             </div>
         </div>
 
-        @if(session('success'))
-            <div class="flash-success bg-[#ecfdf5] border-[#10b981]/30 text-[#059669] mb-4 sm:mb-6 flex items-center text-xs sm:text-sm">
-                <i class="fas fa-check-circle mr-2"></i>
-                {{ session('success') }}
-            </div>
-        @endif
-
         <!-- Admin Stats Cards -->
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-5 sm:mb-6">
             <div class="stats-card">
