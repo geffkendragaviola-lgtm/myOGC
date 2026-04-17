@@ -514,7 +514,8 @@
                                     <form action="{{ route('student.events.register', $event) }}" method="POST" class="flex-1 min-w-[100px]">
                                         @csrf
                                         <button type="submit"
-                                                class="action-btn register w-full">
+                                                class="action-btn register w-full"
+                                                onclick="return confirm('Are you sure you want to register for this event?')">
                                             <i class="fas fa-calendar-plus text-[9px]"></i>
                                             <span class="hidden sm:inline">Register</span>
                                         </button>
