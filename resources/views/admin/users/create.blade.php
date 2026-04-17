@@ -396,7 +396,7 @@
             <div id="counselor-fields" class="panel-card hidden">
                 <div class="panel-topline"></div>
                 <div class="panel-header">
-                    <div class="panel-icon"><i class="fas fa-user-tie text-[9px] sm:text-xs"></i></div>
+                    <div class="panel-icon"><i class="fas fa-user-doctor text-[9px] sm:text-xs"></i></div>
                     <div>
                         <h3 class="panel-title">Counselor Information</h3>
                         <p class="panel-subtitle hidden sm:block">Professional role, credentials, and college assignment.</p>
@@ -442,7 +442,7 @@
             <div id="admin-fields" class="panel-card hidden">
                 <div class="panel-topline"></div>
                 <div class="panel-header">
-                    <div class="panel-icon"><i class="fas fa-user-shield text-[9px] sm:text-xs"></i></div>
+                    <div class="panel-icon"><i class="fas fa-shield-halved text-[9px] sm:text-xs"></i></div>
                     <div>
                         <h3 class="panel-title">Admin Information</h3>
                         <p class="panel-subtitle hidden sm:block">Administrative credential details for system access.</p>

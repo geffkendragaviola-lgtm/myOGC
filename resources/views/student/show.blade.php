@@ -355,16 +355,29 @@
             size: A4;
         }
 
+        /* Hide sidebar, navbar, and non-content elements */
+        .ogc-navbar,
+        #ogcSidebar,
+        .sidebar-footer,
+        .no-print,
+        .btn,
+        .tabs-nav,
+        .alert-warning {
+            display: none !important;
+        }
+
+        /* Reset main content margin so it fills the page */
+        #ogcMainContent {
+            margin-left: 0 !important;
+            padding-top: 0 !important;
+            width: 100% !important;
+        }
+
         body {
             background: white !important;
             color: #000 !important;
             font-size: 11pt;
             line-height: 1.4;
-        }
-
-        /* Hide UI elements */
-        .btn, .tabs-nav, .alert-warning, .no-print {
-            display: none !important;
         }
 
         /* Show all tab content for print */
@@ -613,7 +626,7 @@
 
             <!-- Contact Information -->
             <div class="card lg:col-span-2">
-                <div class="card-header"><i class="fas fa-address-card"></i> Contact Information</div>
+                <div class="card-header"><i class="fas fa-id-card"></i> Contact Information</div>
                 <div class="card-body contact-list">
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
@@ -645,7 +658,7 @@
                 <button class="tab-btn" data-tab="academic"><i class="fas fa-graduation-cap"></i> Academic</button>
                 <button class="tab-btn" data-tab="learning"><i class="fas fa-laptop"></i> Learning</button>
                 <button class="tab-btn" data-tab="psychosocial"><i class="fas fa-brain"></i> Psychosocial</button>
-                <button class="tab-btn" data-tab="needs"><i class="fas fa-clipboard-list"></i> Needs</button>
+                <button class="tab-btn" data-tab="needs"><i class="fas fa-notes-medical"></i> Needs</button>
             </div>
 
             <div class="card-body">
@@ -1057,7 +1070,7 @@
         @endphp
         @if($hasUrgentNeeds || count($counselingConcerns) > 0)
         <div class="card counseling-card">
-            <div class="card-header"><i class="fas fa-exclamation-circle"></i> Counseling Information</div>
+            <div class="card-header"><i class="fas fa-circle-exclamation"></i> Counseling Information</div>
             <div class="card-body">
                 @if($hasUrgentNeeds)
                     <div class="alert alert-danger mb-3">

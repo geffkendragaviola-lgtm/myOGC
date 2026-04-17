@@ -155,143 +155,122 @@ class AnalyticsController extends Controller
     }
 
     public function counselor(Request $request)
-    {
-        $user = auth()->user();
+        {
+            $user = auth()->user();
 
-        // Get all counselor assignments for this user
-        $counselorAssignments = \App\Models\Counselor::with('college')
-            ->where('user_id', $user->id)
-            ->get();
+            $counselorAssignments = \App\Models\Counselor::with('college')
+                ->where('user_id', $user->id)
+                ->get();
 
-        if ($counselorAssignments->isEmpty()) {
-            abort(404, 'Counselor profile not found.');
+            if ($counselorAssignments->isEmpty()) {
+                abort(404, 'Counselor profile not found.');
+            }
+
+            $counselor         = $counselorAssignments->first();
+            $year              = $request->input('year', now()->year);
+            $dateFrom          = $request->input('date_from');
+            $dateTo            = $request->input('date_to');
+            $selectedCollegeId = $request->input('college_id');
+
+            $colleges = $counselorAssignments->pluck('college')->filter()->unique('id')->values();
+
+            // Build per-college analytics
+            $collegeAnalytics = [];
+
+            foreach ($counselorAssignments as $assignment) {
+                $college = $assignment->college;
+                if (!$college) continue;
+
+                if ($selectedCollegeId && $college->id != $selectedCollegeId) continue;
+
+                $base = Appointment::query()
+                    ->whereHas('student', fn($q) => $q->where('college_id', $college->id));
+
+                if ($dateFrom && $dateTo) {
+                    $base->whereBetween('appointment_date', [$dateFrom, $dateTo]);
+                } else {
+                    $base->whereYear('appointment_date', $year);
+                }
+
+                $statusCounts = (clone $base)
+                    ->select('status', DB::raw('count(*) as total'))
+                    ->groupBy('status')
+                    ->pluck('total', 'status')
+                    ->toArray();
+
+                $allStatuses = [
+                    'pending'              => 'Pending',
+                    'approved'             => 'Approved',
+                    'completed'            => 'Completed',
+                    'cancelled'            => 'Cancelled',
+                    'rejected'             => 'Rejected',
+                    'referred'             => 'Referred',
+                    'rescheduled'          => 'Rescheduled',
+                    'reschedule_requested' => 'Reschedule Requested',
+                    'reschedule_rejected'  => 'Reschedule Rejected',
+                ];
+
+                $statusData = [];
+                foreach ($allStatuses as $key => $label) {
+                    $statusData[] = ['key' => $key, 'label' => $label, 'count' => $statusCounts[$key] ?? 0];
+                }
+
+                $monthlyRaw = (clone $base)
+                    ->select(DB::raw('EXTRACT(MONTH FROM appointment_date)::int as month'), DB::raw('count(*) as total'))
+                    ->whereIn('status', ['completed', 'approved', 'rescheduled'])
+                    ->groupBy(DB::raw('EXTRACT(MONTH FROM appointment_date)::int'))
+                    ->orderBy('month')
+                    ->pluck('total', 'month')
+                    ->toArray();
+
+                $monthlyData = [];
+                for ($m = 1; $m <= 12; $m++) {
+                    $monthlyData[] = ['month' => Carbon::create()->month($m)->format('M'), 'count' => $monthlyRaw[$m] ?? 0];
+                }
+
+                $bookingTypeData = (clone $base)
+                    ->select('booking_type', DB::raw('count(*) as total'))
+                    ->whereNotNull('booking_type')
+                    ->groupBy('booking_type')
+                    ->pluck('total', 'booking_type')
+                    ->toArray();
+
+                $collegeAnalytics[] = [
+                    'college'           => $college,
+                    'totalAppointments' => (clone $base)->count(),
+                    'totalStudents'     => (clone $base)->distinct('student_id')->count('student_id'),
+                    'completedCount'    => (clone $base)->where('status', 'completed')->count(),
+                    'pendingCount'      => (clone $base)->whereIn('status', ['pending', 'approved'])->count(),
+                    'referralCount'     => (clone $base)->where('status', 'referred')->count(),
+                    'cancelledCount'    => (clone $base)->where('status', 'cancelled')->count(),
+                    'statusData'        => $statusData,
+                    'monthlyData'       => $monthlyData,
+                    'bookingTypeData'   => $bookingTypeData,
+                ];
+            }
+
+            $availableYears = Appointment::whereHas('student', fn($q) =>
+                    $q->whereIn('college_id', $counselorAssignments->pluck('college_id'))
+                )
+                ->selectRaw('EXTRACT(YEAR FROM appointment_date)::int as yr')
+                ->groupBy('yr')
+                ->orderBy('yr', 'desc')
+                ->pluck('yr')
+                ->toArray();
+
+            if (empty($availableYears)) {
+                $availableYears = [now()->year];
+            }
+
+            return view('analytics.counselor', compact(
+                'counselor',
+                'colleges',
+                'collegeAnalytics',
+                'selectedCollegeId',
+                'year',
+                'dateFrom',
+                'dateTo',
+                'availableYears'
+            ));
         }
-
-        $counselor      = $counselorAssignments->first();
-        $counselorIds   = $counselorAssignments->pluck('id');
-        $collegeIds     = $counselorAssignments->pluck('college_id')->unique()->values();
-        $colleges       = $counselorAssignments->pluck('college')->filter()->unique('id')->values();
-        $collegeName    = $colleges->count() === 1
-            ? $colleges->first()->name
-            : $colleges->pluck('name')->implode(' / ');
-
-        $year      = $request->input('year', now()->year);
-        $dateFrom  = $request->input('date_from');
-        $dateTo    = $request->input('date_to');
-
-        // Base: appointments handled by this counselor's college(s)
-        $base = Appointment::query()
-            ->whereHas('student', fn($q) => $q->whereIn('college_id', $collegeIds));
-
-        if ($dateFrom && $dateTo) {
-            $base->whereBetween('appointment_date', [$dateFrom, $dateTo]);
-        } else {
-            $base->whereYear('appointment_date', $year);
-        }
-
-        // ── Summary cards ──────────────────────────────────────────────
-        $totalAppointments = (clone $base)->count();
-        $totalStudents     = (clone $base)->distinct('student_id')->count('student_id');
-        $completedCount    = (clone $base)->where('status', 'completed')->count();
-        $pendingCount      = (clone $base)->whereIn('status', ['pending', 'approved'])->count();
-        $referralCount     = (clone $base)->where('status', 'referred')->count();
-        $cancelledCount    = (clone $base)->where('status', 'cancelled')->count();
-
-        // ── Status breakdown ───────────────────────────────────────────
-        $statusCounts = (clone $base)
-            ->select('status', DB::raw('count(*) as total'))
-            ->groupBy('status')
-            ->pluck('total', 'status')
-            ->toArray();
-
-        $allStatuses = [
-            'pending'              => 'Pending',
-            'approved'             => 'Approved',
-            'completed'            => 'Completed',
-            'cancelled'            => 'Cancelled',
-            'referred'             => 'Referred',
-            'rescheduled'          => 'Rescheduled',
-            'reschedule_requested' => 'Reschedule Requested',
-            'reschedule_rejected'  => 'Reschedule Rejected',
-        ];
-
-        $statusData = [];
-        foreach ($allStatuses as $key => $label) {
-            $statusData[] = [
-                'key'   => $key,
-                'label' => $label,
-                'count' => $statusCounts[$key] ?? 0,
-            ];
-        }
-
-        // ── Monthly counseling availed ─────────────────────────────────
-        $monthlyRaw = (clone $base)
-            ->select(
-                DB::raw('EXTRACT(MONTH FROM appointment_date)::int as month'),
-                DB::raw('count(*) as total')
-            )
-            ->whereIn('status', ['completed', 'approved', 'rescheduled'])
-            ->groupBy(DB::raw('EXTRACT(MONTH FROM appointment_date)::int'))
-            ->orderBy('month')
-            ->pluck('total', 'month')
-            ->toArray();
-
-        $monthlyData = [];
-        for ($m = 1; $m <= 12; $m++) {
-            $monthlyData[] = [
-                'month' => Carbon::create()->month($m)->format('M'),
-                'count' => $monthlyRaw[$m] ?? 0,
-            ];
-        }
-
-        // ── Booking type breakdown ─────────────────────────────────────
-        $bookingTypeData = (clone $base)
-            ->select('booking_type', DB::raw('count(*) as total'))
-            ->whereNotNull('booking_type')
-            ->groupBy('booking_type')
-            ->pluck('total', 'booking_type')
-            ->toArray();
-
-        // ── Top concerns ───────────────────────────────────────────────
-        $topConcerns = (clone $base)
-            ->select('booking_type', DB::raw('count(*) as total'))
-            ->where('status', 'completed')
-            ->whereNotNull('booking_type')
-            ->groupBy('booking_type')
-            ->orderByDesc('total')
-            ->pluck('total', 'booking_type')
-            ->toArray();
-
-        // ── Available years ────────────────────────────────────────────
-        $availableYears = Appointment::whereHas('student', fn($q) => $q->whereIn('college_id', $collegeIds))
-            ->selectRaw('EXTRACT(YEAR FROM appointment_date)::int as yr')
-            ->groupBy('yr')
-            ->orderBy('yr', 'desc')
-            ->pluck('yr')
-            ->toArray();
-
-        if (empty($availableYears)) {
-            $availableYears = [now()->year];
-        }
-
-        return view('analytics.counselor', compact(
-            'counselor',
-            'colleges',
-            'collegeName',
-            'year',
-            'dateFrom',
-            'dateTo',
-            'totalAppointments',
-            'totalStudents',
-            'completedCount',
-            'pendingCount',
-            'referralCount',
-            'cancelledCount',
-            'statusData',
-            'monthlyData',
-            'bookingTypeData',
-            'topConcerns',
-            'availableYears'
-        ));
-    }
 }

@@ -646,6 +646,16 @@
                                 </div>
 
                                 <div class="md:col-span-2">
+                                    <label for="facebook_link" class="block label-text">Facebook Page Link</label>
+                                    <input type="url" id="facebook_link" name="facebook_link"
+                                           value="{{ old('facebook_link', $counselorProfile->facebook_link ?? '') }}"
+                                           placeholder="e.g. https://www.facebook.com/yourpage"
+                                           class="form-input">
+                                    <p class="helper-text">Students will see this link in their appointment details.</p>
+                                    @error('facebook_link') <p class="error-text">{{ $message }}</p> @enderror
+                                </div>
+
+                                <div class="md:col-span-2">
                                     <label for="college_id" class="block label-text">Assigned College</label>
                                     <select id="college_id" name="college_id" disabled class="form-select">
                                         <option value="">Select College</option>

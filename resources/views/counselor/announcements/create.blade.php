@@ -183,7 +183,7 @@
             <div class="hero-card">
                 <div class="relative p-4 sm:p-5 flex items-start gap-3">
                     <div class="hero-icon">
-                        <i class="fas {{ isset($announcement) ? 'fa-edit' : 'fa-plus' }} text-base sm:text-lg"></i>
+                        <i class="fas {{ isset($announcement) ? 'fa-pen-to-square' : 'fa-plus' }} text-base sm:text-lg"></i>
                     </div>
                     <div class="min-w-0">
                         <div class="hero-badge">
@@ -233,7 +233,7 @@
                                        class="image-remove-btn"
                                        onclick="return confirm('Are you sure you want to remove this image?')"
                                        title="Remove Image">
-                                        <i class="fas fa-times"></i>
+                                        <i class="fas fa-xmark"></i>
                                     </a>
                                 </div>
                                 <p class="text-[10px] sm:text-xs text-[#8b7e76] mt-2">Current image — upload a new one to replace</p>
@@ -258,7 +258,7 @@
                                 <img id="preview" class="w-full h-48 object-cover" alt="Preview">
                                 <button type="button" onclick="removeImagePreview()"
                                         class="image-remove-btn" title="Remove Preview">
-                                    <i class="fas fa-times"></i>
+                                    <i class="fas fa-xmark"></i>
                                 </button>
                             </div>
                         </div>

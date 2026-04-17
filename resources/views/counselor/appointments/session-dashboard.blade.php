@@ -171,7 +171,7 @@
                 <div class="relative p-4 sm:p-5 flex flex-col md:flex-row md:items-start md:justify-between gap-4">
                     <div class="flex items-start gap-3">
                         <div class="hero-icon">
-                            <i class="fas fa-clipboard-list text-base sm:text-lg"></i>
+                            <i class="fas fa-notes-medical text-base sm:text-lg"></i>
                         </div>
                         <div class="min-w-0">
                             <div class="hero-badge">
@@ -196,7 +196,7 @@
         <div class="panel-card mb-6">
             <div class="panel-topline"></div>
             <div class="panel-header">
-                <div class="panel-icon"><i class="fas fa-sliders-h text-[9px] sm:text-xs"></i></div>
+                <div class="panel-icon"><i class="fas fa-sliders text-[9px] sm:text-xs"></i></div>
                 <div>
                     <h2 class="panel-title">Search and Filter</h2>
                     <p class="panel-subtitle hidden sm:block">Find sessions by student, status, or date</p>
@@ -255,7 +255,7 @@
             @if($appointments->isEmpty())
                 <div class="empty-state">
                     <div class="empty-state-icon">
-                        <i class="fas fa-clipboard-list"></i>
+                        <i class="fas fa-notes-medical"></i>
                     </div>
                     <p class="text-sm sm:text-base font-medium text-[#2c2420]">No appointments found.</p>
                     <p class="text-xs sm:text-sm text-[#8b7e76] mt-1">Appointments will appear here once they are created.</p>
@@ -278,7 +278,7 @@
                                             </h2>
                                             <div class="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1">
                                                 <span class="appt-meta">
-                                                    <i class="fas fa-calendar-alt"></i>
+                                                    <i class="fas fa-calendar-days"></i>
                                                     {{ $appointment->appointment_date->format('M j, Y') }}
                                                 </span>
                                                 <span class="appt-meta">

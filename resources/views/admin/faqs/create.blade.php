@@ -149,7 +149,7 @@
                 <div class="hero-card">
                     <div class="relative p-4 sm:p-5 flex items-start gap-3">
                         <div class="hero-icon">
-                            <i class="fas fa-question-circle text-base sm:text-lg"></i>
+                            <i class="fas fa-circle-question text-base sm:text-lg"></i>
                         </div>
                         <div class="min-w-0">
                             <div class="hero-badge">

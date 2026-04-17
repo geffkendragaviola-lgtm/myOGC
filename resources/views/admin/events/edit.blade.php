@@ -202,7 +202,7 @@
         @if($errors->any())
             <div class="alert-error bg-[#fdf2f2] border-[#b91c1c]/30 text-[#b91c1c]">
                 <div class="flex items-start">
-                    <i class="fas fa-exclamation-circle mr-2 text-rose-500 mt-0.5 text-sm"></i>
+                    <i class="fas fa-circle-exclamation mr-2 text-rose-500 mt-0.5 text-sm"></i>
                     <ul class="list-disc list-inside text-[10px] sm:text-xs space-y-1">
                         @foreach($errors->all() as $error)
                             <li>{{ $error }}</li>
@@ -383,7 +383,7 @@
                         <div class="section-topline"></div>
                         <div class="section-header">
                             <div class="section-icon">
-                                <i class="fas fa-info-circle text-[9px] sm:text-xs"></i>
+                                <i class="fas fa-circle-info text-[9px] sm:text-xs"></i>
                             </div>
                             <div>
                                 <h3 class="section-title">Current Event Information</h3>

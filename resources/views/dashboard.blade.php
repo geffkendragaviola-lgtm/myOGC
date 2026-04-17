@@ -414,6 +414,13 @@
             .hero-stats {
                 grid-template-columns: 1fr;
             }
+
+            .container { padding-left: 0.85rem !important; padding-right: 0.85rem !important; }
+            .grid.grid-cols-2 { grid-template-columns: 1fr; }
+            .grid.grid-cols-3 { grid-template-columns: 1fr; }
+            .grid.sm\:grid-cols-2 { grid-template-columns: 1fr; }
+            .grid.md\:grid-cols-2 { grid-template-columns: 1fr; }
+            .grid.lg\:grid-cols-3 { grid-template-columns: 1fr; }
         }
 
         ::-webkit-scrollbar {
@@ -453,16 +460,16 @@
 
                             <div class="dropdown-panel hidden" id="counselor-dropdown-menu">
                                 <a href="{{ route('counselor.dashboard') }}" class="dropdown-link">
-                                    <i class="fas fa-tachometer-alt mr-2"></i> Dashboard
+                                    <i class="fas fa-gauge-high mr-2"></i> Dashboard
                                 </a>
                                 <a href="{{ route('counselor.resources.index') }}" class="dropdown-link">
-                                    <i class="fas fa-box-open mr-2"></i> Resources
+                                    <i class="fas fa-folder-open mr-2"></i> Resources
                                 </a>
                                 <a href="{{ route('counselor.announcements.index') }}" class="dropdown-link">
                                     <i class="fas fa-bullhorn mr-2"></i> Manage Announcements
                                 </a>
                                 <a href="{{ route('counselor.events.index') }}" class="dropdown-link">
-                                    <i class="fas fa-calendar-alt mr-2"></i> Manage Events
+                                    <i class="fas fa-calendar-days mr-2"></i> Manage Events
                                 </a>
                                 <a href="{{ route('counselor.calendar') }}" class="dropdown-link">
                                     <i class="fas fa-calendar mr-2"></i> Calendar
@@ -483,13 +490,13 @@
 
                             <div class="dropdown-panel hidden" id="admin-dropdown-menu">
                                 <a href="{{ route('admin.dashboard') }}" class="dropdown-link">
-                                    <i class="fas fa-tachometer-alt mr-2"></i> Dashboard
+                                    <i class="fas fa-gauge-high mr-2"></i> Dashboard
                                 </a>
                                 <a href="{{ route('admin.users') }}" class="dropdown-link">
                                     <i class="fas fa-users mr-2"></i> Manage Users
                                 </a>
                                 <a href="{{ route('admin.events') }}" class="dropdown-link">
-                                    <i class="fas fa-calendar-alt mr-2"></i> Manage Events
+                                    <i class="fas fa-calendar-days mr-2"></i> Manage Events
                                 </a>
                                 <a href="{{ route('admin.users.create') }}" class="dropdown-link">
                                     <i class="fas fa-user-plus mr-2"></i> Create User
@@ -498,7 +505,7 @@
                                     <i class="fas fa-user-graduate mr-2"></i> Students
                                 </a>
                                 <a href="{{ route('admin.counselors') }}" class="dropdown-link">
-                                    <i class="fas fa-user-md mr-2"></i> Counselors
+                                    <i class="fas fa-user-doctor mr-2"></i> Counselors
                                 </a>
                             </div>
                         </div>
@@ -553,12 +560,12 @@
                                 <div class="text-xs text-[var(--primary-red)] capitalize font-semibold">Role: {{ Auth::user()->role }}</div>
                             </div>
                             <a href="{{ route('profile.edit') }}" class="block py-2 text-[var(--text-dark)] hover:text-[var(--primary-red)]">
-                                <i class="fas fa-user-circle mr-2"></i> Profile
+                                <i class="fas fa-circle-user mr-2"></i> Profile
                             </a>
                             <form method="POST" action="{{ route('logout') }}" class="inline">
                                 @csrf
                                 <button type="submit" class="w-full text-left block py-2 text-[var(--text-dark)] hover:text-[var(--primary-red)]">
-                                    <i class="fas fa-sign-out-alt mr-2"></i> Logout
+                                    <i class="fas fa-arrow-right-from-bracket mr-2"></i> Logout
                                 </button>
                             </form>
                         </div>
@@ -680,7 +687,7 @@
                                                     @else
                                                         @foreach($announcement->colleges->take(3) as $college)
                                                             <span class="bg-[#fbf4ea] text-[#8f1d1d] text-xs px-3 py-1 rounded-full font-medium border border-[#ead8bf]">
-                                                                <i class="fas fa-university mr-1"></i> {{ $college->name }}
+                                                                <i class="fas fa-building-columns mr-1"></i> {{ $college->name }}
                                                             </span>
                                                         @endforeach
                                                         @if($announcement->colleges->count() > 3)
@@ -850,7 +857,7 @@
                             <p class="text-[var(--primary-red)] font-semibold text-lg">Head of the Office of Guidance and Counseling</p>
                             <p class="text-[var(--text-secondary)]">{{ $headCounselor->position }} • {{ $headCounselor->credentials }}</p>
                             <p class="text-[var(--text-secondary)]">
-                                <i class="fas fa-university mr-2 text-[var(--accent-gold)]"></i>{{ $headCounselor->college->name ?? 'N/A' }}
+                                <i class="fas fa-building-columns mr-2 text-[var(--accent-gold)]"></i>{{ $headCounselor->college->name ?? 'N/A' }}
                             </p>
                             <p class="text-[var(--text-secondary)] mt-2">
                                 <i class="fas fa-envelope mr-2 text-[var(--accent-gold)]"></i>{{ $headCounselor->user->email }}

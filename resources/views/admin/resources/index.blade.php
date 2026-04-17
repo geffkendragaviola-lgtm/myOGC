@@ -197,7 +197,7 @@
             @if($resources->isEmpty())
                 <div class="p-6 sm:p-10 md:p-12 text-center">
                     <div class="empty-state-icon mb-4">
-                        <i class="fas fa-box-open text-[#a89f97] text-2xl sm:text-3xl"></i>
+                        <i class="fas fa-folder-open text-[#a89f97] text-2xl sm:text-3xl"></i>
                     </div>
                     <h3 class="text-lg sm:text-xl font-semibold text-[#4a3f3a] mb-2">No Resources Yet</h3>
                     <p class="text-[#8b7e76] text-xs sm:text-sm">Get started by creating your first resource.</p>
@@ -220,7 +220,7 @@
                     </div>
                     <div class="flex items-center gap-2">
                         <span class="table-live-pill">
-                            <i class="far fa-clock mr-1 text-[9px]"></i> Live data
+                            <i class="fas fa-clock mr-1 text-[9px]"></i> Live data
                         </span>
                     </div>
                 </div>
@@ -290,7 +290,7 @@
                                             <button type="submit"
                                                     class="status-btn inline-flex items-center px-2 sm:px-2.5 py-1 rounded-full text-[10px] sm:text-xs font-semibold
                                                     {{ $resource->is_active ? 'bg-[#ecfdf5] text-[#059669] border border-[#10b981]/30 hover:bg-[#d1fae5]' : 'bg-[#f5f0eb] text-[#6b5e57] border border-[#e5e0db]/70 hover:bg-[#e5e0db]' }}">
-                                                <i class="fas {{ $resource->is_active ? 'fa-check-circle' : 'fa-circle' }} mr-1.5 text-[8px] sm:text-xs"></i>
+                                                <i class="fas {{ $resource->is_active ? 'fa-circle-check' : 'fa-circle' }} mr-1.5 text-[8px] sm:text-xs"></i>
                                                 {{ $resource->is_active ? 'Active' : 'Inactive' }}
                                             </button>
                                         </form>
@@ -310,7 +310,7 @@
                                             <a href="{{ route('admin.resources.edit', $resource) }}"
                                                class="action-link"
                                                title="Edit Resource">
-                                                <i class="fas fa-edit text-[10px] sm:text-base"></i>
+                                                <i class="fas fa-pen-to-square text-[10px] sm:text-base"></i>
                                             </a>
 
                                             <form action="{{ route('admin.resources.destroy', $resource) }}" method="POST" class="inline">
@@ -320,7 +320,7 @@
                                                         class="delete-link"
                                                         onclick="return confirm('Are you sure you want to delete this resource?')"
                                                         title="Delete Resource">
-                                                    <i class="fas fa-trash-alt text-[10px] sm:text-base"></i>
+                                                    <i class="fas fa-trash-can-alt text-[10px] sm:text-base"></i>
                                                 </button>
                                             </form>
                                         </div>

@@ -262,7 +262,7 @@
                 <div class="relative p-4 sm:p-5 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                     <div class="flex items-start gap-3">
                         <div class="hero-icon">
-                            <i class="fas fa-calendar-alt text-base sm:text-lg"></i>
+                            <i class="fas fa-calendar-days text-base sm:text-lg"></i>
                         </div>
                         <div class="min-w-0">
                             <div class="hero-badge">
@@ -363,7 +363,7 @@
         @if($date->isWeekend())
         <div class="alert-weekend mb-6">
             <div class="alert-weekend-icon">
-                <i class="fas fa-calendar-times"></i>
+                <i class="fas fa-calendar-xmark"></i>
             </div>
             <div>
                 <h3 class="text-sm font-semibold">Weekend Schedule</h3>
@@ -622,7 +622,7 @@
             <div class="modal-header">
                 <h3 class="text-sm font-semibold text-[#2c2420]">Appointment Details</h3>
                 <button onclick="closeAppointmentModal()" class="modal-close" title="Close">
-                    <i class="fas fa-times"></i>
+                    <i class="fas fa-xmark"></i>
                 </button>
             </div>
             <div id="appointmentDetails" class="modal-body">

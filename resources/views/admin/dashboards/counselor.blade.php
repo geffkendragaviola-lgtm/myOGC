@@ -17,7 +17,7 @@
                     <div class="hero-card-pattern"></div>
                     <div class="relative flex items-start gap-3 p-4 sm:p-5">
                         <div class="hero-icon">
-                            <i class="fas fa-user-tie text-base sm:text-lg"></i>
+                            <i class="fas fa-user-doctor text-base sm:text-lg"></i>
                         </div>
                         <div class="min-w-0">
                             <div class="hero-badge">
@@ -53,7 +53,7 @@
             <div class="panel-topline"></div>
             <div class="panel-header">
                 <div class="panel-header-icon">
-                    <i class="fas fa-sliders-h text-[10px] sm:text-xs"></i>
+                    <i class="fas fa-sliders text-[10px] sm:text-xs"></i>
                 </div>
                 <div>
                     <h2 class="panel-title">Search and Filter</h2>
@@ -99,7 +99,7 @@
             <div class="table-header-bar">
                 <div class="flex items-center gap-2.5">
                     <div class="table-header-icon">
-                        <i class="fas fa-user-tie text-[#9a7b0a] text-[10px] sm:text-xs"></i>
+                        <i class="fas fa-user-doctor text-[#9a7b0a] text-[10px] sm:text-xs"></i>
                     </div>
                     <div>
                         <h2 class="text-sm font-medium text-[#2c2420]">Counselor Directory</h2>
@@ -109,7 +109,7 @@
 
                 <div class="flex items-center gap-2">
                     <span class="table-live-pill">
-                        <i class="far fa-clock mr-1 text-[9px]"></i> Live data
+                        <i class="fas fa-clock mr-1 text-[9px]"></i> Live data
                     </span>
                 </div>
             </div>
@@ -177,7 +177,7 @@
                                 <td class="px-4 py-3 sm:py-3.5 whitespace-nowrap">
                                     <div class="inline-flex items-center gap-1.5 text-xs sm:text-sm text-[#8b7e76]">
                                         <span class="mini-icon bg-[#fdf2f2] text-[#7a2a2a]/60">
-                                            <i class="far fa-calendar-alt text-[10px]"></i>
+                                            <i class="fas fa-calendar-days-days text-[10px]"></i>
                                         </span>
                                         {{ $counselor->created_at?->format('M j, Y') ?? 'N/A' }}
                                     </div>
@@ -188,7 +188,7 @@
                                 <td colspan="5" class="px-4 py-10 sm:py-12 text-center">
                                     <div class="flex flex-col items-center justify-center">
                                         <div class="empty-state-icon mb-3">
-                                            <i class="fas fa-user-tie-slash text-[#a89f97] text-lg"></i>
+                                            <i class="fas fa-user-doctor-slash text-[#a89f97] text-lg"></i>
                                         </div>
                                         <p class="text-xs sm:text-sm font-medium text-[#6b5e57]">No counselors found.</p>
                                         <p class="text-[10px] sm:text-xs text-[#8b7e76] mt-1">Try adjusting your search or filter criteria</p>
@@ -272,7 +272,7 @@
             @else
             <div class="px-4 sm:px-5 py-3 sm:py-3.5 border-t border-[#e5e0db]/60 bg-[#faf8f5]/40">
                 <div class="flex items-center justify-center gap-2 text-[10px] sm:text-xs text-[#8b7e76]">
-                    <i class="fas fa-check-circle text-[#059669]"></i>
+                    <i class="fas fa-circle-check text-[#059669]"></i>
                     <span>Showing all <span class="font-semibold text-[#2c2420]">{{ $counselors->total() }}</span> counselors</span>
                 </div>
             </div>

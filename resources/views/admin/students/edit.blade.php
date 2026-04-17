@@ -175,7 +175,7 @@
         @if($errors->any())
             <div class="glass-alert error-alert mb-4 sm:mb-6">
                 <div class="flex items-center text-xs sm:text-sm">
-                    <i class="fas fa-exclamation-circle mr-2"></i>
+                    <i class="fas fa-circle-exclamation mr-2"></i>
                     <div>
                         <div class="font-semibold">Please fix the errors below.</div>
                     </div>

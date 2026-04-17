@@ -371,7 +371,7 @@
     <!-- Login Modal -->
     <div class="auth-overlay" id="authOverlay">
         <div class="auth-modal" id="authModal">
-            <button class="auth-modal-close" onclick="closeLoginModal()" title="Close"><i class="fas fa-times"></i></button>
+            <button class="auth-modal-close" onclick="closeLoginModal()" title="Close"><i class="fas fa-xmark"></i></button>
 
             <div class="auth-modal-logo">
                 <img src="{{ asset('images/msu-iit-logo.png') }}" alt="MSU-IIT" onerror="this.style.display='none'">

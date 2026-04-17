@@ -530,7 +530,7 @@
             <div class="modal-header">
                 <h3 class="text-sm font-semibold text-[#2c2420]">Book Follow-up Appointment</h3>
                 <button type="button" onclick="closeFollowupModal()" class="modal-close" title="Close">
-                    <i class="fas fa-times"></i>
+                    <i class="fas fa-xmark"></i>
                 </button>
             </div>
 

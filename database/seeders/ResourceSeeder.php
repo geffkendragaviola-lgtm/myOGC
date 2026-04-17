@@ -59,7 +59,7 @@ class ResourceSeeder extends Seeder
             ],
             [
                 'user_id' => $adminId,
-                'title' => 'Private Videos',
+                'title' => 'Curated Videos',
                 'description' => 'Exclusive video content created by our counseling team for registered students.',
                 'icon' => 'fas fa-lock',
                 'button_text' => 'Access Content',

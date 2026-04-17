@@ -159,7 +159,7 @@
                         {{ $student->college->name ?? 'N/A' }} • {{ $student->year_level }}
                     </div>
                     <div class="count-badge">
-                        <i class="fas fa-clipboard-list"></i>
+                        <i class="fas fa-notes-medical"></i>
                         {{ $sessionNotes->count() }} session note(s) found
                     </div>
                 </div>
@@ -179,7 +179,7 @@
         <!-- Session Notes List -->
         @if($sessionNotes->isEmpty())
             <div class="panel-card empty-state">
-                <i class="fas fa-clipboard-list empty-icon"></i>
+                <i class="fas fa-notes-medical empty-icon"></i>
                 <h3 class="empty-title">No Session Notes Yet</h3>
                 <p class="empty-text">Start documenting your counseling sessions with this student.</p>
                 <a href="{{ route('counselor.session-notes.create', $student) }}"
@@ -209,7 +209,7 @@
                             <div class="note-actions flex items-center">
                                 <a href="{{ route('counselor.session-notes.edit', $note) }}"
                                    class="action-btn" title="Edit Note">
-                                    <i class="fas fa-edit"></i>
+                                    <i class="fas fa-pen-to-square"></i>
                                 </a>
                             </div>
                         </div>

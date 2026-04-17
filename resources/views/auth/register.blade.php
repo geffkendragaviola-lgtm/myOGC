@@ -100,7 +100,7 @@
 
 <div class="reg-overlay">
     <div class="reg-modal">
-        <a href="/" class="reg-modal-close" title="Back to home"><i class="fas fa-times"></i></a>
+        <a href="/" class="reg-modal-close" title="Back to home"><i class="fas fa-xmark"></i></a>
 <div class="form-card">
                     @php
                         $verifiedEmail = session('registration_email_verified');

@@ -209,7 +209,7 @@
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
             <div class="stat-card">
                 <div class="stat-icon-box stat-icon-gray">
-                    <i class="fas fa-comments"></i>
+                    <i class="fas fa-message"></i>
                 </div>
                 <div>
                     <p class="stat-label">Total Feedback</p>
@@ -236,7 +236,7 @@
             </div>
             <div class="stat-card">
                 <div class="stat-icon-box stat-icon-orange">
-                    <i class="fas fa-chart-bar"></i>
+                    <i class="fas fa-chart-column"></i>
                 </div>
                 <div>
                     <p class="stat-label">Distribution</p>
@@ -405,7 +405,7 @@
                         @empty
                             <tr>
                                 <td colspan="5" class="empty-state">
-                                    <i class="fas fa-comments empty-icon"></i>
+                                    <i class="fas fa-message empty-icon"></i>
                                     <p class="empty-title">No feedback found.</p>
                                     <p class="empty-text">No feedback submissions match your current filters.</p>
                                 </td>

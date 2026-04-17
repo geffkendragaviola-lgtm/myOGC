@@ -303,7 +303,7 @@
                         <div class="section-topline"></div>
                         <div class="section-header">
                             <div class="section-icon">
-                                <i class="fas fa-chart-bar text-xs sm:text-sm"></i>
+                                <i class="fas fa-chart-column text-xs sm:text-sm"></i>
                             </div>
                             <div>
                                 <h3 class="section-title">Satisfaction Rating</h3>
@@ -356,7 +356,7 @@
                                         <p class="text-[#4a3f3a] leading-relaxed whitespace-pre-wrap text-sm sm:text-base">{{ $feedback->comments }}</p>
                                     </div>
                                     <div class="mt-3 sm:mt-4 text-[10px] sm:text-xs text-[#8b7e76] flex items-center gap-1.5">
-                                        <i class="fas fa-info-circle"></i>
+                                        <i class="fas fa-circle-info"></i>
                                         {{ str_word_count($feedback->comments) }} words, {{ strlen($feedback->comments) }} characters
                                     </div>
                                 @else
@@ -411,7 +411,7 @@
         <!-- Action Buttons -->
         <div class="mt-5 sm:mt-6 flex flex-col lg:flex-row justify-between items-start lg:items-center gap-3 sm:gap-4">
             <div class="footer-note flex items-center gap-1">
-                <i class="fas fa-info-circle"></i>
+                <i class="fas fa-circle-info"></i>
                 This feedback is part of the system's quality assurance process.
             </div>
             <div class="flex flex-wrap gap-2 sm:gap-3 w-full lg:w-auto">

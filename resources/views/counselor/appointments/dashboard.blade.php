@@ -199,14 +199,14 @@
                         <div class="flex flex-wrap gap-1.5 mb-3">
                             @foreach($allColleges as $college)
                                 <span class="welcome-college">
-                                    <i class="fas fa-university text-[10px]"></i>{{ $college->name }}
+                                    <i class="fas fa-building-columns text-[10px]"></i>{{ $college->name }}
                                 </span>
                             @endforeach
                         </div>
 
                         <!-- Position & Credentials -->
                         <p class="welcome-meta">
-                            <i class="fas fa-user-tie mr-1.5 text-[10px]"></i>{{ $counselor->position }} • {{ $counselor->credentials }}
+                            <i class="fas fa-user-doctor mr-1.5 text-[10px]"></i>{{ $counselor->position }} • {{ $counselor->credentials }}
                         </p>
                     </div>
 
@@ -238,7 +238,7 @@
             <div class="stat-card">
                 <div class="relative p-4 flex items-center gap-3">
                     <div class="stat-icon" style="background: #059669;">
-                        <i class="fas fa-check-circle text-sm"></i>
+                        <i class="fas fa-circle-check text-sm"></i>
                     </div>
                     <div class="min-w-0">
                         <p class="stat-label">Approved</p>
@@ -250,7 +250,7 @@
             <div class="stat-card">
                 <div class="relative p-4 flex items-center gap-3">
                     <div class="stat-icon" style="background: var(--maroon-800);">
-                        <i class="fas fa-calendar-alt text-sm"></i>
+                        <i class="fas fa-calendar-days text-sm"></i>
                     </div>
                     <div class="min-w-0">
                         <p class="stat-label">Total</p>
@@ -327,7 +327,7 @@
                         <div class="grid grid-cols-2 gap-3 sm:gap-4">
                             <a href="{{ route('counselor.calendar') }}"
                                class="quick-action maroon">
-                                <i class="fas fa-calendar-alt"></i>
+                                <i class="fas fa-calendar-days"></i>
                                 <p>View Calendar</p>
                             </a>
                             <a href="{{ route('counselor.appointments') }}?status=pending"
@@ -371,7 +371,7 @@
                                                     {{ $appointment->student->user->first_name }} {{ $appointment->student->user->last_name }}
                                                 </p>
                                                 <p class="upcoming-college">
-                                                    <i class="fas fa-university mr-1 text-[9px]"></i>{{ $appointment->student->college->name ?? 'N/A' }}
+                                                    <i class="fas fa-building-columns mr-1 text-[9px]"></i>{{ $appointment->student->college->name ?? 'N/A' }}
                                                 </p>
                                             </div>
                                         </div>

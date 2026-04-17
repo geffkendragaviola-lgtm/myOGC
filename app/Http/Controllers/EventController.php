@@ -97,13 +97,26 @@ public function updateRegistrationStatus(Request $request, Event $event, EventRe
 
     return redirect()->back()->with('success', 'Registration status updated successfully!');
 }
- public function index()
+ public function index(Request $request)
     {
-        $events = Event::with('user')
+        $query = Event::with('user')
             ->where('user_id', Auth::id())
             ->orderBy('event_start_date', 'desc')
-            ->orderBy('start_time', 'desc')
-            ->get();
+            ->orderBy('start_time', 'desc');
+
+        switch ($request->input('filter')) {
+            case 'active':
+                $query->where('is_active', true);
+                break;
+            case 'upcoming':
+                $query->where('event_start_date', '>=', now()->toDateString());
+                break;
+            case 'required':
+                $query->where('is_required', true);
+                break;
+        }
+
+        $events = $query->get();
 
         return view('counselor.events.index', compact('events'));
     }

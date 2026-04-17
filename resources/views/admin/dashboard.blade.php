@@ -3,224 +3,337 @@
 @section('title', 'Dashboard - Admin Panel')
 
 @section('content')
-    <div class="min-h-screen bg-slate-50/80 relative overflow-hidden font-sans">
-        <!-- Subtle Background Elements -->
-        <div class="absolute top-0 left-0 w-full h-80 bg-gradient-to-b from-[#820000]/[0.03] to-transparent pointer-events-none"></div>
-        <div class="absolute -top-20 -right-20 w-96 h-96 bg-[#F8650C]/[0.04] rounded-full blur-3xl pointer-events-none"></div>
-        <div class="absolute bottom-0 -left-20 w-72 h-72 bg-[#820000]/[0.03] rounded-full blur-3xl pointer-events-none"></div>
+<style>
+    :root {
+        --maroon-900: #3a0c0c;
+        --maroon-800: #5c1a1a;
+        --maroon-700: #7a2a2a;
+        --gold-500: #c9a227;
+        --gold-400: #d4af37;
+        --bg-warm: #faf8f5;
+        --border-soft: #e5e0db;
+        --text-primary: #2c2420;
+        --text-secondary: #6b5e57;
+        --text-muted: #8b7e76;
+    }
 
-        <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-8 max-w-7xl">
-            
-            <!-- Header -->
-            <div class="flex flex-col md:flex-row md:items-end justify-between mb-8 gap-4">
-                <div>
-                    <h1 class="text-2xl font-semibold tracking-tight text-slate-900">Overview</h1>
-                    <p class="text-sm text-slate-500 mt-1 flex items-center gap-2">
-                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
-                        System Operational • {{ now()->format('l, F j, Y') }}
-                    </p>
+    .dash-shell { position:relative; overflow:hidden; background:var(--bg-warm); min-height:100vh; }
+    .dash-glow { position:absolute; border-radius:50%; filter:blur(80px); pointer-events:none; opacity:0.22; }
+    .dash-glow.one { top:-40px; left:-50px; width:240px; height:240px; background:var(--gold-400); }
+    .dash-glow.two { bottom:-40px; right:-60px; width:260px; height:260px; background:var(--maroon-800); }
+
+    /* Cards */
+    .hero-card, .panel-card, .stat-card, .quick-card {
+        position:relative; overflow:hidden; border-radius:0.75rem;
+        border:1px solid var(--border-soft); background:rgba(255,255,255,0.95);
+        backdrop-filter:blur(8px); box-shadow:0 2px 8px rgba(44,36,32,0.04);
+        transition:box-shadow 0.2s ease, transform 0.2s ease;
+    }
+    .hero-card::before, .panel-card::before, .stat-card::before, .quick-card::before {
+        content:""; position:absolute; inset:0; pointer-events:none;
+        background:radial-gradient(circle at top right, rgba(212,175,55,0.06), transparent 30%);
+    }
+    .panel-card:hover, .stat-card:hover { box-shadow:0 4px 14px rgba(44,36,32,0.07); }
+    .quick-card:hover { transform:translateY(-2px); box-shadow:0 6px 18px rgba(44,36,32,0.08); border-color:rgba(212,175,55,0.35); }
+
+    /* Hero */
+    .hero-icon {
+        width:2.75rem; height:2.75rem; border-radius:0.75rem; color:#fef9e7; flex-shrink:0;
+        background:linear-gradient(135deg, var(--maroon-800) 0%, var(--maroon-700) 100%);
+        box-shadow:0 4px 12px rgba(92,26,26,0.15); display:flex; align-items:center; justify-content:center;
+    }
+    .hero-badge {
+        display:inline-flex; align-items:center; gap:0.4rem; border-radius:999px;
+        border:1px solid rgba(212,175,55,0.3); background:rgba(254,249,231,0.8);
+        padding:0.2rem 0.55rem; font-size:9px; font-weight:700; text-transform:uppercase;
+        letter-spacing:0.16em; color:var(--maroon-700);
+    }
+    .hero-badge-dot { width:0.3rem; height:0.3rem; border-radius:999px; background:var(--gold-400); }
+
+    /* Summary card (dark maroon) */
+    .summary-card {
+        position:relative; overflow:hidden; border-radius:0.75rem;
+        border:1px solid rgba(92,26,26,0.15);
+        background:linear-gradient(135deg, var(--maroon-800) 0%, var(--maroon-900) 100%);
+        color:white; box-shadow:0 4px 12px rgba(58,12,12,0.15);
+    }
+    .summary-card::before {
+        content:""; position:absolute; inset:0; opacity:0.15;
+        background:radial-gradient(circle at top right, var(--gold-400), transparent 40%); pointer-events:none;
+    }
+    .summary-icon {
+        width:2.5rem; height:2.5rem; border-radius:0.75rem; flex-shrink:0;
+        display:flex; align-items:center; justify-content:center;
+        background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.1); color:#fef9e7;
+    }
+    .summary-label { font-size:9px; font-weight:700; text-transform:uppercase; letter-spacing:0.2em; color:rgba(255,255,255,0.7); }
+    .summary-value { font-size:1.5rem; line-height:1; font-weight:800; margin-top:0.3rem; }
+    .summary-sub { font-size:0.7rem; color:rgba(255,255,255,0.75); margin-top:0.2rem; }
+
+    /* Stat cards */
+    .stat-icon {
+        width:2.5rem; height:2.5rem; border-radius:0.75rem; flex-shrink:0;
+        display:flex; align-items:center; justify-content:center;
+    }
+    .stat-value { font-size:1.6rem; font-weight:800; color:var(--text-primary); line-height:1; }
+    .stat-label { font-size:0.7rem; font-weight:600; text-transform:uppercase; letter-spacing:0.1em; color:var(--text-muted); margin-top:0.15rem; }
+    .stat-bar { height:3px; border-radius:999px; margin-top:0.85rem; background:var(--border-soft); overflow:hidden; }
+    .stat-bar-fill { height:100%; border-radius:999px; }
+
+    /* Panel */
+    .panel-topline { position:absolute; inset-inline:0; top:0; height:3px; background:linear-gradient(90deg, var(--maroon-800) 0%, var(--gold-400) 50%, var(--maroon-800) 100%); }
+    .panel-header { display:flex; align-items:center; gap:0.7rem; padding:0.85rem 1.25rem; border-bottom:1px solid rgba(229,224,219,0.6); }
+    .panel-icon { width:2rem; height:2rem; border-radius:0.6rem; display:flex; align-items:center; justify-content:center; background:rgba(254,249,231,0.7); color:var(--maroon-700); flex-shrink:0; }
+    .panel-title { font-size:0.8rem; font-weight:600; color:var(--text-primary); }
+    .panel-subtitle { font-size:0.68rem; color:var(--text-muted); margin-top:0.1rem; }
+
+    /* Quick access */
+    .quick-icon {
+        width:2.5rem; height:2.5rem; border-radius:0.65rem; flex-shrink:0;
+        display:flex; align-items:center; justify-content:center;
+        transition:background 0.2s, color 0.2s;
+    }
+
+    /* Table */
+    .table-row { transition:background 0.15s; }
+    .table-row:hover { background:rgba(254,249,231,0.35); }
+    .avatar-badge {
+        width:2.25rem; height:2.25rem; border-radius:0.65rem; flex-shrink:0;
+        display:flex; align-items:center; justify-content:center;
+        font-weight:700; font-size:0.7rem; color:var(--maroon-700);
+        background:linear-gradient(135deg,#fef9e7,#f5e6b8); border:1px solid rgba(212,175,55,0.3);
+    }
+    .table-footer { padding:0.75rem 1.25rem; border-top:1px solid rgba(229,224,219,0.6); background:rgba(250,248,245,0.4); }
+
+    @media(max-width:639px){
+        .stat-value { font-size:1.35rem; }
+        .panel-header { padding:0.75rem 1rem; }
+    }
+</style>
+
+<div class="dash-shell">
+    <div class="dash-glow one"></div>
+    <div class="dash-glow two"></div>
+
+    <div class="relative max-w-7xl mx-auto px-4 sm:px-6 py-5 md:py-8 space-y-5 sm:space-y-6">
+
+        {{-- Page header --}}
+        <div class="grid grid-cols-1 xl:grid-cols-[1fr_auto] gap-4 items-stretch">
+            <div class="hero-card">
+                <div class="relative p-4 sm:p-5 flex items-start gap-3">
+                    <div class="hero-icon"><i class="fas fa-gauge-high text-base sm:text-lg"></i></div>
+                    <div class="min-w-0">
+                        <div class="hero-badge"><span class="hero-badge-dot"></span>Admin Panel</div>
+                        <h1 class="text-lg sm:text-xl lg:text-2xl font-semibold tracking-tight text-[#2c2420] mt-2">Dashboard</h1>
+                        <p class="text-[#6b5e57] text-xs sm:text-sm mt-1.5">
+                            <span class="inline-flex items-center gap-1.5">
+                                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                                System operational &mdash; {{ now()->format('l, F j, Y') }}
+                            </span>
+                        </p>
+                    </div>
                 </div>
             </div>
 
-            <!-- Stats Grid -->
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 mb-10">
-                
-                @php
-                    $statsCards = [
-                        ['label' => 'Total Users', 'value' => $stats['total_users'], 'icon' => 'fa-users', 'color' => '#820000', 'bg' => 'from-[#820000] to-[#a00000]', 'width' => '100%'],
-                        ['label' => 'Students', 'value' => $stats['total_students'], 'icon' => 'fa-graduation-cap', 'color' => '#F8650C', 'bg' => 'from-[#F8650C] to-[#ff7b2c]', 'width' => '75%'],
-                        ['label' => 'Counselors', 'value' => $stats['total_counselors'], 'icon' => 'fa-user-tie', 'color' => '#FFC917', 'bg' => 'from-[#FFC917] to-[#ffdd4a]', 'width' => '60%'],
-                        ['label' => 'Admins', 'value' => $stats['total_admins'], 'icon' => 'fa-user-shield', 'color' => '#4B5563', 'bg' => 'from-gray-600 to-gray-800', 'width' => '40%'],
-                    ];
-                @endphp
-
-                @foreach($statsCards as $stat)
-                <div class="group bg-white rounded-xl border border-slate-200/60 p-5 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-300 relative overflow-hidden">
-                    <div class="flex justify-between items-start mb-4">
-                        <div>
-                            <p class="text-xs font-medium text-slate-400 uppercase tracking-wide">{{ $stat['label'] }}</p>
-                            <h3 class="text-2xl font-semibold text-slate-800 mt-0.5">{{ number_format($stat['value']) }}</h3>
-                        </div>
-                        <div class="p-2.5 rounded-lg bg-gradient-to-br {{ $stat['bg'] }} shadow-sm text-white">
-                            <i class="fas {{ $stat['icon'] }} text-base"></i>
-                        </div>
-                    </div>
-                    
-                    <div class="space-y-2">
-                        <div class="flex items-center justify-between">
-                            <span class="text-xs font-semibold inline-block px-2 py-0.5 rounded-md text-{{ $stat['color'] === '#820000' ? 'red' : ($stat['color'] === '#F8650C' ? 'orange' : 'yellow') }}-600 bg-{{ $stat['color'] === '#820000' ? 'red' : ($stat['color'] === '#F8650C' ? 'orange' : 'yellow') }}-100">
-                                Capacity
-                            </span>
-                            <span class="text-xs font-medium text-slate-500">{{ $stat['width'] }}</span>
-                        </div>
-                        <div class="overflow-hidden h-1.5 w-full bg-slate-100 rounded-full">
-                            <div style="width: {{ $stat['width'] }}" class="h-full rounded-full bg-gradient-to-r {{ $stat['bg'] }} transition-all duration-1000 ease-out"></div>
-                        </div>
-                    </div>
-                </div>
-                @endforeach
-
-                <!-- Active Now Card -->
-                <div class="group bg-gradient-to-br from-[#820000] to-[#5e0000] rounded-xl p-5 shadow-sm shadow-[#820000]/10 text-white relative overflow-hidden hover:shadow-md transition-all duration-300">
-                    <div class="absolute top-0 right-0 -mt-6 -mr-6 w-28 h-28 bg-white/10 rounded-full blur-xl pointer-events-none"></div>
-                    <div class="flex justify-between items-start mb-4 relative z-10">
-                        <div>
-                            <p class="text-xs font-medium text-white/60 uppercase tracking-wide">Active Sessions</p>
-                            <h3 class="text-2xl font-semibold mt-0.5">{{ rand(12, 48) }}</h3>
-                        </div>
-                        <div class="p-2.5 rounded-lg bg-white/10 backdrop-blur-sm border border-white/10">
-                            <i class="fas fa-bolt text-white text-base"></i>
-                        </div>
-                    </div>
-                    <div class="mt-4 relative z-10">
-                        <div class="flex items-center gap-2 text-xs text-white/70">
-                            <span class="relative flex h-2 w-2">
-                              <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-70"></span>
-                              <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
-                            </span>
-                            Live Activity
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Two Column Layout -->
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                
-                <!-- Left: Quick Access -->
-                <div class="lg:col-span-1 space-y-5">
-                    <div class="flex items-center justify-between">
-                        <h2 class="text-base font-semibold text-slate-800">Quick Access</h2>
-                        <a href="#" class="text-xs font-medium text-[#820000] hover:text-[#6a0000] transition-colors">View All</a>
-                    </div>
-
-                    <div class="space-y-3">
-                        <a href="{{ route('admin.users.create') }}" class="flex items-center p-3.5 bg-white rounded-xl border border-slate-200/60 shadow-sm hover:shadow-md hover:border-[#820000]/20 group transition-all duration-200">
-                            <div class="h-10 w-10 rounded-lg bg-red-50 text-[#820000] flex items-center justify-center group-hover:bg-[#820000] group-hover:text-white transition-colors duration-200">
-                                <i class="fas fa-user-plus text-base"></i>
-                            </div>
-                            <div class="ml-3 flex-1 min-w-0">
-                                <h4 class="text-sm font-semibold text-slate-800 group-hover:text-[#820000] transition-colors truncate">Add New User</h4>
-                                <p class="text-xs text-slate-500 truncate">Create administrator or staff account</p>
-                            </div>
-                            <i class="fas fa-chevron-right text-slate-300 group-hover:text-[#820000] group-hover:translate-x-0.5 transition-all text-xs"></i>
-                        </a>
-
-                        <a href="{{ route('admin.students') }}" class="flex items-center p-3.5 bg-white rounded-xl border border-slate-200/60 shadow-sm hover:shadow-md hover:border-[#F8650C]/20 group transition-all duration-200">
-                            <div class="h-10 w-10 rounded-lg bg-orange-50 text-[#F8650C] flex items-center justify-center group-hover:bg-[#F8650C] group-hover:text-white transition-colors duration-200">
-                                <i class="fas fa-graduation-cap text-base"></i>
-                            </div>
-                            <div class="ml-3 flex-1 min-w-0">
-                                <h4 class="text-sm font-semibold text-slate-800 group-hover:text-[#F8650C] transition-colors truncate">Student Records</h4>
-                                <p class="text-xs text-slate-500 truncate">Manage enrollments and grades</p>
-                            </div>
-                            <i class="fas fa-chevron-right text-slate-300 group-hover:text-[#F8650C] group-hover:translate-x-0.5 transition-all text-xs"></i>
-                        </a>
-
-                        <a href="{{ route('admin.counselors') }}" class="flex items-center p-3.5 bg-white rounded-xl border border-slate-200/60 shadow-sm hover:shadow-md hover:border-yellow-400/20 group transition-all duration-200">
-                            <div class="h-10 w-10 rounded-lg bg-yellow-50 text-[#FFC917] flex items-center justify-center group-hover:bg-[#FFC917] group-hover:text-white transition-colors duration-200">
-                                <i class="fas fa-comments text-base"></i>
-                            </div>
-                            <div class="ml-3 flex-1 min-w-0">
-                                <h4 class="text-sm font-semibold text-slate-800 group-hover:text-[#FFC917] transition-colors truncate">Counseling Logs</h4>
-                                <p class="text-xs text-slate-500 truncate">Review recent sessions</p>
-                            </div>
-                            <i class="fas fa-chevron-right text-slate-300 group-hover:text-[#FFC917] group-hover:translate-x-0.5 transition-all text-xs"></i>
-                        </a>
-                    </div>
-                </div>
-
-                <!-- Right: Recent Users Table -->
-                <div class="lg:col-span-2">
-                    <div class="bg-white rounded-xl border border-slate-200/60 shadow-sm overflow-hidden flex flex-col">
-                        <div class="px-5 py-4 border-b border-slate-100 bg-slate-50/40 flex justify-between items-center">
-                            <div>
-                                <h2 class="text-base font-semibold text-slate-800">Recent Registrations</h2>
-                                <p class="text-xs text-slate-500 mt-0.5">Latest accounts created in the system</p>
-                            </div>
-                        </div>
-
-                        <div class="overflow-x-auto">
-                            <table class="min-w-full divide-y divide-slate-100">
-                                <thead class="bg-slate-50/50">
-                                    <tr>
-                                        <th class="px-5 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">User Details</th>
-                                        <th class="px-5 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Role</th>
-                                        <th class="px-5 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Status</th>
-                                        <th class="px-5 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Date</th>
-                                    </tr>
-                                </thead>
-                                <tbody class="bg-white divide-y divide-slate-50">
-                                    @forelse($recentUsers as $user)
-                                    <tr class="hover:bg-slate-50/60 transition-colors duration-150 group">
-                                        <td class="px-5 py-3 whitespace-nowrap">
-                                            <div class="flex items-center">
-                                                <div class="flex-shrink-0 h-9 w-9">
-                                                    <div class="h-9 w-9 rounded-full bg-slate-100 flex items-center justify-center text-slate-600 font-semibold text-xs border border-slate-200">
-                                                        {{ strtoupper(substr($user->first_name, 0, 1)) }}{{ strtoupper(substr($user->last_name, 0, 1)) }}
-                                                    </div>
-                                                </div>
-                                                <div class="ml-3">
-                                                    <div class="text-sm font-semibold text-slate-900 group-hover:text-[#820000] transition-colors">
-                                                        {{ $user->first_name }} {{ $user->last_name }}
-                                                    </div>
-                                                    <div class="text-xs text-slate-400">{{ $user->email }}</div>
-                                                </div>
-                                            </div>
-                                        </td>
-                                        <td class="px-5 py-3 whitespace-nowrap">
-                                            @php
-                                                $roleStyles = [
-                                                    'admin' => 'bg-red-50 text-red-700 border-red-100 icon-bg-red',
-                                                    'counselor' => 'bg-yellow-50 text-yellow-800 border-yellow-100 icon-bg-yellow',
-                                                    'student' => 'bg-blue-50 text-blue-700 border-blue-100 icon-bg-blue',
-                                                ];
-                                                $style = $roleStyles[$user->role] ?? 'bg-gray-50 text-gray-600';
-                                                $icons = [
-                                                    'admin' => 'fa-user-shield',
-                                                    'counselor' => 'fa-user-tie',
-                                                    'student' => 'fa-graduation-cap'
-                                                ];
-                                            @endphp
-                                            <span class="px-2.5 py-1 inline-flex text-xs leading-5 font-medium rounded-md border {{ $style }}">
-                                                <i class="fas {{ $icons[$user->role] ?? 'fa-user' }} mr-1.5 mt-0.5 opacity-70"></i>
-                                                {{ ucfirst($user->role) }}
-                                            </span>
-                                        </td>
-                                        <td class="px-5 py-3 whitespace-nowrap">
-                                            <span class="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium bg-emerald-50 text-emerald-700 border border-emerald-100">
-                                                <span class="w-1.5 h-1.5 mr-1.5 bg-emerald-500 rounded-full"></span>
-                                                Active
-                                            </span>
-                                        </td>
-                                        <td class="px-5 py-3 whitespace-nowrap text-xs text-slate-500">
-                                            {{ $user->created_at->format('M d, Y') }}
-                                        </td>
-                                    </tr>
-                                    @empty
-                                    <tr>
-                                        <td colspan="4" class="px-5 py-10 text-center">
-                                            <div class="flex flex-col items-center justify-center text-slate-400">
-                                                <i class="fas fa-folder-open text-3xl mb-2 opacity-40"></i>
-                                                <p class="text-sm font-medium">No recent users found</p>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                    @endforelse
-                                </tbody>
-                            </table>
-                        </div>
-                        
-                        <div class="px-5 py-3 border-t border-slate-100 bg-slate-50/30 flex items-center justify-between">
-                            <span class="text-xs text-slate-500">Showing <span class="font-medium text-slate-800">{{ $recentUsers->count() }}</span> results</span>
-                            <div class="flex gap-1.5">
-                                <button class="px-3 py-1.5 border border-slate-200 rounded-md text-xs font-medium text-slate-500 hover:bg-white hover:text-[#820000] hover:border-slate-300 transition disabled:opacity-50">Previous</button>
-                                <button class="px-3 py-1.5 border border-slate-200 rounded-md text-xs font-medium text-slate-500 hover:bg-white hover:text-[#820000] hover:border-slate-300 transition">Next</button>
-                            </div>
-                        </div>
+            <div class="summary-card">
+                <div class="relative h-full flex items-center gap-3 px-5 py-4">
+                    <div class="summary-icon"><i class="fas fa-calendar-days text-sm"></i></div>
+                    <div>
+                        <p class="summary-label">This Month</p>
+                        <p class="summary-value">{{ $stats['total_events'] ?? 0 }}</p>
+                        <p class="summary-sub">Total events in system</p>
                     </div>
                 </div>
             </div>
         </div>
+
+        {{-- Stat cards --}}
+        @php
+            $cards = [
+                ['label'=>'Total Users',  'value'=>$stats['total_users'],      'icon'=>'fa-users',          'bg'=>'background:linear-gradient(135deg,#7a2a2a,#5c1a1a);color:#fef9e7;', 'bar'=>'background:linear-gradient(90deg,#7a2a2a,#d4af37);', 'w'=>'100%'],
+                ['label'=>'Students',     'value'=>$stats['total_students'],   'icon'=>'fa-user-graduate',  'bg'=>'background:rgba(254,249,231,0.8);color:#7a5a1a;',                  'bar'=>'background:linear-gradient(90deg,#c9a227,#f0cd63);',  'w'=>'75%'],
+                ['label'=>'Counselors',   'value'=>$stats['total_counselors'], 'icon'=>'fa-user-doctor',    'bg'=>'background:rgba(240,253,244,0.8);color:#065f46;',                  'bar'=>'background:linear-gradient(90deg,#2d7a4f,#4ade80);',  'w'=>'60%'],
+                ['label'=>'Admins',       'value'=>$stats['total_admins'],     'icon'=>'fa-shield-halved',  'bg'=>'background:rgba(245,240,235,0.8);color:#6b5e57;',                  'bar'=>'background:linear-gradient(90deg,#8b7e76,#c4b8b1);',  'w'=>'40%'],
+                ['label'=>'Active Events','value'=>$stats['active_events'],    'icon'=>'fa-calendar-days',  'bg'=>'background:rgba(254,249,231,0.8);color:#7a2a2a;',                  'bar'=>'background:linear-gradient(90deg,#d4af37,#f0cd63);',  'w'=>'55%'],
+            ];
+        @endphp
+        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4">
+            @foreach($cards as $c)
+            <div class="stat-card p-4">
+                <div class="flex items-start justify-between gap-2">
+                    <div class="min-w-0">
+                        <p class="stat-label">{{ $c['label'] }}</p>
+                        <p class="stat-value mt-1">{{ number_format($c['value']) }}</p>
+                    </div>
+                    <div class="stat-icon" style="{{ $c['bg'] }}">
+                        <i class="fas {{ $c['icon'] }} text-sm"></i>
+                    </div>
+                </div>
+                <div class="stat-bar">
+                    <div class="stat-bar-fill" style="width:{{ $c['w'] }};{{ $c['bar'] }}"></div>
+                </div>
+            </div>
+            @endforeach
+        </div>
+
+        {{-- Two-column layout --}}
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-5 sm:gap-6">
+
+            {{-- Quick access --}}
+            <div class="lg:col-span-1 space-y-3">
+                <div class="panel-card">
+                    <div class="panel-topline"></div>
+                    <div class="panel-header">
+                        <div class="panel-icon"><i class="fas fa-bolt text-xs"></i></div>
+                        <div>
+                            <p class="panel-title">Quick Access</p>
+                            <p class="panel-subtitle hidden sm:block">Common admin actions</p>
+                        </div>
+                    </div>
+                    <div class="p-3 space-y-2">
+                        @php
+                            $quickLinks = [
+                                ['href'=>route('admin.users.create'),  'icon'=>'fa-user-plus',     'label'=>'Add New User',      'sub'=>'Create a new account',          'ic_bg'=>'background:rgba(253,242,242,0.8);color:#7a2a2a;', 'ic_hover'=>'background:#7a2a2a;color:#fef9e7;'],
+                                ['href'=>route('admin.students'),      'icon'=>'fa-user-graduate', 'label'=>'Student Records',   'sub'=>'Browse all students',           'ic_bg'=>'background:rgba(254,249,231,0.8);color:#7a5a1a;', 'ic_hover'=>'background:#c9a227;color:#3a0c0c;'],
+                                ['href'=>route('admin.counselors'),    'icon'=>'fa-user-doctor',   'label'=>'Counselors',        'sub'=>'View counselor directory',      'ic_bg'=>'background:rgba(240,253,244,0.8);color:#065f46;', 'ic_hover'=>'background:#2d7a4f;color:#fff;'],
+                                ['href'=>route('admin.appointments'),  'icon'=>'fa-calendar-check','label'=>'Appointments',      'sub'=>'Manage all appointments',       'ic_bg'=>'background:rgba(245,240,235,0.8);color:#6b5e57;', 'ic_hover'=>'background:#5c1a1a;color:#fef9e7;'],
+                                ['href'=>route('admin.analytics'),     'icon'=>'fa-chart-column',  'label'=>'Analytics',         'sub'=>'View system analytics',         'ic_bg'=>'background:rgba(254,249,231,0.8);color:#7a2a2a;', 'ic_hover'=>'background:#d4af37;color:#3a0c0c;'],
+                            ];
+                        @endphp
+                        @foreach($quickLinks as $ql)
+                        <a href="{{ $ql['href'] }}"
+                           class="quick-card flex items-center gap-3 p-3 group"
+                           style="text-decoration:none;">
+                            <div class="quick-icon" style="{{ $ql['ic_bg'] }}" data-hover="{{ $ql['ic_hover'] }}">
+                                <i class="fas {{ $ql['icon'] }} text-sm"></i>
+                            </div>
+                            <div class="min-w-0 flex-1">
+                                <p class="text-xs font-semibold text-[#2c2420] group-hover:text-[#7a2a2a] transition truncate">{{ $ql['label'] }}</p>
+                                <p class="text-[10px] text-[#8b7e76] truncate">{{ $ql['sub'] }}</p>
+                            </div>
+                            <i class="fas fa-chevron-right text-[#c4b8b1] text-[10px] group-hover:text-[#7a2a2a] group-hover:translate-x-0.5 transition-all flex-shrink-0"></i>
+                        </a>
+                        @endforeach
+                    </div>
+                </div>
+            </div>
+
+            {{-- Recent registrations --}}
+            <div class="lg:col-span-2">
+                <div class="panel-card overflow-hidden h-full flex flex-col">
+                    <div class="panel-topline"></div>
+                    <div class="panel-header">
+                        <div class="panel-icon"><i class="fas fa-users text-xs"></i></div>
+                        <div>
+                            <p class="panel-title">Recent Registrations</p>
+                            <p class="panel-subtitle hidden sm:block">Latest accounts created in the system</p>
+                        </div>
+                    </div>
+
+                    <div class="overflow-x-auto flex-1">
+                        <table class="w-full min-w-[520px]">
+                            <thead>
+                                <tr style="background:rgba(250,248,245,0.8);">
+                                    <th class="px-4 py-2.5 text-left text-[10px] font-semibold text-[#8b7e76] uppercase tracking-wider">User</th>
+                                    <th class="px-4 py-2.5 text-left text-[10px] font-semibold text-[#8b7e76] uppercase tracking-wider">Role</th>
+                                    <th class="px-4 py-2.5 text-left text-[10px] font-semibold text-[#8b7e76] uppercase tracking-wider">Joined</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-[#e5e0db]/50">
+                                @forelse($recentUsers as $user)
+                                <tr class="table-row">
+                                    <td class="px-4 py-3">
+                                        <div class="flex items-center gap-2.5">
+                                            <div class="avatar-badge">
+                                                {{ strtoupper(substr($user->first_name,0,1)) }}{{ strtoupper(substr($user->last_name,0,1)) }}
+                                            </div>
+                                            <div class="min-w-0">
+                                                <p class="text-xs font-semibold text-[#2c2420] truncate">{{ $user->first_name }} {{ $user->last_name }}</p>
+                                                <p class="text-[10px] text-[#8b7e76] truncate max-w-[160px]">{{ $user->email }}</p>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="px-4 py-3 whitespace-nowrap">
+                                        @php
+                                            $roleStyle = match($user->role) {
+                                                'admin'     => 'background:#fdf2f2;color:#b91c1c;border:1px solid rgba(185,28,28,0.2);',
+                                                'counselor' => 'background:#fffbeb;color:#7a5a1a;border:1px solid rgba(212,175,55,0.3);',
+                                                default     => 'background:#ecfdf5;color:#059669;border:1px solid rgba(16,185,129,0.25);',
+                                            };
+                                            $roleIcon = match($user->role) {
+                                                'admin'     => 'fa-shield-halved',
+                                                'counselor' => 'fa-user-doctor',
+                                                default     => 'fa-user-graduate',
+                                            };
+                                        @endphp
+                                        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-semibold" style="{{ $roleStyle }}">
+                                            <i class="fas {{ $roleIcon }} text-[9px]"></i>
+                                            {{ ucfirst($user->role) }}
+                                        </span>
+                                    </td>
+                                    <td class="px-4 py-3 whitespace-nowrap text-[10px] text-[#8b7e76]">
+                                        {{ $user->created_at->format('M d, Y') }}
+                                    </td>
+                                </tr>
+                                @empty
+                                <tr>
+                                    <td colspan="3" class="px-4 py-10 text-center">
+                                        <div class="flex flex-col items-center gap-2 text-[#8b7e76]">
+                                            <i class="fas fa-inbox text-2xl opacity-30"></i>
+                                            <p class="text-xs">No recent users found</p>
+                                        </div>
+                                    </td>
+                                </tr>
+                                @endforelse
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="table-footer flex items-center justify-between">
+                        <span class="text-[10px] text-[#8b7e76]">
+                            Showing <span class="font-semibold text-[#2c2420]">{{ $recentUsers->count() }}</span> recent users
+                        </span>
+                        <a href="{{ route('admin.users') }}"
+                           class="inline-flex items-center gap-1.5 text-[10px] font-semibold text-[#7a2a2a] hover:text-[#5c1a1a] transition">
+                            View all <i class="fas fa-arrow-right text-[9px]"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {{-- Recent events row --}}
+        @if(isset($recentEvents) && $recentEvents->count())
+        <div class="panel-card overflow-hidden">
+            <div class="panel-topline"></div>
+            <div class="panel-header">
+                <div class="panel-icon"><i class="fas fa-calendar-days text-xs"></i></div>
+                <div>
+                    <p class="panel-title">Recent Events</p>
+                    <p class="panel-subtitle hidden sm:block">Latest events added to the system</p>
+                </div>
+                <a href="{{ route('admin.events') }}" class="ml-auto text-[10px] font-semibold text-[#7a2a2a] hover:text-[#5c1a1a] transition flex items-center gap-1">
+                    View all <i class="fas fa-arrow-right text-[9px]"></i>
+                </a>
+            </div>
+            <div class="p-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-3">
+                @foreach($recentEvents as $event)
+                <div class="rounded-lg border border-[#e5e0db] bg-[#faf8f5]/60 p-3 hover:border-[rgba(212,175,55,0.4)] hover:bg-[rgba(254,249,231,0.4)] transition">
+                    <p class="text-xs font-semibold text-[#2c2420] truncate">{{ $event->title }}</p>
+                    <p class="text-[10px] text-[#8b7e76] mt-1 flex items-center gap-1">
+                        <i class="fas fa-calendar-days text-[9px] text-[#c4b8b1]"></i>
+                        {{ \Carbon\Carbon::parse($event->event_start_date)->format('M j, Y') }}
+                    </p>
+                    <span class="inline-flex items-center mt-2 px-2 py-0.5 rounded-full text-[9px] font-semibold
+                        {{ $event->is_active ? 'bg-[#ecfdf5] text-[#059669] border border-[#10b981]/25' : 'bg-[#f5f0eb] text-[#8b7e76] border border-[#e5e0db]' }}">
+                        {{ $event->is_active ? 'Active' : 'Inactive' }}
+                    </span>
+                </div>
+                @endforeach
+            </div>
+        </div>
+        @endif
+
     </div>
+</div>
 @endsection

@@ -242,7 +242,7 @@
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 mb-6">
             <div class="stat-card">
                 <div class="stat-icon-box stat-icon-gray">
-                    <i class="fas fa-clipboard-list"></i>
+                    <i class="fas fa-notes-medical"></i>
                 </div>
                 <div>
                     <p class="stat-label">Total Notes</p>
@@ -354,7 +354,7 @@
         <div class="panel-card overflow-hidden">
             @if($sessionNotes->isEmpty())
                 <div class="text-center py-12">
-                    <i class="fas fa-clipboard-list text-6xl text-[var(--border-soft)] mb-4"></i>
+                    <i class="fas fa-notes-medical text-6xl text-[var(--border-soft)] mb-4"></i>
                     <p class="text-[var(--text-secondary)] text-lg font-medium">No session notes found.</p>
                     <p class="text-[var(--text-muted)] text-sm mt-1">Session notes will appear here after you create them.</p>
                     <a href="{{ route('counselor.appointments') }}"
@@ -462,11 +462,11 @@
                                             </button>
                                             <a href="{{ route('counselor.session-notes.edit', $note) }}"
                                                class="action-btn action-edit" title="Edit Note">
-                                                <i class="fas fa-edit text-xs"></i>
+                                                <i class="fas fa-pen-to-square text-xs"></i>
                                             </a>
                                             <a href="{{ route('counselor.session-notes.index', $note->student) }}"
                                                class="action-btn action-list" title="All Student Notes">
-                                                <i class="fas fa-clipboard-list text-xs"></i>
+                                                <i class="fas fa-notes-medical text-xs"></i>
                                             </a>
                                             <a href="{{ route('counselor.session-notes.create', $note->student) }}"
                                                class="action-btn action-add" title="Add New Note">
@@ -495,7 +495,7 @@
         <div class="modal-header">
             <h3 class="text-lg font-bold text-[var(--text-primary)]">Session Note Details</h3>
             <button onclick="closeSessionNoteModal()" class="modal-close">
-                <i class="fas fa-times text-xl"></i>
+                <i class="fas fa-xmark text-xl"></i>
             </button>
         </div>
         <div id="sessionNoteDetails" class="modal-body">
@@ -655,11 +655,11 @@
                         <div class="flex flex-col sm:flex-row justify-end gap-3 pt-4 border-t border-[var(--border-soft)]">
                             <a href="/counselor/session-notes/${data.id}/edit"
                                class="btn-action btn-filter w-full sm:w-auto">
-                                <i class="fas fa-edit"></i> Edit Note
+                                <i class="fas fa-pen-to-square"></i> Edit Note
                             </a>
                             <a href="/counselor/students/${data.student.id}/session-notes"
                                class="btn-action btn-reset w-full sm:w-auto">
-                                <i class="fas fa-clipboard-list"></i> All Student Notes
+                                <i class="fas fa-notes-medical"></i> All Student Notes
                             </a>
                         </div>
                     </div>

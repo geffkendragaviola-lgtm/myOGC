@@ -330,7 +330,7 @@
                     </div>
                     <div class="flex items-center gap-2">
                         <button type="button" class="remove-override">
-                            <i class="fas fa-trash-alt mr-1"></i> Remove
+                            <i class="fas fa-trash-can-alt mr-1"></i> Remove
                         </button>
                     </div>
                 `;

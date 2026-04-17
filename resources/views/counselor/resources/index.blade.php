@@ -178,7 +178,7 @@
         <div class="panel-card overflow-hidden">
             @if($resources->isEmpty())
                 <div class="empty-state">
-                    <i class="fas fa-box-open empty-icon"></i>
+                    <i class="fas fa-folder-open empty-icon"></i>
                     <h3 class="empty-title">No Resources Yet</h3>
                     <p class="empty-text">Get started by creating your first resource.</p>
                     <a href="{{ route('counselor.resources.create') }}"
@@ -254,7 +254,7 @@
                                             <a href="{{ route('counselor.resources.edit', $resource) }}"
                                                class="action-btn action-edit"
                                                title="Edit">
-                                                <i class="fas fa-edit text-xs"></i>
+                                                <i class="fas fa-pen-to-square text-xs"></i>
                                             </a>
 
                                             <form action="{{ route('counselor.resources.destroy', $resource) }}" method="POST" class="inline">
@@ -264,7 +264,7 @@
                                                         class="action-btn action-delete"
                                                         onclick="return confirm('Are you sure you want to delete this resource?')"
                                                         title="Delete">
-                                                    <i class="fas fa-trash text-xs"></i>
+                                                    <i class="fas fa-trash-can text-xs"></i>
                                                 </button>
                                             </form>
                                         </div>

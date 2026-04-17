@@ -223,7 +223,7 @@
             <div class="summary-card" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); border-color: rgba(16,185,129,0.3);">
                 <div class="relative p-4 flex items-center gap-3">
                     <div class="summary-icon flex-shrink-0" style="background: rgba(255,255,255,0.15); border-color: rgba(255,255,255,0.2);">
-                        <i class="fas fa-play-circle text-sm"></i>
+                        <i class="fas fa-circle-play text-sm"></i>
                     </div>
                     <div class="min-w-0">
                         <p class="summary-label">Active</p>
@@ -253,7 +253,7 @@
             <div class="summary-card" style="background: linear-gradient(135deg, #6b7280 0%, #4b5563 100%); border-color: rgba(107,114,128,0.3);">
                 <div class="relative p-4 flex items-center gap-3">
                     <div class="summary-icon flex-shrink-0" style="background: rgba(255,255,255,0.15); border-color: rgba(255,255,255,0.2);">
-                        <i class="fas fa-check-circle text-sm"></i>
+                        <i class="fas fa-circle-check text-sm"></i>
                     </div>
                     <div class="min-w-0">
                         <p class="summary-label">Completed</p>
@@ -289,7 +289,7 @@
                 </div>
                 <div class="flex items-center gap-2">
                     <span class="table-live-pill">
-                        <i class="far fa-clock mr-1 text-[9px]"></i> Live updates
+                        <i class="fas fa-clock mr-1 text-[9px]"></i> Live updates
                     </span>
                 </div>
             </div>
@@ -336,7 +336,7 @@
                                 </td>
                                 <td class="px-4 sm:px-6 py-3.5 whitespace-nowrap text-xs sm:text-sm text-[#6b5e57]">
                                     <div class="flex items-center gap-1.5">
-                                        <i class="far fa-calendar-alt text-[#7a2a2a]/60 text-[9px] sm:text-xs"></i>
+                                        <i class="fas fa-calendar-days-days text-[#7a2a2a]/60 text-[9px] sm:text-xs"></i>
                                         {{ $announcement->created_at->format('M j, Y') }}
                                     </div>
                                 </td>
@@ -344,7 +344,7 @@
                                     <div class="flex items-center gap-1.5 sm:gap-2">
                                         <a href="{{ route('counselor.announcements.edit', $announcement) }}"
                                            class="action-icon" title="Edit">
-                                            <i class="fas fa-edit"></i>
+                                            <i class="fas fa-pen-to-square"></i>
                                         </a>
 
                                         @if($announcement->is_active)
@@ -367,7 +367,7 @@
                                                         class="action-icon success"
                                                         title="Mark as Completed"
                                                         onclick="return confirm('Mark this announcement as completed?')">
-                                                    <i class="fas fa-check-circle"></i>
+                                                    <i class="fas fa-circle-check"></i>
                                                 </button>
                                             </form>
                                         @else
@@ -391,7 +391,7 @@
                                                     class="action-icon danger"
                                                     title="Delete"
                                                     onclick="return confirm('Are you sure you want to delete this announcement?')">
-                                                <i class="fas fa-trash"></i>
+                                                <i class="fas fa-trash-can"></i>
                                             </button>
                                         </form>
                                     </div>

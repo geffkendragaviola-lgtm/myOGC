@@ -58,6 +58,21 @@
             pointer-events: none;
             opacity: 0.6;
         }
+
+        /* ── Responsive ── */
+        @media (max-width: 768px) {
+            .container { padding-left: 1rem; padding-right: 1rem; }
+        }
+        @media (max-width: 640px) {
+            .container { padding-left: 0.85rem; padding-right: 0.85rem; }
+            .max-w-4xl { max-width: 100%; }
+            /* Stack two-column grids */
+            .grid.grid-cols-2 { grid-template-columns: 1fr; }
+            .grid.sm\:grid-cols-2 { grid-template-columns: 1fr; }
+            /* Time slot grid: 2 columns on mobile */
+            .grid.grid-cols-3 { grid-template-columns: repeat(2, 1fr); }
+            .grid.grid-cols-4 { grid-template-columns: repeat(2, 1fr); }
+        }
     </style>
 </head>
 <body class="bg-gray-50">
@@ -182,7 +197,7 @@
                     if (data.available_slots.length === 0 && data.booked_slots.length === 0) {
                         timeSlots.innerHTML = `
                             <div class="col-span-full text-center p-6 border-2 border-dashed border-red-300 rounded-lg bg-red-50">
-                                <i class="fas fa-calendar-times text-red-400 text-2xl mb-2"></i>
+                                <i class="fas fa-calendar-xmark text-red-400 text-2xl mb-2"></i>
                                 <p class="text-red-600 font-semibold">No working hours for this date</p>
                                 <p class="text-red-500 text-sm mt-1">Please choose another date</p>
                             </div>
@@ -233,7 +248,7 @@
                             slotElement.innerHTML = `
                                 <div class="font-medium">${slot.display}</div>
                                 <div class="text-xs text-green-600 mt-1 flex items-center justify-center">
-                                    <i class="fas fa-check-circle mr-1"></i> Available
+                                    <i class="fas fa-circle-check mr-1"></i> Available
                                 </div>
                             `;
 
@@ -288,7 +303,7 @@
                     console.error('Error fetching time slots:', error);
                     timeSlots.innerHTML = `
                         <div class="col-span-full text-center p-6 border-2 border-dashed border-red-300 rounded-lg bg-red-50">
-                            <i class="fas fa-exclamation-circle text-red-400 text-2xl mb-2"></i>
+                            <i class="fas fa-circle-exclamation text-red-400 text-2xl mb-2"></i>
                             <p class="text-red-600 font-semibold">Error loading time slots</p>
                             <p class="text-red-500 text-sm mt-1">Please try again or contact support</p>
                         </div>

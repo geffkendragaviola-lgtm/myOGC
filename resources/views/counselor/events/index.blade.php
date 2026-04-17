@@ -243,7 +243,7 @@
                 <div class="relative p-4 sm:p-5 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                     <div class="flex items-start gap-3">
                         <div class="hero-icon">
-                            <i class="fas fa-calendar-alt text-base sm:text-lg"></i>
+                            <i class="fas fa-calendar-days text-base sm:text-lg"></i>
                         </div>
                         <div class="min-w-0">
                             <div class="hero-badge">
@@ -264,9 +264,9 @@
             </div>
         </div>
 
-        <!-- Stats -->
+        <!-- Stats (clickable filters) -->
         <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 mb-6">
-            <div class="stat-card">
+            <a href="{{ route('counselor.events.index') }}" class="stat-card">
                 <div class="relative p-3 sm:p-4 flex items-center gap-2 sm:gap-3">
                     <div class="stat-icon flex-shrink-0">
                         <i class="fas fa-calendar text-[10px] sm:text-sm"></i>
@@ -276,21 +276,21 @@
                         <p class="stat-value">{{ $events->count() }}</p>
                     </div>
                 </div>
-            </div>
+            </a>
 
-            <div class="stat-card">
+            <a href="{{ route('counselor.events.index') }}?filter=active" class="stat-card">
                 <div class="relative p-3 sm:p-4 flex items-center gap-2 sm:gap-3">
                     <div class="stat-icon flex-shrink-0" style="background: rgba(254,249,231,0.9); color: #c9a227;">
-                        <i class="fas fa-play-circle text-[10px] sm:text-sm"></i>
+                        <i class="fas fa-circle-play text-[10px] sm:text-sm"></i>
                     </div>
                     <div class="min-w-0">
                         <p class="stat-label">Active</p>
                         <p class="stat-value">{{ $events->where('is_active', true)->count() }}</p>
                     </div>
                 </div>
-            </div>
+            </a>
 
-            <div class="stat-card">
+            <a href="{{ route('counselor.events.index') }}?filter=upcoming" class="stat-card">
                 <div class="relative p-3 sm:p-4 flex items-center gap-2 sm:gap-3">
                     <div class="stat-icon flex-shrink-0" style="background: rgba(254,249,231,0.9); color: var(--maroon-700);">
                         <i class="fas fa-users text-[10px] sm:text-sm"></i>
@@ -300,19 +300,19 @@
                         <p class="stat-value">{{ $events->where('event_start_date', '>=', now()->toDateString())->count() }}</p>
                     </div>
                 </div>
-            </div>
+            </a>
 
-            <div class="stat-card">
+            <a href="{{ route('counselor.events.index') }}?filter=required" class="stat-card">
                 <div class="relative p-3 sm:p-4 flex items-center gap-2 sm:gap-3">
                     <div class="stat-icon flex-shrink-0" style="background: rgba(255,244,229,0.9); color: #92400e;">
-                        <i class="fas fa-exclamation-circle text-[10px] sm:text-sm"></i>
+                        <i class="fas fa-circle-exclamation text-[10px] sm:text-sm"></i>
                     </div>
                     <div class="min-w-0">
                         <p class="stat-label">Required</p>
                         <p class="stat-value">{{ $events->where('is_required', true)->count() }}</p>
                     </div>
                 </div>
-            </div>
+            </a>
         </div>
 
         <!-- Status Messages -->
@@ -344,7 +344,7 @@
                                         <span class="event-type">{{ $event->type }}</span>
                                         @if($event->is_required)
                                             <span class="event-badge required">
-                                                <i class="fas fa-exclamation-circle text-[8px]"></i> Required
+                                                <i class="fas fa-circle-exclamation text-[8px]"></i> Required
                                             </span>
                                         @endif
                                     </div>
@@ -362,7 +362,7 @@
                                     </span>
                                 @else
                                     <span class="college-chip specific">
-                                        <i class="fas fa-university text-[8px]"></i> {{ $event->colleges->count() }}
+                                        <i class="fas fa-building-columns text-[8px]"></i> {{ $event->colleges->count() }}
                                     </span>
                                 @endif
                             </div>
@@ -373,15 +373,15 @@
                             <!-- Date and Time -->
                             <div class="space-y-1 mb-3">
                                 <div class="event-meta">
-                                    <i class="far fa-calendar"></i>
+                                    <i class="fas fa-calendar-days"></i>
                                     <span>{{ $event->date_range }}</span>
                                 </div>
                                 <div class="event-meta">
-                                    <i class="far fa-clock"></i>
+                                    <i class="fas fa-clock"></i>
                                     <span>{{ $event->time_range }}</span>
                                 </div>
                                 <div class="event-meta">
-                                    <i class="fas fa-map-marker-alt"></i>
+                                    <i class="fas fa-location-dot"></i>
                                     <span class="truncate">{{ $event->location }}</span>
                                 </div>
                                 @if($event->max_attendees)
@@ -427,7 +427,7 @@
 
                                 <a href="{{ route('counselor.events.edit', $event) }}"
                                    class="action-btn edit">
-                                    <i class="fas fa-edit text-[9px]"></i>
+                                    <i class="fas fa-pen-to-square text-[9px]"></i>
                                     <span>Edit</span>
                                 </a>
 
@@ -447,7 +447,7 @@
                                     @method('DELETE')
                                     <button type="submit"
                                             class="action-btn delete w-full">
-                                        <i class="fas fa-trash text-[9px]"></i>
+                                        <i class="fas fa-trash-can-can text-[9px]"></i>
                                         <span>Delete</span>
                                     </button>
                                 </form>
@@ -456,7 +456,7 @@
                             <!-- Event Status and Created Info -->
                             <div class="event-footer">
                                 <div>
-                                    <i class="far fa-calendar-plus mr-1"></i>
+                                    <i class="fas fa-calendar-days-plus mr-1"></i>
                                     {{ $event->created_at->format('M j, Y') }}
                                 </div>
                                 <div>
@@ -466,7 +466,7 @@
                                         </span>
                                     @else
                                         <span class="event-period">
-                                            <i class="fas fa-history text-[8px]"></i> Past
+                                            <i class="fas fa-clock-rotate-left text-[8px]"></i> Past
                                         </span>
                                     @endif
                                 </div>
@@ -476,39 +476,6 @@
                 @endforeach
             </div>
 
-            <!-- Quick Stats Footer -->
-            <div class="mt-6 sm:mt-8">
-                <div class="panel-card">
-                    <div class="panel-topline"></div>
-                    <div class="p-4 sm:p-5">
-                        <h3 class="panel-title mb-3 sm:mb-4">Event Overview</h3>
-                        <div class="overview-grid">
-                            <div class="overview-item active">
-                                <div class="overview-value active">{{ $events->where('is_active', true)->count() }}</div>
-                                <div class="overview-label">Active Events</div>
-                            </div>
-                            <div class="overview-item upcoming">
-                                <div class="overview-value upcoming">
-                                    {{ $events->where('event_start_date', '>=', now()->toDateString())->count() }}
-                                </div>
-                                <div class="overview-label">Upcoming</div>
-                            </div>
-                            <div class="overview-item required">
-                                <div class="overview-value required">
-                                    {{ $events->where('is_required', true)->count() }}
-                                </div>
-                                <div class="overview-label">Required</div>
-                            </div>
-                            <div class="overview-item registrations">
-                                <div class="overview-value registrations">
-                                    {{ $events->sum('registered_count') }}
-                                </div>
-                                <div class="overview-label">Total Registrations</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
         @endif
     </div>
 </div>

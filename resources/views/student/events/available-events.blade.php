@@ -240,7 +240,7 @@
                 <div class="hero-card">
                     <div class="relative p-4 sm:p-5 flex items-start gap-3">
                         <div class="hero-icon">
-                            <i class="fas fa-calendar-alt text-base sm:text-lg"></i>
+                            <i class="fas fa-calendar-days text-base sm:text-lg"></i>
                         </div>
                         <div class="min-w-0">
                             <a href="{{ route('mhc') }}" class="back-link mb-2">
@@ -301,7 +301,7 @@
         <div class="panel-card mb-5 sm:mb-6">
             <div class="panel-topline"></div>
             <div class="panel-header">
-                <div class="panel-icon"><i class="fas fa-sliders-h text-[9px] sm:text-xs"></i></div>
+                <div class="panel-icon"><i class="fas fa-sliders text-[9px] sm:text-xs"></i></div>
                 <div>
                     <h3 class="panel-title">Filter Events</h3>
                     <p class="panel-subtitle hidden sm:block">Find events by type or registration status.</p>
@@ -371,7 +371,7 @@
                     There are currently no upcoming events available for your college. Check back soon!
                 </p>
                 <div class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-[#fef3c7] border border-[#f59e0b]/30">
-                    <i class="fas fa-info-circle text-[#b45309] text-[9px]"></i>
+                    <i class="fas fa-circle-info text-[#b45309] text-[9px]"></i>
                     <span class="text-[#92400e] text-[0.75rem]">New events will appear here when scheduled by your counselors.</span>
                 </div>
             </div>
@@ -415,7 +415,7 @@
                                     <span class="event-badge type">{{ $event->type }}</span>
                                     @if($isRequiredEvent)
                                         <span class="event-badge required">
-                                            <i class="fas fa-exclamation-circle text-[8px]"></i> Required
+                                            <i class="fas fa-circle-exclamation text-[8px]"></i> Required
                                         </span>
                                     @endif
                                     @if($isRegistered)
@@ -430,7 +430,7 @@
                                 @if($event->for_all_colleges)
                                     <i class="fas fa-globe text-[8px]"></i> All Colleges
                                 @else
-                                    <i class="fas fa-university text-[8px]"></i> {{ $event->colleges->count() }} Colleges
+                                    <i class="fas fa-building-columns text-[8px]"></i> {{ $event->colleges->count() }} Colleges
                                 @endif
                             </span>
 
@@ -445,11 +445,11 @@
                             <!-- Date and Time -->
                             <div class="space-y-1.5 mb-3">
                                 <div class="event-detail">
-                                    <i class="far fa-clock"></i>
+                                    <i class="fas fa-clock"></i>
                                     <span>{{ $event->time_range }}</span>
                                 </div>
                                 <div class="event-detail">
-                                    <i class="far fa-map-marker-alt"></i>
+                                    <i class="far fa-location-dot"></i>
                                     <span class="line-clamp-1">{{ $event->location }}</span>
                                 </div>
                                 @if($event->max_attendees)
@@ -460,7 +460,7 @@
                                 @endif
                                 @if($registrationDate)
                                     <div class="event-detail">
-                                        <i class="far fa-calendar-check" style="color:#c9a227"></i>
+                                        <i class="fas fa-calendar-days-check" style="color:#c9a227"></i>
                                         <span>Registered: {{ $registrationDate->format('M j, Y') }}</span>
                                     </div>
                                 @endif
@@ -500,7 +500,7 @@
                                             <button type="submit"
                                                     class="action-btn cancel w-full"
                                                     onclick="return confirm('Are you sure you want to cancel your registration for this event?')">
-                                                <i class="fas fa-times-circle text-[9px]"></i>
+                                                <i class="fas fa-circle-xmark text-[9px]"></i>
                                                 <span class="hidden sm:inline">Cancel</span>
                                             </button>
                                         </form>
@@ -521,7 +521,7 @@
                                     </form>
                                 @else
                                     <button class="action-btn" disabled style="background:rgba(209,213,219,0.8);color:#6b7280;border:1px solid #d1d5db">
-                                        <i class="fas fa-calendar-times text-[9px]"></i>
+                                        <i class="fas fa-calendar-xmark text-[9px]"></i>
                                         <span class="hidden sm:inline">Full</span>
                                     </button>
                                 @endif
@@ -529,7 +529,7 @@
                                 <!-- View Details Button -->
                                 <button onclick="toggleDetails('details-{{ $event->id }}')"
                                         class="action-btn details flex-1 min-w-[100px]">
-                                    <i class="fas fa-info-circle text-[9px]"></i>
+                                    <i class="fas fa-circle-info text-[9px]"></i>
                                     <span class="hidden sm:inline">Details</span>
                                 </button>
                             </div>
@@ -548,7 +548,7 @@
                                             </span>
                                         @else
                                             <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-[#f3f4f6] text-[#6b7280] border border-[#d1d5db]">
-                                                <i class="fas fa-history text-[8px]"></i> Past
+                                                <i class="fas fa-clock-rotate-left text-[8px]"></i> Past
                                             </span>
                                         @endif
                                     </div>
@@ -581,7 +581,7 @@
                                     @if($isRequiredEvent)
                                         <div class="info-box">
                                             <div class="flex items-center mb-1">
-                                                <i class="fas fa-info-circle"></i>
+                                                <i class="fas fa-circle-info"></i>
                                                 <span class="font-semibold">Required Event</span>
                                             </div>
                                             <p class="text-[0.7rem]">

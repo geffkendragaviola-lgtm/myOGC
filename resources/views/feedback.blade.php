@@ -218,6 +218,21 @@
             background: var(--gold-primary);
             border-radius: 2px;
         }
+
+        /* ── Responsive ── */
+        @media (max-width: 768px) {
+            .container { padding-left: 1rem !important; padding-right: 1rem !important; }
+            .survey-card { border-radius: 0.85rem; }
+        }
+        @media (max-width: 640px) {
+            .container { padding-left: 0.85rem !important; padding-right: 0.85rem !important; }
+            .max-w-2xl, .max-w-3xl, .max-w-4xl { max-width: 100%; }
+            .grid.grid-cols-2 { grid-template-columns: 1fr; }
+            .grid.sm\:grid-cols-2 { grid-template-columns: 1fr; }
+            .grid.grid-cols-3 { grid-template-columns: 1fr; }
+            /* Rating stars: larger touch targets */
+            .rating-star, [class*="star"] { font-size: 1.75rem; }
+        }
     </style>
 </head>
 <body class="bg-[var(--bg-warm)] feedback-container min-h-screen flex flex-col">
@@ -252,12 +267,12 @@
                                 <div class="text-xs text-[var(--maroon-soft)] capitalize font-semibold mt-1">Role: {{ Auth::user()->role }}</div>
                             </div>
                             <a href="{{ route('profile.edit') }}" class="block py-2 text-[var(--text-primary)] hover:text-[var(--maroon-soft)] transition">
-                                <i class="fas fa-user-circle mr-2"></i> Profile
+                                <i class="fas fa-circle-user mr-2"></i> Profile
                             </a>
                             <form method="POST" action="{{ route('logout') }}" class="border-t pt-2 mt-2 border-[var(--border-soft)]">
                                 @csrf
                                 <button type="submit" class="w-full text-left block py-2 text-[var(--text-primary)] hover:text-[var(--maroon-soft)] transition">
-                                    <i class="fas fa-sign-out-alt mr-2"></i> Logout
+                                    <i class="fas fa-arrow-right-from-bracket mr-2"></i> Logout
                                 </button>
                             </form>
                         </div>
@@ -284,7 +299,7 @@
             @if($errors->any())
                 <div class="alert-error mb-6">
                     <div class="font-semibold mb-2 flex items-center">
-                        <i class="fas fa-exclamation-circle mr-2"></i> Please fix the following errors:
+                        <i class="fas fa-circle-exclamation mr-2"></i> Please fix the following errors:
                     </div>
                     <ul class="list-disc list-inside text-sm space-y-1 ml-2">
                         @foreach($errors->all() as $error)

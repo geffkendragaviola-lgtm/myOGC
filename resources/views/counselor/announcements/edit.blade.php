@@ -266,7 +266,7 @@
             <div class="hero-card">
                 <div class="relative p-4 sm:p-5 flex items-start gap-3">
                     <div class="hero-icon">
-                        <i class="fas fa-edit text-base sm:text-lg"></i>
+                        <i class="fas fa-pen-to-square text-base sm:text-lg"></i>
                     </div>
                     <div class="min-w-0">
                         <div class="hero-badge">
@@ -334,7 +334,7 @@
                                     <button type="submit"
                                             class="primary-btn px-4 py-2 text-xs sm:text-sm"
                                             onclick="return confirm('Are you sure you want to remove this image?')">
-                                        <i class="fas fa-times mr-1.5 text-[9px] sm:text-xs"></i> Remove Current Image
+                                        <i class="fas fa-xmark mr-1.5 text-[9px] sm:text-xs"></i> Remove Current Image
                                     </button>
                                 </form>
                             </div>
@@ -358,7 +358,7 @@
                                 <img id="preview" class="w-full h-48 object-cover" alt="Preview">
                                 <button type="button" onclick="removeImagePreview()"
                                         class="image-remove-btn" title="Remove Preview">
-                                    <i class="fas fa-times"></i>
+                                    <i class="fas fa-xmark"></i>
                                 </button>
                             </div>
                         </div>
@@ -529,7 +529,7 @@
         <div class="modal-header">
             <h3 class="text-sm font-semibold text-[#2c2420]">Announcement Preview</h3>
             <button type="button" onclick="closePreview()" class="modal-close" title="Close">
-                <i class="fas fa-times"></i>
+                <i class="fas fa-xmark"></i>
             </button>
         </div>
 
@@ -658,7 +658,7 @@ function previewAnnouncement() {
         selectedColleges.slice(0, 3).forEach(college => {
             const badge = document.createElement('span');
             badge.className = 'preview-badge college';
-            badge.innerHTML = `<i class="fas fa-university"></i> ${college}`;
+            badge.innerHTML = `<i class="fas fa-building-columns"></i> ${college}`;
             collegesContainer.appendChild(badge);
         });
         if (selectedColleges.length > 3) {
