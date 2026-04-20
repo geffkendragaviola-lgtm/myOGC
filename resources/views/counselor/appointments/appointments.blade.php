@@ -1700,6 +1700,10 @@
                                 <label class="field-label">Type of Booking</label>
                                 <p class="mt-1 text-xs sm:text-sm text-[#2c2420]">${data.appointment.booking_type || 'N/A'}</p>
                             </div>
+                            <div>
+                                <label class="field-label">Booking Category</label>
+                                <p class="mt-1 text-xs sm:text-sm text-[#2c2420]">${data.appointment.booking_category ? data.appointment.booking_category.charAt(0).toUpperCase() + data.appointment.booking_category.slice(1).replace('-', ' ') : 'N/A'}</p>
+                            </div>
 
                                 <div>
                                     <label class="field-label">Concern</label>

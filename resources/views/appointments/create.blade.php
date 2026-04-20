@@ -526,6 +526,20 @@
                     </p>
                 </div>
 
+                <!-- Booking Category -->
+                <div class="mb-6">
+                    <label class="field-label">Booking Category <span style="color:#dc2626;">*</span></label>
+                    <select name="booking_category" id="bookingCategory" class="select-field" required>
+                        <option value="online" selected>Online Booking</option>
+                        <option value="walk-in">Walk-in</option>
+                        <option value="referred">Referred</option>
+                        <option value="called-in">Called-in</option>
+                    </select>
+                    <p class="field-help">
+                        Select how the appointment was initiated.
+                    </p>
+                </div>
+
                 <!-- Reason / Concern Category -->
                 <div class="mb-6">
                     <label class="field-label">Reason / Concern Category <span style="color:#dc2626;">*</span></label>
@@ -543,7 +557,7 @@
                         <option value="Other">Other</option>
                     </select>
                     <p class="field-help">
-                        Static dropdown for future use. Students can choose the closest reason for booking.
+                        Select the category that best describes your concern.
                     </p>
                 </div>
 
@@ -611,10 +625,11 @@
                 </div>
 
                 <!-- Concern -->
-                <div class="mb-6">
+                <div class="mb-6" id="presentingProblemWrap" style="display:none;">
                     <label class="field-label">Presenting Problem <span style="color:#dc2626;">*</span></label>
-                    <textarea name="concern" rows="4" class="textarea-field"
-                              placeholder="Briefly describe the reason for your appointment" required></textarea>
+                    <textarea name="concern" id="concernTextarea" rows="4" class="textarea-field"
+                              placeholder="Briefly describe your presenting problem"></textarea>
+                    <p class="field-help">Please describe your concern in your own words.</p>
                 </div>
 
                 <!-- Submit Button -->
@@ -847,7 +862,8 @@ document.addEventListener('DOMContentLoaded', function() {
         const moodRating = moodRatingSelect.value;
         const date = dateSelect.value;
         const time = selectedTime.value;
-        const concern = document.querySelector('textarea[name="concern"]').value.trim();
+        const concernTextarea = document.getElementById('concernTextarea');
+        const concern = concernTextarea ? concernTextarea.value.trim() : '';
 
         if (!counselorId) {
             showSystemAlert('Please select a counselor before proceeding.', 'warning', 'Counselor required');
@@ -873,7 +889,7 @@ document.addEventListener('DOMContentLoaded', function() {
             showSystemAlert('Please select an available time slot.', 'warning', 'Time slot required');
             return false;
         }
-        if (!concern) {
+        if (concernCategory === 'Other' && !concern) {
             showSystemAlert('Please describe your presenting problem.', 'warning', 'Presenting problem required');
             return false;
         }
@@ -926,7 +942,20 @@ document.addEventListener('DOMContentLoaded', function() {
             consentInput.name = 'consent_acknowledged';
             consentInput.value = '1';
             appointmentForm.appendChild(consentInput);
-            
+
+            // If category is not "Other", inject the category value as the concern
+            const category = concernCategorySelect.value;
+            const concernTextarea = document.getElementById('concernTextarea');
+            if (category !== 'Other') {
+                const hiddenConcern = document.createElement('input');
+                hiddenConcern.type = 'hidden';
+                hiddenConcern.name = 'concern';
+                hiddenConcern.value = category;
+                appointmentForm.appendChild(hiddenConcern);
+                // Disable textarea so it doesn't submit a blank value
+                if (concernTextarea) concernTextarea.disabled = true;
+            }
+
             appointmentForm.submit();
         }
     });
@@ -1162,6 +1191,19 @@ document.addEventListener('DOMContentLoaded', function() {
             bookingTypeHelp.textContent = '';
         }
     }
+
+    // Concern category toggle — show "Presenting Problem" only when "Other" is selected
+    function togglePresentingProblem() {
+        const wrap = document.getElementById('presentingProblemWrap');
+        const textarea = document.getElementById('concernTextarea');
+        if (!wrap || !textarea) return;
+        const isOther = concernCategorySelect.value === 'Other';
+        wrap.style.display = isOther ? '' : 'none';
+        textarea.required = isOther;
+        if (!isOther) textarea.value = '';
+    }
+    concernCategorySelect?.addEventListener('change', togglePresentingProblem);
+    togglePresentingProblem(); // run on load
 
     function checkReferredCounselorsAvailability() {
         if (allowAllCounselors) {

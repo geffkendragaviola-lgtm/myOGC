@@ -195,6 +195,10 @@
                                 <div class="detail-value muted">{{ $appointment->booking_type ?: '—' }}</div>
                             </div>
                             <div>
+                                <span class="detail-label">Booking Category</span>
+                                <div class="detail-value muted">{{ $appointment->booking_category ? ucwords(str_replace('-', ' ', $appointment->booking_category)) : '—' }}</div>
+                            </div>
+                            <div>
                                 <span class="detail-label">Case Number</span>
                                 <div class="detail-value muted">{{ $appointment->case_number ?: '—' }}</div>
                             </div>

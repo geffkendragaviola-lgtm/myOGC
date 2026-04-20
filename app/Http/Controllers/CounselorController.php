@@ -749,6 +749,7 @@ public function getAppointmentDetails(Appointment $appointment)
                 ? $appointment->getStatusWithReferralContext($currentCounselorId)
                 : ucfirst($appointment->status),
             'booking_type' => $appointment->booking_type,
+            'booking_category' => $appointment->booking_category,
             'is_referred' => (bool) $appointment->is_referred,
             'referred_to_counselor_id' => $appointment->referred_to_counselor_id,
             'original_counselor_id' => $appointment->original_counselor_id,

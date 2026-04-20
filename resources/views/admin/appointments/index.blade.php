@@ -606,6 +606,7 @@
                                         <p class="text-sm"><span class="font-medium text-[#8b7e76]">Date:</span> <span class="text-[#2c2420]">${data.formatted_date || 'N/A'}</span></p>
                                         <p class="text-sm"><span class="font-medium text-[#8b7e76]">Time:</span> <span class="text-[#2c2420]">${data.formatted_time || 'N/A'}</span></p>
                                         <p class="text-sm"><span class="font-medium text-[#8b7e76]">Type:</span> <span class="text-[#2c2420]">${data.appointment?.booking_type || 'N/A'}</span></p>
+                                        <p class="text-sm"><span class="font-medium text-[#8b7e76]">Category:</span> <span class="text-[#2c2420]">${data.appointment?.booking_category ? data.appointment.booking_category.charAt(0).toUpperCase() + data.appointment.booking_category.slice(1).replace('-', ' ') : 'N/A'}</span></p>
                                     </div>
                                     <div>
                                         <p class="text-sm"><span class="font-medium text-[#8b7e76]">Status:</span> 

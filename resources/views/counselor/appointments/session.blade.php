@@ -277,8 +277,16 @@
                                 </div>
                             </div>
                             <div>
-                                <span class="detail-label">Category</span>
-                                <div class="detail-value">{{ $appointment->status === 'referred' ? 'Referred' : 'Booked' }}</div>
+                                <span class="detail-label">Booking Type</span>
+                                <div class="detail-value">{{ $appointment->booking_type ?: '—' }}</div>
+                            </div>
+                            <div>
+                                <span class="detail-label">Booking Category</span>
+                                <div class="detail-value">{{ $appointment->booking_category ? ucwords(str_replace('-', ' ', $appointment->booking_category)) : '—' }}</div>
+                            </div>
+                            <div>
+                                <span class="detail-label">Status</span>
+                                <div class="detail-value">{{ $appointment->status === 'referred' ? 'Referred' : ucwords(str_replace('_', ' ', $appointment->status)) }}</div>
                             </div>
                             <div>
                                 <span class="detail-label">Case Number</span>
@@ -334,6 +342,10 @@
                             <div>
                                 <span class="detail-label">Type</span>
                                 <div class="detail-value">{{ $followupAppointment->booking_type ? ucwords(str_replace('_', ' ', $followupAppointment->booking_type)) : '—' }} - Follow up</div>
+                            </div>
+                            <div>
+                                <span class="detail-label">Category</span>
+                                <div class="detail-value">{{ $followupAppointment->booking_category ? ucwords(str_replace('-', ' ', $followupAppointment->booking_category)) : '—' }}</div>
                             </div>
                             <div>
                                 <span class="detail-label">Status</span>
@@ -550,6 +562,22 @@
                             <option value="Consultation" {{ old('booking_type') === 'Consultation' ? 'selected' : '' }}>Consultation</option>
                         </select>
                         @error('booking_type')
+                            <p class="error-text">{{ $message }}</p>
+                        @enderror
+                    </div>
+
+                    <div>
+                        <label for="followup_booking_category" class="field-label">Booking Category <span class="text-[#b91c1c]">*</span></label>
+                        <select name="booking_category"
+                                id="followup_booking_category"
+                                class="select-field text-xs sm:text-sm"
+                                required>
+                            <option value="online" {{ old('booking_category') === 'online' ? 'selected' : '' }}>Online Booking</option>
+                            <option value="walk-in" {{ old('booking_category') === 'walk-in' ? 'selected' : '' }}>Walk-in</option>
+                            <option value="referred" {{ old('booking_category') === 'referred' ? 'selected' : '' }}>Referred</option>
+                            <option value="called-in" {{ old('booking_category') === 'called-in' ? 'selected' : '' }}>Called-in</option>
+                        </select>
+                        @error('booking_category')
                             <p class="error-text">{{ $message }}</p>
                         @enderror
                     </div>

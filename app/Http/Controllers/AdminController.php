@@ -284,6 +284,7 @@ class AdminController extends Controller
                 'status' => $appointment->status,
                 'status_display' => $statusDisplay,
                 'booking_type' => $appointment->booking_type,
+                'booking_category' => $appointment->booking_category,
                 'is_referred' => (bool) $appointment->is_referred,
                 'referral_outcome_display' => $referralOutcomeDisplay,
                 'referred_to_counselor_id' => $appointment->referred_to_counselor_id,

@@ -37,6 +37,7 @@ class Appointment extends Model
         'start_time',
         'end_time',
         'booking_type',
+        'booking_category',
         'concern',
         'status',
         'notes',

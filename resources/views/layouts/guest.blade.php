@@ -238,7 +238,7 @@
         .auth-forgot:hover { text-decoration: underline; }
         .auth-submit {
             width: 100%; height: 52px; border: none; border-radius: 12px;
-            background: linear-gradient(135deg, #820000, #F8650C);
+            background: #820000;
             color: #fff; font-size: 16px; font-weight: 800; cursor: pointer;
             font-family: 'Inter', sans-serif; box-shadow: 0 8px 24px rgba(130,0,0,0.25);
             transition: transform 0.15s, box-shadow 0.2s;

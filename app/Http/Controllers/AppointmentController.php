@@ -85,6 +85,7 @@ class AppointmentController extends Controller
             'appointment_date' => 'required|date|after:yesterday',
             'start_time' => 'required|date_format:H:i',
             'booking_type' => 'required|in:Counseling,Consultation',
+            'booking_category' => 'nullable|in:online,walk-in,referred,called-in',
             'concern' => 'required|string|max:500',
             'auto_approve' => 'nullable|boolean',
         ]);
@@ -181,6 +182,7 @@ class AppointmentController extends Controller
                 'start_time' => $request->start_time,
                 'end_time' => $endTimeFormatted,
                 'booking_type' => $request->booking_type,
+                'booking_category' => $request->input('booking_category', 'online'),
                 'concern' => $request->concern,
                 'status' => $request->boolean('auto_approve', true) ? 'approved' : 'pending',
                 'notes' => $followupNote,
@@ -330,6 +332,7 @@ public function storeByCounselor(Request $request)
         'appointment_date' => 'required|date|after:yesterday',
         'start_time' => 'required|date_format:H:i',
         'booking_type' => 'required|in:Initial Interview,Counseling,Consultation',
+        'booking_category' => 'required|in:online,walk-in,referred,called-in',
         'concern' => 'required|string|max:500',
     ]);
 
@@ -426,6 +429,7 @@ public function storeByCounselor(Request $request)
             'start_time' => $request->start_time,
             'end_time' => $endTimeFormatted,
             'booking_type' => $request->booking_type,
+            'booking_category' => $request->booking_category,
             'concern' => $request->concern,
             'status' => 'approved',
             'notes' => 'Booked by counselor on ' . now()->toDateTimeString(),
@@ -880,6 +884,7 @@ public function store(Request $request)
         'appointment_date' => 'required|date|after:yesterday',
         'start_time' => 'required|date_format:H:i',
         'booking_type' => 'required|in:Initial Interview,Counseling,Consultation',
+        'booking_category' => 'required|in:online,walk-in,referred,called-in',
         'concern' => 'required|string|max:500'
     ]);
 
@@ -971,6 +976,7 @@ public function store(Request $request)
             'start_time' => $request->start_time,
             'end_time' => $endTimeFormatted,
             'booking_type' => $request->booking_type,
+            'booking_category' => $request->booking_category,
             'concern' => $request->concern,
             'status' => 'pending'
         ]);

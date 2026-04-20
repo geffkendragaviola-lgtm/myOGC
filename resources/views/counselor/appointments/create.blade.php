@@ -264,6 +264,20 @@
                 </div>
 
                 <div class="mt-6">
+                    <label class="field-label">Booking Category</label>
+                    <select name="booking_category" id="bookingCategory" class="select-field text-xs sm:text-sm" required>
+                        <option value="online" {{ old('booking_category') === 'online' ? 'selected' : '' }}>Online Booking</option>
+                        <option value="walk-in" {{ old('booking_category') === 'walk-in' ? 'selected' : '' }}>Walk-in</option>
+                        <option value="referred" {{ old('booking_category') === 'referred' ? 'selected' : '' }}>Referred</option>
+                        <option value="called-in" {{ old('booking_category') === 'called-in' ? 'selected' : '' }}>Called-in</option>
+                    </select>
+                    <p class="helper-text">Select how the appointment was initiated.</p>
+                    @error('booking_category')
+                        <p class="error-text">{{ $message }}</p>
+                    @enderror
+                </div>
+
+                <div class="mt-6">
                     <label class="field-label">Select Date</label>
                     <div class="calendar-card">
                         <div class="calendar-nav">
