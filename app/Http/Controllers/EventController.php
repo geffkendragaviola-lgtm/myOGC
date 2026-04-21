@@ -291,6 +291,7 @@ public function updateRegistrationStatus(Request $request, Event $event, EventRe
             ->upcoming()
             ->active()
             ->forCollege($student->college_id)
+            ->forYearLevel($student->year_level)
             ->orderBy('event_start_date')
             ->orderBy('start_time')
             ->get();

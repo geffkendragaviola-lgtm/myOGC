@@ -181,8 +181,12 @@
 
                                 <td class="px-3 sm:px-4 py-2.5 sm:py-3">
                                     <div class="flex items-center gap-2.5">
-                                        <div class="avatar-badge">
-                                            {{ strtoupper(substr($student->user->first_name, 0, 1)) }}{{ strtoupper(substr($student->user->last_name, 0, 1)) }}
+                                        <div class="avatar-badge overflow-hidden" style="{{ $student->profile_picture ? 'background:none;padding:0;' : '' }}">
+                                            @if($student->profile_picture)
+                                                <img src="{{ asset('storage/' . $student->profile_picture) }}" alt="" class="w-full h-full object-cover">
+                                            @else
+                                                {{ strtoupper(substr($student->user->first_name, 0, 1)) }}{{ strtoupper(substr($student->user->last_name, 0, 1)) }}
+                                            @endif
                                         </div>
                                         <div class="min-w-0">
                                             <div class="text-xs sm:text-sm font-semibold text-[#2c2420] truncate">

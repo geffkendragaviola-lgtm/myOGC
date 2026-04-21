@@ -585,6 +585,7 @@
                             ->upcoming()
                             ->active()
                             ->forCollege($student->college_id)
+                            ->forYearLevel($student->year_level)
                             ->limit(3)
                             ->get();
                     } else {

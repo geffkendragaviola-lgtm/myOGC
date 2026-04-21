@@ -219,6 +219,16 @@ public function getCancellationCutoffTime(): string
         });
     }
 
+    public function scopeForYearLevel($query, ?string $yearLevel)
+    {
+        if (!$yearLevel) return $query;
+
+        return $query->where(function($q) use ($yearLevel) {
+            $q->whereNull('year_levels')
+              ->orWhereJsonContains('year_levels', $yearLevel);
+        });
+    }
+
     public function scopeRequiredForCollege($query, $collegeId)
     {
         return $query->where('is_required', true)

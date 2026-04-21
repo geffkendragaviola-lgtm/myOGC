@@ -219,6 +219,7 @@
                             @php
                                 $slots = $availability[$dayKey] ?? [];
                                 $isAvailable = !empty($slots);
+                                $slotDisplay = !empty($slots) ? implode(', ', $slots) : '08:00-12:00, 13:00-17:00';
                             @endphp
                             <div class="day-card">
                                 <label class="flex items-center mb-3 cursor-pointer">
@@ -228,7 +229,7 @@
                                     <span class="ms-2 custom-control-label">{{ $dayLabel }}</span>
                                 </label>
                                 <input type="text" name="availability_slots[{{ $dayKey }}]"
-                                       value="{{ old('availability_slots.' . $dayKey, implode(', ', $slots)) }}"
+                                       value="{{ $slotDisplay }}"
                                        placeholder="08:00-12:00, 13:00-17:00"
                                        class="input-field">
                                 <p class="helper-text">Use 24-hour format, comma-separated ranges.</p>
@@ -263,7 +264,7 @@
                                 <div>
                                     <label class="block text-xs font-semibold text-[var(--text-secondary)] uppercase mb-1">Time Slots</label>
                                     <input type="text" name="schedule_overrides[{{ $index }}][time_slots]"
-                                           value="{{ old('schedule_overrides.' . $index . '.time_slots', implode(', ', $override->time_slots ?? [])) }}"
+                                           value="{{ implode(', ', $override->time_slots ?? []) }}"
                                            placeholder="08:00-12:00, 13:00-17:00"
                                            class="input-field">
                                 </div>

@@ -933,8 +933,15 @@
         <div class="sidebar-user-section">
             <div class="sidebar-user-card">
                 <div class="flex items-center gap-3">
-                    <div class="sidebar-user-avatar">
-                        <i class="fas fa-user-graduate text-white text-sm"></i>
+                    @php $studentPic = Auth::user()->student?->profile_picture; @endphp
+                    <div class="sidebar-user-avatar" style="{{ $studentPic ? 'background:none;padding:0;overflow:hidden;' : '' }}">
+                        @if($studentPic)
+                            <img src="{{ asset('storage/' . $studentPic) }}"
+                                 alt="Profile"
+                                 style="width:100%;height:100%;object-fit:cover;border-radius:1rem;">
+                        @else
+                            <i class="fas fa-user-graduate text-white text-sm"></i>
+                        @endif
                     </div>
                     <div class="flex-1 min-w-0">
                         <div class="sidebar-user-name truncate">{{ Auth::user()->first_name }} {{ Auth::user()->last_name }}</div>

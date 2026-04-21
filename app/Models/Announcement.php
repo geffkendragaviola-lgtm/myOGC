@@ -21,7 +21,8 @@ class Announcement extends Model
         'start_date',
         'end_date',
         'is_active',
-        'for_all_colleges'
+        'for_all_colleges',
+        'year_levels',
     ];
 
     protected $casts = [
@@ -29,6 +30,7 @@ class Announcement extends Model
         'end_date' => 'date',
         'is_active' => 'boolean',
         'for_all_colleges' => 'boolean',
+        'year_levels' => 'array',
     ];
 
     protected $appends = [
@@ -108,6 +110,19 @@ public function getImageUrlAttribute(): ?string
               ->orWhereHas('colleges', function($q) use ($collegeId) {
                   $q->where('college_id', $collegeId);
               });
+        });
+    }
+
+    /**
+     * Scope to filter by year level (null year_levels = all year levels).
+     */
+    public function scopeForYearLevel($query, ?string $yearLevel)
+    {
+        if (!$yearLevel) return $query;
+
+        return $query->where(function($q) use ($yearLevel) {
+            $q->whereNull('year_levels')
+              ->orWhereJsonContains('year_levels', $yearLevel);
         });
     }
 

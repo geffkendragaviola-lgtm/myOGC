@@ -4,6 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Models\Appointment;
 use App\Models\College;
+use App\Models\Counselor;
+use App\Models\Feedback;
+use App\Models\SessionNote;
 use App\Models\Student;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -38,6 +41,34 @@ class AnalyticsController extends Controller
         $totalStudents     = (clone $base)->distinct('student_id')->count('student_id');
         $completedCount    = (clone $base)->where('status', 'completed')->count();
         $pendingCount      = (clone $base)->whereIn('status', ['pending', 'approved'])->count();
+        $noShowCount       = (clone $base)->where('status', 'no_show')->count();
+        $referralCount     = (clone $base)->where('status', 'referred')->count();
+        $completionRate    = $totalAppointments > 0 ? round(($completedCount / $totalAppointments) * 100, 1) : 0;
+        $noShowRate        = $totalAppointments > 0 ? round(($noShowCount / $totalAppointments) * 100, 1) : 0;
+
+        // Avg satisfaction (scoped to college if filtered, otherwise global for period)
+        $feedbackQuery = Feedback::whereNotNull('satisfaction_rating');
+        if ($collegeId) {
+            $feedbackQuery->whereHas('user.student', fn($q) => $q->where('college_id', $collegeId));
+        }
+        $avgSatisfaction = $feedbackQuery->avg('satisfaction_rating');
+        $avgSatisfaction = $avgSatisfaction ? round($avgSatisfaction, 1) : null;
+
+        // Follow-up required (from session notes linked to filtered appointments)
+        $followUpCount = SessionNote::whereHas('appointment', function ($q) use ($base) {
+            $q->whereIn('id', (clone $base)->select('id'));
+        })->where('requires_follow_up', true)->count();
+
+        // Counselor utilization: avg appointments per counselor this period
+        $counselorApptCounts = (clone $base)
+            ->select('counselor_id', DB::raw('count(*) as total'))
+            ->whereNotNull('counselor_id')
+            ->groupBy('counselor_id')
+            ->pluck('total')
+            ->toArray();
+        $avgCounselorLoad = count($counselorApptCounts) > 0
+            ? round(array_sum($counselorApptCounts) / count($counselorApptCounts), 1)
+            : 0;
 
         // ── Status breakdown ───────────────────────────────────────────
         $statusCounts = (clone $base)
@@ -146,6 +177,13 @@ class AnalyticsController extends Controller
             'totalStudents',
             'completedCount',
             'pendingCount',
+            'noShowCount',
+            'referralCount',
+            'completionRate',
+            'noShowRate',
+            'avgSatisfaction',
+            'followUpCount',
+            'avgCounselorLoad',
             'statusData',
             'monthlyData',
             'collegeAppointmentCounts',
@@ -202,7 +240,7 @@ class AnalyticsController extends Controller
                     'pending'              => 'Pending',
                     'approved'             => 'Approved',
                     'completed'            => 'Completed',
-                    'cancelled'            => 'Cancelled',
+                    'no_show'              => 'No Show',
                     'rejected'             => 'Rejected',
                     'referred'             => 'Referred',
                     'rescheduled'          => 'Rescheduled',
@@ -235,17 +273,54 @@ class AnalyticsController extends Controller
                     ->pluck('total', 'booking_type')
                     ->toArray();
 
+                // Students per college: total enrolled vs booked vs completed
+                $totalEnrolled   = \App\Models\Student::where('college_id', $college->id)->count();
+                $studentsBooked  = (clone $base)->distinct('student_id')->count('student_id');
+                $studentsCompleted = (clone $base)->where('status', 'completed')->distinct('student_id')->count('student_id');
+
+                // Completion rate (completed / total appointments)
+                $totalAppts   = (clone $base)->count();
+                $completedCnt = (clone $base)->where('status', 'completed')->count();
+                $completionRate = $totalAppts > 0 ? round(($completedCnt / $totalAppts) * 100, 1) : 0;
+
+                // No-show rate
+                $noShowCnt  = (clone $base)->where('status', 'no_show')->count();
+                $noShowRate = $totalAppts > 0 ? round(($noShowCnt / $totalAppts) * 100, 1) : 0;
+
+                // Booking category breakdown
+                $bookingCategoryData = (clone $base)
+                    ->select('booking_category', DB::raw('count(*) as total'))
+                    ->whereNotNull('booking_category')
+                    ->groupBy('booking_category')
+                    ->pluck('total', 'booking_category')
+                    ->toArray();
+
+                // Peak day of week
+                $peakDayRaw = (clone $base)
+                    ->select(DB::raw("TO_CHAR(appointment_date, 'Day') as day_name"), DB::raw('count(*) as total'))
+                    ->groupBy(DB::raw("TO_CHAR(appointment_date, 'Day')"))
+                    ->orderByDesc('total')
+                    ->first();
+                $peakDay = $peakDayRaw ? trim($peakDayRaw->day_name) : null;
+
                 $collegeAnalytics[] = [
-                    'college'           => $college,
-                    'totalAppointments' => (clone $base)->count(),
-                    'totalStudents'     => (clone $base)->distinct('student_id')->count('student_id'),
-                    'completedCount'    => (clone $base)->where('status', 'completed')->count(),
-                    'pendingCount'      => (clone $base)->whereIn('status', ['pending', 'approved'])->count(),
-                    'referralCount'     => (clone $base)->where('status', 'referred')->count(),
-                    'cancelledCount'    => (clone $base)->where('status', 'cancelled')->count(),
-                    'statusData'        => $statusData,
-                    'monthlyData'       => $monthlyData,
-                    'bookingTypeData'   => $bookingTypeData,
+                    'college'              => $college,
+                    'totalAppointments'    => $totalAppts,
+                    'totalStudents'        => $studentsBooked,
+                    'completedCount'       => $completedCnt,
+                    'pendingCount'         => (clone $base)->whereIn('status', ['pending', 'approved'])->count(),
+                    'referralCount'        => (clone $base)->where('status', 'referred')->count(),
+                    'cancelledCount'       => $noShowCnt,
+                    'completionRate'       => $completionRate,
+                    'noShowRate'           => $noShowRate,
+                    'totalEnrolled'        => $totalEnrolled,
+                    'studentsBooked'       => $studentsBooked,
+                    'studentsCompleted'    => $studentsCompleted,
+                    'peakDay'              => $peakDay,
+                    'statusData'           => $statusData,
+                    'monthlyData'          => $monthlyData,
+                    'bookingTypeData'      => $bookingTypeData,
+                    'bookingCategoryData'  => $bookingCategoryData,
                 ];
             }
 

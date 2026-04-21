@@ -75,8 +75,8 @@
         width:2.5rem; height:2.5rem; border-radius:0.75rem; flex-shrink:0;
         display:flex; align-items:center; justify-content:center;
     }
-    .stat-value { font-size:1.6rem; font-weight:800; color:var(--text-primary); line-height:1; }
-    .stat-label { font-size:0.7rem; font-weight:600; text-transform:uppercase; letter-spacing:0.1em; color:var(--text-muted); margin-top:0.15rem; }
+    .stat-value { font-size:1.6rem; font-weight:600; color:var(--text-primary); line-height:1; }
+    .stat-label { font-size:0.7rem; font-weight:500; text-transform:uppercase; letter-spacing:0.1em; color:var(--text-muted); margin-top:0.15rem; }
     .stat-bar { height:3px; border-radius:999px; margin-top:0.85rem; background:var(--border-soft); overflow:hidden; }
     .stat-bar-fill { height:100%; border-radius:999px; }
 
@@ -175,6 +175,127 @@
             </div>
             @endforeach
         </div>
+
+        {{-- Counseling analytics cards --}}
+        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4">
+            {{-- Total Appointments --}}
+            <div class="stat-card p-4">
+                <div class="flex items-start justify-between gap-2">
+                    <div class="min-w-0">
+                        <p class="stat-label">Appointments</p>
+                        <p class="stat-value mt-1" style="font-weight:600;">{{ number_format($stats['total_appointments']) }}</p>
+                    </div>
+                    <div class="stat-icon" style="background:#7a2a2a;color:#fff;">
+                        <i class="fas fa-calendar-check text-sm"></i>
+                    </div>
+                </div>
+                <div class="stat-bar"><div class="stat-bar-fill" style="width:100%;background:#7a2a2a;"></div></div>
+            </div>
+
+            {{-- Completion Rate --}}
+            <div class="stat-card p-4">
+                <div class="flex items-start justify-between gap-2">
+                    <div class="min-w-0">
+                        <p class="stat-label">Completion Rate</p>
+                        <p class="stat-value mt-1" style="font-weight:600;color:#2d7a4f;">{{ $stats['completion_rate'] }}%</p>
+                    </div>
+                    <div class="stat-icon" style="background:#ecfdf5;color:#2d7a4f;border:1px solid #d1fae5;">
+                        <i class="fas fa-circle-check text-sm"></i>
+                    </div>
+                </div>
+                <div class="stat-bar"><div class="stat-bar-fill" style="width:{{ $stats['completion_rate'] }}%;background:#2d7a4f;"></div></div>
+            </div>
+
+            {{-- Pending / Awaiting --}}
+            <div class="stat-card p-4">
+                <div class="flex items-start justify-between gap-2">
+                    <div class="min-w-0">
+                        <p class="stat-label">Pending</p>
+                        <p class="stat-value mt-1" style="font-weight:600;color:#b45309;">{{ number_format($stats['pending_count']) }}</p>
+                    </div>
+                    <div class="stat-icon" style="background:#fef3c7;color:#b45309;border:1px solid #fde68a;">
+                        <i class="fas fa-hourglass-half text-sm"></i>
+                    </div>
+                </div>
+                <div class="stat-bar"><div class="stat-bar-fill" style="width:{{ $stats['total_appointments'] > 0 ? round(($stats['pending_count']/$stats['total_appointments'])*100) : 0 }}%;background:#d97706;"></div></div>
+            </div>
+
+            {{-- No-Show Rate --}}
+            <div class="stat-card p-4">
+                <div class="flex items-start justify-between gap-2">
+                    <div class="min-w-0">
+                        <p class="stat-label">No-Show Rate</p>
+                        <p class="stat-value mt-1" style="font-weight:600;color:#b91c1c;">{{ $stats['no_show_rate'] }}%</p>
+                    </div>
+                    <div class="stat-icon" style="background:#fee2e2;color:#b91c1c;border:1px solid #fecaca;">
+                        <i class="fas fa-user-xmark text-sm"></i>
+                    </div>
+                </div>
+                <div class="stat-bar"><div class="stat-bar-fill" style="width:{{ $stats['no_show_rate'] }}%;background:#dc2626;"></div></div>
+            </div>
+
+            {{-- Avg Satisfaction --}}
+            <div class="stat-card p-4">
+                <div class="flex items-start justify-between gap-2">
+                    <div class="min-w-0">
+                        <p class="stat-label">Avg Satisfaction</p>
+                        <p class="stat-value mt-1" style="font-weight:600;color:#c9a227;">
+                            {{ $stats['avg_satisfaction'] !== null ? $stats['avg_satisfaction'].'/5' : 'N/A' }}
+                        </p>
+                    </div>
+                    <div class="stat-icon" style="background:#fef9e7;color:#c9a227;border:1px solid #f5e6b8;">
+                        <i class="fas fa-star text-sm"></i>
+                    </div>
+                </div>
+                @php $satPct = $stats['avg_satisfaction'] !== null ? ($stats['avg_satisfaction']/5)*100 : 0; @endphp
+                <div class="stat-bar"><div class="stat-bar-fill" style="width:{{ $satPct }}%;background:#c9a227;"></div></div>
+            </div>
+
+            {{-- Follow-up Required --}}
+            <div class="stat-card p-4">
+                <div class="flex items-start justify-between gap-2">
+                    <div class="min-w-0">
+                        <p class="stat-label">Follow-ups Due</p>
+                        <p class="stat-value mt-1" style="font-weight:600;color:#5c1a1a;">{{ number_format($stats['follow_up_count']) }}</p>
+                    </div>
+                    <div class="stat-icon" style="background:#f5e6e8;color:#5c1a1a;border:1px solid #e5d0d3;">
+                        <i class="fas fa-rotate-right text-sm"></i>
+                    </div>
+                </div>
+                <div class="stat-bar"><div class="stat-bar-fill" style="width:60%;background:#5c1a1a;"></div></div>
+            </div>
+        </div>
+
+        {{-- Appointments by College mini-panel --}}
+        @if($appointmentsByCollege->count())
+        <div class="panel-card overflow-hidden">
+            <div class="panel-topline"></div>
+            <div class="panel-header">
+                <div class="panel-icon"><i class="fas fa-building-columns text-xs"></i></div>
+                <div>
+                    <p class="panel-title">Appointments by College</p>
+                    <p class="panel-subtitle hidden sm:block">Top colleges by counseling load</p>
+                </div>
+                <a href="{{ route('admin.analytics') }}" class="ml-auto text-[10px] font-semibold text-[#7a2a2a] hover:text-[#5c1a1a] transition flex items-center gap-1">
+                    Full analytics <i class="fas fa-arrow-right text-[9px]"></i>
+                </a>
+            </div>
+            <div class="p-4 space-y-2.5">
+                @php $maxAppts = $appointmentsByCollege->max('total') ?: 1; @endphp
+                @foreach($appointmentsByCollege as $row)
+                <div class="flex items-center gap-3">
+                    <span class="text-[11px] text-[#6b5e57] truncate" style="min-width:0;flex:1;">{{ $row->college_name }}</span>
+                    <div class="flex-shrink-0" style="width:45%;">
+                        <div style="height:6px;border-radius:999px;background:#e5e0db;overflow:hidden;">
+                            <div style="height:100%;border-radius:999px;width:{{ round(($row->total/$maxAppts)*100) }}%;background:#7a2a2a;"></div>
+                        </div>
+                    </div>
+                    <span class="text-[11px] font-semibold text-[#2c2420] flex-shrink-0" style="min-width:2rem;text-align:right;">{{ $row->total }}</span>
+                </div>
+                @endforeach
+            </div>
+        </div>
+        @endif
 
         {{-- Two-column layout --}}
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-5 sm:gap-6">

@@ -40,7 +40,9 @@ class CounselorAnnouncementController extends Controller
             'is_active' => 'boolean',
             'for_all_colleges' => 'boolean',
             'colleges' => 'required_if:for_all_colleges,false|array',
-            'colleges.*' => 'exists:colleges,id'
+            'colleges.*' => 'exists:colleges,id',
+            'year_levels' => 'nullable|array',
+            'year_levels.*' => 'string|in:1st Year,2nd Year,3rd Year,4th Year,5th Year',
         ]);
 
         $data = [
@@ -50,7 +52,8 @@ class CounselorAnnouncementController extends Controller
             'start_date' => $request->start_date,
             'end_date' => $request->end_date,
             'is_active' => $request->is_active ?? true,
-            'for_all_colleges' => $request->for_all_colleges ?? false
+            'for_all_colleges' => $request->for_all_colleges ?? false,
+            'year_levels' => !empty($request->year_levels) ? $request->year_levels : null,
         ];
 
         // Handle image upload
@@ -100,7 +103,9 @@ if ($request->hasFile('image')) {
             'is_active' => 'boolean',
             'for_all_colleges' => 'boolean',
             'colleges' => 'required_if:for_all_colleges,false|array',
-            'colleges.*' => 'exists:colleges,id'
+            'colleges.*' => 'exists:colleges,id',
+            'year_levels' => 'nullable|array',
+            'year_levels.*' => 'string|in:1st Year,2nd Year,3rd Year,4th Year,5th Year',
         ]);
 
         $data = [
@@ -109,7 +114,8 @@ if ($request->hasFile('image')) {
             'start_date' => $request->start_date,
             'end_date' => $request->end_date,
             'is_active' => $request->is_active ?? $announcement->is_active,
-            'for_all_colleges' => $request->for_all_colleges ?? false
+            'for_all_colleges' => $request->for_all_colleges ?? false,
+            'year_levels' => !empty($request->year_levels) ? $request->year_levels : null,
         ];
 
         // Handle image upload

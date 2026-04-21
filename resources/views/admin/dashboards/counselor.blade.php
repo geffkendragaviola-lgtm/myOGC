@@ -123,6 +123,7 @@
                             <th class="px-4 py-3 text-left text-[10px] sm:text-[11px] font-semibold text-[#8b7e76] uppercase tracking-[0.14em] whitespace-nowrap">Position</th>
                             <th class="px-4 py-3 text-left text-[10px] sm:text-[11px] font-semibold text-[#8b7e76] uppercase tracking-[0.14em] whitespace-nowrap">Credentials</th>
                             <th class="px-4 py-3 text-left text-[10px] sm:text-[11px] font-semibold text-[#8b7e76] uppercase tracking-[0.14em] whitespace-nowrap">Created</th>
+                            <th class="px-4 py-3 text-left text-[10px] sm:text-[11px] font-semibold text-[#8b7e76] uppercase tracking-[0.14em] whitespace-nowrap">Actions</th>
                         </tr>
                     </thead>
 
@@ -131,8 +132,12 @@
                             <tr class="table-row group">
                                 <td class="px-4 py-3 sm:py-3.5">
                                     <div class="flex items-center gap-2.5">
-                                        <div class="avatar-badge">
-                                            {{ strtoupper(substr($counselor->user->first_name, 0, 1)) }}{{ strtoupper(substr($counselor->user->last_name, 0, 1)) }}
+                                        <div class="avatar-badge overflow-hidden" style="{{ $counselor->user->profile_picture ? 'background:none;padding:0;' : '' }}">
+                                            @if($counselor->user->profile_picture)
+                                                <img src="{{ asset('storage/' . $counselor->user->profile_picture) }}" alt="" class="w-full h-full object-cover">
+                                            @else
+                                                {{ strtoupper(substr($counselor->user->first_name, 0, 1)) }}{{ strtoupper(substr($counselor->user->last_name, 0, 1)) }}
+                                            @endif
                                         </div>
                                         <div class="min-w-0">
                                             <div class="text-xs sm:text-sm font-semibold text-[#2c2420] truncate">
@@ -182,10 +187,16 @@
                                         {{ $counselor->created_at?->format('M j, Y') ?? 'N/A' }}
                                     </div>
                                 </td>
+                                <td class="px-4 py-3 sm:py-3.5 whitespace-nowrap">
+                                    <a href="{{ route('admin.counselors.edit', $counselor) }}"
+                                       class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[10px] sm:text-xs font-semibold text-[#7a2a2a] bg-[rgba(122,42,42,0.07)] hover:bg-[rgba(122,42,42,0.14)] transition-colors">
+                                        <i class="fas fa-pen-to-square"></i> Edit
+                                    </a>
+                                </td>
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="5" class="px-4 py-10 sm:py-12 text-center">
+                                <td colspan="6" class="px-4 py-10 sm:py-12 text-center">
                                     <div class="flex flex-col items-center justify-center">
                                         <div class="empty-state-icon mb-3">
                                             <i class="fas fa-user-doctor-slash text-[#a89f97] text-lg"></i>

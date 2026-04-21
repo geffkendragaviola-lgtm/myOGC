@@ -262,8 +262,12 @@
                         <tr class="table-row group">
                             <td class="px-4 sm:px-6 py-3.5 whitespace-nowrap">
                                 <div class="flex items-center gap-2.5 sm:gap-3">
-                                    <div class="avatar-badge">
-                                        {{ strtoupper(substr($user->first_name, 0, 1)) }}{{ strtoupper(substr($user->last_name, 0, 1)) }}
+                                    <div class="avatar-badge overflow-hidden" style="{{ $user->profile_picture ? 'background:none;padding:0;' : '' }}">
+                                        @if($user->profile_picture)
+                                            <img src="{{ asset('storage/' . $user->profile_picture) }}" alt="" class="w-full h-full object-cover">
+                                        @else
+                                            {{ strtoupper(substr($user->first_name, 0, 1)) }}{{ strtoupper(substr($user->last_name, 0, 1)) }}
+                                        @endif
                                     </div>
                                     <div class="min-w-0">
                                         <div class="text-xs sm:text-sm font-semibold text-[#2c2420] truncate max-w-[120px] sm:max-w-[160px]">

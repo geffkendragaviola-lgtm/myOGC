@@ -878,6 +878,11 @@
                     <span>Dashboard</span>
                 </a>
 
+                <a href="{{ route('counselor.analytics') }}" class="sidebar-link {{ request()->routeIs('counselor.analytics') ? 'active' : '' }}">
+                    <i class="fas fa-chart-column"></i>
+                    <span>Analytics</span>
+                </a>
+
                 <a href="{{ route('counselor.calendar') }}" class="sidebar-link {{ request()->routeIs('counselor.calendar') ? 'active' : '' }}">
                     <i class="fas fa-calendar-days"></i>
                     <span>Calendar</span>
@@ -891,6 +896,11 @@
                 <a href="{{ route('counselor.appointment-sessions.dashboard') }}" class="sidebar-link {{ request()->routeIs('counselor.appointment-sessions.*') ? 'active' : '' }}">
                     <i class="fas fa-notes-medical"></i>
                     <span>Appointment Sessions</span>
+                </a>
+
+                <a href="{{ route('counselor.students.index') }}" class="sidebar-link {{ request()->routeIs('counselor.students.*') ? 'active' : '' }}">
+                    <i class="fas fa-user-graduate"></i>
+                    <span>Students</span>
                 </a>
 
                 <a href="{{ route('counselor.events.index') }}" class="sidebar-link {{ request()->routeIs('counselor.events.*') ? 'active' : '' }}">
@@ -916,11 +926,6 @@
                 <a href="{{ route('counselor.availability.edit') }}" class="sidebar-link {{ request()->routeIs('counselor.availability.*') ? 'active' : '' }}">
                     <i class="fas fa-clock-rotate-left"></i>
                     <span>Availability</span>
-                </a>
-
-                <a href="{{ route('counselor.analytics') }}" class="sidebar-link {{ request()->routeIs('counselor.analytics') ? 'active' : '' }}">
-                    <i class="fas fa-chart-column"></i>
-                    <span>Analytics</span>
                 </a>
             </div>
         </div>

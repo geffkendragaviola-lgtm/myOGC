@@ -113,6 +113,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/dashboard', [CounselorController::class, 'dashboard'])->name('counselor.dashboard');
         Route::get('/calendar', [CounselorController::class, 'calendar'])->name('counselor.calendar');
         Route::get('/appointments', [CounselorController::class, 'appointments'])->name('counselor.appointments');
+        Route::get('/students', [CounselorController::class, 'students'])->name('counselor.students.index');
         Route::get('/appointments/create', [AppointmentController::class, 'createByCounselor'])->name('counselor.appointments.create');
         Route::post('/appointments', [AppointmentController::class, 'storeByCounselor'])->name('counselor.appointments.store');
         Route::get('/appointment-sessions', [CounselorController::class, 'appointmentSessionsDashboard'])
@@ -231,6 +232,8 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
     Route::get('/students/{student}/edit', [AdminController::class, 'editStudent'])->name('students.edit');
     Route::patch('/students/{student}', [AdminController::class, 'updateStudent'])->name('students.update');
     Route::get('/counselors', [AdminController::class, 'counselors'])->name('counselors');
+    Route::get('/counselors/{counselor}/edit', [AdminController::class, 'editCounselor'])->name('counselors.edit');
+    Route::patch('/counselors/{counselor}', [AdminController::class, 'updateCounselor'])->name('counselors.update');
 
     Route::get('/appointments', [AdminController::class, 'appointments'])->name('appointments');
     Route::get('/appointments/{appointment}/details', [AdminController::class, 'getAppointmentDetails'])->name('appointments.details');

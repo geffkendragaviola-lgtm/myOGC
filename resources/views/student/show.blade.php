@@ -133,9 +133,9 @@
         border-radius: 999px;
         font-size: 0.7rem;
         font-weight: 700;
-        background: rgba(212,175,55,0.2);
+        background: transparent;
         color: var(--maroon-800);
-        border: 1px solid rgba(212,175,55,0.4);
+        border: 1px solid rgba(212,175,55,0.9);
     }
 
     /* Stats Grid */
@@ -239,37 +239,15 @@
         display: inline-flex;
         align-items: center;
         gap: 0.25rem;
+        background: transparent !important;
+        border: 1px solid currentColor;
     }
-    .badge.bg-primary { 
-        background: rgba(212,175,55,0.25); 
-        color: var(--maroon-900); 
-        border: 1px solid rgba(212,175,55,0.5); 
-    }
-    .badge.bg-success { 
-        background: rgba(16,185,129,0.2); 
-        color: #042f24; 
-        border: 1px solid rgba(16,185,129,0.4); 
-    }
-    .badge.bg-warning { 
-        background: rgba(245,158,11,0.25); 
-        color: #7c3d0a; 
-        border: 1px solid rgba(245,158,11,0.5); 
-    }
-    .badge.bg-danger { 
-        background: rgba(239,68,68,0.2); 
-        color: #7f1d1d; 
-        border: 1px solid rgba(239,68,68,0.4); 
-    }
-    .badge.bg-info { 
-        background: rgba(59,130,246,0.2); 
-        color: #1e3a5f; 
-        border: 1px solid rgba(59,130,246,0.4); 
-    }
-    .badge.bg-secondary { 
-        background: rgba(156,163,175,0.25); 
-        color: #1f2937; 
-        border: 1px solid rgba(156,163,175,0.5); 
-    }
+    .badge.bg-primary { color: #0d6efd !important; }
+    .badge.bg-success { color: #198754 !important; }
+    .badge.bg-warning { color: #b88900 !important; }
+    .badge.bg-danger { color: #dc3545 !important; }
+    .badge.bg-info { color: #0dcaf0 !important; }
+    .badge.bg-secondary { color: #6c757d !important; }
 
     /* Alerts - High Contrast Text */
     .alert {
@@ -573,9 +551,7 @@
                 <h1 class="page-title">Student Profile</h1>
                 <p class="page-subtitle">Complete student information and support details</p>
             </div>
-            <button class="btn btn-primary" onclick="window.print()">
-                <i class="fas fa-print"></i> Print Profile
-            </button>
+           
         </div>
 
         <!-- Profile Completion Alert -->
@@ -1055,38 +1031,6 @@
                 </div>
             </div>
         </div>
-
-        <!-- Counseling Information Section -->
-        @php
-            $hasUrgentNeeds = $student->psychosocialData && $student->psychosocialData->needs_immediate_counseling;
-            $counselingConcerns = [];
-            if ($student->psychosocialData && $student->psychosocialData->future_counseling_concerns) {
-                if (is_array($student->psychosocialData->future_counseling_concerns)) {
-                    $counselingConcerns = $student->psychosocialData->future_counseling_concerns;
-                } else {
-                    $counselingConcerns = [$student->psychosocialData->future_counseling_concerns];
-                }
-            }
-        @endphp
-        @if($hasUrgentNeeds || count($counselingConcerns) > 0)
-        <div class="card counseling-card">
-            <div class="card-header"><i class="fas fa-circle-exclamation"></i> Counseling Information</div>
-            <div class="card-body">
-                @if($hasUrgentNeeds)
-                    <div class="alert alert-danger mb-3">
-                        <i class="fas fa-ambulance"></i>
-                        <strong>This student requires immediate counseling attention.</strong>
-                    </div>
-                @endif
-                @if(count($counselingConcerns) > 0)
-                    <h4 class="tab-section-title">Counseling Concerns:</h4>
-                    <ul class="list-disc list-inside text-sm space-y-1">
-                        @foreach($counselingConcerns as $concern) <li>{{ $concern }}</li> @endforeach
-                    </ul>
-                @endif
-            </div>
-        </div>
-        @endif
 
         <!-- Print Footer (visible only when printing) -->
         <div class="print-footer">

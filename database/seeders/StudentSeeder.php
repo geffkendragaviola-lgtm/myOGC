@@ -34,8 +34,9 @@ class StudentSeeder extends Seeder
                 'number_of_children' => 0,
                 'citizenship' => 'Filipino',
                 'address' => 'Iligan City',
+                'region_of_residence' => 'Region X',
                 'phone_number' => '09952796162',
-                'email' => 'geff.gaviola@g.msuiit.edu.ph',
+                'email' => 'student@g.msuiit.edu.ph',
                 'password' => Hash::make('1234567890'),
                 'role' => 'student',
             ],
@@ -46,7 +47,9 @@ class StudentSeeder extends Seeder
                 'college_id' => 7,
                 'msu_sase_score' => 85.5,
                 'academic_year' => '2024-2025',
+                'profile_picture' => null,
                 'student_status' => 'new',
+                'initial_interview_completed' => false,
             ],
             relations: [
                 'personal' => [
@@ -54,8 +57,8 @@ class StudentSeeder extends Seeder
                     'home_address' => 'Tibanga, Iligan City',
                     'stays_with' => 'parents/guardian',
                     'working_student' => 'no and have no plan to work',
-                    'talents_skills' => json_encode(['programming', 'web development', 'problem solving']),
-                    'leisure_activities' => json_encode(['reading', 'coding', 'gaming']),
+                    'talents_skills' => ['programming', 'web development', 'problem solving'],
+                    'leisure_activities' => ['reading', 'coding', 'gaming'],
                     'serious_medical_condition' => 'None',
                     'physical_disability' => 'None',
                     'sex_identity' => 'female/woman',
@@ -88,44 +91,44 @@ class StudentSeeder extends Seeder
                     'school_address' => 'Iligan City',
                     'shs_track' => 'academic',
                     'shs_strand' => 'STEM',
-                    'awards_honors' => json_encode(['Valedictorian', 'Best in Math']),
-                    'student_organizations' => json_encode(['Math Club', 'Programming Club']),
-                    'co_curricular_activities' => json_encode(['Robotics Competition', 'Math Olympiad']),
+                    'awards_honors' => ['Valedictorian', 'Best in Math'],
+                    'student_organizations' => ['Math Club', 'Programming Club'],
+                    'co_curricular_activities' => ['Robotics Competition', 'Math Olympiad'],
                     'career_option_1' => 'Software Developer',
                     'career_option_2' => 'Data Scientist',
                     'career_option_3' => 'Web Developer',
                     'course_choice_by' => 'own choice',
                     'course_choice_reason' => 'Passion for technology and programming',
-                    'msu_choice_reasons' => json_encode(['quality education', 'affordable tuition fees', 'prestigious institution']),
+                    'msu_choice_reasons' => ['quality education', 'affordable tuition fees', 'prestigious institution'],
                     'future_career_plans' => 'Become a software engineer and work in tech industry',
                 ],
                 'learning_resources' => [
                     'internet_access' => 'full internet access',
-                    'technology_gadgets' => json_encode(['laptop/notebook', 'mobile phone smartphone']),
-                    'internet_connectivity' => json_encode(['home internet']),
+                    'technology_gadgets' => ['laptop/notebook', 'mobile phone smartphone'],
+                    'internet_connectivity' => ['home internet'],
                     'distance_learning_readiness' => 'fully ready',
                     'learning_space_description' => 'Quiet room with desk and computer',
                 ],
                 'psychosocial' => [
-                    'personality_characteristics' => json_encode(['organized', 'analytical', 'introverted']),
-                    'coping_mechanisms' => json_encode(['listening to music', 'talking to friends']),
+                    'personality_characteristics' => ['organized', 'analytical', 'introverted'],
+                    'coping_mechanisms' => ['listening to music', 'talking to friends'],
                     'mental_health_perception' => 'Generally good, occasional stress',
                     'had_counseling_before' => false,
                     'sought_psychologist_help' => false,
-                    'problem_sharing_targets' => json_encode(['friends', 'mother']),
+                    'problem_sharing_targets' => ['friends', 'mother'],
                     'needs_immediate_counseling' => false,
                     'future_counseling_concerns' => 'Academic pressure and career decisions',
                 ],
                 'needs_assessment' => [
-                    'improvement_needs' => json_encode(['Time-management skills', 'Test-taking skills']),
-                    'financial_assistance_needs' => json_encode(['Grants/scholarships']),
-                    'personal_social_needs' => json_encode(['Stress management', 'Motivation']),
-                    'stress_responses' => json_encode(['Listened to music', 'Tried to solve my problem']),
+                    'improvement_needs' => ['Time-management skills', 'Test-taking skills'],
+                    'financial_assistance_needs' => ['Grants/scholarships'],
+                    'personal_social_needs' => ['Stress management', 'Motivation'],
+                    'stress_responses' => ['Hurt myself', 'Tried to solve my problem'],
                     'easy_discussion_target' => 'friends/relatives',
-                    'counseling_perceptions' => json_encode([
+                    'counseling_perceptions' => [
                         'I know that help is available at the Guidance and Counseling Center of MSU-IIT.' => 'always',
                         'I am shy to ask assistance/seek counseling from my guidance counselor.' => 'sometimes',
-                    ]),
+                    ],
                 ],
             ]
         );
@@ -144,6 +147,7 @@ class StudentSeeder extends Seeder
                 'number_of_children' => 0,
                 'citizenship' => 'Filipino',
                 'address' => 'Cagayan de Oro City',
+                'region_of_residence' => 'Region X',
                 'phone_number' => '09120000009',
                 'email' => 'chs@g.msuiit.edu.ph',
                 'password' => Hash::make('1234567890'),
@@ -156,6 +160,7 @@ class StudentSeeder extends Seeder
                 'college_id' => 8,
                 'msu_sase_score' => 88.2,
                 'academic_year' => '2024-2025',
+                'profile_picture' => null,
                 'student_status' => 'new',
             ],
             relations: [
@@ -164,8 +169,8 @@ class StudentSeeder extends Seeder
                     'home_address' => 'Cagayan de Oro City',
                     'stays_with' => 'relatives',
                     'working_student' => 'no but planning to work',
-                    'talents_skills' => json_encode(['caregiving', 'communication', 'first aid']),
-                    'leisure_activities' => json_encode(['reading medical journals', 'volunteering']),
+                    'talents_skills' => ['caregiving', 'communication', 'first aid'],
+                    'leisure_activities' => ['reading medical journals', 'volunteering'],
                     'serious_medical_condition' => 'None',
                     'physical_disability' => 'None',
                     'sex_identity' => 'female/woman',
@@ -188,6 +193,7 @@ class StudentSeeder extends Seeder
                 'number_of_children' => 0,
                 'citizenship' => 'Filipino',
                 'address' => 'Iligan City',
+                'region_of_residence' => 'Region X',
                 'phone_number' => '09120000001',
                 'email' => 'cass@g.msuiit.edu.ph',
                 'password' => Hash::make('1234567890'),
@@ -200,6 +206,7 @@ class StudentSeeder extends Seeder
                 'college_id' => 1,
                 'msu_sase_score' => 82.7,
                 'academic_year' => '2024-2025',
+                'profile_picture' => null,
                 'student_status' => 'new',
             ],
             relations: [
@@ -208,8 +215,8 @@ class StudentSeeder extends Seeder
                     'home_address' => 'Palao, Iligan City',
                     'stays_with' => 'board/roommates',
                     'working_student' => 'yes part time',
-                    'talents_skills' => json_encode(['writing', 'public speaking', 'research']),
-                    'leisure_activities' => json_encode(['reading novels', 'debating']),
+                    'talents_skills' => ['writing', 'public speaking', 'research'],
+                    'leisure_activities' => ['reading novels', 'debating'],
                     'serious_medical_condition' => 'None',
                     'physical_disability' => 'None',
                     'sex_identity' => 'male/man',
@@ -232,6 +239,7 @@ class StudentSeeder extends Seeder
                 'number_of_children' => 0,
                 'citizenship' => 'Filipino',
                 'address' => 'Iligan City',
+                'region_of_residence' => 'Region X',
                 'phone_number' => '09120000002',
                 'email' => 'coe@g.msuiit.edu.ph',
                 'password' => Hash::make('1234567890'),
@@ -244,6 +252,7 @@ class StudentSeeder extends Seeder
                 'college_id' => 2,
                 'msu_sase_score' => 87.9,
                 'academic_year' => '2024-2025',
+                'profile_picture' => null,
                 'student_status' => 'returnee',
             ],
             relations: [
@@ -252,8 +261,8 @@ class StudentSeeder extends Seeder
                     'home_address' => 'Tominobo, Iligan City',
                     'stays_with' => 'living on my own',
                     'working_student' => 'yes full time',
-                    'talents_skills' => json_encode(['drafting', 'calculations', 'project management']),
-                    'leisure_activities' => json_encode(['basketball', 'engineering projects']),
+                    'talents_skills' => ['drafting', 'calculations', 'project management'],
+                    'leisure_activities' => ['basketball', 'engineering projects'],
                     'serious_medical_condition' => 'None',
                     'physical_disability' => 'None',
                     'sex_identity' => 'male/man',
@@ -626,7 +635,7 @@ class StudentSeeder extends Seeder
                     'improvement_needs' => json_encode(['Time-management skills', 'Study habits']),
                     'financial_assistance_needs' => json_encode(['Grants/scholarships']),
                     'personal_social_needs' => json_encode(['Stress management', 'Self-confidence']),
-                    'stress_responses' => json_encode(['Listened to music', 'Talked to someone I trust']),
+                    'stress_responses' => json_encode(['Listened to music', 'Attempted to end my life']),
                     'easy_discussion_target' => 'parents',
                     'counseling_perceptions' => json_encode([
                         'I know that help is available at the Guidance and Counseling Center of MSU-IIT.' => 'always',
@@ -656,17 +665,48 @@ class StudentSeeder extends Seeder
                 continue;
             }
 
-            $modelMap[$key]::updateOrCreate(
+            $modelClass = $modelMap[$key];
+            $data = $this->normalizeCastedAttributes($modelClass, $data);
+
+            $modelClass::updateOrCreate(
                 ['student_id' => $student->id],
                 $data
             );
         }
     }
 
+    private function normalizeCastedAttributes(string $modelClass, array $attributes): array
+    {
+        $instance = new $modelClass();
+        $casts = method_exists($instance, 'getCasts') ? $instance->getCasts() : [];
+
+        foreach ($casts as $key => $castType) {
+            if (! array_key_exists($key, $attributes)) {
+                continue;
+            }
+
+            if ($castType !== 'array') {
+                continue;
+            }
+
+            $value = $attributes[$key];
+            if (is_string($value)) {
+                $decoded = json_decode($value, true);
+                if (json_last_error() === JSON_ERROR_NONE && is_array($decoded)) {
+                    $attributes[$key] = $decoded;
+                }
+            }
+        }
+
+        return $attributes;
+    }
+
     private function upsertUser(array $userData): User
     {
         $email = $userData['email'];
         unset($userData['email']);
+
+        $userData['region_of_residence'] = $userData['region_of_residence'] ?? null;
 
         return User::updateOrCreate(
             ['email' => $email],
@@ -679,6 +719,19 @@ class StudentSeeder extends Seeder
         $studentNumber = $studentData['student_id'];
         unset($studentData['student_id']);
         $studentData['user_id'] = $userId;
+
+        $studentData['profile_picture'] = $studentData['profile_picture'] ?? null;
+
+        if (! array_key_exists('initial_interview_completed', $studentData)) {
+            $initialInterviewCompleted = null;
+            $yearLevel = $studentData['year_level'] ?? null;
+            if (in_array($yearLevel, ['1st Year', '2nd Year'], true)) {
+                $initialInterviewCompleted = false;
+            } elseif (in_array($yearLevel, ['3rd Year', '4th Year', '5th Year'], true)) {
+                $initialInterviewCompleted = true;
+            }
+            $studentData['initial_interview_completed'] = $initialInterviewCompleted;
+        }
 
         return Student::updateOrCreate(
             ['student_id' => $studentNumber],

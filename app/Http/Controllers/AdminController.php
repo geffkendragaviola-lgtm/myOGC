@@ -10,6 +10,7 @@ use App\Models\College;
 use App\Models\Event;
 use App\Models\EventRegistration;
 use App\Models\Appointment;
+use App\Models\Feedback;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -41,15 +42,45 @@ class AdminController extends Controller
         }
 
         // Stats with relationships
-        $stats = [
-            'total_users' => User::count(),
-            'total_students' => Student::count(),
-            'total_counselors' => Counselor::count(),
-            'total_admins' => Admin::count(),
-            'total_events' => Event::count(),
-            'active_events' => Event::where('is_active', true)->count(),
-            'upcoming_events' => Event::where('event_start_date', '>=', now()->toDateString())->count(),
+        $totalAppointments = Appointment::count();
+        $completedCount    = Appointment::where('status', 'completed')->count();
+        $pendingCount      = Appointment::whereIn('status', ['pending', 'approved'])->count();
+        $noShowCount       = Appointment::where('status', 'no_show')->count();
+        $referralCount     = Appointment::where('status', 'referred')->count();
+        $completionRate    = $totalAppointments > 0 ? round(($completedCount / $totalAppointments) * 100, 1) : 0;
+        $noShowRate        = $totalAppointments > 0 ? round(($noShowCount / $totalAppointments) * 100, 1) : 0;
 
+        $avgSatisfaction = Feedback::whereNotNull('satisfaction_rating')->avg('satisfaction_rating');
+        $avgSatisfaction = $avgSatisfaction ? round($avgSatisfaction, 1) : null;
+
+        $followUpCount = \App\Models\SessionNote::where('requires_follow_up', true)->count();
+
+        // Appointments per college
+        $appointmentsByCollege = Appointment::select('colleges.name as college_name', DB::raw('count(*) as total'))
+            ->join('students', 'appointments.student_id', '=', 'students.id')
+            ->join('colleges', 'students.college_id', '=', 'colleges.id')
+            ->groupBy('colleges.name')
+            ->orderByDesc('total')
+            ->limit(5)
+            ->get();
+
+        $stats = [
+            'total_users'       => User::count(),
+            'total_students'    => Student::count(),
+            'total_counselors'  => Counselor::count(),
+            'total_admins'      => Admin::count(),
+            'total_events'      => Event::count(),
+            'active_events'     => Event::where('is_active', true)->count(),
+            'upcoming_events'   => Event::where('event_start_date', '>=', now()->toDateString())->count(),
+            'total_appointments'=> $totalAppointments,
+            'completed_count'   => $completedCount,
+            'pending_count'     => $pendingCount,
+            'no_show_count'     => $noShowCount,
+            'referral_count'    => $referralCount,
+            'completion_rate'   => $completionRate,
+            'no_show_rate'      => $noShowRate,
+            'avg_satisfaction'  => $avgSatisfaction,
+            'follow_up_count'   => $followUpCount,
         ];
 
         // Recent events for admin dashboard
@@ -64,7 +95,7 @@ class AdminController extends Controller
             ->limit(10)
             ->get();
 
-        return view('admin.dashboard', compact('admin', 'stats', 'recentUsers', 'recentEvents'));
+        return view('admin.dashboard', compact('admin', 'stats', 'recentUsers', 'recentEvents', 'appointmentsByCollege'));
     }
 
     /**
@@ -1494,6 +1525,76 @@ class AdminController extends Controller
     /**
      * Display all counselors
      */
+    public function editCounselor(Counselor $counselor)
+    {
+        $userId = Auth::id();
+        $admin = Admin::with('user')->where('user_id', $userId)->first();
+        $counselor->load('user', 'college');
+        $colleges = College::orderBy('name')->get();
+        return view('admin.counselors.edit', compact('admin', 'counselor', 'colleges'));
+    }
+
+    public function updateCounselor(Request $request, Counselor $counselor)
+    {
+        $counselor->load('user');
+
+        $validated = $request->validate([
+            'first_name'          => 'required|string|max:100',
+            'middle_name'         => 'nullable|string|max:100',
+            'last_name'           => 'required|string|max:100',
+            'email'               => ['required', 'string', 'email', 'max:100', Rule::unique('users', 'email')->ignore($counselor->user_id)],
+            'phone_number'        => 'nullable|string|max:20',
+            'address'             => 'nullable|string',
+            'birthdate'           => 'nullable|date',
+            'sex'                 => 'nullable|in:male,female,other',
+            'college_id'          => 'required|exists:colleges,id',
+            'position'            => 'required|string|max:100',
+            'credentials'         => 'required|string|max:100',
+            'specialization'      => 'nullable|string|max:100',
+            'is_head'             => 'boolean',
+            'daily_booking_limit' => 'nullable|integer|min:0|max:50',
+            'google_calendar_id'  => 'nullable|string|max:255',
+            'facebook_link'       => 'nullable|url|max:255',
+        ]);
+
+        DB::beginTransaction();
+        try {
+            $age = null;
+            if (!empty($validated['birthdate'])) {
+                $age = Carbon::parse($validated['birthdate'])->age;
+            }
+
+            $counselor->user->update([
+                'first_name'   => strip_tags($validated['first_name']),
+                'middle_name'  => isset($validated['middle_name']) ? strip_tags($validated['middle_name']) : null,
+                'last_name'    => strip_tags($validated['last_name']),
+                'email'        => $validated['email'],
+                'phone_number' => $validated['phone_number'] ?? null,
+                'address'      => isset($validated['address']) ? strip_tags($validated['address']) : null,
+                'birthdate'    => $validated['birthdate'] ?? null,
+                'age'          => $age,
+                'sex'          => $validated['sex'] ?? null,
+            ]);
+
+            $counselor->update([
+                'college_id'          => $validated['college_id'],
+                'position'            => strip_tags($validated['position']),
+                'credentials'         => strip_tags($validated['credentials']),
+                'specialization'      => isset($validated['specialization']) ? strip_tags($validated['specialization']) : null,
+                'is_head'             => (bool)($request->input('is_head', false)),
+                'daily_booking_limit' => $validated['daily_booking_limit'] ?? null,
+                'google_calendar_id'  => $validated['google_calendar_id'] ?? null,
+                'facebook_link'       => $validated['facebook_link'] ?? null,
+            ]);
+
+            DB::commit();
+            return redirect()->route('admin.counselors.edit', $counselor)->with('success', 'Counselor updated successfully.');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return redirect()->back()->withInput()->withErrors(['error' => 'Failed to update counselor: ' . $e->getMessage()]);
+        }
+    }
+
     public function counselors(Request $request)
     {
         $userId = Auth::id();

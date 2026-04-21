@@ -285,25 +285,49 @@
                         @enderror
                     </div>
 
-                    <!-- Year Level Restriction -->
+                    <!-- Year Level Availability -->
                     <div class="md:col-span-2">
-                        <label class="section-title">Year Level Restriction</label>
-                        <p class="text-xs mb-2" style="color:var(--text-muted)">Leave all unchecked to allow all year levels. Check specific year levels to restrict visibility.</p>
-                        @php $oldYearLevels = old('year_levels', []); @endphp
-                        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-2">
-                            @foreach(['1st Year','2nd Year','3rd Year','4th Year','5th Year'] as $yl)
-                            <div class="flex items-center gap-2 p-2 rounded-lg border border-[var(--border-soft)] bg-[rgba(250,248,245,0.6)]">
-                                <input type="checkbox" id="yl_{{ Str::slug($yl) }}" name="year_levels[]"
-                                       value="{{ $yl }}"
-                                       {{ in_array($yl, $oldYearLevels) ? 'checked' : '' }}
-                                       class="custom-checkbox">
-                                <label for="yl_{{ Str::slug($yl) }}" class="custom-control-label text-xs">{{ $yl }}</label>
+                        <label class="section-title">Year Level Availability</label>
+
+                        <div class="mt-2 space-y-3">
+                            <div class="flex items-center gap-3">
+                                <input type="radio" id="for_all_year_levels_true" name="for_all_year_levels" value="1"
+                                       {{ empty(old('year_levels', [])) ? 'checked' : '' }}
+                                       class="custom-radio">
+                                <label for="for_all_year_levels_true" class="custom-control-label">
+                                    All Year Levels - Available to students from all year levels
+                                </label>
                             </div>
-                            @endforeach
+                            <div class="flex items-center gap-3">
+                                <input type="radio" id="for_all_year_levels_false" name="for_all_year_levels" value="0"
+                                       {{ !empty(old('year_levels', [])) ? 'checked' : '' }}
+                                       class="custom-radio">
+                                <label for="for_all_year_levels_false" class="custom-control-label">
+                                    Specific Year Levels - Choose which year levels can see this event
+                                </label>
+                            </div>
                         </div>
-                        @error('year_levels')
-                            <p class="error-msg">{{ $message }}</p>
-                        @enderror
+
+                        <div id="year_levels_selection" class="{{ !empty(old('year_levels', [])) ? 'mt-4' : 'hidden' }}">
+                            <label class="section-title">Select Year Levels *</label>
+                            <div class="college-grid">
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-2">
+                                    @php $oldYearLevels = old('year_levels', []); @endphp
+                                    @foreach(['1st Year','2nd Year','3rd Year','4th Year','5th Year'] as $yl)
+                                    <div class="college-item">
+                                        <input type="checkbox" id="yl_{{ Str::slug($yl) }}" name="year_levels[]"
+                                               value="{{ $yl }}"
+                                               {{ in_array($yl, $oldYearLevels) ? 'checked' : '' }}
+                                               class="custom-checkbox">
+                                        <label for="yl_{{ Str::slug($yl) }}" class="custom-control-label">{{ $yl }}</label>
+                                    </div>
+                                    @endforeach
+                                </div>
+                            </div>
+                            @error('year_levels')
+                                <p class="error-msg">{{ $message }}</p>
+                            @enderror
+                        </div>
                     </div>
 
                     <!-- Start Date -->
@@ -418,6 +442,25 @@ document.addEventListener('DOMContentLoaded', function() {
 
     allCollegesRadio.addEventListener('change', toggleCollegesSelection);
     specificCollegesRadio.addEventListener('change', toggleCollegesSelection);
+
+    // Year level selection toggle
+    const allYearLevelsRadio = document.getElementById('for_all_year_levels_true');
+    const specificYearLevelsRadio = document.getElementById('for_all_year_levels_false');
+    const yearLevelsSelection = document.getElementById('year_levels_selection');
+
+    function toggleYearLevelsSelection() {
+        if (specificYearLevelsRadio.checked) {
+            yearLevelsSelection.classList.remove('hidden');
+            yearLevelsSelection.classList.add('mt-4');
+        } else {
+            yearLevelsSelection.classList.add('hidden');
+            yearLevelsSelection.classList.remove('mt-4');
+            document.querySelectorAll('input[name="year_levels[]"]').forEach(cb => cb.checked = false);
+        }
+    }
+
+    allYearLevelsRadio.addEventListener('change', toggleYearLevelsSelection);
+    specificYearLevelsRadio.addEventListener('change', toggleYearLevelsSelection);
 
     // Image preview functionality
     const imageInput = document.getElementById('image');

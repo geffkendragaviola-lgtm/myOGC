@@ -373,17 +373,12 @@ public function storeByCounselor(Request $request)
         return redirect()->back()->with('error', 'This counselor is not available on the selected date.');
     }
 
-    if ($this->getCounselorBookingsForDate($counselorIds, $date) >= $this->getDailyBookingLimit($counselor)) {
-        return redirect()->back()->with('error', 'Daily booking limit reached for the selected counselor.');
-    }
+    // Daily booking limit is intentionally not enforced here —
+    // counselors can book beyond the limit for urgent/emergency student needs.
 
     $startTime = Carbon::parse($request->start_time);
     $endTime = $startTime->copy()->addHour();
     $endTimeFormatted = $endTime->format('H:i');
-
-    if (!$this->isSlotWithinAvailability($counselor, $date, $request->start_time, $endTimeFormatted)) {
-        return redirect()->back()->with('error', 'Selected time is outside the counselor availability.');
-    }
 
     $existingAppointment = Appointment::whereIn('counselor_id', $counselorIds)
         ->where('appointment_date', $request->appointment_date)
@@ -543,6 +538,13 @@ public function getFollowupAvailableSlots(Request $request)
     // Get counselor's availability for that day
     $dayAvailability = $this->getAvailabilityForDate($counselor, $date);
 
+    // Counselors can create bookings even without saved availability.
+    // For counselors, if there are no working hours configured for this day, fall back to default hours.
+    $requestUser = $request->user();
+    if (empty($dayAvailability) && $requestUser && $requestUser->role === 'counselor') {
+        $dayAvailability = ['08:00-12:00', '13:00-17:00'];
+    }
+
     if (empty($dayAvailability)) {
         return response()->json([
             'available_slots' => [],
@@ -660,13 +662,20 @@ public function getAvailableSlots(Request $request)
 
     // Get counselor's availability for that day
     $dayAvailability = $this->getAvailabilityForDate($counselor, $date);
+    $requestUser = $request->user();
+    $isCounselorRequest = $requestUser && $requestUser->role === 'counselor';
 
+    // Counselors can book outside their set availability (emergency/urgent cases)
     if (empty($dayAvailability)) {
-        return response()->json([
-            'available_slots' => [],
-            'booked_slots' => [],
-            'message' => 'No working hours for this day'
-        ]);
+        if ($isCounselorRequest) {
+            $dayAvailability = ['08:00-17:00'];
+        } else {
+            return response()->json([
+                'available_slots' => [],
+                'booked_slots' => [],
+                'message' => 'No working hours for this day'
+            ]);
+        }
     }
 
     // Get booked appointments for that date - DB slot blocking statuses only
@@ -767,6 +776,8 @@ public function getAvailableDates(Request $request)
     $minDate = $allowToday ? $today->copy() : $today->copy()->addDay();
 
     $availability = $counselor->getAvailability();
+    $requestUser = $request->user();
+    $isCounselorRequest = $requestUser && $requestUser->role === 'counselor';
     $overrides = CounselorScheduleOverride::where('counselor_id', $counselor->id)
         ->whereBetween('date', [$monthStart->toDateString(), $monthEnd->toDateString()])
         ->get()
@@ -800,7 +811,8 @@ public function getAvailableDates(Request $request)
             continue;
         }
 
-        if ($this->getCounselorBookingsForDate($counselorIds, $currentDate) >= $this->getDailyBookingLimit($counselor)) {
+        // Counselors can book beyond daily limit for urgent/emergency cases
+        if (!$isCounselorRequest && $this->getCounselorBookingsForDate($counselorIds, $currentDate) >= $this->getDailyBookingLimit($counselor)) {
             $results[$dateKey] = false;
             $currentDate->addDay();
             continue;
@@ -811,6 +823,11 @@ public function getAvailableDates(Request $request)
         } else {
             $dayName = strtolower($currentDate->englishDayOfWeek);
             $dayAvailability = $availability[$dayName] ?? [];
+
+            // Counselors can book on any day, even outside their set availability
+            if ($isCounselorRequest && empty($dayAvailability)) {
+                $dayAvailability = ['08:00-17:00'];
+            }
         }
 
         if (empty($dayAvailability)) {

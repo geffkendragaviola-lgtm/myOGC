@@ -540,9 +540,43 @@
                     <h2 class="section-title"><i class="fas fa-id-badge"></i> {{ ucfirst(Auth::user()->role) }} Profile Information</h2>
 
                     @if(Auth::user()->role === 'student')
-                        <form method="POST" action="{{ route('profile.student.update') }}">
+                        <form method="POST" action="{{ route('profile.student.update') }}" enctype="multipart/form-data">
                             @csrf
                             @method('patch')
+
+                            {{-- Profile Picture --}}
+                            <div class="mb-6 flex flex-col sm:flex-row items-center gap-5">
+                                <div class="relative flex-shrink-0">
+                                    @if($studentProfile?->profile_picture)
+                                        <img id="pic-preview-student"
+                                             src="{{ asset('storage/' . $studentProfile->profile_picture) }}"
+                                             alt="Profile Picture"
+                                             class="w-24 h-24 rounded-full object-cover border-4"
+                                             style="border-color: var(--accent-gold);">
+                                    @else
+                                        <div id="pic-placeholder-student"
+                                             class="w-24 h-24 rounded-full flex items-center justify-center text-3xl font-bold text-white"
+                                             style="background: linear-gradient(135deg, var(--primary-red), var(--primary-red-dark));">
+                                            {{ strtoupper(substr(Auth::user()->first_name, 0, 1)) }}
+                                        </div>
+                                        <img id="pic-preview-student" src="" alt="Preview" class="w-24 h-24 rounded-full object-cover border-4 hidden"
+                                             style="border-color: var(--accent-gold);">
+                                    @endif
+                                </div>
+                                <div class="flex-1">
+                                    <label class="block label-text mb-1">Profile Picture</label>
+                                    <label for="profile_picture_student"
+                                           class="inline-flex items-center gap-2 cursor-pointer px-4 py-2 rounded-xl text-sm font-semibold transition"
+                                           style="background: var(--bg-light); border: 1px solid var(--border-soft); color: var(--text-dark);">
+                                        <i class="fas fa-camera"></i> Choose Photo
+                                    </label>
+                                    <input type="file" id="profile_picture_student" name="profile_picture"
+                                           accept="image/jpeg,image/png,image/jpg,image/gif,image/webp"
+                                           class="hidden" onchange="previewStudentPic(this)">
+                                    <p class="helper-text mt-1">JPG, PNG, GIF or WebP. Max 4MB.</p>
+                                    @error('profile_picture') <p class="error-text">{{ $message }}</p> @enderror
+                                </div>
+                            </div>
 
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div>
@@ -583,6 +617,14 @@
                                     </select>
                                     @error('college_id') <p class="error-text">{{ $message }}</p> @enderror
                                 </div>
+                            </div>
+
+                            <div class="flex justify-end mt-6">
+                                <button type="submit"
+                                        class="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl text-sm font-semibold text-white transition"
+                                        style="background: linear-gradient(135deg, var(--primary-red), var(--primary-red-dark)); box-shadow: 0 4px 12px rgba(122,42,42,0.2);">
+                                    <i class="fas fa-save"></i> Save Profile Picture
+                                </button>
                             </div>
                         </form>
 
@@ -735,6 +777,20 @@
         function previewPic(input) {
             const preview = document.getElementById('pic-preview');
             const placeholder = document.getElementById('pic-placeholder');
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = e => {
+                    preview.src = e.target.result;
+                    preview.classList.remove('hidden');
+                    if (placeholder) placeholder.classList.add('hidden');
+                };
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+        function previewStudentPic(input) {
+            const preview = document.getElementById('pic-preview-student');
+            const placeholder = document.getElementById('pic-placeholder-student');
             if (input.files && input.files[0]) {
                 const reader = new FileReader();
                 reader.onload = e => {

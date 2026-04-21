@@ -436,103 +436,24 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
 
-        const yearLevel = student.year_level;
         const hasCompletedInitialInterview = student.initial_interview_completed === true;
         const hasInitialInterviewAppointment = initialInterviewBookedStudentIds
             .map(id => String(id))
             .includes(String(student.id));
-        const hasInProgressInitialInterview = initialInterviewInProgressStudentIds
-            .map(id => String(id))
-            .includes(String(student.id));
 
-        const isFirstYear = yearLevel === '1st Year';
-        const isSecondYear = yearLevel === '2nd Year';
-        const isUpperYear = !isFirstYear && !isSecondYear;
-
-        const counselingOption = bookingTypeSelect.querySelector('option[value="Counseling"]');
-        const consultationOption = bookingTypeSelect.querySelector('option[value="Consultation"]');
-        const needsInitialInterview = isFirstYear || isSecondYear;
-
-        if (hasCompletedInitialInterview) {
+        if (hasCompletedInitialInterview || hasInitialInterviewAppointment) {
             if (bookingTypeSelect.value === 'Initial Interview') {
                 bookingTypeSelect.value = '';
             }
             bookingTypeInitial.disabled = true;
             bookingTypeInitial.hidden = true;
-            bookingTypeHelp.textContent = 'Initial Interview is already completed.';
+            bookingTypeHelp.textContent = hasCompletedInitialInterview
+                ? 'Initial Interview is already completed.'
+                : 'Initial Interview is already booked.';
             return;
         }
 
-        if (hasInitialInterviewAppointment) {
-            if (bookingTypeSelect.value === 'Initial Interview') {
-                bookingTypeSelect.value = '';
-            }
-            bookingTypeInitial.disabled = true;
-            bookingTypeInitial.hidden = true;
-
-            if (needsInitialInterview) {
-                counselingOption && (counselingOption.disabled = true);
-                consultationOption && (consultationOption.disabled = true);
-                bookingTypeHelp.textContent = 'Counseling and Consultation are available only after the Initial Interview is completed.';
-                if (bookingTypeSelect.value === 'Counseling' || bookingTypeSelect.value === 'Consultation') {
-                    bookingTypeSelect.value = '';
-                }
-                return;
-            }
-
-            bookingTypeHelp.textContent = 'Initial Interview is already booked.';
-            return;
-        }
-
-        if (needsInitialInterview && !hasCompletedInitialInterview) {
-            counselingOption && (counselingOption.disabled = true);
-            consultationOption && (consultationOption.disabled = true);
-            if (bookingTypeSelect.value === 'Counseling' || bookingTypeSelect.value === 'Consultation') {
-                bookingTypeSelect.value = '';
-            }
-
-            if (!isFirstYear) {
-                bookingTypeInitial.disabled = false;
-                bookingTypeInitial.hidden = false;
-                bookingTypeHelp.textContent = 'Counseling and Consultation are available only after the Initial Interview is completed.';
-                return;
-            }
-        }
-
-        if (needsInitialInterview && hasInProgressInitialInterview) {
-            counselingOption && (counselingOption.disabled = true);
-            consultationOption && (consultationOption.disabled = true);
-            if (bookingTypeSelect.value === 'Counseling' || bookingTypeSelect.value === 'Consultation') {
-                bookingTypeSelect.value = '';
-            }
-            bookingTypeHelp.textContent = 'Counseling and Consultation are available only after the Initial Interview is completed.';
-            return;
-        }
-
-        if (isFirstYear) {
-            bookingTypeInitial.disabled = false;
-            bookingTypeInitial.hidden = false;
-            bookingTypeSelect.value = 'Initial Interview';
-            bookingTypeSelect.querySelectorAll('option').forEach(option => {
-                option.disabled = option.value !== 'Initial Interview' && option.value !== '';
-            });
-            bookingTypeHelp.textContent = 'Initial Interview is required for 1st year students.';
-            return;
-        }
-
-        if (isUpperYear) {
-            if (bookingTypeSelect.value === 'Initial Interview') {
-                bookingTypeSelect.value = '';
-            }
-            bookingTypeInitial.disabled = true;
-            bookingTypeInitial.hidden = true;
-            bookingTypeHelp.textContent = 'Initial Interview is not available for this student.';
-            return;
-        }
-
-        bookingTypeInitial.disabled = false;
-        bookingTypeInitial.hidden = false;
-        bookingTypeHelp.textContent = 'Initial Interview is available if the student has not completed it yet.';
+        bookingTypeHelp.textContent = 'Select the reason for the appointment.';
     }
 
     function formatDateValue(date) {

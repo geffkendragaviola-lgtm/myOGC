@@ -37,6 +37,7 @@ public function events()
     $events = Event::active()
         ->upcoming()
         ->forCollege($student->college_id)
+        ->forYearLevel($student->year_level)
         ->with(['colleges', 'registrations' => function($query) use ($student) {
             $query->where('student_id', $student->id);
         }])

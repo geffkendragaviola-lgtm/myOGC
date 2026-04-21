@@ -654,10 +654,14 @@
                     @php
                         use Carbon\Carbon;
                         $userCollegeId = Auth::user()->student->college_id ?? null;
+                        $userYearLevel = Auth::user()->student->year_level ?? null;
                         $announcements = \App\Models\Announcement::with(['user', 'colleges'])
                             ->active()
                             ->when($userCollegeId, function($query) use ($userCollegeId) {
                                 return $query->forCollege($userCollegeId);
+                            })
+                            ->when($userYearLevel, function($query) use ($userYearLevel) {
+                                return $query->forYearLevel($userYearLevel);
                             })
                             ->orderBy('created_at', 'desc')
                             ->get()
@@ -846,7 +850,13 @@
                     @if($headCounselor)
                     <div class="section-card p-8 mb-8 flex flex-col md:flex-row items-center border-l-4 border-[#d4af37] hover:shadow-xl transition">
                         <div class="w-32 h-32 bg-gradient-to-br from-[#f8f1e8] to-[#efe3d4] rounded-full overflow-hidden mb-4 md:mb-0 md:mr-6 shadow-lg soft-ring">
-                            <img src="https://images.unsplash.com/photo-1560250097-0b93528c311a?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80" alt="Head Counselor" class="w-full h-full object-cover">
+                            @if($headCounselor->user->profile_picture)
+                                <img src="{{ asset('storage/' . $headCounselor->user->profile_picture) }}" alt="Head Counselor" class="w-full h-full object-cover">
+                            @else
+                                <div class="w-full h-full flex items-center justify-center text-3xl font-bold text-[#7a2a2a]">
+                                    {{ strtoupper(substr($headCounselor->user->first_name, 0, 1)) }}{{ strtoupper(substr($headCounselor->user->last_name, 0, 1)) }}
+                                </div>
+                            @endif
                         </div>
                         <div>
                             <h3 class="text-2xl font-bold text-[var(--text-dark)]">
@@ -886,7 +896,13 @@
                             @endphp
                             <div class="dashboard-staff-card p-6 text-center">
                                 <div class="w-24 h-24 bg-gradient-to-br from-[#f8f1e8] to-[#efe3d4] rounded-full overflow-hidden mx-auto mb-4 soft-ring">
-                                    <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80" alt="Counselor" class="w-full h-full object-cover">
+                                    @if($counselor->user->profile_picture)
+                                        <img src="{{ asset('storage/' . $counselor->user->profile_picture) }}" alt="Counselor" class="w-full h-full object-cover">
+                                    @else
+                                        <div class="w-full h-full flex items-center justify-center text-2xl font-bold text-[#7a2a2a]">
+                                            {{ strtoupper(substr($counselor->user->first_name, 0, 1)) }}{{ strtoupper(substr($counselor->user->last_name, 0, 1)) }}
+                                        </div>
+                                    @endif
                                 </div>
                                 <h4 class="text-lg font-semibold text-[var(--text-dark)]">
                                     {{ $counselor->user->first_name }}

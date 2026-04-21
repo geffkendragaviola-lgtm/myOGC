@@ -207,60 +207,54 @@
 
         <!-- Stats Cards -->
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-8">
-            <div class="summary-card">
+            <div class="summary-card" style="background:#faf8f5; border-color:rgba(122,42,42,0.12);">
                 <div class="relative p-4 flex items-center gap-3">
-                    <div class="summary-icon flex-shrink-0">
+                    <div class="summary-icon flex-shrink-0" style="background:rgba(122,42,42,0.08); border-color:rgba(122,42,42,0.12); color:#7a2a2a;">
                         <i class="fas fa-bullhorn text-sm"></i>
                     </div>
                     <div class="min-w-0">
-                        <p class="summary-label">Total</p>
-                        <p class="summary-value">{{ $announcements->total() }}</p>
-                        <p class="summary-subtext">Announcements</p>
+                        <p class="summary-label" style="color:var(--text-muted);">Total</p>
+                        <p class="summary-value" style="color:var(--text-primary);">{{ $announcements->total() }}</p>
+                        <p class="summary-subtext" style="color:var(--text-secondary);">Announcements</p>
                     </div>
                 </div>
             </div>
 
-            <div class="summary-card" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); border-color: rgba(16,185,129,0.3);">
+            <div class="summary-card" style="background:#f0fdf6; border-color:rgba(16,185,129,0.15);">
                 <div class="relative p-4 flex items-center gap-3">
-                    <div class="summary-icon flex-shrink-0" style="background: rgba(255,255,255,0.15); border-color: rgba(255,255,255,0.2);">
+                    <div class="summary-icon flex-shrink-0" style="background:rgba(16,185,129,0.1); border-color:rgba(16,185,129,0.15); color:#059669;">
                         <i class="fas fa-circle-play text-sm"></i>
                     </div>
                     <div class="min-w-0">
-                        <p class="summary-label">Active</p>
-                        <p class="summary-value">
-                            {{ $announcements->where('is_active', true)->where('status', 'active')->count() }}
-                        </p>
-                        <p class="summary-subtext">Currently live</p>
+                        <p class="summary-label" style="color:var(--text-muted);">Active</p>
+                        <p class="summary-value" style="color:var(--text-primary);">{{ $announcements->where('is_active', true)->where('status', 'active')->count() }}</p>
+                        <p class="summary-subtext" style="color:var(--text-secondary);">Currently live</p>
                     </div>
                 </div>
             </div>
 
-            <div class="summary-card" style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); border-color: rgba(245,158,11,0.3);">
+            <div class="summary-card" style="background:#fffbeb; border-color:rgba(245,158,11,0.15);">
                 <div class="relative p-4 flex items-center gap-3">
-                    <div class="summary-icon flex-shrink-0" style="background: rgba(255,255,255,0.15); border-color: rgba(255,255,255,0.2);">
+                    <div class="summary-icon flex-shrink-0" style="background:rgba(245,158,11,0.1); border-color:rgba(245,158,11,0.15); color:#b45309;">
                         <i class="fas fa-clock text-sm"></i>
                     </div>
                     <div class="min-w-0">
-                        <p class="summary-label">Scheduled</p>
-                        <p class="summary-value">
-                            {{ $announcements->where('status', 'scheduled')->count() }}
-                        </p>
-                        <p class="summary-subtext">Pending publish</p>
+                        <p class="summary-label" style="color:var(--text-muted);">Scheduled</p>
+                        <p class="summary-value" style="color:var(--text-primary);">{{ $announcements->where('status', 'scheduled')->count() }}</p>
+                        <p class="summary-subtext" style="color:var(--text-secondary);">Pending publish</p>
                     </div>
                 </div>
             </div>
 
-            <div class="summary-card" style="background: linear-gradient(135deg, #6b7280 0%, #4b5563 100%); border-color: rgba(107,114,128,0.3);">
+            <div class="summary-card" style="background:#f8f9fa; border-color:rgba(107,114,128,0.12);">
                 <div class="relative p-4 flex items-center gap-3">
-                    <div class="summary-icon flex-shrink-0" style="background: rgba(255,255,255,0.15); border-color: rgba(255,255,255,0.2);">
+                    <div class="summary-icon flex-shrink-0" style="background:rgba(107,114,128,0.08); border-color:rgba(107,114,128,0.12); color:#4b5563;">
                         <i class="fas fa-circle-check text-sm"></i>
                     </div>
                     <div class="min-w-0">
-                        <p class="summary-label">Completed</p>
-                        <p class="summary-value">
-                            {{ $announcements->where('is_active', false)->count() }}
-                        </p>
-                        <p class="summary-subtext">Archived</p>
+                        <p class="summary-label" style="color:var(--text-muted);">Completed</p>
+                        <p class="summary-value" style="color:var(--text-primary);">{{ $announcements->where('is_active', false)->count() }}</p>
+                        <p class="summary-subtext" style="color:var(--text-secondary);">Archived</p>
                     </div>
                 </div>
             </div>

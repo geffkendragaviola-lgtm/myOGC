@@ -113,12 +113,8 @@ class ProfileController extends Controller
     public function updateStudent(Request $request)
     {
         try {
-            return back()->withErrors(['error' => 'You can only change your password on this page.']);
-
             $request->validate([
-                'student_id' => ['required', 'string', 'max:50'],
-                'year_level' => ['required', 'string', 'in:1st Year,2nd Year,3rd Year,4th Year,5th Year,Graduate'],
-                'college_id' => ['required', 'exists:colleges,id'],
+                'profile_picture' => ['nullable', 'image', 'mimes:jpeg,png,jpg,gif,webp', 'max:4096'],
             ]);
 
             $user = $request->user();
@@ -129,13 +125,17 @@ class ProfileController extends Controller
 
             $studentProfile = Student::where('user_id', $user->id)->first();
 
-            if ($studentProfile) {
-                $studentProfile->update($request->all());
-            } else {
-                Student::create(array_merge(
-                    ['user_id' => $user->id],
-                    $request->all()
-                ));
+            if (!$studentProfile) {
+                return back()->withErrors(['error' => 'Student profile not found.']);
+            }
+
+            if ($request->hasFile('profile_picture')) {
+                if ($studentProfile->profile_picture) {
+                    \Illuminate\Support\Facades\Storage::disk('public')->delete($studentProfile->profile_picture);
+                }
+                $path = $request->file('profile_picture')->store('profile-pictures', 'public');
+                $studentProfile->profile_picture = $path;
+                $studentProfile->save();
             }
 
             return Redirect::route('profile.edit')->with('status', 'student-profile-updated');
@@ -240,20 +240,38 @@ class ProfileController extends Controller
                 return back()->withErrors(['error' => 'Unauthorized action.']);
             }
 
-            $counselorProfile = Counselor::where('user_id', $user->id)->first();
+            $counselorProfiles = Counselor::where('user_id', $user->id)->get();
 
-            if (!$counselorProfile) {
+            if ($counselorProfiles->isEmpty()) {
                 return Redirect::route('profile.edit')->withErrors(['error' => 'Counselor profile not found.']);
             }
 
             $availability = $this->buildAvailabilityFromRequest($request);
+            $dailyBookingLimit = $request->input('daily_booking_limit');
+            $overrides = $request->input('schedule_overrides', []);
 
-            $counselorProfile->update([
-                'daily_booking_limit' => $request->input('daily_booking_limit', $counselorProfile->daily_booking_limit),
-                'availability' => $availability,
+            Log::info('Availability update', [
+                'user_id' => $user->id,
+                'selected_days' => $request->input('availability_days', []),
+                'slots_input' => $request->input('availability_slots', []),
+                'built_availability' => $availability,
+                'counselor_count' => $counselorProfiles->count(),
             ]);
 
-            $this->syncScheduleOverrides($counselorProfile, $request->input('schedule_overrides', []));
+            foreach ($counselorProfiles as $counselorProfile) {
+                $rows = \Illuminate\Support\Facades\DB::table('counselors')
+                    ->where('id', $counselorProfile->id)
+                    ->update([
+                        'daily_booking_limit' => $dailyBookingLimit ?? $counselorProfile->daily_booking_limit,
+                        'availability' => json_encode($availability),
+                        'updated_at' => now(),
+                    ]);
+
+                Log::debug('DB update result', ['counselor_id' => $counselorProfile->id, 'rows_affected' => $rows]);
+
+                $counselorProfile->refresh();
+                $this->syncScheduleOverrides($counselorProfile, $overrides);
+            }
 
             return Redirect::route('counselor.availability.edit')->with('status', 'counselor-availability-updated');
         } catch (\Exception $e) {
@@ -274,13 +292,16 @@ class ProfileController extends Controller
             'sunday',
         ];
 
+        $defaultSlots = ['08:00-12:00', '13:00-17:00'];
         $selectedDays = $request->input('availability_days', []);
         $slotsInput = $request->input('availability_slots', []);
         $availability = [];
 
         foreach ($days as $day) {
             if (in_array($day, $selectedDays, true)) {
-                $availability[$day] = $this->parseTimeSlots($slotsInput[$day] ?? '');
+                $parsed = $this->parseTimeSlots($slotsInput[$day] ?? '');
+                // If checked but no valid slots typed, use the default
+                $availability[$day] = !empty($parsed) ? $parsed : $defaultSlots;
             } else {
                 $availability[$day] = [];
             }

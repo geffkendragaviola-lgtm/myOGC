@@ -433,6 +433,46 @@
                         </div>
                     </div>
 
+                    <!-- Year Level Targeting -->
+                    <div class="md:col-span-2">
+                        <label class="field-label">Year Level Availability <span class="text-[#b91c1c]">*</span></label>
+
+                        <div class="mb-4 radio-group">
+                            <div class="radio-option">
+                                <input type="radio" id="for_all_year_levels_true" name="for_all_year_levels" value="1"
+                                       {{ empty(old('year_levels', $announcement->year_levels ?? [])) ? 'checked' : '' }}>
+                                <label for="for_all_year_levels_true">
+                                    <strong>All Year Levels</strong> — Visible to students from all year levels
+                                </label>
+                            </div>
+                            <div class="radio-option">
+                                <input type="radio" id="for_all_year_levels_false" name="for_all_year_levels" value="0"
+                                       {{ !empty(old('year_levels', $announcement->year_levels ?? [])) ? 'checked' : '' }}>
+                                <label for="for_all_year_levels_false">
+                                    <strong>Specific Year Levels</strong> — Choose which year levels can see this announcement
+                                </label>
+                            </div>
+                        </div>
+
+                        <div id="year_levels_selection" class="{{ !empty(old('year_levels', $announcement->year_levels ?? [])) ? '' : 'hidden' }}">
+                            <label class="field-label">Select Year Levels <span class="text-[#b91c1c]">*</span></label>
+                            <div class="college-grid" style="max-height:none;">
+                                @php $oldYearLevels = old('year_levels', $announcement->year_levels ?? []); @endphp
+                                @foreach(['1st Year','2nd Year','3rd Year','4th Year','5th Year'] as $yl)
+                                <div class="checkbox-option">
+                                    <input type="checkbox" id="yl_ann_{{ Str::slug($yl) }}" name="year_levels[]"
+                                           value="{{ $yl }}"
+                                           {{ in_array($yl, $oldYearLevels) ? 'checked' : '' }}>
+                                    <label for="yl_ann_{{ Str::slug($yl) }}">{{ $yl }}</label>
+                                </div>
+                                @endforeach
+                            </div>
+                            @error('year_levels')
+                                <p class="error-text">{{ $message }}</p>
+                            @enderror
+                        </div>
+                    </div>
+
                     <!-- Dates -->
                     <div>
                         <label for="start_date" class="field-label">Start Date (Optional)</label>
@@ -594,6 +634,23 @@ document.addEventListener('DOMContentLoaded', function() {
 
     allCollegesRadio.addEventListener('change', toggleCollegesSelection);
     specificCollegesRadio.addEventListener('change', toggleCollegesSelection);
+
+    // Year level selection toggle
+    const allYearLevelsRadio = document.getElementById('for_all_year_levels_true');
+    const specificYearLevelsRadio = document.getElementById('for_all_year_levels_false');
+    const yearLevelsSelection = document.getElementById('year_levels_selection');
+
+    function toggleYearLevelsSelection() {
+        if (specificYearLevelsRadio.checked) {
+            yearLevelsSelection.classList.remove('hidden');
+        } else {
+            yearLevelsSelection.classList.add('hidden');
+            document.querySelectorAll('input[name="year_levels[]"]').forEach(cb => cb.checked = false);
+        }
+    }
+
+    allYearLevelsRadio.addEventListener('change', toggleYearLevelsSelection);
+    specificYearLevelsRadio.addEventListener('change', toggleYearLevelsSelection);
 
     // Image preview functionality
     const imageInput = document.getElementById('image');

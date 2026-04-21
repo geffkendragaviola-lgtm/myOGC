@@ -93,6 +93,95 @@ public function dashboard()
     ));
 }
 
+public function students(Request $request)
+{
+    $user = Auth::user();
+    if (!$user || $user->role !== 'counselor') {
+        abort(403);
+    }
+
+    $counselorAssignments = Counselor::with('college')
+        ->where('user_id', $user->id)
+        ->get();
+
+    if ($counselorAssignments->isEmpty()) {
+        abort(404, 'Counselor profile not found.');
+    }
+
+    $collegeIds = $counselorAssignments->pluck('college_id')->filter()->unique()->values();
+    if ($collegeIds->isEmpty()) {
+        abort(403, 'Counselor college assignment is missing.');
+    }
+
+    $counselorIds = $counselorAssignments->pluck('id')->filter()->unique()->values();
+
+    $referredStudentIds = Appointment::query()
+        ->whereIn('referred_to_counselor_id', $counselorIds->all())
+        ->pluck('student_id')
+        ->filter()
+        ->unique()
+        ->values();
+
+    $search = $request->get('search');
+    $college = $request->get('college');
+
+    $visibleCollegeIds = $collegeIds
+        ->merge(
+            Student::query()
+                ->whereIn('id', $referredStudentIds->all())
+                ->pluck('college_id')
+                ->filter()
+        )
+        ->unique()
+        ->values();
+
+    if ($college && !$visibleCollegeIds->contains((int) $college)) {
+        abort(403);
+    }
+
+    $query = Student::with(['user', 'college', 'lastSessionNote', 'needsAssessment'])
+        ->where(function ($q) use ($collegeIds, $referredStudentIds) {
+            $q->whereIn('college_id', $collegeIds->all());
+
+            if ($referredStudentIds->isNotEmpty()) {
+                $q->orWhereIn('id', $referredStudentIds->all());
+            }
+        });
+
+    if ($search) {
+        $query->where(function ($q) use ($search) {
+            $q->where('student_id', 'like', "%{$search}%")
+                ->orWhere('course', 'like', "%{$search}%")
+                ->orWhereHas('user', function ($q) use ($search) {
+                    $q->where('first_name', 'like', "%{$search}%")
+                        ->orWhere('last_name', 'like', "%{$search}%")
+                        ->orWhere('email', 'like', "%{$search}%");
+                });
+        });
+    }
+
+    if ($college) {
+        $query->where('college_id', (int) $college);
+    }
+
+    $students = $query
+        ->orderBy('student_id')
+        ->paginate(15)
+        ->appends($request->query());
+
+    $assignedColleges = College::query()
+        ->whereIn('id', $visibleCollegeIds->all())
+        ->orderBy('name')
+        ->get();
+
+    return view('counselor.students.index', [
+        'students' => $students,
+        'colleges' => $assignedColleges,
+        'search' => $search,
+        'college' => $college,
+    ]);
+}
+
 public function appointmentSessionsDashboard(Request $request)
 {
     $userId = Auth::id();
