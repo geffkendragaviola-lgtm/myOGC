@@ -327,28 +327,7 @@
                             Override Availability — book outside set hours / daily limit
                         </span>
                     </label>
-                    <div id="createManualTimeWrap" class="hidden mt-3" style="padding:0.75rem;border:1px solid #fca5a5;border-radius:0.6rem;background:rgba(255,241,242,0.3);">
-                        <p style="font-size:0.7rem;color:#991b1b;font-weight:600;margin:0 0 0.5rem;display:flex;align-items:center;gap:0.4rem;">
-                            <i class="fas fa-exclamation-triangle text-[10px]"></i>
-                            Override mode — enter date and time manually
-                        </p>
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                            <div>
-                                <label class="field-label">Date <span class="text-[#b91c1c]">*</span></label>
-                                <input type="date" id="createManualDate"
-                                       min="{{ now()->format('Y-m-d') }}"
-                                       class="input-field text-xs"
-                                       onchange="document.getElementById('dateSelect').value = this.value;">
-                            </div>
-                            <div>
-                                <label class="field-label">Start Time <span class="text-[#b91c1c]">*</span></label>
-                                <input type="time" id="createManualTime"
-                                       class="input-field text-xs"
-                                       onchange="document.getElementById('selectedTime').value = this.value;">
-                            </div>
-                        </div>
                     </div>
-                </div>
 
                 <div class="mt-6">
                     <label class="field-label">Concern / Agenda</label>
@@ -386,6 +365,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const calendarStatus = document.getElementById('calendarStatus');
     const timeSlots = document.getElementById('timeSlots');
     const selectedTime = document.getElementById('selectedTime');
+    const overrideCheck = document.getElementById('createOverrideCheck');
 
     let currentSelectedSlot = null;
     const minDate = new Date();
@@ -539,9 +519,10 @@ document.addEventListener('DOMContentLoaded', function() {
             const date = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), day);
             const dateValue = formatDateValue(date);
             const isPast = date < minDate;
+            const isOverride = overrideCheck && overrideCheck.checked;
             const availabilityKnown = availabilityByDate.has(dateValue);
             const isAvailable = availabilityByDate.get(dateValue) === true;
-            const isDisabled = !counselorId || isPast || !availabilityKnown || !isAvailable;
+            const isDisabled = !counselorId || isPast || (!isOverride && (!availabilityKnown || !isAvailable));
 
             const button = document.createElement('button');
             button.type = 'button';
@@ -587,9 +568,10 @@ document.addEventListener('DOMContentLoaded', function() {
         const requestId = ++availabilityRequestId;
         setCalendarStatus('Checking available dates...');
         const monthValue = `${currentMonth.getFullYear()}-${String(currentMonth.getMonth() + 1).padStart(2, '0')}`;
+        const isOverride = overrideCheck && overrideCheck.checked;
 
         try {
-            const response = await fetch(`/appointments/available-dates?counselor_id=${counselorId}&month=${monthValue}&allow_today=1`);
+            const response = await fetch(`/appointments/available-dates?counselor_id=${counselorId}&month=${monthValue}&allow_today=1&override_availability=${isOverride ? 1 : 0}`);
             if (!response.ok) {
                 throw new Error('Failed to load available dates');
             }
@@ -627,6 +609,7 @@ document.addEventListener('DOMContentLoaded', function() {
     function loadAvailableSlots() {
         const counselorId = counselorIdInput.value;
         const date = dateSelect.value;
+        const isOverride = overrideCheck && overrideCheck.checked;
 
         if (!counselorId || !date) {
             timeSlots.innerHTML = '<div class="text-[#8b7e76] text-center p-4 border-2 border-dashed border-[#e5e0db] rounded-lg text-xs">Select a counselor and date to see available time slots</div>';
@@ -636,7 +619,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         timeSlots.innerHTML = '<div class="text-[#8b7e76] text-center p-4 border-2 border-dashed border-[#e5e0db] rounded-lg text-xs">Loading available slots...</div>';
 
-        fetch(`{{ route('appointments.available-slots') }}?counselor_id=${counselorId}&date=${date}`)
+        fetch(`{{ route('appointments.available-slots') }}?counselor_id=${counselorId}&date=${date}&override_availability=${isOverride ? 1 : 0}`)
             .then(response => response.json())
             .then(data => {
                 if (data.message) {
@@ -706,6 +689,12 @@ document.addEventListener('DOMContentLoaded', function() {
         loadMonthAvailability();
     });
 
+    overrideCheck?.addEventListener('change', function() {
+        loadMonthAvailability();
+        renderCalendar();
+        loadAvailableSlots();
+    });
+
     studentSelect?.addEventListener('change', function() {
         updateBookingTypeOptions();
     });
@@ -724,20 +713,19 @@ function toggleCreateOverride(enabled) {
     const selectedTime = document.getElementById('selectedTime');
 
     if (enabled) {
-        slotWrap.classList.add('hidden');
         manualWrap.classList.remove('hidden');
-        dateSelect.removeAttribute('required');
-        selectedTime.removeAttribute('required');
     } else {
-        slotWrap.classList.remove('hidden');
         manualWrap.classList.add('hidden');
-        dateSelect.setAttribute('required', '');
-        selectedTime.setAttribute('required', '');
         document.getElementById('createManualDate').value = '';
         document.getElementById('createManualTime').value = '';
         dateSelect.value = '';
         selectedTime.value = '';
     }
+
+    // Re-evaluate calendar + slots based on override mode
+    loadMonthAvailability();
+    renderCalendar();
+    loadAvailableSlots();
 }
 </script>
 @endsection

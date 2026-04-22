@@ -674,21 +674,15 @@
                                                         <i class="fas fa-circle-check"></i> Accept
                                                     </button>
                                                 </form>
-                                                <form action="{{ route('appointments.reschedule.reject', $appointment) }}" method="POST" class="inline">
-                                                    @csrf @method('PATCH')
-                                                    <button type="submit" class="action-btn reject"
-                                                            onclick="return confirm('Reject the proposed time and keep the original schedule?')">
-                                                        <i class="fas fa-circle-xmark"></i> Reject
-                                                    </button>
-                                                </form>
+                                                <button type="button" class="action-btn reject"
+                                                        onclick="openReasonModal('{{ route('appointments.reschedule.reject', $appointment) }}', 'PATCH', 'Reject Reschedule', 'Why are you rejecting this reschedule request?')">
+                                                    <i class="fas fa-circle-xmark"></i> Reject
+                                                </button>
                                             @elseif(in_array($appointment->status, ['pending', 'approved', 'rescheduled'], true) && Auth::user()->role === 'student')
-                                                <form action="{{ route('appointments.cancel', $appointment) }}" method="POST" class="inline">
-                                                    @csrf
-                                                    <button type="submit" class="action-btn cancel"
-                                                            onclick="return confirm('Are you sure you want to cancel this appointment? The time slot will become available for others.')">
-                                                        <i class="fas fa-xmark"></i> Cancel
-                                                    </button>
-                                                </form>
+                                                <button type="button" class="action-btn cancel"
+                                                        onclick="openReasonModal('{{ route('appointments.cancel', $appointment) }}', 'POST', 'Cancel Appointment', 'Please tell us why you are cancelling this appointment.')">
+                                                    <i class="fas fa-xmark"></i> Cancel
+                                                </button>
                                             @elseif($appointment->status === 'referred' && Auth::user()->role === 'student')
                                                 @if($appointment->proposed_date && $appointment->proposed_start_time && $appointment->proposed_end_time)
                                                     <form action="{{ route('appointments.referral.accept', $appointment) }}" method="POST" class="inline">
@@ -698,13 +692,10 @@
                                                             <i class="fas fa-circle-check"></i> Accept
                                                         </button>
                                                     </form>
-                                                    <form action="{{ route('appointments.referral.reject', $appointment) }}" method="POST" class="inline">
-                                                        @csrf @method('PATCH')
-                                                        <button type="submit" class="action-btn reject"
-                                                                onclick="return confirm('Reject this referral? This appointment will be closed and you will need to create a new request if you still want counseling.')">
-                                                            <i class="fas fa-circle-xmark"></i> Reject
-                                                        </button>
-                                                    </form>
+                                                    <button type="button" class="action-btn reject"
+                                                            onclick="openReasonModal('{{ route('appointments.referral.reject', $appointment) }}', 'PATCH', 'Reject Referral', 'Why are you rejecting this referral?')">
+                                                        <i class="fas fa-circle-xmark"></i> Reject
+                                                    </button>
                                                 @else
                                                     <span class="text-[#7a2a2a] text-xs italic">Awaiting details</span>
                                                 @endif
@@ -886,6 +877,59 @@ document.addEventListener('keydown', function(e) {
         closeReferralReasonModal();
         closeCounselorInfoModal();
     }
+});
+</script>
+
+<!-- Cancellation/Rejection Reason Modal -->
+<div id="reasonModal" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.45);align-items:center;justify-content:center;">
+    <div style="background:#fff;border-radius:0.75rem;padding:1.5rem;width:100%;max-width:440px;margin:1rem;box-shadow:0 20px 60px rgba(0,0,0,0.2);">
+        <h3 id="reasonModalTitle" style="margin:0 0 0.25rem;font-size:1rem;font-weight:700;color:#2c2420;"></h3>
+        <p id="reasonModalSubtitle" style="margin:0 0 1rem;font-size:0.8rem;color:#6b7280;"></p>
+        <form id="reasonModalForm" method="POST">
+            @csrf
+            <input type="hidden" name="_method" id="reasonModalMethod" value="POST">
+            <textarea name="cancellation_reason" id="reasonModalInput" rows="4" required
+                      placeholder="Enter your reason here..."
+                      style="width:100%;padding:0.65rem 0.75rem;border:1px solid #d1d5db;border-radius:0.5rem;font-size:0.85rem;resize:vertical;outline:none;box-sizing:border-box;"></textarea>
+            <p id="reasonModalError" style="display:none;color:#b91c1c;font-size:0.75rem;margin:0.25rem 0 0;"></p>
+            <div style="display:flex;gap:0.5rem;justify-content:flex-end;margin-top:1rem;">
+                <button type="button" onclick="closeReasonModal()"
+                        style="padding:0.5rem 1rem;border:1px solid #d1d5db;border-radius:0.5rem;background:#fff;font-size:0.82rem;cursor:pointer;color:#374151;">
+                    Cancel
+                </button>
+                <button type="submit"
+                        style="padding:0.5rem 1rem;border:none;border-radius:0.5rem;background:#7a2a2a;color:#fff;font-size:0.82rem;font-weight:600;cursor:pointer;">
+                    Confirm
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+function openReasonModal(action, method, title, subtitle) {
+    document.getElementById('reasonModalTitle').textContent = title;
+    document.getElementById('reasonModalSubtitle').textContent = subtitle;
+    document.getElementById('reasonModalForm').action = action;
+    document.getElementById('reasonModalMethod').value = method;
+    document.getElementById('reasonModalInput').value = '';
+    document.getElementById('reasonModalError').style.display = 'none';
+    document.getElementById('reasonModal').style.display = 'flex';
+}
+function closeReasonModal() {
+    document.getElementById('reasonModal').style.display = 'none';
+}
+document.getElementById('reasonModalForm').addEventListener('submit', function(e) {
+    const val = document.getElementById('reasonModalInput').value.trim();
+    if (!val) {
+        e.preventDefault();
+        const err = document.getElementById('reasonModalError');
+        err.textContent = 'Please provide a reason before submitting.';
+        err.style.display = 'block';
+    }
+});
+document.getElementById('reasonModal').addEventListener('click', function(e) {
+    if (e.target === this) closeReasonModal();
 });
 </script>
 @endsection

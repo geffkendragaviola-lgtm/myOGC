@@ -337,6 +337,40 @@ class AnalyticsController extends Controller
                 $availableYears = [now()->year];
             }
 
+            // --- Outside-college analytics ---
+            $assignedCollegeIds = $counselorAssignments->pluck('college_id')->filter()->unique()->values();
+
+            $outsideBase = Appointment::with('student.user', 'student.college')
+                ->whereIn('counselor_id', $counselorAssignments->pluck('id'))
+                ->whereHas('student', fn($q) => $q->whereNotIn('college_id', $assignedCollegeIds));
+
+            if ($dateFrom && $dateTo) {
+                $outsideBase->whereBetween('appointment_date', [$dateFrom, $dateTo]);
+            } else {
+                $outsideBase->whereYear('appointment_date', $year);
+            }
+
+            $outsideTotal      = (clone $outsideBase)->count();
+            $outsideCompleted  = (clone $outsideBase)->where('status', 'completed')->count();
+            $outsidePending    = (clone $outsideBase)->whereIn('status', ['pending', 'approved'])->count();
+            $outsideCancelled  = (clone $outsideBase)->whereIn('status', ['cancelled', 'rejected', 'no_show'])->count();
+
+            // Breakdown by college
+            $outsideByCollege = (clone $outsideBase)
+                ->join('students', 'appointments.student_id', '=', 'students.id')
+                ->join('colleges', 'students.college_id', '=', 'colleges.id')
+                ->selectRaw('colleges.id as college_id, colleges.name as college_name, count(*) as total, count(distinct appointments.student_id) as unique_students')
+                ->groupBy('colleges.id', 'colleges.name')
+                ->orderByDesc('total')
+                ->get();
+
+            // Recent outside-college appointments
+            $outsideRecent = (clone $outsideBase)
+                ->with('student.user', 'student.college')
+                ->orderByDesc('appointment_date')
+                ->limit(10)
+                ->get();
+
             return view('analytics.counselor', compact(
                 'counselor',
                 'colleges',
@@ -345,7 +379,13 @@ class AnalyticsController extends Controller
                 'year',
                 'dateFrom',
                 'dateTo',
-                'availableYears'
+                'availableYears',
+                'outsideTotal',
+                'outsideCompleted',
+                'outsidePending',
+                'outsideCancelled',
+                'outsideByCollege',
+                'outsideRecent'
             ));
         }
 }

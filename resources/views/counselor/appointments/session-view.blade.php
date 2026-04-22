@@ -189,6 +189,14 @@
                                 <span class="detail-label">Status</span>
                                 <div class="detail-value">{{ ucwords(str_replace('_',' ',$appointment->status)) }}</div>
                             </div>
+                            @if($appointment->cancellation_reason)
+                            <div>
+                                <span class="detail-label">Student's Reason</span>
+                                <div class="detail-value" style="color:#b91c1c;background:rgba(239,68,68,0.06);border:1px solid rgba(239,68,68,0.2);border-radius:0.4rem;padding:0.5rem 0.65rem;font-size:0.82rem;">
+                                    {{ $appointment->cancellation_reason }}
+                                </div>
+                            </div>
+                            @endif
                             <div>
                                 <span class="detail-label">Case Number</span>
                                 <div class="detail-value muted">{{ $appointment->case_number ?: '—' }}</div>

@@ -857,6 +857,7 @@ public function getAppointmentDetails(Appointment $appointment)
             'session_url' => $sessionUrl,
             'has_session_notes' => $appointment->sessionNotes->isNotEmpty(),
             'session_notes_count' => $appointment->sessionNotes->count(),
+            'cancellation_reason' => $appointment->cancellation_reason,
         ],
         'referral' => [
             'referred_to_name' => $appointment->referredCounselor && $appointment->referredCounselor->user

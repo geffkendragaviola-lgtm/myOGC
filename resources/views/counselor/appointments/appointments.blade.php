@@ -658,6 +658,11 @@
                                                     {{ $referralBadgeText }}
                                                 </span>
                                             @endif
+                                            @if($appointment->cancellation_reason)
+                                                <span class="text-[10px] text-[#b91c1c] italic mt-0.5" style="max-width:160px;white-space:normal;line-height:1.3;" title="{{ $appointment->cancellation_reason }}">
+                                                    "{{ Str::limit($appointment->cancellation_reason, 50) }}"
+                                                </span>
+                                            @endif
                                         </div>
                                     </td>
 
@@ -913,27 +918,6 @@
                                     Override Availability — book outside set hours / daily limit
                                 </span>
                             </label>
-
-                            {{-- Manual time input (shown when override is on) --}}
-                            <div id="rescheduleManualTimeWrap" class="hidden space-y-3" style="padding:0.75rem;border:1px solid #fca5a5;border-radius:0.6rem;background:rgba(255,241,242,0.3);">
-                                <p style="font-size:0.7rem;color:#991b1b;font-weight:600;margin:0 0 0.5rem;display:flex;align-items:center;gap:0.4rem;">
-                                    <i class="fas fa-exclamation-triangle text-[10px]"></i>
-                                    Override mode — enter date and time manually
-                                </p>
-                                <div>
-                                    <label class="field-label">Date <span class="text-[#b91c1c]">*</span></label>
-                                    <input type="date" id="rescheduleManualDate"
-                                           min="{{ now()->format('Y-m-d') }}"
-                                           class="input-field text-xs"
-                                           onchange="syncRescheduleManualDate(this.value)">
-                                </div>
-                                <div>
-                                    <label class="field-label">Start Time <span class="text-[#b91c1c]">*</span></label>
-                                    <input type="time" id="rescheduleManualTime"
-                                           class="input-field text-xs"
-                                           onchange="syncRescheduleManualTime(this.value)">
-                                </div>
-                            </div>
 
                             <div id="rescheduleCalendarWrap">
                                 <label class="field-label">Select Date</label>
@@ -1442,6 +1426,7 @@
             function renderRescheduleCalendar() {
                 const calendarGrid = document.getElementById('rescheduleCalendarGrid');
                 const calendarMonthLabel = document.getElementById('rescheduleCalendarMonthLabel');
+                const overrideCheck = document.getElementById('rescheduleOverrideCheck');
 
                 if (!calendarGrid || !calendarMonthLabel || !rescheduleCurrentMonth) {
                     return;
@@ -1463,9 +1448,10 @@
                     const date = new Date(rescheduleCurrentMonth.getFullYear(), rescheduleCurrentMonth.getMonth(), day);
                     const dateValue = rescheduleFormatDateValue(date);
                     const isPast = date < rescheduleMinDate;
+                    const isOverride = Boolean(overrideCheck && overrideCheck.checked);
                     const availabilityKnown = rescheduleAvailabilityByDate.has(dateValue);
                     const isAvailable = rescheduleAvailabilityByDate.get(dateValue) === true;
-                    const isDisabled = !rescheduleCounselorId || isPast || !availabilityKnown || !isAvailable;
+                    const isDisabled = !rescheduleCounselorId || isPast || (!isOverride && (!availabilityKnown || !isAvailable));
 
                     const button = document.createElement('button');
                     button.type = 'button';
@@ -1506,6 +1492,9 @@
                 rescheduleAvailabilityByDate = new Map();
                 renderRescheduleCalendar();
 
+                const overrideCheck = document.getElementById('rescheduleOverrideCheck');
+                const isOverride = Boolean(overrideCheck && overrideCheck.checked);
+
                 if (!rescheduleCounselorId) {
                     setRescheduleCalendarStatus('Select a counselor to load available dates.');
                     return;
@@ -1516,7 +1505,7 @@
                 const monthValue = `${rescheduleCurrentMonth.getFullYear()}-${String(rescheduleCurrentMonth.getMonth() + 1).padStart(2, '0')}`;
 
                 try {
-                    const response = await fetch(`/appointments/available-dates?counselor_id=${rescheduleCounselorId}&month=${monthValue}&allow_today=1`);
+                    const response = await fetch(`/appointments/available-dates?counselor_id=${rescheduleCounselorId}&month=${monthValue}&allow_today=1&override_availability=${isOverride ? 1 : 0}`);
                     const data = await response.json();
                     if (requestId !== rescheduleAvailabilityRequestId) {
                         return;
@@ -1558,6 +1547,8 @@
                 const date = document.getElementById('rescheduleDateSelect').value;
                 const timeSlots = document.getElementById('rescheduleTimeSlots');
                 const selectedTime = document.getElementById('rescheduleSelectedTime');
+                const overrideCheck = document.getElementById('rescheduleOverrideCheck');
+                const isOverride = Boolean(overrideCheck && overrideCheck.checked);
 
                 if (!rescheduleCounselorId || !date) {
                     timeSlots.innerHTML = '<div class="text-[#8b7e76] text-center p-4 border-2 border-dashed border-[#e5e0db] rounded-lg text-xs">Select a date to see available time slots</div>';
@@ -1567,7 +1558,7 @@
 
                 timeSlots.innerHTML = '<div class="text-[#8b7e76] text-center p-4 border-2 border-dashed border-[#e5e0db] rounded-lg text-xs">Loading available slots...</div>';
 
-                fetch(`{{ route('appointments.available-slots') }}?counselor_id=${rescheduleCounselorId}&date=${date}`, {
+                fetch(`{{ route('appointments.available-slots') }}?counselor_id=${rescheduleCounselorId}&date=${date}&override_availability=${isOverride ? 1 : 0}`, {
                     headers: { 'Accept': 'application/json' }
                 })
                 .then(response => response.json())
@@ -1665,28 +1656,21 @@
                 const timeInput  = document.getElementById('rescheduleSelectedTime');
 
                 if (enabled) {
-                    calWrap.classList.add('hidden');
-                    slotWrap.classList.add('hidden');
                     manualWrap.classList.remove('hidden');
-                    // Remove required from hidden fields
-                    dateInput.removeAttribute('required');
-                    timeInput.removeAttribute('required');
                 } else {
-                    calWrap.classList.remove('hidden');
-                    slotWrap.classList.remove('hidden');
                     manualWrap.classList.add('hidden');
-                    dateInput.setAttribute('required', '');
-                    timeInput.setAttribute('required', '');
                     // Clear manual inputs
-                    const md = document.getElementById('rescheduleManualDate');
                     const mt = document.getElementById('rescheduleManualTime');
-                    if (md) md.value = '';
                     if (mt) mt.value = '';
                 }
-            }
 
-            function syncRescheduleManualDate(val) {
-                document.getElementById('rescheduleDateSelect').value = val;
+                // Refresh calendar availability & slots based on override mode
+                if (rescheduleCurrentMonth) {
+                    loadRescheduleMonthAvailability();
+                }
+                if (dateInput && dateInput.value) {
+                    loadRescheduleAvailableSlots();
+                }
             }
 
             function syncRescheduleManualTime(val) {
@@ -1841,6 +1825,13 @@
                                         ${data.appointment.status_display || (data.appointment.status.charAt(0).toUpperCase() + data.appointment.status.slice(1))}
                                     </span>
                                 </div>
+
+                                ${data.appointment.cancellation_reason ? `
+                                <div>
+                                    <label class="field-label">Student's Reason</label>
+                                    <p class="mt-1 text-xs italic" style="color:#b91c1c;background:rgba(239,68,68,0.06);border:1px solid rgba(239,68,68,0.2);border-radius:0.4rem;padding:0.4rem 0.6rem;">${data.appointment.cancellation_reason}</p>
+                                </div>
+                                ` : ''}
 
                                 ${data.appointment.has_session_notes ? `
                                 <div class="border-t pt-4 mt-4" style="border-color: var(--border-soft)/60;">

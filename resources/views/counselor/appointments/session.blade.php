@@ -361,6 +361,14 @@
                                 <span class="detail-label">Status</span>
                                 <div class="detail-value">{{ $appointment->status === 'referred' ? 'Referred' : ucwords(str_replace('_', ' ', $appointment->status)) }}</div>
                             </div>
+                            @if($appointment->cancellation_reason)
+                            <div>
+                                <span class="detail-label">Student's Reason</span>
+                                <div class="detail-value" style="color:#b91c1c;background:rgba(239,68,68,0.06);border:1px solid rgba(239,68,68,0.2);border-radius:0.4rem;padding:0.5rem 0.65rem;font-size:0.82rem;">
+                                    {{ $appointment->cancellation_reason }}
+                                </div>
+                            </div>
+                            @endif
                             <div>
                                 <span class="detail-label">Case Number</span>
                                 <div class="detail-value muted">{{ $appointment->case_number ?: '—' }}</div>
@@ -677,29 +685,6 @@
                                 </span>
                             </label>
 
-                            {{-- Manual time input (shown when override is on) --}}
-                            <div id="fuManualTimeWrap" class="hidden" style="padding:0.75rem;border:1px solid #fca5a5;border-radius:0.6rem;background:rgba(255,241,242,0.3);">
-                                <p style="font-size:0.7rem;color:#991b1b;font-weight:600;margin:0 0 0.5rem;display:flex;align-items:center;gap:0.4rem;">
-                                    <i class="fas fa-exclamation-triangle text-[10px]"></i>
-                                    Override mode — enter date and time manually
-                                </p>
-                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                                    <div>
-                                        <label class="field-label">Date <span class="text-[#b91c1c]">*</span></label>
-                                        <input type="date" id="fuManualDate"
-                                               min="{{ now()->format('Y-m-d') }}"
-                                               class="input-field text-xs"
-                                               onchange="document.getElementById('followup_appointment_date').value = this.value; updateFollowupSubmitState();">
-                                    </div>
-                                    <div>
-                                        <label class="field-label">Start Time <span class="text-[#b91c1c]">*</span></label>
-                                        <input type="time" id="fuManualTime"
-                                               class="input-field text-xs"
-                                               onchange="document.getElementById('followup_selected_time').value = this.value; updateFollowupSubmitState();">
-                                    </div>
-                                </div>
-                            </div>
-
                             {{-- Auto-approve --}}
                             <label style="display:flex;align-items:center;gap:0.6rem;cursor:pointer;padding:0.65rem 0.85rem;border:1px solid var(--border-soft);border-radius:0.6rem;background:rgba(254,249,231,0.4);">
                                 <input type="checkbox" name="auto_approve" id="followup_auto_approve" value="1" checked
@@ -780,8 +765,6 @@
             const timeHidden = document.getElementById('followup_selected_time');
 
             if (enabled) {
-                if (calWrap)  calWrap.classList.add('hidden');
-                if (slotWrap) slotWrap.classList.add('hidden');
                 if (manualWrap) manualWrap.classList.remove('hidden');
                 // Sync manual date if already set
                 const manualTime = document.getElementById('fuManualTime');
@@ -791,8 +774,6 @@
                     timeHidden.value = '';
                 }
             } else {
-                if (calWrap)  calWrap.classList.remove('hidden');
-                if (slotWrap) slotWrap.classList.remove('hidden');
                 if (manualWrap) manualWrap.classList.add('hidden');
                 // Clear manual inputs
                 const manualTime = document.getElementById('fuManualTime');
@@ -803,6 +784,11 @@
                 dateHidden.value = '';
             }
             updateFollowupSubmitState();
+
+            // Refresh calendar availability & slots in case override affects enabled dates/slots
+            if (!enabled && dateHidden && dateHidden.value) {
+                loadFollowupSlots(dateHidden.value);
+            }
         }
 
         function handleFollowupBackdropClick(event) {
@@ -820,8 +806,11 @@
 
             const isOverride = overrideCheck && overrideCheck.checked;
             if (isOverride) {
-                // Need both a date and a time
-                btn.disabled = !(dateHidden && dateHidden.value && selectedTime.value);
+                const manualDate = document.getElementById('fuManualDate');
+                const manualTime = document.getElementById('fuManualTime');
+                const hasCalendarSelection = Boolean(dateHidden && dateHidden.value && selectedTime.value);
+                const hasManualSelection = Boolean(manualDate && manualTime && manualDate.value && manualTime.value);
+                btn.disabled = !(hasCalendarSelection || hasManualSelection);
             } else {
                 btn.disabled = !selectedTime.value;
             }
@@ -859,6 +848,7 @@
         async function loadFollowupSlots(dateValue) {
             const slotsContainer = document.getElementById('followup_time_slots');
             const selectedTime = document.getElementById('followup_selected_time');
+            const overrideCheck = document.getElementById('fuOverrideCheck');
             if (!slotsContainer || !selectedTime) return;
 
             selectedTime.value = '';
@@ -872,7 +862,8 @@
             slotsContainer.innerHTML = '<div class="col-span-full text-center text-[#8b7e76] text-xs py-3">Loading slots...</div>';
 
             const counselorId = {{ (int) $effectiveCounselorId }};
-            const url = `{{ route('counselor.appointments.followup-available-slots') }}?counselor_id=${encodeURIComponent(counselorId)}&date=${encodeURIComponent(dateValue)}`;
+            const isOverride = Boolean(overrideCheck && overrideCheck.checked);
+            const url = `{{ route('counselor.appointments.followup-available-slots') }}?counselor_id=${encodeURIComponent(counselorId)}&date=${encodeURIComponent(dateValue)}&override_availability=${isOverride ? 1 : 0}`;
 
             try {
                 const res = await fetch(url, { headers: { 'Accept': 'application/json' } });
@@ -908,6 +899,7 @@
             const calStatus    = document.getElementById('fuCalStatus');
             const calPrev      = document.getElementById('fuCalPrev');
             const calNext      = document.getElementById('fuCalNext');
+            const overrideCheck = document.getElementById('fuOverrideCheck');
 
             if (!calGrid) return;
 
@@ -936,6 +928,7 @@
                 calGrid.innerHTML = '';
                 const startDay = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), 1).getDay();
                 const daysInMonth = new Date(currentMonth.getFullYear(), currentMonth.getMonth()+1, 0).getDate();
+                const isOverride = Boolean(overrideCheck && overrideCheck.checked);
 
                 for (let i=0; i<startDay; i++) calGrid.appendChild(document.createElement('div'));
 
@@ -949,7 +942,7 @@
                     btn.textContent = day;
                     btn.className = 'calendar-day';
 
-                    if (past || !avail) {
+                    if (past || (!isOverride && !avail)) {
                         btn.disabled = true;
                         btn.classList.add('disabled');
                     } else {
@@ -976,7 +969,8 @@
                 const month = `${currentMonth.getFullYear()}-${String(currentMonth.getMonth()+1).padStart(2,'0')}`;
                 const id = ++reqId;
                 try {
-                    const res  = await fetch(`/appointments/available-dates?counselor_id=${counselorId}&month=${month}&allow_today=1`);
+                    const isOverride = Boolean(overrideCheck && overrideCheck.checked);
+                    const res  = await fetch(`/appointments/available-dates?counselor_id=${counselorId}&month=${month}&allow_today=1&override_availability=${isOverride ? 1 : 0}`);
                     const data = await res.json();
                     if (id !== reqId) return;
                     Object.entries(data.availability || {}).forEach(([k,v]) => availMap.set(k, v===true));
@@ -1001,6 +995,14 @@
             calNext.addEventListener('click', () => {
                 currentMonth = new Date(currentMonth.getFullYear(), currentMonth.getMonth()+1, 1);
                 loadMonthAvail();
+            });
+
+            overrideCheck?.addEventListener('change', () => {
+                // Override affects which dates are selectable + which slots are returned
+                loadMonthAvail();
+                if (dateHidden && dateHidden.value) {
+                    loadFollowupSlots(dateHidden.value);
+                }
             });
 
             loadMonthAvail();

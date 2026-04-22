@@ -401,6 +401,118 @@
 
     @endif
 </div>
+
+{{-- Outside-College Students Section --}}
+@if($outsideTotal > 0)
+<div class="mt-6" style="max-width:1200px;margin-left:auto;margin-right:auto;padding:0 1rem;">
+    <div class="an-card">
+        <div class="sec-title" style="margin-bottom:1.25rem;">
+            <i class="fas fa-arrow-right-arrow-left"></i>
+            Students from Outside Your Assigned College(s)
+            <span style="margin-left:auto;font-size:0.72rem;font-weight:500;color:var(--text-muted);">
+                {{ $dateFrom && $dateTo ? $dateFrom.' – '.$dateTo : 'Year '.$year }}
+            </span>
+        </div>
+
+        {{-- Summary stats --}}
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-5">
+            <div class="stat-card">
+                <div class="stat-icon si-purple"><i class="fas fa-users"></i></div>
+                <div>
+                    <div class="stat-value">{{ $outsideTotal }}</div>
+                    <div class="stat-label">Total Appointments</div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon si-green"><i class="fas fa-circle-check"></i></div>
+                <div>
+                    <div class="stat-value">{{ $outsideCompleted }}</div>
+                    <div class="stat-label">Completed</div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon si-gold"><i class="fas fa-clock"></i></div>
+                <div>
+                    <div class="stat-value">{{ $outsidePending }}</div>
+                    <div class="stat-label">Pending / Approved</div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon si-red"><i class="fas fa-ban"></i></div>
+                <div>
+                    <div class="stat-value">{{ $outsideCancelled }}</div>
+                    <div class="stat-label">Cancelled / No-show</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+            {{-- Breakdown by college --}}
+            <div>
+                <div class="text-xs font-semibold uppercase tracking-wide mb-3" style="color:var(--text-secondary);">
+                    <i class="fas fa-building-columns mr-1"></i>Breakdown by College
+                </div>
+                <div class="space-y-2">
+                    @foreach($outsideByCollege as $row)
+                    @php $pct = $outsideTotal > 0 ? round(($row->total / $outsideTotal) * 100) : 0; @endphp
+                    <div style="background:rgba(250,248,245,0.7);border:1px solid var(--border-soft);border-radius:0.6rem;padding:0.65rem 0.85rem;">
+                        <div class="flex items-center justify-between mb-1">
+                            <span style="font-size:0.8rem;font-weight:600;color:var(--text-primary);">{{ $row->college_name }}</span>
+                            <span style="font-size:0.75rem;color:var(--text-secondary);">{{ $row->total }} appts &middot; {{ $row->unique_students }} students</span>
+                        </div>
+                        <div class="reach-bar-track">
+                            <div class="reach-bar-fill" style="width:{{ $pct }}%;background:linear-gradient(90deg,#6d28d9,#4c1d95);"></div>
+                        </div>
+                    </div>
+                    @endforeach
+                </div>
+            </div>
+
+            {{-- Recent appointments --}}
+            <div>
+                <div class="text-xs font-semibold uppercase tracking-wide mb-3" style="color:var(--text-secondary);">
+                    <i class="fas fa-clock-rotate-left mr-1"></i>Recent Appointments
+                </div>
+                <div style="overflow-x:auto;">
+                    <table style="width:100%;border-collapse:collapse;font-size:0.78rem;">
+                        <thead>
+                            <tr style="border-bottom:1px solid var(--border-soft);">
+                                <th style="text-align:left;padding:0.4rem 0.5rem;color:var(--text-muted);font-weight:600;text-transform:uppercase;font-size:0.65rem;letter-spacing:0.05em;">Student</th>
+                                <th style="text-align:left;padding:0.4rem 0.5rem;color:var(--text-muted);font-weight:600;text-transform:uppercase;font-size:0.65rem;letter-spacing:0.05em;">College</th>
+                                <th style="text-align:left;padding:0.4rem 0.5rem;color:var(--text-muted);font-weight:600;text-transform:uppercase;font-size:0.65rem;letter-spacing:0.05em;">Date</th>
+                                <th style="text-align:left;padding:0.4rem 0.5rem;color:var(--text-muted);font-weight:600;text-transform:uppercase;font-size:0.65rem;letter-spacing:0.05em;">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach($outsideRecent as $appt)
+                            <tr style="border-bottom:1px solid rgba(229,224,219,0.5);">
+                                <td style="padding:0.45rem 0.5rem;color:var(--text-primary);font-weight:500;">
+                                    {{ $appt->student->user->full_name ?? '—' }}
+                                </td>
+                                <td style="padding:0.45rem 0.5rem;color:var(--text-secondary);">
+                                    {{ $appt->student->college->name ?? '—' }}
+                                </td>
+                                <td style="padding:0.45rem 0.5rem;color:var(--text-secondary);">
+                                    {{ $appt->appointment_date->format('M j, Y') }}
+                                </td>
+                                <td style="padding:0.45rem 0.5rem;">
+                                    <span style="display:inline-flex;padding:0.15rem 0.5rem;border-radius:999px;font-size:0.65rem;font-weight:700;text-transform:uppercase;
+                                        background:{{ in_array($appt->status, ['completed']) ? 'rgba(45,122,79,0.1)' : (in_array($appt->status, ['pending','approved']) ? 'rgba(212,175,55,0.15)' : 'rgba(185,28,28,0.1)') }};
+                                        color:{{ in_array($appt->status, ['completed']) ? '#1e5c38' : (in_array($appt->status, ['pending','approved']) ? '#7a2a2a' : '#991b1b') }};">
+                                        {{ ucwords(str_replace('_', ' ', $appt->status)) }}
+                                    </span>
+                                </td>
+                            </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@endif
+
 @endsection
 
 @push('scripts')

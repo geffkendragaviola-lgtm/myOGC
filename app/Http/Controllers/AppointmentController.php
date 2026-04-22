@@ -526,6 +526,10 @@ public function getReferredCounselors(Request $request)
  */
 public function getFollowupAvailableSlots(Request $request)
 {
+    $requestUser = $request->user();
+    $isCounselorRequest = $requestUser && $requestUser->role === 'counselor';
+    $overrideAvailability = $request->boolean('override_availability', false);
+
     $request->validate([
         'counselor_id' => 'required|exists:counselors,id',
         'date' => 'required|date|after_or_equal:today',
@@ -542,7 +546,7 @@ public function getFollowupAvailableSlots(Request $request)
         ]);
     }
 
-    if ($this->getCounselorBookingsForDate($counselorIds, $date) >= $this->getDailyBookingLimit($counselor)) {
+    if (!$overrideAvailability && $this->getCounselorBookingsForDate($counselorIds, $date) >= $this->getDailyBookingLimit($counselor)) {
         return response()->json([
             'available_slots' => [],
             'booked_slots' => [],
@@ -553,10 +557,14 @@ public function getFollowupAvailableSlots(Request $request)
     // Get counselor's availability for that day
     $dayAvailability = $this->getAvailabilityForDate($counselor, $date);
 
+    if ($overrideAvailability && $isCounselorRequest) {
+        // Override mode: allow booking outside set hours; still respect closed dates.
+        $dayAvailability = ['08:00-17:00'];
+    }
+
     // Only fall back if the counselor has no availability configured at all.
     // If they have a schedule set, an empty day means they don't work that day.
-    $requestUser = $request->user();
-    if (empty($dayAvailability) && $requestUser && $requestUser->role === 'counselor' && $counselor->availability === null) {
+    if (empty($dayAvailability) && $isCounselorRequest && $counselor->availability === null) {
         $dayAvailability = ['08:00-12:00', '13:00-17:00'];
     }
 
@@ -653,6 +661,7 @@ public function getAvailableSlots(Request $request)
 {
     $requestUser = $request->user();
     $isCounselorRequest = $requestUser && $requestUser->role === 'counselor';
+    $overrideAvailability = $request->boolean('override_availability', false);
 
     $request->validate([
         'counselor_id' => 'required|exists:counselors,id',
@@ -670,7 +679,7 @@ public function getAvailableSlots(Request $request)
         ]);
     }
 
-    if ($this->getCounselorBookingsForDate($counselorIds, $date) >= $this->getDailyBookingLimit($counselor)) {
+    if (!$overrideAvailability && $this->getCounselorBookingsForDate($counselorIds, $date) >= $this->getDailyBookingLimit($counselor)) {
         return response()->json([
             'available_slots' => [],
             'booked_slots' => [],
@@ -680,6 +689,11 @@ public function getAvailableSlots(Request $request)
 
     // Get counselor's availability for that day
     $dayAvailability = $this->getAvailabilityForDate($counselor, $date);
+
+    if ($overrideAvailability && $isCounselorRequest) {
+        // Override mode: allow booking outside set hours; still respect closed dates.
+        $dayAvailability = ['08:00-17:00'];
+    }
 
     // Counselors can book outside their set availability (emergency/urgent cases)
     if (empty($dayAvailability)) {
@@ -794,6 +808,7 @@ public function getAvailableDates(Request $request)
     $availability = $counselor->getAvailability();
     $requestUser = $request->user();
     $isCounselorRequest = $requestUser && $requestUser->role === 'counselor';
+    $overrideAvailability = $request->boolean('override_availability', false);
     $overrides = CounselorScheduleOverride::where('counselor_id', $counselor->id)
         ->whereBetween('date', [$monthStart->toDateString(), $monthEnd->toDateString()])
         ->get()
@@ -823,6 +838,13 @@ public function getAvailableDates(Request $request)
         $override = $overrides->get($dateKey);
         if ($override && $override->is_closed) {
             $results[$dateKey] = false;
+            $currentDate->addDay();
+            continue;
+        }
+
+        // Counselor override mode: allow selecting any non-past, non-closed date in the month.
+        if ($overrideAvailability && $isCounselorRequest) {
+            $results[$dateKey] = true;
             $currentDate->addDay();
             continue;
         }
@@ -1053,7 +1075,7 @@ public function store(Request $request)
         ->with('success', 'Appointment booked successfully! It is now pending approval.');
 }
 
-    public function cancel(Appointment $appointment)
+    public function cancel(Request $request, Appointment $appointment)
     {
         // Check if the student owns this appointment
         $student = Student::where('user_id', Auth::id())->first();
@@ -1067,6 +1089,10 @@ public function store(Request $request)
             return redirect()->back()->with('error', 'This appointment cannot be cancelled.');
         }
 
+        $request->validate([
+            'cancellation_reason' => 'required|string|max:500',
+        ]);
+
         $calendarService = new GoogleCalendarService();
         if ($appointment->google_calendar_event_id && $appointment->counselor && $appointment->counselor->google_calendar_id) {
             $calendarService->deleteEvent($appointment->google_calendar_event_id, $appointment->counselor->google_calendar_id);
@@ -1075,6 +1101,7 @@ public function store(Request $request)
         $appointment->update([
             'status' => 'cancelled',
             'notes' => $appointment->notes . "\nCancelled by student on " . now()->toDateTimeString(),
+            'cancellation_reason' => $request->cancellation_reason,
             'google_calendar_event_id' => null,
             'proposed_date' => null,
             'proposed_start_time' => null,
@@ -1164,7 +1191,12 @@ public function reschedule(Request $request, Appointment $appointment)
     }
 
     $counselorIds = Counselor::where('user_id', $counselor->user_id)->pluck('id')->all();
-    if (!in_array($appointment->getEffectiveCounselorId(), $counselorIds, true)) {
+
+    // For referred appointments, allow the referred-to counselor to reschedule directly
+    $isReferredCounselor = $appointment->status === 'referred'
+        && in_array((int) $appointment->referred_to_counselor_id, array_map('intval', $counselorIds), true);
+
+    if (!$isReferredCounselor && !in_array($appointment->getEffectiveCounselorId(), $counselorIds, true)) {
         return redirect()->back()->with('error', 'You can only reschedule your own appointments.');
     }
 
@@ -1236,7 +1268,7 @@ public function reschedule(Request $request, Appointment $appointment)
             'error' => $exception->getMessage(),
         ]);
 
-        // Calendar unavailable  proceeding with DB-only slot validation
+        // Calendar unavailable — proceeding with DB-only slot validation
     }
 
     $rescheduleNote = "RESCHEDULE REQUESTED by {$counselor->user->first_name} {$counselor->user->last_name} on " .
@@ -1252,6 +1284,7 @@ public function reschedule(Request $request, Appointment $appointment)
 
     try {
         $oldEventId = $appointment->google_calendar_event_id;
+        $oldCounselorForCalendar = $appointment->counselor;
 
         $eventData = [
             'name' => 'Counseling Appointment - ' . $appointment->student->user->first_name . ' ' . $appointment->student->user->last_name,
@@ -1263,8 +1296,9 @@ public function reschedule(Request $request, Appointment $appointment)
         if ($counselor->google_calendar_id) {
             try {
                 $newEvent = $calendarService->createAppointmentEvent($eventData, $counselor->google_calendar_id);
-                if ($oldEventId) {
-                    $calendarService->deleteEvent($oldEventId, $counselor->google_calendar_id);
+                // Delete old event from old counselor's calendar if switching counselors
+                if ($oldEventId && $oldCounselorForCalendar && $oldCounselorForCalendar->google_calendar_id) {
+                    $calendarService->deleteEvent($oldEventId, $oldCounselorForCalendar->google_calendar_id);
                 }
             } catch (\Throwable $calendarException) {
                 Log::warning('Google Calendar event skipped for reschedule request', [
@@ -1275,7 +1309,7 @@ public function reschedule(Request $request, Appointment $appointment)
             }
         }
 
-        $appointment->update([
+        $updateData = [
             'status' => 'reschedule_requested',
             'proposed_date' => $date->toDateString(),
             'proposed_start_time' => $request->start_time,
@@ -1284,7 +1318,18 @@ public function reschedule(Request $request, Appointment $appointment)
             'reschedule_requested_at' => now(),
             'notes' => ($appointment->notes ? $appointment->notes . "\n\n" : '') . $rescheduleNote,
             'google_calendar_event_id' => $newEvent?->id ?? $appointment->google_calendar_event_id,
-        ]);
+        ];
+
+        // If the referred counselor is rescheduling, transfer ownership now so the
+        // student sees the correct counselor details immediately.
+        if ($isReferredCounselor) {
+            $updateData['counselor_id'] = $counselor->id;
+            $updateData['referral_outcome'] = 'accepted';
+            $updateData['referral_resolved_at'] = now();
+            $updateData['referral_resolved_by_counselor_id'] = $counselor->id;
+        }
+
+        $appointment->update($updateData);
 
         DB::commit();
     } catch (\Throwable $exception) {
@@ -1541,6 +1586,10 @@ public function rejectReschedule(Request $request, Appointment $appointment)
         return redirect()->back()->with('error', 'This appointment does not have a pending reschedule request.');
     }
 
+    $request->validate([
+        'cancellation_reason' => 'required|string|max:500',
+    ]);
+
     if ($appointment->google_calendar_event_id && $appointment->counselor && $appointment->counselor->google_calendar_id) {
         try {
             $calendarService = new GoogleCalendarService();
@@ -1560,6 +1609,7 @@ public function rejectReschedule(Request $request, Appointment $appointment)
     $appointment->update([
         'status' => 'rejected',
         'notes' => ($appointment->notes ? $appointment->notes . "\n\n" : '') . $rejectNote,
+        'cancellation_reason' => $request->cancellation_reason,
         'google_calendar_event_id' => null,
         'proposed_date' => null,
         'proposed_start_time' => null,
@@ -1799,6 +1849,10 @@ public function rejectReferral(Request $request, Appointment $appointment)
         return redirect()->back()->with('error', 'This appointment does not have a pending referral request.');
     }
 
+    $request->validate([
+        'cancellation_reason' => 'required|string|max:500',
+    ]);
+
     $calendarId = null;
     if ($appointment->referredCounselor && $appointment->referredCounselor->google_calendar_id) {
         $calendarId = $appointment->referredCounselor->google_calendar_id;
@@ -1827,6 +1881,7 @@ public function rejectReferral(Request $request, Appointment $appointment)
     $appointment->update([
         'status' => 'rejected',
         'notes' => ($appointment->notes ? $appointment->notes . "\n\n" : '') . $rejectNote,
+        'cancellation_reason' => $request->cancellation_reason,
         'google_calendar_event_id' => null,
         'referred_to_counselor_id' => null,
         'referral_reason' => null,

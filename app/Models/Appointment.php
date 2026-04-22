@@ -57,6 +57,7 @@ class Appointment extends Model
         'proposed_end_time',
         'reschedule_reason',
         'reschedule_requested_at',
+        'cancellation_reason',
     ];
 
     protected $casts = [
