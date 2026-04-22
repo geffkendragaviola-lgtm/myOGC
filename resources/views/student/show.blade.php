@@ -568,6 +568,65 @@
         </div>
         @endif
 
+        <!-- High-Risk Alert (Counselor Only) -->
+        @if(Auth::check() && Auth::user()->role === 'counselor')
+        @php
+            $stressResponses = $student->needsAssessment?->stress_responses ?? [];
+            $stressResponses = is_array($stressResponses) ? $stressResponses : [];
+            $riskResponses = ['Hurt myself', 'Attempted to end my life', 'Thought it would be better dead'];
+            $hasSelfHarmRisk = !$student->high_risk_overridden
+                && count(array_intersect($riskResponses, $stressResponses)) > 0;
+            $isHighRisk = $student->is_high_risk || $hasSelfHarmRisk;
+        @endphp
+        <div class="card mb-4" style="border-left:3px solid {{ $isHighRisk ? '#dc2626' : '#e5e0db' }};">
+            <div class="card-header" style="background:{{ $isHighRisk ? '#fee2e2' : 'white' }};color:{{ $isHighRisk ? '#991b1b' : 'var(--text-primary)' }};">
+                <i class="fas fa-{{ $isHighRisk ? 'exclamation-triangle' : 'shield-halved' }}"></i>
+                High-Risk Status
+                <button type="button" 
+                        onclick="toggleHighRiskModal()"
+                        class="btn btn-sm ml-auto"
+                        style="padding:0.35rem 0.75rem;font-size:0.75rem;">
+                    <i class="fas fa-edit"></i> {{ $student->is_high_risk ? 'Update Flag' : 'Flag Student' }}
+                </button>
+            </div>
+            <div class="card-body">
+                @if($isHighRisk)
+                    <div style="display:flex;flex-direction:column;gap:0.75rem;">
+                        @if($hasSelfHarmRisk)
+                            <div style="padding:0.75rem;background:#fff7ed;border:1px solid #fed7aa;border-radius:0.5rem;">
+                                <p style="margin:0 0 0.25rem 0;font-size:0.82rem;font-weight:600;color:#9a3412;">
+                                    <i class="fas fa-notes-medical"></i> Assessment-Based Risk
+                                </p>
+                                <p style="margin:0;font-size:0.8rem;color:#7c2d12;">
+                                    Student indicated self-harm or suicidal thoughts in their needs assessment.
+                                </p>
+                            </div>
+                        @endif
+                        @if($student->is_high_risk)
+                            <div style="padding:0.75rem;background:#fef3c7;border:1px solid #fde68a;border-radius:0.5rem;">
+                                <p style="margin:0 0 0.25rem 0;font-size:0.82rem;font-weight:600;color:#92400e;">
+                                    <i class="fas fa-flag"></i> Counselor Flagged
+                                </p>
+                                @if($student->high_risk_notes)
+                                    <p style="margin:0.25rem 0;color:#78350f;font-size:0.8rem;"><strong>Notes:</strong> {{ $student->high_risk_notes }}</p>
+                                @endif
+                                <p style="margin:0.25rem 0 0;font-size:0.72rem;color:#a16207;">
+                                    By {{ $student->flaggedBy->first_name ?? 'Unknown' }} {{ $student->flaggedBy->last_name ?? '' }}
+                                    · {{ $student->high_risk_flagged_at?->format('M j, Y g:i A') }}
+                                </p>
+                            </div>
+                        @endif
+                    </div>
+                @else
+                    <p style="margin:0;color:var(--text-secondary);font-size:0.85rem;">
+                        <i class="fas fa-check-circle" style="color:#059669;"></i> 
+                        This student is not currently flagged as high-risk.
+                    </p>
+                @endif
+            </div>
+        </div>
+        @endif
+
         <!-- Student Basic Information -->
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-4">
             <!-- Profile Card -->
@@ -1055,5 +1114,92 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 });
+
+// High-Risk Modal Functions
+function toggleHighRiskModal() {
+    const modal = document.getElementById('highRiskModal');
+    modal.style.display = modal.style.display === 'flex' ? 'none' : 'flex';
+}
+
+function submitHighRiskForm() {
+    const isHighRisk = document.getElementById('is_high_risk').checked;
+    const notes = document.getElementById('high_risk_notes').value;
+    const submitBtn = document.getElementById('submitHighRiskBtn');
+    
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+    
+    fetch('{{ route("counselor.students.toggle-high-risk", $student) }}', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+        },
+        body: JSON.stringify({
+            is_high_risk: isHighRisk,
+            high_risk_notes: notes
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            location.reload();
+        } else {
+            alert('Error: ' + (data.message || 'Failed to update high-risk status'));
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = '<i class="fas fa-save"></i> Save Changes';
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('An error occurred. Please try again.');
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = '<i class="fas fa-save"></i> Save Changes';
+    });
+}
 </script>
+
+<!-- High-Risk Modal -->
+@if(Auth::check() && Auth::user()->role === 'counselor')
+<div id="highRiskModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:9999;align-items:center;justify-content:center;padding:1rem;">
+    <div style="background:white;border-radius:0.75rem;max-width:500px;width:100%;box-shadow:0 20px 25px -5px rgba(0,0,0,0.1);">
+        <div style="padding:1.25rem;border-bottom:1px solid var(--border-soft);display:flex;align-items:center;justify-content:space-between;">
+            <h3 style="margin:0;font-size:1.1rem;font-weight:600;color:var(--text-primary);">
+                <i class="fas fa-exclamation-triangle" style="color:#dc2626;"></i> High-Risk Status
+            </h3>
+            <button onclick="toggleHighRiskModal()" style="background:none;border:none;font-size:1.5rem;color:var(--text-muted);cursor:pointer;padding:0;width:2rem;height:2rem;display:flex;align-items:center;justify-content:center;">×</button>
+        </div>
+        <div style="padding:1.25rem;">
+            <div style="margin-bottom:1rem;">
+                <label style="display:flex;align-items:center;gap:0.5rem;cursor:pointer;padding:0.75rem;border:2px solid var(--border-soft);border-radius:0.5rem;transition:all 0.2s;">
+                    <input type="checkbox" id="is_high_risk" {{ ($student->is_high_risk || $hasSelfHarmRisk) ? 'checked' : '' }} 
+                           style="width:1.25rem;height:1.25rem;cursor:pointer;">
+                    <span style="font-weight:600;color:var(--text-primary);">Flag this student as high-risk</span>
+                </label>
+            </div>
+            <div style="margin-bottom:1rem;">
+                <label style="display:block;font-size:0.85rem;font-weight:600;color:var(--text-primary);margin-bottom:0.5rem;">
+                    Notes (Optional)
+                </label>
+                <textarea id="high_risk_notes" 
+                          rows="4" 
+                          placeholder="Add any relevant notes about why this student is flagged as high-risk..."
+                          style="width:100%;padding:0.75rem;border:1px solid var(--border-soft);border-radius:0.5rem;font-size:0.85rem;resize:vertical;">{{ $student->high_risk_notes }}</textarea>
+                <p style="font-size:0.75rem;color:var(--text-muted);margin-top:0.35rem;">Maximum 1000 characters</p>
+            </div>
+        </div>
+        <div style="padding:1rem 1.25rem;border-top:1px solid var(--border-soft);display:flex;gap:0.75rem;justify-content:flex-end;">
+            <button onclick="toggleHighRiskModal()" 
+                    style="padding:0.5rem 1rem;border:1px solid var(--border-soft);background:white;color:var(--text-primary);border-radius:0.5rem;font-size:0.85rem;font-weight:600;cursor:pointer;">
+                Cancel
+            </button>
+            <button id="submitHighRiskBtn"
+                    onclick="submitHighRiskForm()" 
+                    style="padding:0.5rem 1rem;border:none;background:var(--maroon-700);color:white;border-radius:0.5rem;font-size:0.85rem;font-weight:600;cursor:pointer;">
+                <i class="fas fa-save"></i> Save Changes
+            </button>
+        </div>
+    </div>
+</div>
+@endif
 @endsection

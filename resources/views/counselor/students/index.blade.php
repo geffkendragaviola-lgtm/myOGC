@@ -59,12 +59,14 @@
                                 $stressResponses = $student->needsAssessment?->stress_responses ?? [];
                                 $stressResponses = is_array($stressResponses) ? $stressResponses : [];
                                 $riskResponses = ['Hurt myself', 'Attempted to end my life', 'Thought it would be better dead'];
-                                $hasSelfHarmRisk = count(array_intersect($riskResponses, $stressResponses)) > 0;
+                                $hasSelfHarmRisk = !$student->high_risk_overridden
+                                    && count(array_intersect($riskResponses, $stressResponses)) > 0;
+                                $isHighRisk = $student->is_high_risk || $hasSelfHarmRisk;
                             @endphp
-                            <tr class="cursor-pointer hover:bg-[#faf8f5] {{ $hasSelfHarmRisk ? 'bg-red-50' : '' }}" onclick="window.location='{{ route('counselor.students.profile', $student) }}'">
+                            <tr class="cursor-pointer hover:bg-[#faf8f5] {{ $isHighRisk ? 'bg-red-50' : '' }}" onclick="window.location='{{ route('counselor.students.profile', $student) }}'">
                                 <td class="px-4 py-3">
                                     <div class="flex items-center gap-3">
-                                        <div class="w-9 h-9 rounded-full overflow-hidden flex-shrink-0 bg-[#f0ebe5] flex items-center justify-center">
+                                        <div class="w-9 h-9 rounded-full overflow-hidden flex-shrink-0 bg-[#f0ebe5] flex items-center justify-center {{ $isHighRisk ? 'ring-2 ring-red-500' : '' }}">
                                             @if($student->profile_picture)
                                                 <img src="{{ asset('storage/' . $student->profile_picture) }}" alt="" class="w-full h-full object-cover">
                                             @else
@@ -80,11 +82,16 @@
                                             <div class="text-[11px] text-[#8b7e76] font-mono truncate max-w-xs">
                                                 {{ $student->user->email }}
                                             </div>
-                                            @if($hasSelfHarmRisk)
-                                                <div class="mt-1">
+                                            @if($isHighRisk)
+                                                <div class="mt-1 flex flex-wrap gap-1">
                                                     <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold bg-red-100 text-red-700 border border-red-200">
-                                                        High-risk individuals
+                                                        <i class="fas fa-exclamation-triangle text-[9px] mr-1"></i> High-risk individuals
                                                     </span>
+                                                    @if($student->is_high_risk)
+                                                        <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold bg-orange-100 text-orange-700 border border-orange-200">
+                                                            <i class="fas fa-flag text-[9px] mr-1"></i> Counselor Flagged
+                                                        </span>
+                                                    @endif
                                                 </div>
                                             @endif
                                         </div>

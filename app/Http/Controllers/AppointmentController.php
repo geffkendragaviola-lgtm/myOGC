@@ -82,7 +82,7 @@ class AppointmentController extends Controller
     {
         $request->validate([
             'counselor_id' => 'nullable|integer|exists:counselors,id',
-            'appointment_date' => 'required|date|after:yesterday',
+            'appointment_date' => 'required|date|after_or_equal:today',
             'start_time' => 'required|date_format:H:i',
             'booking_type' => 'required|in:Counseling,Consultation',
             'booking_category' => 'nullable|in:online,walk-in,referred,called-in',
@@ -112,16 +112,21 @@ class AppointmentController extends Controller
             return redirect()->back()->with('error', 'This counselor is not available on the selected date.');
         }
 
-        if ($this->getCounselorBookingsForDate($counselorIds, $date) >= $this->getDailyBookingLimit($counselor)) {
-            return redirect()->back()->with('error', 'Daily booking limit reached for the selected counselor.');
+        $overrideAvailability = $request->boolean('override_availability', false);
+
+        if (!$overrideAvailability && $this->getCounselorBookingsForDate($counselorIds, $date) >= $this->getDailyBookingLimit($counselor)) {
+            return redirect()->back()->with('error', 'Daily booking limit reached. Enable "Override Availability" to book beyond the limit.');
         }
 
         $startTime = Carbon::parse($request->start_time);
         $endTime = $startTime->copy()->addHour();
         $endTimeFormatted = $endTime->format('H:i');
 
-        if (!$this->isSlotWithinAvailability($counselor, $date, $request->start_time, $endTimeFormatted)) {
-            return redirect()->back()->with('error', 'Selected time is outside the counselor availability.');
+        if (!$overrideAvailability) {
+            $dayAvailability = $this->getAvailabilityForDate($counselor, $date);
+            if (!empty($dayAvailability) && !$this->isSlotWithinAvailability($counselor, $date, $request->start_time, $endTimeFormatted)) {
+                return redirect()->back()->with('error', 'Selected time is outside the counselor availability. Enable "Override Availability" to book outside set hours.');
+            }
         }
 
         $existingAppointment = Appointment::whereIn('counselor_id', $counselorIds)
@@ -329,7 +334,7 @@ public function storeByCounselor(Request $request)
     $request->validate([
         'counselor_id' => 'required|exists:counselors,id',
         'student_id' => 'required|exists:students,id',
-        'appointment_date' => 'required|date|after:yesterday',
+        'appointment_date' => 'required|date|after_or_equal:today',
         'start_time' => 'required|date_format:H:i',
         'booking_type' => 'required|in:Initial Interview,Counseling,Consultation',
         'booking_category' => 'required|in:online,walk-in,referred,called-in',
@@ -376,9 +381,19 @@ public function storeByCounselor(Request $request)
     // Daily booking limit is intentionally not enforced here —
     // counselors can book beyond the limit for urgent/emergency student needs.
 
+    $overrideAvailability = $request->boolean('override_availability', false);
+
     $startTime = Carbon::parse($request->start_time);
     $endTime = $startTime->copy()->addHour();
     $endTimeFormatted = $endTime->format('H:i');
+
+    // When override_availability is set, skip availability window check to allow urgent bookings
+    if (!$overrideAvailability) {
+        $dayAvailability = $this->getAvailabilityForDate($counselor, $date);
+        if (!empty($dayAvailability) && !$this->isSlotWithinAvailability($counselor, $date, $request->start_time, $endTimeFormatted)) {
+            return redirect()->back()->with('error', 'Selected time is outside the counselor availability. Enable "Override Availability" to book outside set hours.');
+        }
+    }
 
     $existingAppointment = Appointment::whereIn('counselor_id', $counselorIds)
         ->where('appointment_date', $request->appointment_date)
@@ -513,7 +528,7 @@ public function getFollowupAvailableSlots(Request $request)
 {
     $request->validate([
         'counselor_id' => 'required|exists:counselors,id',
-        'date' => 'required|date|after:yesterday'
+        'date' => 'required|date|after_or_equal:today',
     ]);
 
     $counselor = Counselor::findOrFail($request->counselor_id);
@@ -538,10 +553,10 @@ public function getFollowupAvailableSlots(Request $request)
     // Get counselor's availability for that day
     $dayAvailability = $this->getAvailabilityForDate($counselor, $date);
 
-    // Counselors can create bookings even without saved availability.
-    // For counselors, if there are no working hours configured for this day, fall back to default hours.
+    // Only fall back if the counselor has no availability configured at all.
+    // If they have a schedule set, an empty day means they don't work that day.
     $requestUser = $request->user();
-    if (empty($dayAvailability) && $requestUser && $requestUser->role === 'counselor') {
+    if (empty($dayAvailability) && $requestUser && $requestUser->role === 'counselor' && $counselor->availability === null) {
         $dayAvailability = ['08:00-12:00', '13:00-17:00'];
     }
 
@@ -549,7 +564,7 @@ public function getFollowupAvailableSlots(Request $request)
         return response()->json([
             'available_slots' => [],
             'booked_slots' => [],
-            'message' => 'No working hours for this day'
+            'message' => 'No working hours for this day',
         ]);
     }
 
@@ -636,9 +651,12 @@ public function getFollowupAvailableSlots(Request $request)
 }
 public function getAvailableSlots(Request $request)
 {
+    $requestUser = $request->user();
+    $isCounselorRequest = $requestUser && $requestUser->role === 'counselor';
+
     $request->validate([
         'counselor_id' => 'required|exists:counselors,id',
-        'date' => 'required|date|after:yesterday'
+        'date' => $isCounselorRequest ? 'required|date|after_or_equal:today' : 'required|date|after:yesterday',
     ]);
 
     $counselor = Counselor::findOrFail($request->counselor_id);
@@ -662,18 +680,16 @@ public function getAvailableSlots(Request $request)
 
     // Get counselor's availability for that day
     $dayAvailability = $this->getAvailabilityForDate($counselor, $date);
-    $requestUser = $request->user();
-    $isCounselorRequest = $requestUser && $requestUser->role === 'counselor';
 
     // Counselors can book outside their set availability (emergency/urgent cases)
     if (empty($dayAvailability)) {
-        if ($isCounselorRequest) {
+        if ($isCounselorRequest && $counselor->availability === null) {
             $dayAvailability = ['08:00-17:00'];
         } else {
             return response()->json([
                 'available_slots' => [],
                 'booked_slots' => [],
-                'message' => 'No working hours for this day'
+                'message' => 'No working hours for this day',
             ]);
         }
     }
@@ -824,8 +840,10 @@ public function getAvailableDates(Request $request)
             $dayName = strtolower($currentDate->englishDayOfWeek);
             $dayAvailability = $availability[$dayName] ?? [];
 
-            // Counselors can book on any day, even outside their set availability
-            if ($isCounselorRequest && empty($dayAvailability)) {
+            // Only fall back to default hours if the counselor has NO availability
+            // configured at all (raw column is null). If they have a schedule set,
+            // respect it — an empty day means they simply don't work that day.
+            if ($isCounselorRequest && empty($dayAvailability) && $counselor->availability === null) {
                 $dayAvailability = ['08:00-17:00'];
             }
         }
@@ -902,7 +920,8 @@ public function store(Request $request)
         'start_time' => 'required|date_format:H:i',
         'booking_type' => 'required|in:Initial Interview,Counseling,Consultation',
         'booking_category' => 'required|in:online,walk-in,referred,called-in',
-        'concern' => 'required|string|max:500'
+        'concern' => 'required|string|max:500',
+        'referred_by' => 'nullable|string|max:255',
     ]);
 
     $student = Student::where('user_id', Auth::id())->first();
@@ -995,6 +1014,7 @@ public function store(Request $request)
             'booking_type' => $request->booking_type,
             'booking_category' => $request->booking_category,
             'concern' => $request->concern,
+            'referred_by' => $request->filled('referred_by') ? $request->referred_by : null,
             'status' => 'pending'
         ]);
 
@@ -1133,7 +1153,7 @@ public function updateStatus(Request $request, Appointment $appointment)
 public function reschedule(Request $request, Appointment $appointment)
 {
     $request->validate([
-        'appointment_date' => 'required|date|after:yesterday',
+        'appointment_date' => 'required|date|after_or_equal:today',
         'start_time' => 'required|date_format:H:i',
         'reason' => 'nullable|string|max:500',
     ]);
@@ -1167,12 +1187,17 @@ public function reschedule(Request $request, Appointment $appointment)
         ->where('id', '!=', $appointment->id)
         ->count();
 
-    if ($dailyBookings >= $this->getDailyBookingLimit($counselor)) {
-        return redirect()->back()->with('error', 'Daily booking limit reached for the selected date.');
+    $overrideAvailability = $request->boolean('override_availability', false);
+
+    if (!$overrideAvailability && $dailyBookings >= $this->getDailyBookingLimit($counselor)) {
+        return redirect()->back()->with('error', 'Daily booking limit reached. Enable "Override Availability" to reschedule beyond the limit.');
     }
 
-    if (!$this->isSlotWithinAvailability($counselor, $date, $request->start_time, $endTime)) {
-        return redirect()->back()->with('error', 'Selected time is outside the counselor availability.');
+    if (!$overrideAvailability) {
+        $dayAvailability = $this->getAvailabilityForDate($counselor, $date);
+        if (!empty($dayAvailability) && !$this->isSlotWithinAvailability($counselor, $date, $request->start_time, $endTime)) {
+            return redirect()->back()->with('error', 'Selected time is outside the counselor availability. Enable "Override Availability" to reschedule outside set hours.');
+        }
     }
 
     $existingAppointment = Appointment::whereIn('counselor_id', $counselorIds)

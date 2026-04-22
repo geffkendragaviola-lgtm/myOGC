@@ -303,7 +303,7 @@
                     @enderror
                 </div>
 
-                <div class="mt-6">
+                <div class="mt-6" id="createSlotWrap">
                     <label class="field-label">Available Time Slots</label>
                     <div id="timeSlots" class="grid grid-cols-2 md:grid-cols-3 gap-2 sm:gap-3">
                         <div class="text-[#8b7e76] text-center p-4 border-2 border-dashed border-[#e5e0db] rounded-lg text-xs">
@@ -314,6 +314,40 @@
                     @error('start_time')
                         <p class="error-text">{{ $message }}</p>
                     @enderror
+                </div>
+
+                {{-- Override Availability --}}
+                <div class="mt-4">
+                    <label style="display:flex;align-items:center;gap:0.6rem;cursor:pointer;padding:0.65rem 0.85rem;border:1px solid #fca5a5;border-radius:0.6rem;background:rgba(255,241,242,0.5);">
+                        <input type="checkbox" name="override_availability" id="createOverrideCheck" value="1"
+                               onchange="toggleCreateOverride(this.checked)"
+                               style="width:1rem;height:1rem;accent-color:#dc2626;cursor:pointer;">
+                        <span style="font-size:0.78rem;color:#991b1b;font-weight:600;display:flex;align-items:center;gap:0.4rem;">
+                            <i class="fas fa-bolt text-[10px]"></i>
+                            Override Availability — book outside set hours / daily limit
+                        </span>
+                    </label>
+                    <div id="createManualTimeWrap" class="hidden mt-3" style="padding:0.75rem;border:1px solid #fca5a5;border-radius:0.6rem;background:rgba(255,241,242,0.3);">
+                        <p style="font-size:0.7rem;color:#991b1b;font-weight:600;margin:0 0 0.5rem;display:flex;align-items:center;gap:0.4rem;">
+                            <i class="fas fa-exclamation-triangle text-[10px]"></i>
+                            Override mode — enter date and time manually
+                        </p>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            <div>
+                                <label class="field-label">Date <span class="text-[#b91c1c]">*</span></label>
+                                <input type="date" id="createManualDate"
+                                       min="{{ now()->format('Y-m-d') }}"
+                                       class="input-field text-xs"
+                                       onchange="document.getElementById('dateSelect').value = this.value;">
+                            </div>
+                            <div>
+                                <label class="field-label">Start Time <span class="text-[#b91c1c]">*</span></label>
+                                <input type="time" id="createManualTime"
+                                       class="input-field text-xs"
+                                       onchange="document.getElementById('selectedTime').value = this.value;">
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="mt-6">
@@ -356,7 +390,7 @@ document.addEventListener('DOMContentLoaded', function() {
     let currentSelectedSlot = null;
     const minDate = new Date();
     minDate.setHours(0, 0, 0, 0);
-    minDate.setDate(minDate.getDate() + 1);
+    // Counselors can book same-day appointments
 
     let currentMonth = new Date(minDate.getFullYear(), minDate.getMonth(), 1);
     let selectedDate = null;
@@ -555,7 +589,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const monthValue = `${currentMonth.getFullYear()}-${String(currentMonth.getMonth() + 1).padStart(2, '0')}`;
 
         try {
-            const response = await fetch(`/appointments/available-dates?counselor_id=${counselorId}&month=${monthValue}`);
+            const response = await fetch(`/appointments/available-dates?counselor_id=${counselorId}&month=${monthValue}&allow_today=1`);
             if (!response.ok) {
                 throw new Error('Failed to load available dates');
             }
@@ -602,7 +636,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         timeSlots.innerHTML = '<div class="text-[#8b7e76] text-center p-4 border-2 border-dashed border-[#e5e0db] rounded-lg text-xs">Loading available slots...</div>';
 
-        fetch(`/appointments/available-slots?counselor_id=${counselorId}&date=${date}`)
+        fetch(`{{ route('appointments.available-slots') }}?counselor_id=${counselorId}&date=${date}`)
             .then(response => response.json())
             .then(data => {
                 if (data.message) {
@@ -681,5 +715,29 @@ document.addEventListener('DOMContentLoaded', function() {
     loadMonthAvailability();
     renderCalendar();
 });
+
+function toggleCreateOverride(enabled) {
+    const calendarSection = document.querySelector('#createSlotWrap').previousElementSibling; // calendar card
+    const slotWrap  = document.getElementById('createSlotWrap');
+    const manualWrap = document.getElementById('createManualTimeWrap');
+    const dateSelect = document.getElementById('dateSelect');
+    const selectedTime = document.getElementById('selectedTime');
+
+    if (enabled) {
+        slotWrap.classList.add('hidden');
+        manualWrap.classList.remove('hidden');
+        dateSelect.removeAttribute('required');
+        selectedTime.removeAttribute('required');
+    } else {
+        slotWrap.classList.remove('hidden');
+        manualWrap.classList.add('hidden');
+        dateSelect.setAttribute('required', '');
+        selectedTime.setAttribute('required', '');
+        document.getElementById('createManualDate').value = '';
+        document.getElementById('createManualTime').value = '';
+        dateSelect.value = '';
+        selectedTime.value = '';
+    }
+}
 </script>
 @endsection

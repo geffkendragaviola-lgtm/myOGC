@@ -161,7 +161,7 @@
         background: rgba(255,255,255,0.98); border-radius: 0.75rem;
         border: 1px solid var(--border-soft); backdrop-filter: blur(8px);
         box-shadow: 0 8px 32px rgba(44,36,32,0.12);
-        max-width: 44rem; width: 100%; max-height: 90vh; overflow-y: auto;
+        max-width: 52rem; width: 100%; max-height: 90vh; overflow-y: auto;
     }
     .modal-header {
         display: flex; align-items: center; justify-content: space-between;
@@ -183,14 +183,25 @@
     .time-slot {
         padding: 0.5rem; border-radius: 0.4rem; border: 1px solid var(--border-soft);
         text-align: center; font-size: 0.7rem; font-weight: 500;
-        transition: all 0.18s ease; cursor: pointer;
-        background: rgba(255,255,255,0.9);
+        transition: all 0.18s ease; cursor: pointer; background: rgba(255,255,255,0.9);
     }
     .time-slot:hover { border-color: var(--maroon-700); background: rgba(254,249,231,0.6); }
-    .time-slot.selected {
-        border-color: var(--maroon-700); background: rgba(254,249,231,0.9);
-        color: var(--maroon-700); font-weight: 600;
-    }
+    .time-slot.selected { border-color: var(--maroon-700); background: rgba(254,249,231,0.9); color: var(--maroon-700); font-weight: 600; }
+
+    .calendar-card { border: 1px solid var(--border-soft); border-radius: 0.75rem; background: rgba(255,255,255,0.95); padding: 1rem; }
+    .calendar-nav { display: flex; align-items: center; justify-content: space-between; padding: 0.5rem 0; margin-bottom: 0.5rem; }
+    .calendar-nav-btn { width: 2.25rem; height: 2.25rem; border-radius: 999px; display: flex; align-items: center; justify-content: center; border: 1px solid var(--border-soft); color: var(--text-secondary); transition: all 0.18s ease; font-size: 1rem; background: white; cursor: pointer; }
+    .calendar-nav-btn:hover { background: rgba(254,249,231,0.7); border-color: var(--maroon-700); color: var(--maroon-700); }
+    .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 0.35rem; }
+    .calendar-day-header { text-align: center; font-size: 0.6rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); }
+    .calendar-day { width: 100%; aspect-ratio: 1; border-radius: 0.4rem; display: flex; align-items: center; justify-content: center; font-size: 0.72rem; font-weight: 500; border: 1px solid transparent; transition: all 0.18s ease; cursor: default; background: none; }
+    .calendar-day.available { border-color: rgba(122,42,42,0.3); color: var(--maroon-700); background: rgba(254,249,231,0.5); cursor: pointer; }
+    .calendar-day.available:hover { background: rgba(212,175,55,0.2); border-color: var(--gold-400); }
+    .calendar-day.selected { background: var(--maroon-700) !important; color: #fef9e7 !important; border-color: var(--maroon-700) !important; }
+    .calendar-day:disabled, .calendar-day.disabled { color: var(--text-muted); cursor: not-allowed; opacity: 0.4; }
+    .calendar-status { font-size: 0.7rem; color: var(--text-muted); margin-top: 0.5rem; min-height: 1rem; }
+    .calendar-status.success { color: #065f46; }
+    .calendar-status.error { color: #b91c1c; }
 
     .auto-approve {
         display: flex; align-items: center; gap: 0.5rem;
@@ -200,12 +211,16 @@
     .auto-approve input { width: 1rem; height: 1rem; accent-color: var(--maroon-700); }
     .auto-approve label { font-size: 0.75rem; color: var(--text-secondary); }
 
+    .custom-checkbox {
+        width: 1rem; height: 1rem; accent-color: var(--maroon-700); cursor: pointer;
+    }
+
     @media (max-width: 639px) {
         .panel-header { padding: 0.75rem 1rem; }
         .input-field, .select-field, .textarea-field { padding: 0.6rem 0.75rem; font-size: 0.85rem; }
         .primary-btn, .secondary-btn { width: 100%; justify-content: center; }
         .detail-card .grid { grid-template-columns: 1fr !important; }
-        .checkbox-option label { font-size: 0.8rem; }
+        .checkbox-option label { font-size: 0.7rem; }
         .time-slot { padding: 0.4rem; font-size: 0.65rem; }
         .modal-card { max-height: 95vh; margin: 0.5rem; }
         .modal-header { padding: 0.85rem 1rem; }
@@ -213,6 +228,15 @@
         .hero-card .flex { flex-direction: column; align-items: flex-start !important; }
     }
 </style>
+
+@php
+    $sessionStressResponses = $appointment->student->needsAssessment?->stress_responses ?? [];
+    $sessionStressResponses = is_array($sessionStressResponses) ? $sessionStressResponses : [];
+    $sessionRiskKeywords    = ['Hurt myself', 'Attempted to end my life', 'Thought it would be better dead'];
+    $sessionSelfHarmRisk    = !$appointment->student->high_risk_overridden
+        && count(array_intersect($sessionRiskKeywords, $sessionStressResponses)) > 0;
+    $sessionIsHighRisk      = $appointment->student->is_high_risk || $sessionSelfHarmRisk;
+@endphp
 
 <div class="min-h-screen session-form-shell">
     <div class="session-form-glow one"></div>
@@ -236,6 +260,11 @@
                             <p class="text-[#6b5e57] text-xs sm:text-sm mt-1.5">
                                 {{ $appointment->student->user->first_name }} {{ $appointment->student->user->last_name }}
                                 <span class="text-[#8b7e76]">({{ $appointment->student->student_id }})</span>
+                                @if($sessionIsHighRisk)
+                                    <span class="ml-2 inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-red-100 text-red-700 border border-red-200">
+                                        <i class="fas fa-exclamation-triangle text-[9px]"></i> High-risk individual
+                                    </span>
+                                @endif
                             </p>
                             <p class="text-[10px] sm:text-xs text-[#8b7e76] mt-0.5">
                                 {{ $appointment->student->college->name ?? 'N/A' }} • {{ $appointment->student->course }} • {{ $appointment->student->year_level }}
@@ -256,6 +285,50 @@
                 </div>
             </div>
         </div>
+
+        {{-- High-Risk Banner --}}
+        @if($sessionIsHighRisk)
+        <div style="border-radius:0.75rem;border:1px solid #fecaca;background:#fff5f5;padding:1rem 1.25rem;margin-bottom:1.25rem;display:flex;flex-wrap:wrap;align-items:center;gap:0.75rem;border-left:4px solid #dc2626;">
+            <div style="display:flex;align-items:center;gap:0.6rem;flex:1;min-width:0;">
+                <span style="display:flex;align-items:center;justify-content:center;width:2rem;height:2rem;border-radius:0.5rem;background:#fee2e2;color:#dc2626;flex-shrink:0;">
+                    <i class="fas fa-exclamation-triangle text-sm"></i>
+                </span>
+                <div style="min-width:0;">
+                    <p style="margin:0;font-size:0.82rem;font-weight:700;color:#991b1b;">High-Risk Individual</p>
+                    <div style="display:flex;flex-wrap:wrap;gap:0.5rem;margin-top:0.35rem;">
+                        @if($sessionSelfHarmRisk)
+                            <span style="display:inline-flex;align-items:center;gap:0.3rem;padding:0.2rem 0.6rem;border-radius:999px;font-size:0.7rem;font-weight:600;background:#fff7ed;color:#9a3412;border:1px solid #fed7aa;">
+                                <i class="fas fa-notes-medical text-[9px]"></i> Assessment-Based Risk
+                            </span>
+                        @endif
+                        @if($appointment->student->is_high_risk)
+                            <span style="display:inline-flex;align-items:center;gap:0.3rem;padding:0.2rem 0.6rem;border-radius:999px;font-size:0.7rem;font-weight:600;background:#fee2e2;color:#991b1b;border:1px solid #fecaca;">
+                                <i class="fas fa-flag text-[9px]"></i> Counselor Flagged
+                                @if($appointment->student->high_risk_notes)
+                                    <span style="font-weight:400;"> — {{ Str::limit($appointment->student->high_risk_notes, 60) }}</span>
+                                @endif
+                            </span>
+                        @endif
+                    </div>
+                </div>
+            </div>
+            <button type="button" onclick="toggleHighRiskModal()"
+                    style="flex-shrink:0;padding:0.4rem 0.85rem;border-radius:0.5rem;border:1px solid #fca5a5;background:white;color:#991b1b;font-size:0.75rem;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:0.4rem;">
+                <i class="fas fa-edit text-[10px]"></i> Update Flag
+            </button>
+        </div>
+        @else
+        <div style="border-radius:0.75rem;border:1px solid var(--border-soft);background:white;padding:0.75rem 1.25rem;margin-bottom:1.25rem;display:flex;align-items:center;justify-content:space-between;gap:0.75rem;">
+            <p style="margin:0;font-size:0.8rem;color:var(--text-secondary);display:flex;align-items:center;gap:0.5rem;">
+                <i class="fas fa-shield-halved" style="color:#059669;"></i>
+                This student is not currently flagged as high-risk.
+            </p>
+            <button type="button" onclick="toggleHighRiskModal()"
+                    style="flex-shrink:0;padding:0.35rem 0.75rem;border-radius:0.5rem;border:1px solid var(--border-soft);background:white;color:var(--text-secondary);font-size:0.75rem;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:0.4rem;">
+                <i class="fas fa-flag text-[10px]"></i> Flag as High-Risk
+            </button>
+        </div>
+        @endif
 
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
             <!-- Left Sidebar: Details -->
@@ -291,32 +364,6 @@
                             <div>
                                 <span class="detail-label">Case Number</span>
                                 <div class="detail-value muted">{{ $appointment->case_number ?: '—' }}</div>
-                            </div>
-                            <div>
-                                <span class="detail-label">Date of Referral</span>
-                                <div class="detail-value muted">{{ $appointment->referral_requested_at ? $appointment->referral_requested_at->format('F j, Y g:i A') : '—' }}</div>
-                            </div>
-                            {{-- Referred By --}}
-                            <div>
-                                <span class="detail-label">Referred By</span>
-                                <div class="detail-value muted">
-                                    @if($appointment->originalCounselor && $appointment->originalCounselor->user)
-                                        {{ $appointment->originalCounselor->user->first_name }} {{ $appointment->originalCounselor->user->last_name }}
-                                    @else
-                                        N/A
-                                    @endif
-                                </div>
-                            </div>
-                            {{-- Referred To --}}
-                            <div>
-                                <span class="detail-label">Referred To</span>
-                                <div class="detail-value muted">
-                                    @if($appointment->referredCounselor && $appointment->referredCounselor->user)
-                                        {{ $appointment->referredCounselor->user->first_name }} {{ $appointment->referredCounselor->user->last_name }}
-                                    @else
-                                        N/A
-                                    @endif
-                                </div>
                             </div>
                         </div>
                     </div>
@@ -395,6 +442,8 @@
                         </div>
                     </div>
                 </div>
+
+                <!-- High-Risk Panel removed from sidebar — shown as banner above -->
             </div>
 
             <!-- Right: Session Notes Form -->
@@ -436,18 +485,19 @@
                         <div class="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-3">
                             {{-- Referred By --}}
                             <div class="rounded-lg border p-3" style="border-color:var(--border-soft);background:rgba(250,248,245,0.6);">
+                                @php $hasReferredBy = old('referred_by_source', $latestSessionNote->referred_by_source ?? $appointment->referred_by ?? ''); @endphp
                                 <label class="flex items-center gap-2 cursor-pointer select-none mb-2">
                                     <input type="checkbox" id="chk_referred_by"
                                            class="custom-checkbox"
-                                           {{ old('referred_by_source', $latestSessionNote->referred_by_source ?? '') ? 'checked' : '' }}
+                                           {{ $hasReferredBy ? 'checked' : '' }}
                                            onchange="toggleReferral('referred_by_source', this.checked)">
                                     <span class="text-xs font-semibold" style="color:var(--maroon-800)">Referred By</span>
                                 </label>
-                                <div id="referred_by_box" class="{{ old('referred_by_source', $latestSessionNote->referred_by_source ?? '') ? '' : 'hidden' }}">
+                                <div id="referred_by_box" class="{{ $hasReferredBy ? '' : 'hidden' }}">
                                     <input type="text"
                                            id="referred_by_source"
                                            name="referred_by_source"
-                                           value="{{ old('referred_by_source', $latestSessionNote->referred_by_source ?? '') }}"
+                                           value="{{ old('referred_by_source', $latestSessionNote->referred_by_source ?? $appointment->referred_by ?? '') }}"
                                            placeholder="e.g. Teacher, Professor, Parent, Friend"
                                            class="input-field text-xs"
                                            maxlength="255">
@@ -538,106 +588,164 @@
 
     <!-- Follow-up Modal -->
     <div id="followupModal" class="modal-backdrop hidden" onclick="handleFollowupBackdropClick(event)">
-        <div class="modal-card" onclick="event.stopPropagation();">
-            <div class="modal-header">
-                <h3 class="text-sm font-semibold text-[#2c2420]">Book Follow-up Appointment</h3>
-                <button type="button" onclick="closeFollowupModal()" class="modal-close" title="Close">
+        <div class="modal-card" onclick="event.stopPropagation();" style="max-width:52rem;">
+
+            {{-- Modal Header --}}
+            <div class="modal-header" style="background:linear-gradient(135deg,var(--maroon-800) 0%,var(--maroon-700) 100%);border-radius:0.75rem 0.75rem 0 0;padding:1.1rem 1.5rem;">
+                <div class="flex items-center gap-3">
+                    <div style="width:2.25rem;height:2.25rem;border-radius:0.6rem;background:rgba(255,255,255,0.12);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                        <i class="fas fa-calendar-plus text-sm" style="color:#fef9e7;"></i>
+                    </div>
+                    <div>
+                        <h3 style="margin:0;font-size:0.95rem;font-weight:600;color:#fef9e7;">Book Follow-up Appointment</h3>
+                        <p style="margin:0;font-size:0.7rem;color:rgba(254,249,231,0.7);">
+                            {{ $appointment->student->user->first_name }} {{ $appointment->student->user->last_name }}
+                            &mdash; {{ $appointment->student->student_id }}
+                        </p>
+                    </div>
+                </div>
+                <button type="button" onclick="closeFollowupModal()" class="modal-close" title="Close"
+                        style="color:rgba(254,249,231,0.7);">
                     <i class="fas fa-xmark"></i>
                 </button>
             </div>
 
-            <form action="{{ route('counselor.appointments.followup.store', $appointment) }}" method="POST" class="modal-body">
+            <form action="{{ route('counselor.appointments.followup.store', $appointment) }}" method="POST">
                 @csrf
                 <input type="hidden" name="counselor_id" value="{{ $effectiveCounselorId }}">
 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                        <label for="followup_booking_type" class="field-label">Type of Booking <span class="text-[#b91c1c]">*</span></label>
-                        <select name="booking_type"
-                                id="followup_booking_type"
-                                class="select-field text-xs sm:text-sm"
-                                required>
-                            <option value="">Choose a booking type</option>
-                            <option value="Counseling" {{ old('booking_type') === 'Counseling' ? 'selected' : '' }}>Counseling</option>
-                            <option value="Consultation" {{ old('booking_type') === 'Consultation' ? 'selected' : '' }}>Consultation</option>
-                        </select>
-                        @error('booking_type')
-                            <p class="error-text">{{ $message }}</p>
-                        @enderror
-                    </div>
+                <div class="modal-body" style="padding:1.5rem;">
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
 
-                    <div>
-                        <label for="followup_booking_category" class="field-label">Booking Category <span class="text-[#b91c1c]">*</span></label>
-                        <select name="booking_category"
-                                id="followup_booking_category"
-                                class="select-field text-xs sm:text-sm"
-                                required>
-                            <option value="online" {{ old('booking_category') === 'online' ? 'selected' : '' }}>Online Booking</option>
-                            <option value="walk-in" {{ old('booking_category') === 'walk-in' ? 'selected' : '' }}>Walk-in</option>
-                            <option value="referred" {{ old('booking_category') === 'referred' ? 'selected' : '' }}>Referred</option>
-                            <option value="called-in" {{ old('booking_category') === 'called-in' ? 'selected' : '' }}>Called-in</option>
-                        </select>
-                        @error('booking_category')
-                            <p class="error-text">{{ $message }}</p>
-                        @enderror
-                    </div>
+                        {{-- Left column: fields --}}
+                        <div class="space-y-4">
 
-                    <div>
-                        <label for="followup_appointment_date" class="field-label">Date <span class="text-[#b91c1c]">*</span></label>
-                        <input type="date"
-                               name="appointment_date"
-                               id="followup_appointment_date"
-                               min="{{ now()->addDay()->format('Y-m-d') }}"
-                               class="input-field text-xs sm:text-sm"
-                               required>
-                    </div>
+                            {{-- Type & Category --}}
+                            <div style="background:rgba(250,248,245,0.7);border:1px solid var(--border-soft);border-radius:0.65rem;padding:1rem;">
+                                <p style="font-size:0.65rem;font-weight:700;text-transform:uppercase;letter-spacing:0.12em;color:var(--text-muted);margin:0 0 0.75rem;">Appointment Details</p>
+                                <div class="space-y-3">
+                                    <div>
+                                        <label for="followup_booking_type" class="field-label">Type of Booking <span class="text-[#b91c1c]">*</span></label>
+                                        <select name="booking_type" id="followup_booking_type" class="select-field text-xs sm:text-sm" required>
+                                            <option value="">Choose a type</option>
+                                            <option value="Counseling" {{ old('booking_type') === 'Counseling' ? 'selected' : '' }}>Counseling</option>
+                                            <option value="Consultation" {{ old('booking_type') === 'Consultation' ? 'selected' : '' }}>Consultation</option>
+                                        </select>
+                                        @error('booking_type')<p class="error-text">{{ $message }}</p>@enderror
+                                    </div>
+                                    <div>
+                                        <label for="followup_booking_category" class="field-label">Booking Category <span class="text-[#b91c1c]">*</span></label>
+                                        <select name="booking_category" id="followup_booking_category" class="select-field text-xs sm:text-sm" required>
+                                            <option value="online" {{ old('booking_category') === 'online' ? 'selected' : '' }}>Online Booking</option>
+                                            <option value="walk-in" {{ old('booking_category') === 'walk-in' ? 'selected' : '' }}>Walk-in</option>
+                                            <option value="referred" {{ old('booking_category') === 'referred' ? 'selected' : '' }}>Referred</option>
+                                            <option value="called-in" {{ old('booking_category') === 'called-in' ? 'selected' : '' }}>Called-in</option>
+                                        </select>
+                                        @error('booking_category')<p class="error-text">{{ $message }}</p>@enderror
+                                    </div>
+                                </div>
+                            </div>
 
-                    <div class="md:col-span-2">
-                        <label class="field-label">Time Slot <span class="text-[#b91c1c]">*</span></label>
-                        <div id="followup_time_slots" class="grid grid-cols-2 sm:grid-cols-3 gap-2 max-h-40 overflow-y-auto p-2 border border-[#e5e0db] rounded-lg bg-white">
-                            <div class="col-span-full text-center text-[#8b7e76] text-xs py-3">
-                                Select a date to see available time slots
+                            {{-- Concern --}}
+                            <div style="background:rgba(250,248,245,0.7);border:1px solid var(--border-soft);border-radius:0.65rem;padding:1rem;">
+                                <p style="font-size:0.65rem;font-weight:700;text-transform:uppercase;letter-spacing:0.12em;color:var(--text-muted);margin:0 0 0.75rem;">Concern / Agenda</p>
+                                <textarea name="concern" id="followup_concern" rows="4"
+                                          class="textarea-field" required
+                                          style="min-height:90px;">{{ old('concern', 'Follow-up session') }}</textarea>
+                            </div>
+
+                            {{-- Time Slots --}}
+                            <div id="fuSlotWrap" style="background:rgba(250,248,245,0.7);border:1px solid var(--border-soft);border-radius:0.65rem;padding:1rem;">
+                                <p style="font-size:0.65rem;font-weight:700;text-transform:uppercase;letter-spacing:0.12em;color:var(--text-muted);margin:0 0 0.75rem;">Available Time Slots</p>
+                                <div id="followup_time_slots" class="grid grid-cols-2 gap-2 max-h-44 overflow-y-auto">
+                                    <div class="col-span-full text-center text-[#8b7e76] text-xs py-4 border border-dashed border-[#e5e0db] rounded-lg">
+                                        Select a date to see available time slots
+                                    </div>
+                                </div>
+                                <input type="hidden" name="start_time" id="followup_selected_time">
+                                @error('start_time')<p class="error-text">{{ $message }}</p>@enderror
+                            </div>
+
+                            {{-- Override Availability --}}
+                            <label style="display:flex;align-items:center;gap:0.6rem;cursor:pointer;padding:0.65rem 0.85rem;border:1px solid #fca5a5;border-radius:0.6rem;background:rgba(255,241,242,0.5);">
+                                <input type="checkbox" name="override_availability" id="fuOverrideCheck" value="1"
+                                       onchange="toggleFollowupOverride(this.checked)"
+                                       style="width:1rem;height:1rem;accent-color:#dc2626;cursor:pointer;">
+                                <span style="font-size:0.78rem;color:#991b1b;font-weight:600;display:flex;align-items:center;gap:0.4rem;">
+                                    <i class="fas fa-bolt text-[10px]"></i>
+                                    Override Availability — book outside set hours / daily limit
+                                </span>
+                            </label>
+
+                            {{-- Manual time input (shown when override is on) --}}
+                            <div id="fuManualTimeWrap" class="hidden" style="padding:0.75rem;border:1px solid #fca5a5;border-radius:0.6rem;background:rgba(255,241,242,0.3);">
+                                <p style="font-size:0.7rem;color:#991b1b;font-weight:600;margin:0 0 0.5rem;display:flex;align-items:center;gap:0.4rem;">
+                                    <i class="fas fa-exclamation-triangle text-[10px]"></i>
+                                    Override mode — enter date and time manually
+                                </p>
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                    <div>
+                                        <label class="field-label">Date <span class="text-[#b91c1c]">*</span></label>
+                                        <input type="date" id="fuManualDate"
+                                               min="{{ now()->format('Y-m-d') }}"
+                                               class="input-field text-xs"
+                                               onchange="document.getElementById('followup_appointment_date').value = this.value; updateFollowupSubmitState();">
+                                    </div>
+                                    <div>
+                                        <label class="field-label">Start Time <span class="text-[#b91c1c]">*</span></label>
+                                        <input type="time" id="fuManualTime"
+                                               class="input-field text-xs"
+                                               onchange="document.getElementById('followup_selected_time').value = this.value; updateFollowupSubmitState();">
+                                    </div>
+                                </div>
+                            </div>
+
+                            {{-- Auto-approve --}}
+                            <label style="display:flex;align-items:center;gap:0.6rem;cursor:pointer;padding:0.65rem 0.85rem;border:1px solid var(--border-soft);border-radius:0.6rem;background:rgba(254,249,231,0.4);">
+                                <input type="checkbox" name="auto_approve" id="followup_auto_approve" value="1" checked
+                                       style="width:1rem;height:1rem;accent-color:var(--maroon-700);">
+                                <span style="font-size:0.78rem;color:var(--text-secondary);">Auto-approve this follow-up appointment</span>
+                            </label>
+                        </div>
+
+                        {{-- Right column: calendar --}}
+                        <div id="fuCalendarWrap">
+                            <div style="background:rgba(250,248,245,0.7);border:1px solid var(--border-soft);border-radius:0.65rem;padding:1rem;">
+                                <p style="font-size:0.65rem;font-weight:700;text-transform:uppercase;letter-spacing:0.12em;color:var(--text-muted);margin:0 0 0.75rem;">Select Date <span style="color:#b91c1c;">*</span></p>
+                                <div class="calendar-card" style="border:none;padding:0;background:transparent;">
+                                    <div class="calendar-nav">
+                                        <button type="button" id="fuCalPrev" class="calendar-nav-btn">‹</button>
+                                        <h3 id="fuCalMonthLabel" class="text-sm font-semibold text-[#2c2420]"></h3>
+                                        <button type="button" id="fuCalNext" class="calendar-nav-btn">›</button>
+                                    </div>
+                                    <div class="calendar-grid mb-2">
+                                        <span class="calendar-day-header">Sun</span>
+                                        <span class="calendar-day-header">Mon</span>
+                                        <span class="calendar-day-header">Tue</span>
+                                        <span class="calendar-day-header">Wed</span>
+                                        <span class="calendar-day-header">Thu</span>
+                                        <span class="calendar-day-header">Fri</span>
+                                        <span class="calendar-day-header">Sat</span>
+                                    </div>
+                                    <div id="fuCalGrid" class="calendar-grid"></div>
+                                    <p id="fuCalStatus" class="calendar-status mt-2">Loading available dates...</p>
+                                </div>
+                                <input type="hidden" name="appointment_date" id="followup_appointment_date" required>
+                                @error('appointment_date')<p class="error-text">{{ $message }}</p>@enderror
                             </div>
                         </div>
-                        <input type="hidden" name="start_time" id="followup_selected_time">
-                        @error('start_time')
-                            <p class="error-text">{{ $message }}</p>
-                        @enderror
+
                     </div>
                 </div>
 
-                <div class="mt-4">
-                    <label for="followup_concern" class="field-label">Concern / Agenda <span class="text-[#b91c1c]">*</span></label>
-                    <textarea name="concern"
-                              id="followup_concern"
-                              rows="3"
-                              class="textarea-field"
-                              required>{{ old('concern', 'Follow-up session') }}</textarea>
-                </div>
-
-                <div class="mt-4">
-                    <div class="auto-approve">
-                        <input type="checkbox"
-                               name="auto_approve"
-                               id="followup_auto_approve"
-                               value="1"
-                               checked>
-                        <label for="followup_auto_approve">
-                            Auto-approve this follow-up appointment
-                        </label>
-                    </div>
-                </div>
-
-                <div class="modal-footer">
-                    <button type="button"
-                            onclick="closeFollowupModal()"
-                            class="secondary-btn px-4 py-2 text-xs sm:text-sm">
+                {{-- Footer --}}
+                <div class="modal-footer" style="padding:1rem 1.5rem;border-top:1px solid var(--border-soft);display:flex;justify-content:flex-end;gap:0.75rem;">
+                    <button type="button" onclick="closeFollowupModal()" class="secondary-btn px-5 py-2.5 text-xs sm:text-sm">
                         Cancel
                     </button>
-                    <button type="submit"
-                            id="followup_submit_btn"
-                            class="primary-btn px-4 py-2 text-xs sm:text-sm disabled:opacity-50 disabled:cursor-not-allowed">
-                        Book Follow-up
+                    <button type="submit" id="followup_submit_btn"
+                            class="primary-btn px-5 py-2.5 text-xs sm:text-sm disabled:opacity-50 disabled:cursor-not-allowed">
+                        <i class="fas fa-calendar-check mr-1.5 text-[9px] sm:text-xs"></i> Book Follow-up
                     </button>
                 </div>
             </form>
@@ -650,6 +758,10 @@
             if (modal) {
                 modal.classList.remove('hidden');
             }
+            // Reset override state on open
+            const overrideCheck = document.getElementById('fuOverrideCheck');
+            if (overrideCheck) overrideCheck.checked = false;
+            toggleFollowupOverride(false);
             updateFollowupSubmitState();
         }
 
@@ -658,6 +770,39 @@
             if (modal) {
                 modal.classList.add('hidden');
             }
+        }
+
+        function toggleFollowupOverride(enabled) {
+            const calWrap   = document.getElementById('fuCalendarWrap');
+            const slotWrap  = document.getElementById('fuSlotWrap');
+            const manualWrap = document.getElementById('fuManualTimeWrap');
+            const dateHidden = document.getElementById('followup_appointment_date');
+            const timeHidden = document.getElementById('followup_selected_time');
+
+            if (enabled) {
+                if (calWrap)  calWrap.classList.add('hidden');
+                if (slotWrap) slotWrap.classList.add('hidden');
+                if (manualWrap) manualWrap.classList.remove('hidden');
+                // Sync manual date if already set
+                const manualTime = document.getElementById('fuManualTime');
+                if (manualTime && manualTime.value) {
+                    timeHidden.value = manualTime.value;
+                } else {
+                    timeHidden.value = '';
+                }
+            } else {
+                if (calWrap)  calWrap.classList.remove('hidden');
+                if (slotWrap) slotWrap.classList.remove('hidden');
+                if (manualWrap) manualWrap.classList.add('hidden');
+                // Clear manual inputs
+                const manualTime = document.getElementById('fuManualTime');
+                if (manualTime) manualTime.value = '';
+                const manualDate = document.getElementById('fuManualDate');
+                if (manualDate) manualDate.value = '';
+                timeHidden.value = '';
+                dateHidden.value = '';
+            }
+            updateFollowupSubmitState();
         }
 
         function handleFollowupBackdropClick(event) {
@@ -669,10 +814,17 @@
         function updateFollowupSubmitState() {
             const btn = document.getElementById('followup_submit_btn');
             const selectedTime = document.getElementById('followup_selected_time');
-            if (!btn || !selectedTime) {
-                return;
+            const overrideCheck = document.getElementById('fuOverrideCheck');
+            const dateHidden = document.getElementById('followup_appointment_date');
+            if (!btn || !selectedTime) return;
+
+            const isOverride = overrideCheck && overrideCheck.checked;
+            if (isOverride) {
+                // Need both a date and a time
+                btn.disabled = !(dateHidden && dateHidden.value && selectedTime.value);
+            } else {
+                btn.disabled = !selectedTime.value;
             }
-            btn.disabled = !selectedTime.value;
         }
 
         function setSelectedFollowupSlot(startTime, buttonEl) {
@@ -704,19 +856,15 @@
             }
         }
 
-        async function loadFollowupSlots() {
-            const dateInput = document.getElementById('followup_appointment_date');
+        async function loadFollowupSlots(dateValue) {
             const slotsContainer = document.getElementById('followup_time_slots');
             const selectedTime = document.getElementById('followup_selected_time');
-
-            if (!dateInput || !slotsContainer || !selectedTime) {
-                return;
-            }
+            if (!slotsContainer || !selectedTime) return;
 
             selectedTime.value = '';
             updateFollowupSubmitState();
 
-            if (!dateInput.value) {
+            if (!dateValue) {
                 slotsContainer.innerHTML = '<div class="col-span-full text-center text-[#8b7e76] text-xs py-3">Select a date to see available time slots</div>';
                 return;
             }
@@ -724,20 +872,18 @@
             slotsContainer.innerHTML = '<div class="col-span-full text-center text-[#8b7e76] text-xs py-3">Loading slots...</div>';
 
             const counselorId = {{ (int) $effectiveCounselorId }};
-            const url = `{{ route('counselor.appointments.followup-available-slots') }}?counselor_id=${encodeURIComponent(counselorId)}&date=${encodeURIComponent(dateInput.value)}`;
+            const url = `{{ route('counselor.appointments.followup-available-slots') }}?counselor_id=${encodeURIComponent(counselorId)}&date=${encodeURIComponent(dateValue)}`;
 
             try {
                 const res = await fetch(url, { headers: { 'Accept': 'application/json' } });
                 const data = await res.json();
-
                 const available = Array.isArray(data.available_slots) ? data.available_slots : [];
                 if (!available.length) {
-                    slotsContainer.innerHTML = `<div class="col-span-full text-center text-[#8b7e76] text-xs py-3">${data.message ? data.message : 'No available slots for this date'}</div>`;
+                    slotsContainer.innerHTML = `<div class="col-span-full text-center text-[#8b7e76] text-xs py-3">${data.message || 'No available slots for this date'}</div>`;
                     return;
                 }
-
                 slotsContainer.innerHTML = '';
-                available.forEach((slot) => {
+                available.forEach(slot => {
                     const btn = document.createElement('button');
                     btn.type = 'button';
                     btn.dataset.start = slot.start;
@@ -751,12 +897,184 @@
             }
         }
 
+        // ── Follow-up Calendar ────────────────────────────────────────────────
         document.addEventListener('DOMContentLoaded', () => {
-            const dateInput = document.getElementById('followup_appointment_date');
-            if (dateInput) {
-                dateInput.addEventListener('change', loadFollowupSlots);
-            }
             updateFollowupSubmitState();
+
+            const counselorId = {{ (int) $effectiveCounselorId }};
+            const dateHidden   = document.getElementById('followup_appointment_date');
+            const calGrid      = document.getElementById('fuCalGrid');
+            const calLabel     = document.getElementById('fuCalMonthLabel');
+            const calStatus    = document.getElementById('fuCalStatus');
+            const calPrev      = document.getElementById('fuCalPrev');
+            const calNext      = document.getElementById('fuCalNext');
+
+            if (!calGrid) return;
+
+            const minDate = new Date();
+            minDate.setHours(0,0,0,0);
+            // Counselors can book same-day appointments
+
+            let currentMonth = new Date(minDate.getFullYear(), minDate.getMonth(), 1);
+            let selectedDate  = null;
+            let availMap      = new Map();
+            let reqId         = 0;
+
+            function fmt(d) {
+                return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+            }
+            function sameDay(a,b) {
+                return a && b && a.getFullYear()===b.getFullYear() && a.getMonth()===b.getMonth() && a.getDate()===b.getDate();
+            }
+            function setStatus(msg, tone='') {
+                calStatus.textContent = msg;
+                calStatus.className = 'calendar-status' + (tone ? ' '+tone : '');
+            }
+
+            function renderCal() {
+                calLabel.textContent = currentMonth.toLocaleString('en-US',{month:'long',year:'numeric'});
+                calGrid.innerHTML = '';
+                const startDay = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), 1).getDay();
+                const daysInMonth = new Date(currentMonth.getFullYear(), currentMonth.getMonth()+1, 0).getDate();
+
+                for (let i=0; i<startDay; i++) calGrid.appendChild(document.createElement('div'));
+
+                for (let day=1; day<=daysInMonth; day++) {
+                    const date = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), day);
+                    const dv   = fmt(date);
+                    const past = date < minDate;
+                    const avail = availMap.get(dv) === true;
+                    const btn  = document.createElement('button');
+                    btn.type = 'button';
+                    btn.textContent = day;
+                    btn.className = 'calendar-day';
+
+                    if (past || !avail) {
+                        btn.disabled = true;
+                        btn.classList.add('disabled');
+                    } else {
+                        btn.classList.add('available');
+                    }
+                    if (selectedDate && sameDay(selectedDate, date)) btn.classList.add('selected');
+
+                    btn.addEventListener('click', () => {
+                        if (btn.disabled) return;
+                        selectedDate = date;
+                        dateHidden.value = dv;
+                        setStatus(`Selected: ${date.toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'})}`, 'success');
+                        renderCal();
+                        loadFollowupSlots(dv);
+                    });
+                    calGrid.appendChild(btn);
+                }
+            }
+
+            async function loadMonthAvail() {
+                availMap = new Map();
+                renderCal();
+                setStatus('Checking available dates...');
+                const month = `${currentMonth.getFullYear()}-${String(currentMonth.getMonth()+1).padStart(2,'0')}`;
+                const id = ++reqId;
+                try {
+                    const res  = await fetch(`/appointments/available-dates?counselor_id=${counselorId}&month=${month}&allow_today=1`);
+                    const data = await res.json();
+                    if (id !== reqId) return;
+                    Object.entries(data.availability || {}).forEach(([k,v]) => availMap.set(k, v===true));
+                } catch(e) {
+                    if (id !== reqId) return;
+                    setStatus('Unable to load available dates.', 'error');
+                    renderCal(); return;
+                }
+                if (id !== reqId) return;
+                const hasAny = [...availMap.values()].some(v=>v);
+                setStatus(hasAny ? 'Available dates are highlighted. Select a date to continue.' : 'No available dates this month.', hasAny ? '' : 'error');
+                if (selectedDate && !availMap.get(fmt(selectedDate))) {
+                    selectedDate = null; dateHidden.value = '';
+                }
+                renderCal();
+            }
+
+            calPrev.addEventListener('click', () => {
+                currentMonth = new Date(currentMonth.getFullYear(), currentMonth.getMonth()-1, 1);
+                loadMonthAvail();
+            });
+            calNext.addEventListener('click', () => {
+                currentMonth = new Date(currentMonth.getFullYear(), currentMonth.getMonth()+1, 1);
+                loadMonthAvail();
+            });
+
+            loadMonthAvail();
         });
+    </script>
+
+    {{-- High-Risk Modal --}}
+    <div id="highRiskModal" style="display:none;position:fixed;inset:0;background:rgba(44,36,32,0.6);z-index:9999;align-items:center;justify-content:center;padding:1rem;">
+        <div style="background:white;border-radius:0.75rem;max-width:480px;width:100%;box-shadow:0 20px 40px rgba(0,0,0,0.15);">
+            <div style="padding:1rem 1.25rem;border-bottom:1px solid var(--border-soft);display:flex;align-items:center;justify-content:space-between;">
+                <h3 style="margin:0;font-size:0.95rem;font-weight:600;color:var(--text-primary);display:flex;align-items:center;gap:0.5rem;">
+                    <i class="fas fa-exclamation-triangle" style="color:#dc2626;font-size:0.85rem;"></i> High-Risk Status
+                </h3>
+                <button onclick="toggleHighRiskModal()" style="background:none;border:none;font-size:1.25rem;color:var(--text-muted);cursor:pointer;line-height:1;">×</button>
+            </div>
+            <div style="padding:1.25rem;">
+                <label style="display:flex;align-items:center;gap:0.6rem;cursor:pointer;padding:0.75rem;border:1px solid var(--border-soft);border-radius:0.5rem;margin-bottom:1rem;">
+                    <input type="checkbox" id="hr_is_high_risk" {{ ($appointment->student->is_high_risk || $sessionSelfHarmRisk) ? 'checked' : '' }}
+                           style="width:1.1rem;height:1.1rem;cursor:pointer;accent-color:#dc2626;">
+                    <span style="font-size:0.85rem;font-weight:600;color:var(--text-primary);">Flag this student as high-risk</span>
+                </label>
+                <div>
+                    <label style="display:block;font-size:0.75rem;font-weight:600;color:var(--text-secondary);margin-bottom:0.4rem;text-transform:uppercase;letter-spacing:0.06em;">Notes (Optional)</label>
+                    <textarea id="hr_notes" rows="4"
+                              placeholder="Reason for flagging, observations, concerns..."
+                              style="width:100%;padding:0.65rem 0.75rem;border:1px solid var(--border-soft);border-radius:0.5rem;font-size:0.82rem;resize:vertical;outline:none;">{{ $appointment->student->high_risk_notes }}</textarea>
+                </div>
+            </div>
+            <div style="padding:0.85rem 1.25rem;border-top:1px solid var(--border-soft);display:flex;gap:0.6rem;justify-content:flex-end;">
+                <button onclick="toggleHighRiskModal()"
+                        style="padding:0.5rem 1rem;border:1px solid var(--border-soft);background:white;color:var(--text-secondary);border-radius:0.5rem;font-size:0.82rem;font-weight:600;cursor:pointer;">
+                    Cancel
+                </button>
+                <button id="hrSubmitBtn" onclick="submitHighRisk()"
+                        style="padding:0.5rem 1rem;border:none;background:var(--maroon-700);color:white;border-radius:0.5rem;font-size:0.82rem;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:0.4rem;">
+                    <i class="fas fa-save text-[10px]"></i> Save
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function toggleHighRiskModal() {
+            const modal = document.getElementById('highRiskModal');
+            modal.style.display = modal.style.display === 'flex' ? 'none' : 'flex';
+        }
+
+        function submitHighRisk() {
+            const btn = document.getElementById('hrSubmitBtn');
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin text-[10px]"></i> Saving...';
+
+            fetch('{{ route("counselor.students.toggle-high-risk", $appointment->student) }}', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
+                body: JSON.stringify({
+                    is_high_risk: document.getElementById('hr_is_high_risk').checked,
+                    high_risk_notes: document.getElementById('hr_notes').value,
+                })
+            })
+            .then(r => r.json())
+            .then(data => {
+                if (data.success) { location.reload(); }
+                else {
+                    alert(data.message || 'Failed to update.');
+                    btn.disabled = false;
+                    btn.innerHTML = '<i class="fas fa-save text-[10px]"></i> Save';
+                }
+            })
+            .catch(() => {
+                alert('An error occurred. Please try again.');
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-save text-[10px]"></i> Save';
+            });
+        }
     </script>
 @endsection

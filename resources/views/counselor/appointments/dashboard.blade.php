@@ -282,11 +282,23 @@
                     @else
                         <div class="space-y-3">
                             @foreach($todayAppointments as $appointment)
-                                <div class="appt-card {{ $appointment->status }}">
+                                @php
+                                    $tStress = $appointment->student->needsAssessment?->stress_responses ?? [];
+                                    $tStress = is_array($tStress) ? $tStress : [];
+                                    $tRisk = ['Hurt myself', 'Attempted to end my life', 'Thought it would be better dead'];
+                                    $tIsHighRisk = $appointment->student->is_high_risk
+                                        || (!$appointment->student->high_risk_overridden && count(array_intersect($tRisk, $tStress)) > 0);
+                                @endphp
+                                <div class="appt-card {{ $appointment->status }} {{ $tIsHighRisk ? 'border-l-2 border-red-500' : '' }}">
                                     <div class="flex justify-between items-start mb-2">
                                         <div>
                                             <h3 class="appt-student truncate">
                                                 {{ $appointment->student->user->first_name }} {{ $appointment->student->user->last_name }}
+                                                @if($tIsHighRisk)
+                                                    <span class="ml-1 inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-full text-[9px] font-semibold bg-red-100 text-red-700 border border-red-200">
+                                                        <i class="fas fa-exclamation-triangle" style="font-size:8px;"></i> High-risk
+                                                    </span>
+                                                @endif
                                             </h3>
                                             <p class="appt-id">
                                                 <i class="fas fa-id-card mr-1 text-[9px]"></i>{{ $appointment->student->student_id }}
@@ -357,7 +369,14 @@
                         @else
                             <div class="space-y-3">
                                 @foreach($upcomingAppointments as $appointment)
-                                    <div class="upcoming-card">
+                                    @php
+                                        $uStress = $appointment->student->needsAssessment?->stress_responses ?? [];
+                                        $uStress = is_array($uStress) ? $uStress : [];
+                                        $uRisk = ['Hurt myself', 'Attempted to end my life', 'Thought it would be better dead'];
+                                        $uIsHighRisk = $appointment->student->is_high_risk
+                                            || (!$appointment->student->high_risk_overridden && count(array_intersect($uRisk, $uStress)) > 0);
+                                    @endphp
+                                    <div class="upcoming-card {{ $uIsHighRisk ? 'border-l-2 border-red-400' : '' }}">
                                         <div class="flex items-center gap-3 sm:gap-4">
                                             <div class="upcoming-date">
                                                 <p class="upcoming-date-day">
@@ -374,6 +393,11 @@
                                                 <p class="upcoming-college">
                                                     <i class="fas fa-building-columns mr-1 text-[9px]"></i>{{ $appointment->student->college->name ?? 'N/A' }}
                                                 </p>
+                                                @if($uIsHighRisk)
+                                                    <span class="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-full text-[9px] font-semibold bg-red-100 text-red-700 border border-red-200 mt-1">
+                                                        <i class="fas fa-exclamation-triangle" style="font-size:8px;"></i> High-risk
+                                                    </span>
+                                                @endif
                                             </div>
                                         </div>
                                         <span class="appt-status {{ $appointment->status }}">

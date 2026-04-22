@@ -550,7 +550,15 @@
                                 <tr class="{{ $rowClass }} fade-in" onclick="showAppointmentDetails({{ $appointment->id }})">
                                     <td class="px-4 sm:px-6 py-3.5">
                                         <div class="flex items-center gap-2.5 sm:gap-3">
-                                            <div class="avatar-badge">
+                                            @php
+                                                $stressResponses = $appointment->student->needsAssessment?->stress_responses ?? [];
+                                                $stressResponses = is_array($stressResponses) ? $stressResponses : [];
+                                                $riskResponses = ['Hurt myself', 'Attempted to end my life', 'Thought it would be better dead'];
+                                                $hasSelfHarmRisk = !$appointment->student->high_risk_overridden
+                                                    && count(array_intersect($riskResponses, $stressResponses)) > 0;
+                                                $isHighRisk = $appointment->student->is_high_risk || $hasSelfHarmRisk;
+                                            @endphp
+                                            <div class="avatar-badge {{ $isHighRisk ? 'ring-2 ring-red-500' : '' }}">
                                                 <i class="fas fa-user-graduate text-[9px] sm:text-xs"></i>
                                             </div>
                                             <div class="min-w-0">
@@ -566,6 +574,13 @@
                                                         </span>
                                                     @endif
                                                 </div>
+                                                @if($isHighRisk)
+                                                    <div class="mt-0.5">
+                                                        <span class="inline-flex items-center gap-1 text-[10px] bg-red-100 text-red-700 px-1.5 py-0.5 rounded-full border border-red-200 whitespace-nowrap">
+                                                            <i class="fas fa-exclamation-triangle text-[8px]"></i> High-risk individual
+                                                        </span>
+                                                    </div>
+                                                @endif
                                                 <div class="text-[10px] sm:text-xs text-[#8b7e76] font-mono truncate max-w-[140px] sm:max-w-[180px]">
                                                     {{ $appointment->student->student_id }}
                                                 </div>
@@ -887,7 +902,40 @@
                         @csrf
                         @method('PATCH')
                         <div class="space-y-4">
-                            <div>
+
+                            {{-- Override Availability Toggle --}}
+                            <label id="rescheduleOverrideToggle" style="display:flex;align-items:center;gap:0.6rem;cursor:pointer;padding:0.65rem 0.85rem;border:1px solid #fca5a5;border-radius:0.6rem;background:rgba(255,241,242,0.5);">
+                                <input type="checkbox" name="override_availability" id="rescheduleOverrideCheck" value="1"
+                                       onchange="toggleRescheduleOverride(this.checked)"
+                                       style="width:1rem;height:1rem;accent-color:#dc2626;cursor:pointer;">
+                                <span style="font-size:0.78rem;color:#991b1b;font-weight:600;display:flex;align-items:center;gap:0.4rem;">
+                                    <i class="fas fa-bolt text-[10px]"></i>
+                                    Override Availability — book outside set hours / daily limit
+                                </span>
+                            </label>
+
+                            {{-- Manual time input (shown when override is on) --}}
+                            <div id="rescheduleManualTimeWrap" class="hidden space-y-3" style="padding:0.75rem;border:1px solid #fca5a5;border-radius:0.6rem;background:rgba(255,241,242,0.3);">
+                                <p style="font-size:0.7rem;color:#991b1b;font-weight:600;margin:0 0 0.5rem;display:flex;align-items:center;gap:0.4rem;">
+                                    <i class="fas fa-exclamation-triangle text-[10px]"></i>
+                                    Override mode — enter date and time manually
+                                </p>
+                                <div>
+                                    <label class="field-label">Date <span class="text-[#b91c1c]">*</span></label>
+                                    <input type="date" id="rescheduleManualDate"
+                                           min="{{ now()->format('Y-m-d') }}"
+                                           class="input-field text-xs"
+                                           onchange="syncRescheduleManualDate(this.value)">
+                                </div>
+                                <div>
+                                    <label class="field-label">Start Time <span class="text-[#b91c1c]">*</span></label>
+                                    <input type="time" id="rescheduleManualTime"
+                                           class="input-field text-xs"
+                                           onchange="syncRescheduleManualTime(this.value)">
+                                </div>
+                            </div>
+
+                            <div id="rescheduleCalendarWrap">
                                 <label class="field-label">Select Date</label>
                                 <div class="border border-[#e5e0db] rounded-xl bg-white p-4 shadow-sm">
                                     <div class="calendar-nav">
@@ -911,7 +959,7 @@
                                 </div>
                                 <input type="hidden" name="appointment_date" id="rescheduleDateSelect" required>
                             </div>
-                            <div>
+                            <div id="rescheduleSlotWrap">
                                 <label class="field-label">Available Time Slots</label>
                                 <div id="rescheduleTimeSlots" class="grid grid-cols-2 md:grid-cols-3 gap-2 sm:gap-3">
                                     <div class="text-[#8b7e76] text-center p-4 border-2 border-dashed border-[#e5e0db] rounded-lg text-xs">
@@ -1603,6 +1651,46 @@
                 document.getElementById('rescheduleModal').classList.add('hidden');
                 rescheduleCounselorId = null;
                 rescheduleSelectedDate = null;
+                // Reset override state
+                const overrideCheck = document.getElementById('rescheduleOverrideCheck');
+                if (overrideCheck) overrideCheck.checked = false;
+                toggleRescheduleOverride(false);
+            }
+
+            function toggleRescheduleOverride(enabled) {
+                const calWrap  = document.getElementById('rescheduleCalendarWrap');
+                const slotWrap = document.getElementById('rescheduleSlotWrap');
+                const manualWrap = document.getElementById('rescheduleManualTimeWrap');
+                const dateInput  = document.getElementById('rescheduleDateSelect');
+                const timeInput  = document.getElementById('rescheduleSelectedTime');
+
+                if (enabled) {
+                    calWrap.classList.add('hidden');
+                    slotWrap.classList.add('hidden');
+                    manualWrap.classList.remove('hidden');
+                    // Remove required from hidden fields
+                    dateInput.removeAttribute('required');
+                    timeInput.removeAttribute('required');
+                } else {
+                    calWrap.classList.remove('hidden');
+                    slotWrap.classList.remove('hidden');
+                    manualWrap.classList.add('hidden');
+                    dateInput.setAttribute('required', '');
+                    timeInput.setAttribute('required', '');
+                    // Clear manual inputs
+                    const md = document.getElementById('rescheduleManualDate');
+                    const mt = document.getElementById('rescheduleManualTime');
+                    if (md) md.value = '';
+                    if (mt) mt.value = '';
+                }
+            }
+
+            function syncRescheduleManualDate(val) {
+                document.getElementById('rescheduleDateSelect').value = val;
+            }
+
+            function syncRescheduleManualTime(val) {
+                document.getElementById('rescheduleSelectedTime').value = val;
             }
 
             document.getElementById('referralCalendarPrev')?.addEventListener('click', function() {
@@ -1709,6 +1797,13 @@
                                     <label class="field-label">Concern</label>
                                     <p class="mt-1 text-xs sm:text-sm text-[#6b5e57] whitespace-pre-line">${data.appointment.concern}</p>
                                 </div>
+
+                                ${data.appointment.referred_by ? `
+                                <div>
+                                    <label class="field-label">Referred By</label>
+                                    <p class="mt-1 text-xs sm:text-sm text-[#2c2420]">${data.appointment.referred_by}</p>
+                                </div>
+                                ` : ''}
 
                                 ${data.appointment.notes ? `
                                 <div>

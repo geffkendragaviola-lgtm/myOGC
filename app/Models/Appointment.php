@@ -41,6 +41,7 @@ class Appointment extends Model
         'concern',
         'status',
         'notes',
+        'referred_by',
         'session_note_id',
         'referred_to_counselor_id',
         'referral_reason',

@@ -844,6 +844,7 @@ public function getAppointmentDetails(Appointment $appointment)
             'original_counselor_id' => $appointment->original_counselor_id,
             'referral_reason' => $appointment->referral_reason,
             'referral_requested_at' => $appointment->referral_requested_at?->toIso8601String(),
+            'referred_by' => $appointment->referred_by,
             'referral_outcome' => $appointment->referral_outcome,
             'referral_resolved_at' => $appointment->referral_resolved_at?->toIso8601String(),
             'referral_resolved_by_counselor_id' => $appointment->referral_resolved_by_counselor_id,
@@ -962,7 +963,15 @@ public function viewAppointmentSession(Appointment $appointment)
         abort(403);
     }
 
-    $appointment->load(['student.user', 'student.college', 'referredCounselor.user', 'originalCounselor.user', 'sessionNotes']);
+    $appointment->load([
+        'student.user',
+        'student.college',
+        'student.needsAssessment',
+        'student.flaggedBy',
+        'referredCounselor.user',
+        'originalCounselor.user',
+        'sessionNotes',
+    ]);
 
     $latestSessionNote = $appointment->sessionNotes
         ->sortByDesc('session_date')
@@ -1122,6 +1131,35 @@ public function showStudentProfile(Student $student)
     ]);
 
     return view('student.show', compact('student'));
+}
+
+public function toggleHighRisk(Request $request, Student $student)
+{
+    $request->validate([
+        'is_high_risk'    => 'required|boolean',
+        'high_risk_notes' => 'nullable|string|max:1000',
+    ]);
+
+    $student->update([
+        'is_high_risk'           => $request->is_high_risk,
+        'high_risk_notes'        => $request->high_risk_notes,
+        'high_risk_flagged_at'   => $request->is_high_risk ? now() : null,
+        'high_risk_flagged_by'   => $request->is_high_risk ? auth()->id() : null,
+        // If counselor explicitly unflagged, mark override so assessment logic doesn't re-trigger
+        'high_risk_overridden'   => ! $request->is_high_risk,
+    ]);
+
+    return response()->json([
+        'success' => true,
+        'message' => $request->is_high_risk
+            ? 'Student flagged as high-risk successfully.'
+            : 'High-risk flag removed successfully.',
+        'student' => [
+            'is_high_risk'         => $student->is_high_risk,
+            'high_risk_notes'      => $student->high_risk_notes,
+            'high_risk_flagged_at' => $student->high_risk_flagged_at?->format('M j, Y g:i A'),
+        ],
+    ]);
 }
 
 }

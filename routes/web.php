@@ -170,6 +170,10 @@ Route::middleware('auth')->group(function () {
         // Student profile route
         Route::get('/students/{student}/profile', [CounselorController::class, 'showStudentProfile'])
             ->name('counselor.students.profile');
+        
+        // High-risk flag toggle
+        Route::post('/students/{student}/toggle-high-risk', [CounselorController::class, 'toggleHighRisk'])
+            ->name('counselor.students.toggle-high-risk');
 
         // Export appointments
         Route::get('/appointments/export', [CounselorController::class, 'exportAppointments'])

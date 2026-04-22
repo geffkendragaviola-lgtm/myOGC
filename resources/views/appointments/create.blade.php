@@ -632,6 +632,19 @@
                     <p class="field-help">Please describe your concern in your own words.</p>
                 </div>
 
+                <!-- Referred By -->
+                <div class="mb-6">
+                    <label class="field-label">Referred By <span style="color:var(--text-muted);font-weight:400;">(Optional)</span></label>
+                    <input type="text"
+                           name="referred_by"
+                           id="referredByInput"
+                           class="input-field"
+                           maxlength="255"
+                           placeholder="e.g. Teacher, Professor, Parent, Friend, Classmate"
+                           value="{{ old('referred_by') }}">
+                    <p class="field-help">If someone referred you to counseling, please indicate who.</p>
+                </div>
+
                 <!-- Submit Button -->
                 <div class="flex justify-end space-x-3 sm:space-x-4 btn-row-mobile">
                     <a href="{{ route('appointments.index') }}" class="secondary-btn px-5 py-2.5 text-xs sm:text-sm">

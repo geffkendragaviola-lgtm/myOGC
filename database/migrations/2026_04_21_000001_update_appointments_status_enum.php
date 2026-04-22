@@ -30,9 +30,8 @@ return new class extends Migration
 
     public function down(): void
     {
+        // Cannot safely restore the old 5-status constraint while rows with
+        // extended statuses exist — just drop the constraint.
         DB::statement('ALTER TABLE appointments DROP CONSTRAINT IF EXISTS appointments_status_check');
-
-        $original = "'pending', 'approved', 'rejected', 'cancelled', 'completed'";
-        DB::statement("ALTER TABLE appointments ADD CONSTRAINT appointments_status_check CHECK (status IN ($original))");
     }
 };

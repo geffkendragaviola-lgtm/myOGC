@@ -18,11 +18,6 @@ return new class extends Migration
 
     public function down(): void
     {
-        // Remove the new check constraint
         DB::statement('ALTER TABLE appointments DROP CONSTRAINT IF EXISTS appointments_status_check');
-
-        // Restore original check constraint
-        DB::statement("UPDATE appointments SET status = 'approved' WHERE status NOT IN ('pending', 'approved', 'rejected', 'cancelled', 'completed')");
-        DB::statement("ALTER TABLE appointments ADD CONSTRAINT appointments_status_check CHECK (status IN ('pending', 'approved', 'rejected', 'cancelled', 'completed'))");
     }
 };

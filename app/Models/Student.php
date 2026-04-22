@@ -29,6 +29,11 @@ class Student extends Model
         'profile_picture',
         'student_status',
         'initial_interview_completed',
+        'is_high_risk',
+        'high_risk_notes',
+        'high_risk_flagged_at',
+        'high_risk_flagged_by',
+        'high_risk_overridden',
     ];
 
     /**
@@ -39,6 +44,9 @@ class Student extends Model
     protected $casts = [
         'msu_sase_score' => 'decimal:2',
         'initial_interview_completed' => 'boolean',
+        'is_high_risk' => 'boolean',
+        'high_risk_flagged_at' => 'datetime',
+        'high_risk_overridden' => 'boolean',
     ];
     public function getProfilePictureUrlAttribute(): string
     {
@@ -68,6 +76,14 @@ class Student extends Model
     public function college(): BelongsTo
     {
         return $this->belongsTo(College::class);
+    }
+
+    /**
+     * Get the counselor who flagged this student as high-risk.
+     */
+    public function flaggedBy(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'high_risk_flagged_by');
     }
 
     /**
