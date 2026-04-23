@@ -22,6 +22,15 @@ use App\Mail\AppointmentReferredToCounselor;
 use App\Mail\RescheduleResponse;
 use App\Mail\ReferralResponse;
 use Illuminate\Support\Facades\Mail;
+use App\Notifications\AppointmentBookedNotification;
+use App\Notifications\AppointmentBookedByCounselorNotification;
+use App\Notifications\AppointmentCancelledNotification;
+use App\Notifications\AppointmentStatusChangedNotification;
+use App\Notifications\AppointmentRescheduledNotification;
+use App\Notifications\AppointmentReferredNotification;
+use App\Notifications\AppointmentReferredToCounselorNotification;
+use App\Notifications\RescheduleResponseNotification;
+use App\Notifications\ReferralResponseNotification;
 
 class AppointmentController extends Controller
 {
@@ -490,6 +499,7 @@ public function storeByCounselor(Request $request)
     try {
         $appointment->load(['student.user', 'counselor.user']);
         Mail::to($appointment->student->user->email)->send(new AppointmentBookedByCounselor($appointment));
+        $appointment->student->user->notify(new AppointmentBookedByCounselorNotification($appointment));
     } catch (\Throwable $e) {
         Log::warning('Failed to send counselor-booked appointment email', ['error' => $e->getMessage()]);
     }
@@ -1093,6 +1103,7 @@ public function store(Request $request)
     try {
         $appointment->load(['student.user', 'counselor.user']);
         Mail::to($appointment->counselor->user->email)->send(new AppointmentBooked($appointment));
+        $appointment->counselor->user->notify(new AppointmentBookedNotification($appointment));
     } catch (\Throwable $e) {
         Log::warning('Failed to send booking notification email', ['error' => $e->getMessage()]);
     }
@@ -1140,6 +1151,7 @@ public function store(Request $request)
         try {
             $appointment->load(['student.user', 'counselor.user']);
             Mail::to($appointment->counselor->user->email)->send(new AppointmentCancelled($appointment));
+            $appointment->counselor->user->notify(new AppointmentCancelledNotification($appointment));
         } catch (\Throwable $e) {
             Log::warning('Failed to send cancellation notification email', ['error' => $e->getMessage()]);
         }
@@ -1214,6 +1226,7 @@ public function updateStatus(Request $request, Appointment $appointment)
             $appointment->load(['student.user', 'counselor.user']);
             Mail::to($appointment->student->user->email)
                 ->send(new AppointmentStatusChanged($appointment, $request->status));
+            $appointment->student->user->notify(new AppointmentStatusChangedNotification($appointment, $request->status));
         } catch (\Throwable $e) {
             Log::warning('Failed to send status-changed notification email', ['error' => $e->getMessage()]);
         }
@@ -1393,6 +1406,7 @@ public function reschedule(Request $request, Appointment $appointment)
     try {
         $appointment->load(['student.user', 'counselor.user']);
         Mail::to($appointment->student->user->email)->send(new AppointmentRescheduled($appointment));
+        $appointment->student->user->notify(new AppointmentRescheduledNotification($appointment));
     } catch (\Throwable $e) {
         Log::warning('Failed to send reschedule notification email', ['error' => $e->getMessage()]);
     }
@@ -1550,6 +1564,7 @@ public function refer(Request $request, Appointment $appointment)
     try {
         $appointment->load(['student.user', 'counselor.user', 'referredCounselor.user', 'originalCounselor.user']);
         Mail::to($appointment->student->user->email)->send(new AppointmentReferred($appointment));
+        $appointment->student->user->notify(new AppointmentReferredNotification($appointment));
     } catch (\Throwable $e) {
         Log::warning('Failed to send referral notification email', ['error' => $e->getMessage()]);
     }
@@ -1558,6 +1573,7 @@ public function refer(Request $request, Appointment $appointment)
     try {
         $appointment->loadMissing(['student.user', 'referredCounselor.user', 'originalCounselor.user']);
         Mail::to($appointment->referredCounselor->user->email)->send(new AppointmentReferredToCounselor($appointment));
+        $appointment->referredCounselor->user->notify(new AppointmentReferredToCounselorNotification($appointment));
     } catch (\Throwable $e) {
         Log::warning('Failed to send referral-to-counselor notification email', ['error' => $e->getMessage()]);
     }
@@ -1645,6 +1661,7 @@ public function acceptReschedule(Request $request, Appointment $appointment)
     try {
         $appointment->load(['student.user', 'counselor.user']);
         Mail::to($appointment->counselor->user->email)->send(new RescheduleResponse($appointment, 'accepted'));
+        $appointment->counselor->user->notify(new RescheduleResponseNotification($appointment, 'accepted'));
     } catch (\Throwable $e) {
         Log::warning('Failed to send reschedule-accepted email', ['error' => $e->getMessage()]);
     }
@@ -1699,6 +1716,7 @@ public function rejectReschedule(Request $request, Appointment $appointment)
     try {
         $appointment->load(['student.user', 'counselor.user']);
         Mail::to($appointment->counselor->user->email)->send(new RescheduleResponse($appointment, 'rejected'));
+        $appointment->counselor->user->notify(new RescheduleResponseNotification($appointment, 'rejected'));
     } catch (\Throwable $e) {
         Log::warning('Failed to send reschedule-rejected email', ['error' => $e->getMessage()]);
     }
@@ -1831,6 +1849,7 @@ public function acceptReferralByCounselor(Request $request, Appointment $appoint
     try {
         $appointment->load(['student.user', 'counselor.user', 'originalCounselor.user']);
         Mail::to($appointment->student->user->email)->send(new ReferralResponse($appointment, 'accepted', 'counselor'));
+        $appointment->student->user->notify(new ReferralResponseNotification($appointment, 'accepted', 'counselor'));
     } catch (\Throwable $e) {
         Log::warning('Failed to send referral-accepted-by-counselor email', ['error' => $e->getMessage()]);
     }
@@ -1934,7 +1953,11 @@ public function acceptReferral(Request $request, Appointment $appointment)
         $notifyEmail = $appointment->originalCounselor
             ? $appointment->originalCounselor->user->email
             : $appointment->counselor->user->email;
+        $notifyUser = $appointment->originalCounselor
+            ? $appointment->originalCounselor->user
+            : $appointment->counselor->user;
         Mail::to($notifyEmail)->send(new ReferralResponse($appointment, 'accepted', 'student'));
+        $notifyUser->notify(new ReferralResponseNotification($appointment, 'accepted', 'student'));
     } catch (\Throwable $e) {
         Log::warning('Failed to send referral-accepted email', ['error' => $e->getMessage()]);
     }
@@ -2003,7 +2026,11 @@ public function rejectReferral(Request $request, Appointment $appointment)
         $notifyEmail = $appointment->originalCounselor
             ? $appointment->originalCounselor->user->email
             : $appointment->counselor->user->email;
+        $notifyUser = $appointment->originalCounselor
+            ? $appointment->originalCounselor->user
+            : $appointment->counselor->user;
         Mail::to($notifyEmail)->send(new ReferralResponse($appointment, 'rejected', 'student'));
+        $notifyUser->notify(new ReferralResponseNotification($appointment, 'rejected', 'student'));
     } catch (\Throwable $e) {
         Log::warning('Failed to send referral-rejected email', ['error' => $e->getMessage()]);
     }

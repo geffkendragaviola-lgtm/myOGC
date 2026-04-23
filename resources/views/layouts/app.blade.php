@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>@yield('title', 'Office of Guidance and Counseling')</title>
     <link rel="icon" type="image/png" href="{{ asset('images/msu-iit-logo.png') }}">
     <link rel="shortcut icon" type="image/png" href="{{ asset('images/msu-iit-logo.png') }}">
@@ -819,9 +820,48 @@
         </div>
 
         <div class="flex items-center space-x-3 ml-auto">
-            <button class="ogc-nav-icon transition">
-                <i class="fas fa-bell"></i>
-            </button>
+            {{-- Notification Bell --}}
+            @php
+                $unreadNotifications = Auth::user()->unreadNotifications->take(5);
+                $unreadCount = Auth::user()->unreadNotifications->count();
+            @endphp
+            <div class="relative" id="notif-dropdown-wrapper">
+                <button id="notif-bell-btn" class="ogc-nav-icon transition relative" aria-label="Notifications">
+                    <i class="fas fa-bell"></i>
+                    @if($unreadCount > 0)
+                        <span id="notif-badge" class="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold rounded-full min-w-[16px] h-4 flex items-center justify-center px-1 leading-none">
+                            {{ $unreadCount > 99 ? '99+' : $unreadCount }}
+                        </span>
+                    @endif
+                </button>
+                <div id="notif-panel" class="hidden absolute right-0 top-[calc(100%+10px)] w-80 bg-white rounded-2xl shadow-xl border border-[var(--border-soft)] z-[1002] overflow-hidden">
+                    <div class="flex items-center justify-between px-4 py-3 border-b border-[var(--border-soft)]">
+                        <span class="font-semibold text-sm text-[var(--text-dark)]">Notifications</span>
+                        @if($unreadCount > 0)
+                            <button id="mark-all-read-btn" class="text-xs text-[var(--primary-red)] hover:underline font-medium">Mark all as read</button>
+                        @endif
+                    </div>
+                    <div class="divide-y divide-[var(--border-soft)]" id="notif-list">
+                        @forelse($unreadNotifications as $notif)
+                            <div class="notif-item flex items-start gap-3 px-4 py-3 hover:bg-[var(--bg-light)] cursor-pointer bg-blue-50/40" data-id="{{ $notif->id }}">
+                                <div class="mt-0.5 flex-shrink-0 w-8 h-8 rounded-full bg-[var(--primary-red)] flex items-center justify-center">
+                                    <i class="fas fa-bell text-white text-xs"></i>
+                                </div>
+                                <div class="flex-1 min-w-0">
+                                    <p class="text-xs font-semibold text-[var(--text-dark)] truncate">{{ $notif->data['title'] ?? 'Notification' }}</p>
+                                    <p class="text-xs text-[var(--text-secondary)] mt-0.5 line-clamp-2">{{ $notif->data['message'] ?? '' }}</p>
+                                    <p class="text-[10px] text-[var(--text-muted)] mt-1">{{ $notif->created_at->diffForHumans() }}</p>
+                                </div>
+                            </div>
+                        @empty
+                            <div class="px-4 py-8 text-center text-sm text-[var(--text-muted)]">
+                                <i class="fas fa-bell-slash text-2xl mb-2 block opacity-40"></i>
+                                No new notifications
+                            </div>
+                        @endforelse
+                    </div>
+                </div>
+            </div>
             <div class="ogc-profile-dropdown">
                 <button class="ogc-nav-icon transition" id="profile-dropdown-btn">
                     <i class="fas fa-circle-user text-lg"></i>
@@ -975,6 +1015,68 @@ document.addEventListener('DOMContentLoaded', function () {
         });
 
         profileMenu.addEventListener('click', e => e.stopPropagation());
+    }
+
+    // Notification bell
+    const notifBtn   = document.getElementById('notif-bell-btn');
+    const notifPanel = document.getElementById('notif-panel');
+    const markAllBtn = document.getElementById('mark-all-read-btn');
+
+    if (notifBtn && notifPanel) {
+        notifBtn.addEventListener('click', function (e) {
+            e.stopPropagation();
+            notifPanel.classList.toggle('hidden');
+            if (profileMenu) profileMenu.classList.add('hidden');
+        });
+
+        document.addEventListener('click', function () {
+            notifPanel.classList.add('hidden');
+        });
+
+        notifPanel.addEventListener('click', e => e.stopPropagation());
+
+        // Mark individual as read
+        notifPanel.querySelectorAll('.notif-item').forEach(function (item) {
+            item.addEventListener('click', function () {
+                if (item.dataset.read === 'true') return;
+                const id = item.dataset.id;
+                fetch('/notifications/' + id + '/read', {
+                    method: 'POST',
+                    headers: { 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || '', 'Accept': 'application/json' }
+                }).then(function () {
+                    item.dataset.read = 'true';
+                    item.classList.remove('bg-blue-50/40');
+                    item.classList.add('opacity-60');
+                    updateBadge(-1);
+                });
+            });
+        });
+
+        // Mark all as read
+        if (markAllBtn) {
+            markAllBtn.addEventListener('click', function () {
+                fetch('/notifications/read-all', {
+                    method: 'POST',
+                    headers: { 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || '', 'Accept': 'application/json' }
+                }).then(function () {
+                    notifPanel.querySelectorAll('.notif-item').forEach(el => el.remove());
+                    const list = document.getElementById('notif-list');
+                    if (list) list.innerHTML = '<div class="px-4 py-8 text-center text-sm text-gray-400"><i class="fas fa-bell-slash text-2xl mb-2 block opacity-40"></i>No new notifications</div>';
+                    const badge = document.getElementById('notif-badge');
+                    if (badge) badge.remove();
+                    markAllBtn.remove();
+                });
+            });
+        }
+    }
+
+    function updateBadge(delta) {
+        const badge = document.getElementById('notif-badge');
+        if (!badge) return;
+        const current = parseInt(badge.textContent) || 0;
+        const next = current + delta;
+        if (next <= 0) { badge.remove(); }
+        else { badge.textContent = next > 99 ? '99+' : next; }
     }
 
     if (sidebarToggleBtn) {

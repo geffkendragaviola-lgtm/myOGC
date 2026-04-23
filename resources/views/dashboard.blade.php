@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>Dashboard - Office of Guidance and Counseling</title>
     <link rel="icon" type="image/png" href="{{ asset('images/msu-iit-logo.png') }}">
     <link rel="shortcut icon" type="image/png" href="{{ asset('images/msu-iit-logo.png') }}">
@@ -545,9 +546,48 @@
                         </a>
                     @endif
 
-                    <button class="text-white p-2 rounded-full hover:bg-white hover:bg-opacity-10 transition">
-                        <i class="fas fa-bell"></i>
-                    </button>
+                    {{-- Notification Bell --}}
+                    @php
+                        $unreadNotifications = Auth::user()->unreadNotifications->take(5);
+                        $unreadCount = Auth::user()->unreadNotifications->count();
+                    @endphp
+                    <div class="relative" id="notif-dropdown-wrapper">
+                        <button id="notif-bell-btn" class="text-white p-2 rounded-full hover:bg-white hover:bg-opacity-10 transition relative" aria-label="Notifications">
+                            <i class="fas fa-bell"></i>
+                            @if($unreadCount > 0)
+                                <span id="notif-badge" class="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold rounded-full min-w-[16px] h-4 flex items-center justify-center px-1 leading-none">
+                                    {{ $unreadCount > 99 ? '99+' : $unreadCount }}
+                                </span>
+                            @endif
+                        </button>
+                        <div id="notif-panel" class="hidden absolute right-0 top-[calc(100%+10px)] w-80 bg-white rounded-2xl shadow-xl border border-[var(--border-soft)] z-[1002] overflow-hidden">
+                            <div class="flex items-center justify-between px-4 py-3 border-b border-[var(--border-soft)]">
+                                <span class="font-semibold text-sm text-[var(--text-dark)]">Notifications</span>
+                                @if($unreadCount > 0)
+                                    <button id="mark-all-read-btn" class="text-xs text-[var(--primary-red)] hover:underline font-medium">Mark all as read</button>
+                                @endif
+                            </div>
+                            <div class="overflow-y-auto divide-y divide-[var(--border-soft)]" id="notif-list">
+                                @forelse($unreadNotifications as $notif)
+                                    <div class="notif-item flex items-start gap-3 px-4 py-3 hover:bg-[var(--bg-light)] cursor-pointer bg-blue-50/40" data-id="{{ $notif->id }}">
+                                        <div class="mt-0.5 flex-shrink-0 w-8 h-8 rounded-full bg-[var(--primary-red)] flex items-center justify-center">
+                                            <i class="fas fa-bell text-white text-xs"></i>
+                                        </div>
+                                        <div class="flex-1 min-w-0">
+                                            <p class="text-xs font-semibold text-[var(--text-dark)] truncate">{{ $notif->data['title'] ?? 'Notification' }}</p>
+                                            <p class="text-xs text-[var(--text-secondary)] mt-0.5 line-clamp-2">{{ $notif->data['message'] ?? '' }}</p>
+                                            <p class="text-[10px] text-[var(--text-muted)] mt-1">{{ $notif->created_at->diffForHumans() }}</p>
+                                        </div>
+                                    </div>
+                                @empty
+                                    <div class="px-4 py-8 text-center text-sm text-[var(--text-muted)]">
+                                        <i class="fas fa-bell-slash text-2xl mb-2 block opacity-40"></i>
+                                        No new notifications
+                                    </div>
+                                @endforelse
+                            </div>
+                        </div>
+                    </div>
 
                     <div class="dashboard-profile-dropdown">
                         <button class="text-white p-2 rounded-full hover:bg-white hover:bg-opacity-10 transition" id="profile-dropdown-btn">
@@ -1018,6 +1058,71 @@
 
             document.querySelectorAll('.announcement-image').forEach(img => {
                 img.addEventListener('error', function() { this.style.display = 'none'; });
+            });
+
+            // Notification bell
+            const notifBtn   = document.getElementById('notif-bell-btn');
+            const notifPanel = document.getElementById('notif-panel');
+            const markAllBtn = document.getElementById('mark-all-read-btn');
+
+            if (notifBtn && notifPanel) {
+                notifBtn.addEventListener('click', function (e) {
+                    e.stopPropagation();
+                    document.querySelectorAll('[id$="-dropdown-menu"]').forEach(m => m.classList.add('hidden'));
+                    if (profileMenu) profileMenu.classList.add('hidden');
+                    notifPanel.classList.toggle('hidden');
+                });
+
+                notifPanel.addEventListener('click', e => e.stopPropagation());
+
+                notifPanel.querySelectorAll('.notif-item').forEach(function (item) {
+                    item.addEventListener('click', function () {
+                        if (item.dataset.read === 'true') return;
+                        const id = item.dataset.id;
+                        fetch('/notifications/' + id + '/read', {
+                            method: 'POST',
+                            headers: { 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content, 'Accept': 'application/json' }
+                        }).then(function () {
+                            item.dataset.read = 'true';
+                            item.classList.remove('bg-blue-50/40');
+                            item.classList.add('opacity-60');
+                            updateNotifBadge(-1);
+                        });
+                    });
+                });
+
+                if (markAllBtn) {
+                    markAllBtn.addEventListener('click', function () {
+                        fetch('/notifications/read-all', {
+                            method: 'POST',
+                            headers: { 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content, 'Accept': 'application/json' }
+                        }).then(function () {
+                            notifPanel.querySelectorAll('.notif-item').forEach(function (el) {
+                                el.dataset.read = 'true';
+                                el.classList.remove('bg-blue-50/40');
+                                el.classList.add('opacity-60');
+                            });
+                            const badge = document.getElementById('notif-badge');
+                            if (badge) badge.remove();
+                            markAllBtn.remove();
+                        });
+                    });
+                }
+            }
+
+            function updateNotifBadge(delta) {
+                const badge = document.getElementById('notif-badge');
+                if (!badge) return;
+                const next = (parseInt(badge.textContent) || 0) + delta;
+                if (next <= 0) { badge.remove(); }
+                else { badge.textContent = next > 99 ? '99+' : next; }
+            }
+
+            // Close notif panel on outside click
+            document.addEventListener('click', function (event) {
+                if (notifPanel && !event.target.closest('#notif-dropdown-wrapper')) {
+                    notifPanel.classList.add('hidden');
+                }
             });
         });
     </script>

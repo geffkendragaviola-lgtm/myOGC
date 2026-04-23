@@ -8,6 +8,7 @@ use App\Http\Controllers\AppointmentController;
 use App\Http\Controllers\CounselorController;
 use App\Http\Middleware\CounselorMiddleware;
 use App\Http\Controllers\EventController;
+use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\EventRegistrationController;
 use App\Http\Controllers\ResourceController;
 use App\Http\Controllers\SessionNoteController;
@@ -211,6 +212,12 @@ Route::middleware(['auth'])->group(function () {
 
     // Counselor-specific profile routes
     Route::patch('/profile/counselor', [ProfileController::class, 'updateCounselor'])->name('profile.counselor.update');
+});
+
+// Notification routes
+Route::middleware(['auth'])->prefix('notifications')->name('notifications.')->group(function () {
+    Route::post('/{id}/read', [NotificationController::class, 'markAsRead'])->name('read');
+    Route::post('/read-all', [NotificationController::class, 'markAllAsRead'])->name('read-all');
 });
 
 // Student event routes
