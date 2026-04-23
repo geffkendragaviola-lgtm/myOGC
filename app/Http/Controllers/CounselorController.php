@@ -10,6 +10,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\College;
 use App\Services\GoogleCalendarService;
+use App\Mail\AppointmentStatusChanged;
+use Illuminate\Support\Facades\Mail;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
@@ -780,6 +782,15 @@ public function updateAppointmentStatus(Request $request, Appointment $appointme
         'cancelled' => 'Appointment cancelled.',
         'no_show' => 'Appointment marked as no show.',
     ];
+
+    // Notify student of status change
+    try {
+        $appointment->load(['student.user', 'counselor.user']);
+        Mail::to($appointment->student->user->email)
+            ->send(new AppointmentStatusChanged($appointment, $request->status));
+    } catch (\Throwable $e) {
+        Log::warning('Failed to send status-changed notification email', ['error' => $e->getMessage()]);
+    }
 
     return redirect()->back()->with('success', $statusMessages[$request->status]);
 }

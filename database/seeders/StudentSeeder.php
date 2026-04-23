@@ -36,7 +36,7 @@ class StudentSeeder extends Seeder
                 'address' => 'Iligan City',
                 'region_of_residence' => 'Region X',
                 'phone_number' => '09952796162',
-                'email' => 'student@g.msuiit.edu.ph',
+                'email' => 'geff114@gmail.com',
                 'password' => Hash::make('1234567890'),
                 'role' => 'student',
             ],

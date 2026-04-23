@@ -16,7 +16,7 @@ class EventSeeder extends Seeder
         $cassCollegeId = DB::table('colleges')->where('name', 'College of Arts and Social Sciences')->value('id');
 
         $ccsCounselorUserId = DB::table('users')->where('email', 'gabutan@g.msuiit.edu.ph')->value('id');
-        $cassCounselorUserId = DB::table('users')->where('email', 'ouano@g.msuiit.edu.ph')->value('id');
+        $cassCounselorUserId = DB::table('users')->where('email', 'jullianephilip.ouano@g.msuiit.edu.ph')->value('id');
 
         $fallbackUserId = DB::table('users')->where('role', 'counselor')->value('id')
             ?? DB::table('users')->where('role', 'admin')->value('id')
