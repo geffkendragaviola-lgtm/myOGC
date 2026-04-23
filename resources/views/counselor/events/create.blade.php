@@ -381,6 +381,44 @@
                         @enderror
                     </div>
 
+                    <!-- Attending Counselors -->
+                    <div class="md:col-span-2">
+                        <label class="section-title">Attending Counselors (Google Calendar)</label>
+                        <p class="text-xs text-[var(--text-muted)] mb-3 flex items-center gap-1.5">
+                            <i class="fab fa-google text-[var(--gold-500)]"></i>
+                            Selected counselors will have this event added to their Google Calendar.
+                        </p>
+                        <div class="college-grid">
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-2">
+                                @foreach($counselors as $counselor)
+                                    <div class="college-item">
+                                        @foreach($counselor->all_ids as $cid)
+                                            <input type="hidden" name="_counselor_group_{{ $cid }}" value="{{ $cid }}">
+                                        @endforeach
+                                        <input type="checkbox" id="counselor_{{ $counselor->id }}" name="counselor_ids[]"
+                                               value="{{ implode(',', $counselor->all_ids) }}"
+                                               {{ count(array_intersect($counselor->all_ids, old('counselor_ids', []))) > 0 ? 'checked' : '' }}
+                                               class="custom-checkbox counselor-multi-check"
+                                               data-ids="{{ implode(',', $counselor->all_ids) }}"
+                                               {{ !$counselor->google_calendar_id ? 'disabled' : '' }}>
+                                        <label for="counselor_{{ $counselor->id }}" class="custom-control-label {{ !$counselor->google_calendar_id ? 'opacity-50' : '' }}">
+                                            {{ trim($counselor->user->first_name . ' ' . $counselor->user->last_name) }}
+                                            @if($counselor->college_names)
+                                                <span class="text-xs text-[var(--text-muted)]">({{ $counselor->college_names }})</span>
+                                            @endif
+                                            @if(!$counselor->google_calendar_id)
+                                                <span class="text-xs text-[var(--text-muted)]">(no calendar)</span>
+                                            @endif
+                                        </label>
+                                    </div>
+                                @endforeach
+                            </div>
+                        </div>
+                        @error('counselor_ids')
+                            <p class="error-msg">{{ $message }}</p>
+                        @enderror
+                    </div>
+
                     <!-- Description -->
                     <div class="md:col-span-2">
                         <label for="description" class="section-title">Description *</label>

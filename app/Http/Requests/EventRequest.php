@@ -30,6 +30,8 @@ class EventRequest extends FormRequest
             'colleges.*' => 'exists:colleges,id',
             'year_levels' => 'nullable|array',
             'year_levels.*' => 'string|in:1st Year,2nd Year,3rd Year,4th Year,5th Year',
+            'counselor_ids' => 'nullable|array',
+            'counselor_ids.*' => 'string',
         ];
 
         // Add image validation for create and update

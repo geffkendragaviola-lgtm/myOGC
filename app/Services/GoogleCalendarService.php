@@ -159,6 +159,139 @@ class GoogleCalendarService
         }
     }
 
+    public function syncEventToCounselors(\App\Models\Event $event, array $counselorIds): void
+    {
+        $timezone = config('app.timezone', 'UTC');
+
+        // Build one calendar entry per day so only the specific time window is blocked
+        // each day — matching appointment booking logic and allowing other slots to remain open.
+        $days = [];
+        $current = $event->event_start_date->copy();
+        $endDate  = $event->event_end_date->copy();
+        while ($current->lte($endDate)) {
+            $days[] = $current->format('Y-m-d');
+            $current->addDay();
+        }
+
+        $counselors = \App\Models\Counselor::whereIn('id', $counselorIds)
+            ->whereNotNull('google_calendar_id')
+            ->get();
+
+        foreach ($counselors as $counselor) {
+            try {
+                // Remove any previously synced calendar events for this counselor/event pair
+                $pivot = $event->assignedCounselors()->where('counselor_id', $counselor->id)->first();
+                $existingIds = $pivot?->pivot?->google_calendar_event_id
+                    ? json_decode($pivot->pivot->google_calendar_event_id, true) ?? [$pivot->pivot->google_calendar_event_id]
+                    : [];
+
+                foreach ($existingIds as $oldId) {
+                    try {
+                        $this->deleteEvent($oldId, $counselor->google_calendar_id);
+                    } catch (\Throwable) {}
+                }
+
+                // Create one timed event per day
+                $newIds = [];
+                foreach ($days as $day) {
+                    $startDateTime = \Carbon\Carbon::parse($day . ' ' . $event->start_time, $timezone);
+                    $endDateTime   = \Carbon\Carbon::parse($day . ' ' . $event->end_time, $timezone);
+
+                    $calendarData = [
+                        'name'          => $event->title,
+                        'description'   => $event->description,
+                        'startDateTime' => $startDateTime,
+                        'endDateTime'   => $endDateTime,
+                        'location'      => $event->location,
+                    ];
+
+                    $calendarEvent = $this->createCounselorEvent($calendarData, $counselor->google_calendar_id);
+                    $newIds[] = $calendarEvent->id;
+                }
+
+                // Store all day-event IDs as JSON in the pivot
+                $event->assignedCounselors()->updateExistingPivot($counselor->id, [
+                    'google_calendar_event_id' => json_encode($newIds),
+                ]);
+            } catch (\Throwable $e) {
+                Log::warning('Failed to sync event to counselor calendar', [
+                    'event_id'     => $event->id,
+                    'counselor_id' => $counselor->id,
+                    'error'        => $e->getMessage(),
+                ]);
+            }
+        }
+    }
+
+    public function removeEventFromCounselors(\App\Models\Event $event, array $counselorIds): void
+    {
+        $counselors = \App\Models\Counselor::whereIn('id', $counselorIds)
+            ->whereNotNull('google_calendar_id')
+            ->get();
+
+        foreach ($counselors as $counselor) {
+            try {
+                $pivot = $event->assignedCounselors()->where('counselor_id', $counselor->id)->first();
+                $raw = $pivot?->pivot?->google_calendar_event_id;
+                if (!$raw) continue;
+
+                $ids = json_decode($raw, true) ?? [$raw];
+                foreach ($ids as $calendarEventId) {
+                    $this->deleteEvent($calendarEventId, $counselor->google_calendar_id);
+                }
+            } catch (\Throwable $e) {
+                Log::warning('Failed to remove event from counselor calendar', [
+                    'event_id'     => $event->id,
+                    'counselor_id' => $counselor->id,
+                    'error'        => $e->getMessage(),
+                ]);
+            }
+        }
+    }
+
+    public function createCounselorEvent(array $eventData, string $calendarId): Event
+    {
+        $this->setAuthProfileForCalendar($calendarId);
+        $apiCalendarId = filter_var($calendarId, FILTER_VALIDATE_EMAIL) ? 'primary' : $calendarId;
+
+        try {
+            return Event::create($eventData, $apiCalendarId);
+        } catch (\GuzzleHttp\Exception\RequestException $e) {
+            if (env('APP_ENV') === 'local' && strpos($e->getMessage(), 'cURL error 77') !== false) {
+                Log::warning('SSL certificate error in development - creating mock calendar event', [
+                    'calendar_id' => $calendarId,
+                    'error' => $e->getMessage(),
+                ]);
+                $mockEvent = new Event();
+                $mockEvent->id = 'mock-' . uniqid();
+                return $mockEvent;
+            }
+            throw $e;
+        }
+    }
+
+    public function updateCounselorEvent(string $eventId, array $eventData, string $calendarId): void
+    {
+        try {
+            $this->setAuthProfileForCalendar($calendarId);
+            $apiCalendarId = filter_var($calendarId, FILTER_VALIDATE_EMAIL) ? 'primary' : $calendarId;
+            $calendarEvent = Event::find($eventId, $apiCalendarId);
+            if (!$calendarEvent) {
+                return;
+            }
+            foreach ($eventData as $key => $value) {
+                $calendarEvent->$key = $value;
+            }
+            $calendarEvent->save($apiCalendarId);
+        } catch (\Throwable $exception) {
+            Log::warning('Failed to update Google Calendar event', [
+                'event_id' => $eventId,
+                'calendar_id' => $calendarId,
+                'error' => $exception->getMessage(),
+            ]);
+        }
+    }
+
     public function deleteEvent(?string $eventId, string $calendarId): void
     {
         if (!$eventId) {

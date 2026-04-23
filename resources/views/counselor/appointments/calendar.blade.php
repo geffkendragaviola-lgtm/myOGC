@@ -133,6 +133,11 @@
     .slot-card.no_show { background: rgba(255,237,213,0.9); border-color: rgba(234,88,12,0.3); }
     .slot-card.busy { background: rgba(254,249,231,0.9); border-color: rgba(212,175,55,0.4); }
     .slot-card.available { background: rgba(250,248,245,0.6); border-color: var(--border-soft); }
+    .slot-card.overlap {
+        background: linear-gradient(135deg, rgba(253,242,242,0.95) 0%, rgba(254,249,231,0.95) 100%);
+        border-color: rgba(185,28,28,0.5);
+        box-shadow: 0 0 0 2px rgba(185,28,28,0.15);
+    }
 
     .slot-time { font-size: 0.75rem; font-weight: 600; color: var(--text-primary); }
     .slot-status {
@@ -148,6 +153,7 @@
     .slot-status.no_show { background: rgba(255,237,213,0.9); color: #9a3412; }
     .slot-status.busy { background: rgba(254,249,231,0.9); color: #7a2a2a; }
     .slot-status.available { background: rgba(245,240,235,0.9); color: var(--text-muted); }
+    .slot-status.overlap { background: rgba(253,242,242,0.9); color: #b91c1c; font-weight: 700; }
 
     .slot-student { font-size: 0.75rem; font-weight: 600; color: var(--text-primary); }
     .slot-id { font-size: 0.65rem; color: var(--text-secondary); font-family: ui-monospace, monospace; }
@@ -178,6 +184,7 @@
     .legend-dot.rejected { background: rgba(253,242,242,0.9); border-color: rgba(185,28,28,0.3); }
     .legend-dot.available { background: rgba(245,240,235,0.9); border-color: var(--border-soft); }
     .legend-dot.busy { background: rgba(254,249,231,0.9); border-color: rgba(212,175,55,0.4); }
+    .legend-dot.overlap { background: linear-gradient(135deg, rgba(253,242,242,0.95) 0%, rgba(254,249,231,0.95) 100%); border-color: rgba(185,28,28,0.5); }
     .legend-label { font-size: 0.7rem; color: var(--text-secondary); }
 
     .summary-card {
@@ -415,12 +422,17 @@
                                     $slotEnd = $slotStart->copy()->addHour();
                                     $event = $findEventForSlot($slotStart, $slotEnd);
                                     $isBusy = !$appointment && $event;
-                                    $slotClass = $appointment ? $appointment->status : ($isBusy ? 'busy' : 'available');
+                                    $isOverlap = $appointment && $event;
+                                    $slotClass = $isOverlap ? 'overlap' : ($appointment ? $appointment->status : ($isBusy ? 'busy' : 'available'));
                                 @endphp
                                 <div class="slot-card {{ $slotClass }}">
                                     <div class="flex justify-between items-start mb-2">
                                         <span class="slot-time">{{ \Carbon\Carbon::parse($slot)->format('g:i A') }}</span>
-                                        @if($appointment)
+                                        @if($isOverlap)
+                                            <span class="slot-status overlap">
+                                                <i class="fas fa-exclamation-triangle mr-1 text-[9px]"></i>Overlap
+                                            </span>
+                                        @elseif($appointment)
                                             <span class="slot-status {{ $appointment->status }}">
                                                 {{ $appointment->display_status ?? ucfirst($appointment->status) }}
                                             </span>
@@ -439,9 +451,22 @@
                                             <p class="slot-id">{{ $appointment->student->student_id }}</p>
                                             <p class="slot-concern truncate">{{ Str::limit($appointment->concern, 40) }}</p>
                                         </div>
+                                        @if($isOverlap)
+                                            <div class="mt-1.5 pt-1.5 border-t border-red-200 text-xs text-[#b91c1c]">
+                                                <p class="font-semibold flex items-center gap-1">
+                                                    <i class="fab fa-google text-[9px]"></i>
+                                                    {{ $event['title'] ?? 'Google Calendar Event' }}
+                                                </p>
+                                                @if(!empty($event['location']))<p class="text-[10px] opacity-80">{{ $event['location'] }}</p>@endif
+                                            </div>
+                                        @endif
                                         <div class="slot-actions">
                                             <button onclick="showAppointmentDetails({{ $appointment->id }})"
                                                     class="slot-btn primary">View</button>
+                                            <a href="{{ route('counselor.appointments') }}?highlight={{ $appointment->id }}"
+                                               class="slot-btn primary" style="background: var(--gold-500);">
+                                                <i class="fas fa-arrow-up-right-from-square" style="font-size:0.55rem;margin-right:2px;"></i>Open
+                                            </a>
                                             @if($appointment->status === 'pending')
                                                 <form action="{{ route('counselor.appointments.update-status', $appointment) }}" method="POST" class="inline">
                                                     @csrf @method('PATCH')
@@ -495,12 +520,17 @@
                                     $slotEnd = $slotStart->copy()->addHour();
                                     $event = $findEventForSlot($slotStart, $slotEnd);
                                     $isBusy = !$appointment && $event;
-                                    $slotClass = $appointment ? $appointment->status : ($isBusy ? 'busy' : 'available');
+                                    $isOverlap = $appointment && $event;
+                                    $slotClass = $isOverlap ? 'overlap' : ($appointment ? $appointment->status : ($isBusy ? 'busy' : 'available'));
                                 @endphp
                                 <div class="slot-card {{ $slotClass }}">
                                     <div class="flex justify-between items-start mb-2">
                                         <span class="slot-time">{{ \Carbon\Carbon::parse($slot)->format('g:i A') }}</span>
-                                        @if($appointment)
+                                        @if($isOverlap)
+                                            <span class="slot-status overlap">
+                                                <i class="fas fa-exclamation-triangle mr-1 text-[9px]"></i>Overlap
+                                            </span>
+                                        @elseif($appointment)
                                             <span class="slot-status {{ $appointment->status }}">
                                                 {{ $appointment->display_status ?? ucfirst($appointment->status) }}
                                             </span>
@@ -519,9 +549,22 @@
                                             <p class="slot-id">{{ $appointment->student->student_id }}</p>
                                             <p class="slot-concern truncate">{{ Str::limit($appointment->concern, 40) }}</p>
                                         </div>
+                                        @if($isOverlap)
+                                            <div class="mt-1.5 pt-1.5 border-t border-red-200 text-xs text-[#b91c1c]">
+                                                <p class="font-semibold flex items-center gap-1">
+                                                    <i class="fab fa-google text-[9px]"></i>
+                                                    {{ $event['title'] ?? 'Google Calendar Event' }}
+                                                </p>
+                                                @if(!empty($event['location']))<p class="text-[10px] opacity-80">{{ $event['location'] }}</p>@endif
+                                            </div>
+                                        @endif
                                         <div class="slot-actions">
                                             <button onclick="showAppointmentDetails({{ $appointment->id }})"
                                                     class="slot-btn primary">View</button>
+                                            <a href="{{ route('counselor.appointments') }}?highlight={{ $appointment->id }}"
+                                               class="slot-btn primary" style="background: var(--gold-500);">
+                                                <i class="fas fa-arrow-up-right-from-square" style="font-size:0.55rem;margin-right:2px;"></i>Open
+                                            </a>
                                             @if($appointment->status === 'pending')
                                                 <form action="{{ route('counselor.appointments.update-status', $appointment) }}" method="POST" class="inline">
                                                     @csrf @method('PATCH')
@@ -572,6 +615,7 @@
                             <div class="legend-item"><div class="legend-dot completed"></div><span class="legend-label">Completed</span></div>
                             <div class="legend-item"><div class="legend-dot available"></div><span class="legend-label">Available</span></div>
                             <div class="legend-item"><div class="legend-dot busy"></div><span class="legend-label">Google Calendar</span></div>
+                            <div class="legend-item"><div class="legend-dot overlap"></div><span class="legend-label">⚠ Overlap</span></div>
                         </div>
                     </div>
                 </div>

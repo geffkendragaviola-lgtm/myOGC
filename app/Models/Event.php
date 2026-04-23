@@ -28,7 +28,8 @@ class Event extends Model
         'is_required',
         'for_all_colleges',
         'year_levels',
-        'image'
+        'image',
+        'google_calendar_event_id',
     ];
 
     protected $casts = [
@@ -186,6 +187,13 @@ public function getCancellationCutoffTime(): string
     public function colleges(): BelongsToMany
     {
         return $this->belongsToMany(College::class, 'event_college');
+    }
+
+    public function assignedCounselors(): BelongsToMany
+    {
+        return $this->belongsToMany(Counselor::class, 'event_counselors')
+            ->withPivot('google_calendar_event_id')
+            ->withTimestamps();
     }
 
     public function activeRegistrations(): HasMany

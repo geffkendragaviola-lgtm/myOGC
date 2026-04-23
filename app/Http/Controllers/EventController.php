@@ -10,6 +10,9 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use App\Models\EventRegistration;
 use Illuminate\Support\Facades\Log;
+use App\Services\GoogleCalendarService;
+use App\Models\Counselor;
+use Carbon\Carbon;
 class EventController extends Controller
 {
     /**
@@ -131,7 +134,16 @@ public function updateRegistrationStatus(Request $request, Event $event, EventRe
   public function create()
     {
         $colleges = College::all();
-        return view('counselor.events.create', compact('colleges'));
+        // Group counselors by user so multi-college counselors appear once
+        $counselors = Counselor::with(['user', 'college'])->get()
+            ->groupBy('user_id')
+            ->map(function ($group) {
+                $first = $group->first();
+                $first->all_ids       = $group->pluck('id')->toArray();
+                $first->college_names = $group->pluck('college.name')->filter()->implode(', ');
+                return $first;
+            })->values();
+        return view('counselor.events.create', compact('colleges', 'counselors'));
     }
 
     public function store(EventRequest $request)
@@ -162,6 +174,15 @@ public function updateRegistrationStatus(Request $request, Event $event, EventRe
         // Automatically register students if event is required
         if ($event->is_required) {
             $event->registerRequiredStudents();
+        }
+
+        // Sync to selected counselors' Google Calendars
+        $counselorIds = collect($request->input('counselor_ids', []))
+            ->flatMap(fn($v) => explode(',', $v))
+            ->map('intval')->unique()->filter()->values()->toArray();
+        if (!empty($counselorIds)) {
+            $event->assignedCounselors()->sync($counselorIds);
+            app(GoogleCalendarService::class)->syncEventToCounselors($event, $counselorIds);
         }
 
         return redirect()->route('counselor.events.index')
@@ -212,6 +233,34 @@ public function updateRegistrationStatus(Request $request, Event $event, EventRe
             }
         }
 
+        // Sync counselors' Google Calendars
+        $newCounselorIds = collect($request->input('counselor_ids', []))
+            ->flatMap(fn($v) => explode(',', $v))
+            ->map('intval')->unique()->filter()->values()->toArray();
+
+        // Capture previous counselors BEFORE sync so we know who to remove
+        $previousCounselorIds = $event->assignedCounselors()->pluck('counselors.id')->toArray();
+
+        // Remove calendar entries for deselected counselors first
+        $removedIds = array_diff($previousCounselorIds, $newCounselorIds);
+        if (!empty($removedIds)) {
+            app(GoogleCalendarService::class)->removeEventFromCounselors($event, $removedIds);
+        }
+
+        // Sync pivot table
+        $event->assignedCounselors()->sync($newCounselorIds);
+
+        // Refresh event so updated fields (title, dates, times) are used when syncing
+        $event->refresh();
+
+        // Re-sync all assigned counselors' calendar entries with updated event data
+        if (!empty($newCounselorIds)) {
+            app(GoogleCalendarService::class)->syncEventToCounselors($event, $newCounselorIds);
+        }
+
+        // Sync the event creator's own Google Calendar entry
+        $this->syncEventToCalendar($event, update: true);
+
         return redirect()->route('counselor.events.index')
             ->with('success', 'Event updated successfully!');
     }
@@ -220,6 +269,24 @@ public function updateRegistrationStatus(Request $request, Event $event, EventRe
     {
         if ($event->user_id !== Auth::id()) {
             abort(403, 'Unauthorized action.');
+        }
+
+        // Remove from counselor's Google Calendar
+        if ($event->google_calendar_event_id) {
+            $counselor = Counselor::where('user_id', Auth::id())->first();
+            if ($counselor && $counselor->google_calendar_id) {
+                try {
+                    app(GoogleCalendarService::class)->deleteEvent(
+                        $event->google_calendar_event_id,
+                        $counselor->google_calendar_id
+                    );
+                } catch (\Throwable $e) {
+                    Log::warning('Failed to delete event from Google Calendar', [
+                        'event_id' => $event->id,
+                        'error' => $e->getMessage(),
+                    ]);
+                }
+            }
         }
 
         // Delete event image if exists
@@ -263,8 +330,19 @@ public function updateRegistrationStatus(Request $request, Event $event, EventRe
 
         $colleges = College::all();
         $selectedColleges = $event->colleges->pluck('id')->toArray();
+        $selectedCounselors = $event->assignedCounselors->pluck('id')->toArray();
 
-        return view('counselor.events.edit', compact('event', 'colleges', 'selectedColleges'));
+        // Group counselors by user so multi-college counselors appear once
+        $counselors = Counselor::with(['user', 'college'])->get()
+            ->groupBy('user_id')
+            ->map(function ($group) {
+                $first = $group->first();
+                $first->all_ids       = $group->pluck('id')->toArray();
+                $first->college_names = $group->pluck('college.name')->filter()->implode(', ');
+                return $first;
+            })->values();
+
+        return view('counselor.events.edit', compact('event', 'colleges', 'selectedColleges', 'counselors', 'selectedCounselors'));
     }
 
 
@@ -500,5 +578,54 @@ public function updateRegistrationStatus(Request $request, Event $event, EventRe
         };
 
         return response()->stream($callback, 200, $headers);
+    }
+
+    private function syncEventToCalendar(\App\Models\Event $event, bool $update = false): void
+    {
+        $counselor = Counselor::where('user_id', Auth::id())->first();
+        if (!$counselor || !$counselor->google_calendar_id) {
+            return;
+        }
+
+        $timezone = config('app.timezone', 'UTC');
+        $service  = app(GoogleCalendarService::class);
+
+        // Build one entry per day (same logic as syncEventToCounselors)
+        $days = [];
+        $current = $event->event_start_date->copy();
+        while ($current->lte($event->event_end_date)) {
+            $days[] = $current->format('Y-m-d');
+            $current->addDay();
+        }
+
+        try {
+            // On update: delete all previously stored per-day IDs then recreate
+            if ($update && $event->google_calendar_event_id) {
+                $oldIds = json_decode($event->google_calendar_event_id, true) ?? [$event->google_calendar_event_id];
+                foreach ($oldIds as $oldId) {
+                    try { $service->deleteEvent($oldId, $counselor->google_calendar_id); } catch (\Throwable) {}
+                }
+            }
+
+            $newIds = [];
+            foreach ($days as $day) {
+                $calendarData = [
+                    'name'          => $event->title,
+                    'description'   => $event->description,
+                    'startDateTime' => Carbon::parse($day . ' ' . $event->start_time, $timezone),
+                    'endDateTime'   => Carbon::parse($day . ' ' . $event->end_time, $timezone),
+                    'location'      => $event->location,
+                ];
+                $calendarEvent = $service->createCounselorEvent($calendarData, $counselor->google_calendar_id);
+                $newIds[] = $calendarEvent->id;
+            }
+
+            $event->updateQuietly(['google_calendar_event_id' => json_encode($newIds)]);
+        } catch (\Throwable $e) {
+            Log::warning('Failed to sync event to Google Calendar', [
+                'event_id' => $event->id,
+                'error'    => $e->getMessage(),
+            ]);
+        }
     }
 }

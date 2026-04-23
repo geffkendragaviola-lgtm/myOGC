@@ -48,6 +48,13 @@ class Counselor extends Model
     {
         return $this->hasMany(CounselorScheduleOverride::class);
     }
+
+    public function events(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
+    {
+        return $this->belongsToMany(\App\Models\Event::class, 'event_counselors')
+            ->withPivot('google_calendar_event_id')
+            ->withTimestamps();
+    }
 // Relationship to received referrals
 public function receivedReferrals(): HasMany
 {

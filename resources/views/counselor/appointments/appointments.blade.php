@@ -547,7 +547,7 @@
                                         $rowClass = 'table-row referred-in';
                                     }
                                 @endphp
-                                <tr class="{{ $rowClass }} fade-in" onclick="showAppointmentDetails({{ $appointment->id }})">
+                                <tr id="appointment-{{ $appointment->id }}" class="{{ $rowClass }} fade-in" onclick="showAppointmentDetails({{ $appointment->id }})">
                                     <td class="px-4 sm:px-6 py-3.5">
                                         <div class="flex items-center gap-2.5 sm:gap-3">
                                             @php
@@ -1948,6 +1948,22 @@
                     closeRescheduleModal();
                 }
             });
+        </script>
+
+        <script>
+            // Scroll to and highlight a specific appointment when ?highlight=ID is in the URL
+            (function() {
+                const params = new URLSearchParams(window.location.search);
+                const id = params.get('highlight');
+                if (!id) return;
+                const row = document.getElementById('appointment-' + id);
+                if (!row) return;
+                row.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                row.style.transition = 'outline 0.3s ease, box-shadow 0.3s ease';
+                row.style.outline = '2px solid #c9a227';
+                row.style.boxShadow = '0 0 0 4px rgba(201,162,39,0.2)';
+                setTimeout(() => { row.style.outline = ''; row.style.boxShadow = ''; }, 3000);
+            })();
         </script>
     </div>
 @endsection
