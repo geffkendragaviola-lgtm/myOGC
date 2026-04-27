@@ -30,10 +30,13 @@ class AppointmentStatusChangedNotification extends Notification
         ];
 
         $title = $labels[$this->newStatus] ?? 'Appointment Update';
+        $date  = \Carbon\Carbon::parse($this->appointment->appointment_date)->format('F d, Y');
+        $time  = \Carbon\Carbon::parse($this->appointment->start_time)->format('h:i A');
+        $firstName = $this->appointment->student->user->first_name;
 
         return [
             'title'          => $title,
-            'message'        => $title . ' — Case #' . $this->appointment->case_number,
+            'message'        => "Hi {$firstName}, your appointment on {$date} at {$time} has been " . strtolower($labels[$this->newStatus] ?? $this->newStatus) . '.',
             'appointment_id' => $this->appointment->id,
             'case_number'    => $this->appointment->case_number,
             'status'         => $this->newStatus,

@@ -284,7 +284,7 @@ public function create()
 
     $hasInitialInterviewAppointment = Appointment::where('student_id', $student->id)
         ->where('booking_type', 'Initial Interview')
-        ->whereNotIn('status', ['cancelled', 'rejected'])
+        ->whereNotIn('status', ['cancelled', 'rejected', 'no_show'])
         ->exists();
 
     return view('appointments.create', compact('counselors', 'student', 'allowAllCounselors', 'hasInitialInterviewAppointment'));
@@ -962,6 +962,59 @@ public function getAvailableDates(Request $request)
     ]);
 }
 
+public function getDetails(Appointment $appointment)
+{
+    $student = Student::where('user_id', Auth::id())->first();
+    if (!$student || $appointment->student_id !== $student->id) {
+        abort(403);
+    }
+
+    $appointment->load(['counselor.user', 'counselor.college', 'referredCounselor.user', 'originalCounselor.user', 'sessionNotes']);
+
+    $latestNote = $appointment->sessionNotes->sortByDesc('created_at')->first();
+
+    return response()->json([
+        'appointment' => [
+            'id'                => $appointment->id,
+            'case_number'       => $appointment->case_number,
+            'booking_type'      => $appointment->booking_type,
+            'booking_category'  => $appointment->booking_category,
+            'concern'           => $appointment->concern,
+            'mood_rating'       => $appointment->mood_rating,
+            'referred_by'       => $appointment->referred_by,
+            'referred_to_destination' => $latestNote?->referred_to_destination,
+            'status'            => $appointment->status,
+            'status_display'    => ucfirst(str_replace('_', ' ', $appointment->status)),
+            'is_referred'       => (bool) $appointment->is_referred,
+            'referral_reason'   => $appointment->referral_reason,
+            'cancellation_reason' => $appointment->cancellation_reason,
+            'reschedule_reason'   => $appointment->reschedule_reason,
+            'is_appointment_high_risk' => (bool) $appointment->is_appointment_high_risk,
+            'appointment_high_risk_notes' => $appointment->appointment_high_risk_notes,
+        ],
+        'referral' => [
+            'referred_to_name'   => $appointment->referredCounselor?->user
+                ? $appointment->referredCounselor->user->first_name . ' ' . $appointment->referredCounselor->user->last_name
+                : null,
+            'referred_from_name' => $appointment->originalCounselor?->user
+                ? $appointment->originalCounselor->user->first_name . ' ' . $appointment->originalCounselor->user->last_name
+                : null,
+        ],
+        'counselor' => [
+            'name'     => $appointment->counselor->user->first_name . ' ' . $appointment->counselor->user->last_name,
+            'position' => $appointment->counselor->position,
+            'college'  => $appointment->counselor->college->name ?? 'N/A',
+        ],
+        'formatted_date'          => $appointment->appointment_date->format('F j, Y'),
+        'formatted_time'          => \Carbon\Carbon::parse($appointment->start_time)->format('g:i A') . ' – ' . \Carbon\Carbon::parse($appointment->end_time)->format('g:i A'),
+        'formatted_proposed_date' => $appointment->proposed_date?->format('F j, Y'),
+        'formatted_proposed_time' => ($appointment->proposed_start_time && $appointment->proposed_end_time)
+            ? \Carbon\Carbon::parse($appointment->proposed_start_time)->format('g:i A') . ' – ' . \Carbon\Carbon::parse($appointment->proposed_end_time)->format('g:i A')
+            : null,
+        'formatted_referral_date' => $appointment->referral_requested_at?->format('F j, Y g:i A'),
+    ]);
+}
+
 public function store(Request $request)
 {
     $request->validate([
@@ -970,7 +1023,8 @@ public function store(Request $request)
         'start_time' => 'required|date_format:H:i',
         'booking_type' => 'required|in:Initial Interview,Counseling,Consultation',
         'booking_category' => 'required|in:online,walk-in,referred,called-in',
-        'concern' => 'required|string|max:500',
+        'concern' => 'required|string|max:2000',
+        'mood_rating' => 'nullable|string|max:50',
         'referred_by' => 'nullable|string|max:255',
     ]);
 
@@ -990,7 +1044,7 @@ public function store(Request $request)
     if ($request->booking_type === 'Initial Interview') {
         $hasInitialInterviewAppointment = Appointment::where('student_id', $student->id)
             ->where('booking_type', 'Initial Interview')
-            ->whereNotIn('status', ['cancelled', 'rejected'])
+            ->whereNotIn('status', ['cancelled', 'rejected', 'no_show'])
             ->exists();
 
         if ($hasInitialInterviewAppointment) {
@@ -1055,6 +1109,33 @@ public function store(Request $request)
     DB::beginTransaction();
 
     try {
+        $appointmentHighRiskKeywords = [
+            'Depression / depressive thoughts',
+            'Hurts self',
+            'Self-destructive acting out',
+            'Aggression resulting from conflict/s',
+        ];
+        $concernText   = $request->concern ?? '';
+        $moodRating    = $request->mood_rating ?? '';
+        $highRiskMoods = ['1 - Very Overwhelmed', '2 - Struggling'];
+
+        $triggeredKeywords = collect($appointmentHighRiskKeywords)
+            ->filter(fn($kw) => str_contains($concernText, $kw))
+            ->values()
+            ->toArray();
+        $triggeredMood = in_array($moodRating, $highRiskMoods) ? $moodRating : null;
+
+        $isAppointmentHighRisk = count($triggeredKeywords) > 0 || $triggeredMood !== null;
+
+        $highRiskReasons = [];
+        if (count($triggeredKeywords) > 0) {
+            $highRiskReasons[] = 'Concern: ' . implode(', ', $triggeredKeywords);
+        }
+        if ($triggeredMood) {
+            $highRiskReasons[] = 'Mood at booking: ' . $triggeredMood;
+        }
+        $highRiskNotes = $isAppointmentHighRisk ? implode(' | ', $highRiskReasons) : null;
+
         $appointment = Appointment::create([
             'student_id' => $student->id,
             'counselor_id' => $request->counselor_id,
@@ -1064,7 +1145,10 @@ public function store(Request $request)
             'booking_type' => $request->booking_type,
             'booking_category' => $request->booking_category,
             'concern' => $request->concern,
+            'mood_rating' => $request->filled('mood_rating') ? $request->mood_rating : null,
             'referred_by' => $request->filled('referred_by') ? $request->referred_by : null,
+            'is_appointment_high_risk' => $isAppointmentHighRisk,
+            'appointment_high_risk_notes' => $highRiskNotes,
             'status' => 'pending'
         ]);
 
@@ -1114,14 +1198,12 @@ public function store(Request $request)
 
     public function cancel(Request $request, Appointment $appointment)
     {
-        // Check if the student owns this appointment
         $student = Student::where('user_id', Auth::id())->first();
 
-        if ($appointment->student_id !== $student->id) {
+        if (!$student || $appointment->student_id !== $student->id) {
             return redirect()->back()->with('error', 'You can only cancel your own appointments.');
         }
 
-        // Only allow cancellation of pending or approved appointments
         if (!in_array($appointment->status, ['pending', 'approved', 'rescheduled', 'reschedule_requested', 'reschedule_rejected'], true)) {
             return redirect()->back()->with('error', 'This appointment cannot be cancelled.');
         }
@@ -1132,22 +1214,26 @@ public function store(Request $request)
 
         $calendarService = new GoogleCalendarService();
         if ($appointment->google_calendar_event_id && $appointment->counselor && $appointment->counselor->google_calendar_id) {
-            $calendarService->deleteEvent($appointment->google_calendar_event_id, $appointment->counselor->google_calendar_id);
+            try {
+                $calendarService->deleteEvent($appointment->google_calendar_event_id, $appointment->counselor->google_calendar_id);
+            } catch (\Throwable $e) {
+                Log::warning('Failed to delete calendar event on cancel', ['error' => $e->getMessage()]);
+            }
         }
 
+        $existingNotes = $appointment->notes ?? '';
         $appointment->update([
-            'status' => 'cancelled',
-            'notes' => $appointment->notes . "\nCancelled by student on " . now()->toDateTimeString(),
-            'cancellation_reason' => $request->cancellation_reason,
+            'status'                  => 'cancelled',
+            'notes'                   => trim($existingNotes . "\nCancelled by student on " . now()->toDateTimeString()),
+            'cancellation_reason'     => $request->cancellation_reason,
             'google_calendar_event_id' => null,
-            'proposed_date' => null,
-            'proposed_start_time' => null,
-            'proposed_end_time' => null,
-            'reschedule_reason' => null,
+            'proposed_date'           => null,
+            'proposed_start_time'     => null,
+            'proposed_end_time'       => null,
+            'reschedule_reason'       => null,
             'reschedule_requested_at' => null,
         ]);
 
-        // Notify counselor that student cancelled
         try {
             $appointment->load(['student.user', 'counselor.user']);
             Mail::to($appointment->counselor->user->email)->send(new AppointmentCancelled($appointment));
@@ -1157,7 +1243,8 @@ public function store(Request $request)
         }
 
         return redirect()->route('appointments.index')
-            ->with('success', 'Appointment cancelled successfully. The time slot is now available for booking.');
+            ->with('success', 'Appointment cancelled successfully.')
+            ->withErrors([]);
     }
 
 public function updateStatus(Request $request, Appointment $appointment)
@@ -1578,7 +1665,7 @@ public function refer(Request $request, Appointment $appointment)
         Log::warning('Failed to send referral-to-counselor notification email', ['error' => $e->getMessage()]);
     }
 
-    return redirect()->back()->with('success', 'Referral request sent to the student.');
+    return redirect()->back()->with('success', 'Referral request sent successfully.')->withErrors([]);
 }
 
 public function acceptReschedule(Request $request, Appointment $appointment)

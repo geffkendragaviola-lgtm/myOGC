@@ -46,6 +46,39 @@ class AnalyticsController extends Controller
         $completionRate    = $totalAppointments > 0 ? round(($completedCount / $totalAppointments) * 100, 1) : 0;
         $noShowRate        = $totalAppointments > 0 ? round(($noShowCount / $totalAppointments) * 100, 1) : 0;
 
+        // ── Referral In / Out stats ────────────────────────────────────
+        // Referred In: appointments that were referred TO a counselor (received referrals)
+        $referredInCount  = (clone $base)->whereNotNull('referred_to_counselor_id')->count();
+        // Referred Out: appointments where this was the original counselor who referred out
+        $referredOutCount = (clone $base)->whereNotNull('original_counselor_id')->count();
+        // Unique students referred in / out
+        $referredInStudents  = (clone $base)->whereNotNull('referred_to_counselor_id')->distinct('student_id')->count('student_id');
+        $referredOutStudents = (clone $base)->whereNotNull('original_counselor_id')->distinct('student_id')->count('student_id');
+        $referredInRate   = $totalStudents > 0 ? round(($referredInStudents  / $totalStudents) * 100, 1) : 0;
+        $referredOutRate  = $totalStudents > 0 ? round(($referredOutStudents / $totalStudents) * 100, 1) : 0;
+
+        // External referred_by breakdown
+        $referredByData = (clone $base)
+            ->whereNotNull('referred_by')
+            ->select('referred_by', DB::raw('count(*) as total'))
+            ->groupBy('referred_by')
+            ->orderByDesc('total')
+            ->pluck('total', 'referred_by')
+            ->toArray();
+
+        // Referred To (external destination from session notes)
+        $referredToData = SessionNote::whereHas('appointment', function ($q) use ($base) {
+                $q->whereIn('id', (clone $base)->select('id'));
+            })
+            ->whereNotNull('referred_to_destination')
+            ->where('referred_to_destination', '!=', '')
+            ->select('referred_to_destination', DB::raw('count(*) as total'))
+            ->groupBy('referred_to_destination')
+            ->orderByDesc('total')
+            ->pluck('total', 'referred_to_destination')
+            ->toArray();
+        $referredToCount = array_sum($referredToData);
+
         // Avg satisfaction (scoped to college if filtered, otherwise global for period)
         $feedbackQuery = Feedback::whereNotNull('satisfaction_rating');
         if ($collegeId) {
@@ -188,7 +221,16 @@ class AnalyticsController extends Controller
             'monthlyData',
             'collegeAppointmentCounts',
             'bookingTypeData',
-            'availableYears'
+            'availableYears',
+            'referredInCount',
+            'referredOutCount',
+            'referredInStudents',
+            'referredOutStudents',
+            'referredInRate',
+            'referredOutRate',
+            'referredByData',
+            'referredToData',
+            'referredToCount'
         ));
     }
 
@@ -295,6 +337,52 @@ class AnalyticsController extends Controller
                     ->pluck('total', 'booking_category')
                     ->toArray();
 
+                // Referral In / Out stats — scoped to THIS counselor, matching CounselorController logic
+                // Referred In: this counselor was the recipient of a referral (referred_to_counselor_id = this counselor)
+                $referredInStudents = Appointment::whereNotNull('referred_to_counselor_id')
+                    ->where('referred_to_counselor_id', $assignment->id)
+                    ->when($dateFrom && $dateTo,
+                        fn($q) => $q->whereBetween('appointment_date', [$dateFrom, $dateTo]),
+                        fn($q) => $q->whereYear('appointment_date', $year)
+                    )
+                    ->distinct('student_id')
+                    ->count('student_id');
+
+                // Referred Out: this counselor was the one who referred the student out (original_counselor_id = this counselor)
+                $referredOutStudents = Appointment::whereNotNull('original_counselor_id')
+                    ->where('original_counselor_id', $assignment->id)
+                    ->when($dateFrom && $dateTo,
+                        fn($q) => $q->whereBetween('appointment_date', [$dateFrom, $dateTo]),
+                        fn($q) => $q->whereYear('appointment_date', $year)
+                    )
+                    ->distinct('student_id')
+                    ->count('student_id');
+
+                $referredInRate   = $studentsBooked > 0 ? round(($referredInStudents  / $studentsBooked) * 100, 1) : 0;
+                $referredOutRate  = $studentsBooked > 0 ? round(($referredOutStudents / $studentsBooked) * 100, 1) : 0;
+
+                // External referred_by breakdown
+                $referredByData = (clone $base)
+                    ->whereNotNull('referred_by')
+                    ->select('referred_by', DB::raw('count(*) as total'))
+                    ->groupBy('referred_by')
+                    ->orderByDesc('total')
+                    ->pluck('total', 'referred_by')
+                    ->toArray();
+
+                // Referred To (external destination from session notes)
+                $referredToData = SessionNote::whereHas('appointment', function ($q) use ($base) {
+                        $q->whereIn('id', (clone $base)->select('id'));
+                    })
+                    ->whereNotNull('referred_to_destination')
+                    ->where('referred_to_destination', '!=', '')
+                    ->select('referred_to_destination', DB::raw('count(*) as total'))
+                    ->groupBy('referred_to_destination')
+                    ->orderByDesc('total')
+                    ->pluck('total', 'referred_to_destination')
+                    ->toArray();
+                $referredToCount = array_sum($referredToData);
+
                 // Peak day of week
                 $peakDayRaw = (clone $base)
                     ->select(DB::raw("TO_CHAR(appointment_date, 'Day') as day_name"), DB::raw('count(*) as total'))
@@ -321,6 +409,13 @@ class AnalyticsController extends Controller
                     'monthlyData'          => $monthlyData,
                     'bookingTypeData'      => $bookingTypeData,
                     'bookingCategoryData'  => $bookingCategoryData,
+                    'referredInStudents'   => $referredInStudents,
+                    'referredOutStudents'  => $referredOutStudents,
+                    'referredInRate'       => $referredInRate,
+                    'referredOutRate'      => $referredOutRate,
+                    'referredByData'       => $referredByData,
+                    'referredToData'       => $referredToData,
+                    'referredToCount'      => $referredToCount,
                 ];
             }
 

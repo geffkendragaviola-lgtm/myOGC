@@ -41,136 +41,137 @@
 .rate-warn{background:rgba(234,88,12,0.12);color:#c2410c;}
 .rate-bad{background:rgba(185,28,28,0.12);color:#991b1b;}
 @media print{
-    .no-print{display:none!important;}
-    .print-only{display:block!important;}
-    body{background:#fff!important;font-size:11pt;}
-    .ogc-navbar,#ogcSidebar{display:none!important;}
-    #ogcMainContent{margin-left:0!important;padding-top:0!important;}
-    
-    /* Professional print header */
-    .print-header{
-        display:block!important;
-        border-bottom:3px solid #7a2a2a;
-        padding-bottom:1rem;
-        margin-bottom:1.5rem;
+    * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; color-adjust: exact !important; box-sizing: border-box; }
+
+    @page { size: A4 portrait; margin: 1.8cm 1.5cm 2.2cm 1.5cm; }
+    @page { @bottom-left { content: "MSU-IIT OGC — Confidential"; font-size: 7.5pt; color: #8b7e76; font-family: 'Segoe UI', sans-serif; } @bottom-right { content: "Page " counter(page) " of " counter(pages); font-size: 7.5pt; color: #8b7e76; font-family: 'Segoe UI', sans-serif; } }
+
+    body { background: #fff !important; font-size: 9.5pt; color: #1a1a1a; font-family: 'Segoe UI', Arial, sans-serif; line-height: 1.4; }
+
+    .no-print { display: none !important; }
+    .print-only { display: block !important; }
+    .ogc-navbar, #ogcSidebar { display: none !important; }
+    #ogcMainContent { margin-left: 0 !important; padding-top: 0 !important; }
+    .p-6 { padding: 0 !important; }
+
+    /* ── Report header ── */
+    .print-header {
+        display: block !important;
+        margin-bottom: 1.2rem;
+        padding-bottom: 0.8rem;
+        border-bottom: 2.5pt solid #7a2a2a;
     }
-    .print-header h1{
-        font-size:1.5rem;
-        font-weight:800;
-        color:#3a0c0c;
-        margin-bottom:0.3rem;
-        letter-spacing:-0.02em;
+    .print-header h1 { font-size: 15pt; font-weight: 800; color: #3a0c0c; margin: 0; letter-spacing: -0.02em; }
+    .print-header .ph-subtitle { font-size: 9pt; color: #7a2a2a; font-weight: 600; margin: 0.15rem 0 0; text-transform: uppercase; letter-spacing: 0.06em; }
+    .print-header .report-meta {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-top: 0.5rem;
+        padding-top: 0.4rem;
+        border-top: 0.5pt solid #d4c4bc;
+        font-size: 8pt;
+        color: #6b5e57;
     }
-    .print-header p{
-        font-size:0.85rem;
-        color:#6b5e57;
-        margin:0.15rem 0;
+    .print-header .report-meta strong { color: #3a0c0c; }
+
+    /* ── Section titles ── */
+    .sec-title {
+        font-size: 9pt !important;
+        font-weight: 700 !important;
+        color: #3a0c0c !important;
+        text-transform: uppercase;
+        letter-spacing: 0.07em;
+        border-bottom: 1pt solid #c9a227 !important;
+        padding-bottom: 0.25rem !important;
+        margin-bottom: 0.6rem !important;
+        display: block !important;
     }
-    .print-header .report-meta{
-        display:flex;
-        justify-content:space-between;
-        align-items:center;
-        margin-top:0.5rem;
-        padding-top:0.5rem;
-        border-top:1px solid #e5e0db;
+    .sec-title i { display: none; }
+
+    /* ── Cards ── */
+    .an-card, .stat-card, .reach-card {
+        box-shadow: none !important;
+        border: 0.5pt solid #d4c4bc !important;
+        border-radius: 0 !important;
+        break-inside: avoid;
+        page-break-inside: avoid;
+        margin-bottom: 0.5rem;
+        background: #fff !important;
     }
-    
-    /* Cards and containers */
-    .an-card,.stat-card,.reach-card{
-        box-shadow:none!important;
-        border:1px solid #ddd!important;
-        break-inside:avoid;
-        page-break-inside:avoid;
-        margin-bottom:1rem;
+    .an-card { padding: 0.7rem 0.8rem !important; }
+    .stat-card { padding: 0.45rem 0.6rem !important; gap: 0.4rem !important; }
+    .reach-card { padding: 0.6rem 0.8rem !important; background: #faf8f5 !important; }
+    .stat-value { font-size: 12pt !important; font-weight: 700; }
+    .stat-label { font-size: 7pt !important; }
+    .stat-icon { width: 1.6rem !important; height: 1.6rem !important; font-size: 0.65rem !important; border-radius: 0.25rem !important; }
+    .reach-ratio { font-size: 13pt !important; }
+    .reach-sub { font-size: 7pt !important; }
+    .reach-bar-track { height: 0.35rem !important; margin-top: 0.3rem !important; }
+    .rate-pill { font-size: 6.5pt !important; padding: 0.1rem 0.35rem !important; border: 0.5pt solid currentColor; }
+
+    /* ── College tabs — show all panes ── */
+    .college-tabs { display: none !important; }
+    .college-tab-pane { display: block !important; page-break-before: always; }
+    .college-tab-pane:first-of-type { page-break-before: avoid; }
+
+    /* ── College section divider ── */
+    .print-college-header {
+        display: block !important;
+        border-left: 3pt solid #7a2a2a;
+        padding-left: 0.6rem;
+        margin-bottom: 0.7rem;
     }
-    .stat-card{
-        padding:0.8rem 1rem;
+    .print-college-header h2 { font-size: 12pt; font-weight: 800; color: #3a0c0c; margin: 0; }
+    .print-college-header span { font-size: 8pt; color: #6b5e57; }
+
+    /* ── Grids ── */
+    .grid { display: grid !important; }
+    .grid-cols-2, .lg\:grid-cols-3, .xl\:grid-cols-6 { grid-template-columns: repeat(3, 1fr) !important; gap: 0.35rem !important; }
+    .md\:grid-cols-3 { grid-template-columns: repeat(3, 1fr) !important; gap: 0.4rem !important; }
+    .md\:grid-cols-2, .lg\:grid-cols-2 { grid-template-columns: repeat(2, 1fr) !important; gap: 0.4rem !important; }
+    .lg\:grid-cols-2.gap-5 { gap: 0.4rem !important; }
+
+    /* ── Charts ── */
+    canvas { max-width: 100% !important; height: auto !important; page-break-inside: avoid; }
+    [style*="height:240px"], [style*="height:260px"], [style*="height:200px"] { height: 160px !important; }
+
+    /* ── Print summary table ── */
+    .print-stat-table { display: table !important; width: 100%; border-collapse: collapse; font-size: 8pt; margin-bottom: 0.5rem; }
+    .print-stat-table th { background: #f5f0eb !important; color: #3a0c0c; font-weight: 700; padding: 0.3rem 0.5rem; border: 0.5pt solid #d4c4bc; font-size: 7.5pt; text-transform: uppercase; letter-spacing: 0.04em; }
+    .print-stat-table td { padding: 0.28rem 0.5rem; border: 0.5pt solid #e5e0db; }
+    .print-stat-table tr:nth-child(even) td { background: #faf8f5 !important; }
+    .print-stat-table .val { font-weight: 700; color: #3a0c0c; text-align: right; }
+    .print-stat-table .pct { color: #6b5e57; text-align: right; }
+
+    /* ── Booking type table ── */
+    table { font-size: 7.5pt !important; page-break-inside: avoid; }
+    table th { background: #f5f0eb !important; font-weight: 700; }
+
+    /* ── Signature ── */
+    .print-signature {
+        display: block !important;
+        margin-top: 1.5rem !important;
+        padding-top: 0.8rem;
+        border-top: 0.5pt solid #d4c4bc;
+        page-break-inside: avoid;
     }
-    .reach-card{
-        padding:1rem;
-    }
-    
-    /* Typography */
-    .stat-value{font-size:1.3rem;}
-    .stat-label{font-size:0.7rem;}
-    .reach-ratio{font-size:1.4rem;}
-    .reach-sub{font-size:0.7rem;}
-    .sec-title{
-        font-size:0.9rem;
-        margin-bottom:0.75rem;
-        padding-bottom:0.3rem;
-        border-bottom:2px solid #7a2a2a;
-    }
-    
-    /* Charts */
-    canvas{
-        max-width:100%!important;
-        height:auto!important;
-        page-break-inside:avoid;
-    }
-    
-    /* College tabs - show all */
-    .college-tabs{display:none!important;}
-    .college-tab-pane{
-        display:block!important;
-        page-break-before:always;
-    }
-    .college-tab-pane:first-of-type{
-        page-break-before:avoid;
-    }
-    
-    /* College header for each section */
-    .college-tab-pane::before{
-        content:'';
-        display:block;
-        height:2px;
-        background:linear-gradient(90deg,#7a2a2a,#d4af37);
-        margin-bottom:1rem;
-    }
-    
-    /* Grid adjustments */
-    .grid{
-        display:grid!important;
-    }
-    .grid-cols-2{grid-template-columns:repeat(2,1fr)!important;}
-    .grid-cols-3{grid-template-columns:repeat(3,1fr)!important;}
-    
-    /* Tables */
-    table{
-        font-size:0.8rem;
-        page-break-inside:avoid;
-    }
-    table th{
-        background:#f5f5f5!important;
-        font-weight:700;
-    }
-    
-    /* Rate pills */
-    .rate-pill{
-        font-size:0.65rem;
-        padding:0.2rem 0.5rem;
-        border:1px solid currentColor;
-    }
-    
-    /* Page breaks */
-    .mb-5{margin-bottom:1.5rem!important;}
-    
-    /* Footer on each page */
-    @page{
-        margin:1.5cm 1.5cm 2cm 1.5cm;
-        @bottom-center{
-            content:"Page " counter(page) " of " counter(pages);
-            font-size:9pt;
-            color:#6b5e57;
-        }
-        @bottom-right{
-            content:"MSU-IIT OGC Analytics";
-            font-size:9pt;
-            color:#6b5e57;
-        }
-    }
+    .print-sig-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1.5rem; }
+    .print-sig-item { font-size: 8pt; color: #6b5e57; }
+    .print-sig-line { border-top: 0.75pt solid #3a0c0c; margin-top: 1.6rem; padding-top: 0.3rem; }
+    .print-sig-name { font-weight: 700; color: #1a1a1a; font-size: 8.5pt; }
+    .print-sig-role { color: #6b5e57; font-size: 7.5pt; }
+
+    a { color: inherit !important; text-decoration: none !important; }
+    .mb-5 { margin-bottom: 0.5rem !important; }
+    .space-y-5 > * + * { margin-top: 0.5rem !important; }
+    .space-y-6 > * + * { margin-top: 0.5rem !important; }
 }
 .print-header{display:none;}
+.print-only{display:none;}
+.print-signature{display:none;}
+.print-stat-table{display:none;}
+.print-college-header{display:none;}
 </style>
 @endpush
 @section('content')
@@ -178,10 +179,10 @@
 
     <div class="print-header mb-4">
         <h1>MSU-IIT Office of Guidance and Counseling</h1>
-        <p style="font-weight:600;color:#7a2a2a;font-size:0.95rem;">Counselor Analytics Report</p>
+        <p class="ph-subtitle">Counselor Analytics Report</p>
         <div class="report-meta">
             <div>
-                <p><strong>Period:</strong> {{ $dateFrom && $dateTo ? $dateFrom.' to '.$dateTo : 'Year '.$year }}</p>
+                <p><strong>Period:</strong> {{ $dateFrom && $dateTo ? \Carbon\Carbon::parse($dateFrom)->format('M j, Y').' – '.\Carbon\Carbon::parse($dateTo)->format('M j, Y') : 'Year '.$year }}</p>
                 <p><strong>Prepared by:</strong> {{ auth()->user()->first_name }} {{ auth()->user()->last_name }}</p>
             </div>
             <div style="text-align:right;">
@@ -257,14 +258,47 @@
         <div class="college-tab-pane {{ $idx === 0 ? 'active' : '' }}" id="tab_{{ $ca['college']->id }}">
 
             {{-- College header for print --}}
-            <div class="print-only" style="display:none;">
-                <h2 style="font-size:1.2rem;font-weight:700;color:#7a2a2a;margin-bottom:1rem;">
-                    {{ $ca['college']->name }}
+            <div class="print-only print-college-header" style="display:none;">
+                <h2>{{ $ca['college']->name }}
                     @if($ca['college']->code)
-                        <span style="font-size:0.9rem;font-weight:500;color:#6b5e57;">({{ $ca['college']->code }})</span>
+                        <span>({{ $ca['college']->code }})</span>
                     @endif
                 </h2>
             </div>
+
+            {{-- Print-only stats summary table --}}
+            <table class="print-stat-table" style="display:none;margin-bottom:0.5rem;">
+                <thead><tr>
+                    <th>Metric</th><th class="val">Value</th>
+                    <th>Metric</th><th class="val">Value</th>
+                </tr></thead>
+                <tbody>
+                    <tr>
+                        <td>Total Appointments</td><td class="val">{{ number_format($ca['totalAppointments']) }}</td>
+                        <td>Completion Rate</td><td class="val">{{ $ca['completionRate'] }}%</td>
+                    </tr>
+                    <tr>
+                        <td>Students Seen</td><td class="val">{{ number_format($ca['totalStudents']) }}</td>
+                        <td>No-Show Rate</td><td class="val">{{ $ca['noShowRate'] }}%</td>
+                    </tr>
+                    <tr>
+                        <td>Completed Sessions</td><td class="val">{{ number_format($ca['completedCount']) }}</td>
+                        <td>Inbound Referral (students)</td><td class="val">{{ number_format($ca['referredInStudents']) }} ({{ $ca['referredInRate'] }}%)</td>
+                    </tr>
+                    <tr>
+                        <td>Pending / Approved</td><td class="val">{{ number_format($ca['pendingCount']) }}</td>
+                        <td>Outbound Referral (students)</td><td class="val">{{ number_format($ca['referredOutStudents']) }} ({{ $ca['referredOutRate'] }}%)</td>
+                    </tr>
+                    <tr>
+                        <td>No Show</td><td class="val">{{ number_format($ca['cancelledCount']) }}</td>
+                        <td>Busiest Day</td><td class="val">{{ $ca['peakDay'] ?? '—' }}</td>
+                    </tr>
+                    <tr>
+                        <td>Students Booked / Enrolled</td><td class="val">{{ number_format($ca['studentsBooked']) }} / {{ number_format($ca['totalEnrolled']) }} ({{ $bookedPct }}%)</td>
+                        <td>Students Completed / Enrolled</td><td class="val">{{ number_format($ca['studentsCompleted']) }} / {{ number_format($ca['totalEnrolled']) }} ({{ $completedPct }}%)</td>
+                    </tr>
+                </tbody>
+            </table>
 
             {{-- Summary stat cards --}}
             <div class="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-3 mb-5">
@@ -331,6 +365,74 @@
                         @endif
                     </div>
                 </div>
+            </div>
+
+            {{-- Referral In / Out --}}
+            <div class="an-card mb-5">
+                <div class="sec-title"><i class="fas fa-arrow-right-arrow-left"></i>Referral Overview</div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-3">
+                    <div style="background:rgba(45,122,79,0.07);border:1px solid rgba(45,122,79,0.2);border-radius:0.75rem;padding:1rem;">
+                        <div class="text-xs font-semibold uppercase tracking-wide mb-2" style="color:#2d7a4f;">
+                            <i class="fas fa-arrow-right mr-1"></i>Inbound Referral
+                        </div>
+                        <div style="display:flex;align-items:center;gap:0.75rem;margin-bottom:0.5rem;">
+                            <span style="font-size:1.5rem;font-weight:800;color:#2d7a4f;">{{ number_format($ca['referredInStudents']) }}</span>
+                            <span style="font-size:0.78rem;color:var(--text-secondary);">students ({{ $ca['referredInRate'] }}% of seen)</span>
+                        </div>
+                        <div class="reach-bar-track">
+                            <div class="reach-bar-fill" style="width:{{ min($ca['referredInRate'],100) }}%;background:linear-gradient(90deg,#2d7a4f,#17a2b8);"></div>
+                        </div>
+                    </div>
+                    <div style="background:rgba(122,42,42,0.06);border:1px solid rgba(122,42,42,0.15);border-radius:0.75rem;padding:1rem;">
+                        <div class="text-xs font-semibold uppercase tracking-wide mb-2" style="color:#7a2a2a;">
+                            <i class="fas fa-arrow-left mr-1"></i>Outbound Referral
+                        </div>
+                        <div style="display:flex;align-items:center;gap:0.75rem;margin-bottom:0.5rem;">
+                            <span style="font-size:1.5rem;font-weight:800;color:#7a2a2a;">{{ number_format($ca['referredOutStudents']) }}</span>
+                            <span style="font-size:0.78rem;color:var(--text-secondary);">students ({{ $ca['referredOutRate'] }}% of seen)</span>
+                        </div>
+                        <div class="reach-bar-track">
+                            <div class="reach-bar-fill" style="width:{{ min($ca['referredOutRate'],100) }}%;background:linear-gradient(90deg,#7a2a2a,#d4af37);"></div>
+                        </div>
+                    </div>
+                </div>
+                @if(!empty($ca['referredByData']))
+                <div style="padding-top:0.75rem;border-top:1px solid var(--border-soft);">
+                    <div class="text-xs font-semibold uppercase tracking-wide mb-2" style="color:var(--text-secondary);">
+                        <i class="fas fa-user-tag mr-1"></i>Source of Referral (Referred)
+                    </div>
+                    @php $rbTotal = array_sum($ca['referredByData']); $rbMax = max(1, max($ca['referredByData'])); @endphp
+                    @foreach($ca['referredByData'] as $source => $count)
+                    <div style="display:flex;align-items:center;gap:0.6rem;margin-bottom:0.4rem;">
+                        <span style="font-size:0.78rem;color:var(--text-secondary);min-width:8rem;">{{ ucwords(str_replace('_',' ',$source)) }}</span>
+                        <div class="reach-bar-track" style="flex:1;">
+                            <div class="reach-bar-fill" style="width:{{ ($count/$rbMax)*100 }}%;background:#7a2a2a;"></div>
+                        </div>
+                        <span style="font-size:0.78rem;font-weight:700;color:var(--maroon-soft);min-width:1.5rem;text-align:right;">{{ $count }}</span>
+                        <span style="font-size:0.72rem;color:var(--text-secondary);min-width:2.5rem;text-align:right;">{{ round(($count/$rbTotal)*100,1) }}%</span>
+                    </div>
+                    @endforeach
+                </div>
+                @endif
+                @if(!empty($ca['referredToData']))
+                <div style="padding-top:0.75rem;border-top:1px solid var(--border-soft);margin-top:0.75rem;">
+                    <div class="text-xs font-semibold uppercase tracking-wide mb-2" style="color:var(--text-secondary);">
+                        <i class="fas fa-arrow-up-right-from-square mr-1"></i>Referred Out (External Professional / Service)
+                        <span style="margin-left:0.4rem;font-size:0.68rem;font-weight:500;color:var(--text-muted);">{{ $ca['referredToCount'] }} total</span>
+                    </div>
+                    @php $rtTotal = array_sum($ca['referredToData']); $rtMax = max(1, max($ca['referredToData'])); @endphp
+                    @foreach($ca['referredToData'] as $destination => $count)
+                    <div style="display:flex;align-items:center;gap:0.6rem;margin-bottom:0.4rem;">
+                        <span style="font-size:0.78rem;color:var(--text-secondary);min-width:8rem;">{{ ucwords(str_replace('_',' ',$destination)) }}</span>
+                        <div class="reach-bar-track" style="flex:1;">
+                            <div class="reach-bar-fill" style="width:{{ ($count/$rtMax)*100 }}%;background:#2a5a7a;"></div>
+                        </div>
+                        <span style="font-size:0.78rem;font-weight:700;color:#2a5a7a;min-width:1.5rem;text-align:right;">{{ $count }}</span>
+                        <span style="font-size:0.72rem;color:var(--text-secondary);min-width:2.5rem;text-align:right;">{{ round(($count/$rtTotal)*100,1) }}%</span>
+                    </div>
+                    @endforeach
+                </div>
+                @endif
             </div>
 
             {{-- Monthly chart --}}
@@ -512,6 +614,36 @@
     </div>
 </div>
 @endif
+
+    {{-- Print signature --}}
+    <div class="print-signature">
+        <div class="print-sig-grid">
+            <div class="print-sig-item">
+                <div>Prepared by:</div>
+                <div class="print-sig-line">
+                    <div class="print-sig-name">{{ auth()->user()->first_name }} {{ auth()->user()->last_name }}</div>
+                    <div class="print-sig-role">Guidance Counselor</div>
+                </div>
+            </div>
+            <div class="print-sig-item">
+                <div>Noted by:</div>
+                <div class="print-sig-line">
+                    <div class="print-sig-name">&nbsp;</div>
+                    <div class="print-sig-role">Head, Guidance Office</div>
+                </div>
+            </div>
+            <div class="print-sig-item">
+                <div>Approved by:</div>
+                <div class="print-sig-line">
+                    <div class="print-sig-name">&nbsp;</div>
+                    <div class="print-sig-role">Director / Dean of Student Affairs</div>
+                </div>
+            </div>
+        </div>
+        <p style="font-size:7pt;color:#8b7e76;margin-top:0.8rem;font-style:italic;">
+            This report is generated from the MSU-IIT Office of Guidance and Counseling Information System. All data is confidential and for official use only.
+        </p>
+    </div>
 
 @endsection
 

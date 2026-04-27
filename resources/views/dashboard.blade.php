@@ -912,6 +912,19 @@
                             <p class="text-[var(--text-secondary)] mt-2">
                                 <i class="fas fa-envelope mr-2 text-[var(--accent-gold)]"></i>{{ $headCounselor->user->email }}
                             </p>
+                            @if($headCounselor->user->phone_number)
+                            <p class="text-[var(--text-secondary)] mt-1">
+                                <i class="fas fa-phone mr-2 text-[var(--accent-gold)]"></i>{{ $headCounselor->user->phone_number }}
+                            </p>
+                            @endif
+                            @if($headCounselor->facebook_link)
+                            <p class="mt-1">
+                                <a href="{{ $headCounselor->facebook_link }}" target="_blank" rel="noopener noreferrer"
+                                   class="inline-flex items-center gap-1.5 text-[#1877f2] hover:underline text-sm font-medium">
+                                    <i class="fab fa-facebook text-base"></i> Facebook Profile
+                                </a>
+                            </p>
+                            @endif
                             <p class="text-[var(--text-secondary)] mt-2 leading-relaxed">
                                 As the Head Counselor, {{ $headCounselor->user->first_name }} provides leadership and direction
                                 for all guidance and counseling services. With credentials in {{ $headCounselor->credentials }},
@@ -952,6 +965,24 @@
                                 <p class="text-[var(--primary-red)] font-medium">{{ $counselor->position }}</p>
                                 <p class="text-[var(--text-secondary)] text-sm mt-1">{{ $colleges }}</p>
                                 <p class="text-[var(--text-muted)] text-sm mt-1">{{ $counselor->credentials }}</p>
+                                <div class="mt-3 space-y-1 text-sm text-center">
+                                    <p class="text-[var(--text-secondary)]">
+                                        <i class="fas fa-envelope mr-2 text-[var(--accent-gold)]"></i>{{ $counselor->user->email }}
+                                    </p>
+                                    @if($counselor->user->phone_number)
+                                    <p class="text-[var(--text-secondary)]">
+                                        <i class="fas fa-phone mr-2 text-[var(--accent-gold)]"></i>{{ $counselor->user->phone_number }}
+                                    </p>
+                                    @endif
+                                    @if($counselor->facebook_link)
+                                    <p>
+                                        <a href="{{ $counselor->facebook_link }}" target="_blank" rel="noopener noreferrer"
+                                           class="inline-flex items-center justify-center gap-1.5 text-[#1877f2] hover:underline font-medium">
+                                            <i class="fab fa-facebook text-base"></i> Facebook Profile
+                                        </a>
+                                    </p>
+                                    @endif
+                                </div>
                             </div>
                         @endforeach
                     </div>

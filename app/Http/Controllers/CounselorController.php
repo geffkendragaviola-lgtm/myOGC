@@ -312,6 +312,7 @@ public function appointments(Request $request)
     $baseQuery = Appointment::with([
             'student.user',
             'student.college',
+            'student.appointments.sessionNotes',
             'sessionNotes',
             'referredCounselor.user',
             'originalCounselor.user',
@@ -497,6 +498,16 @@ public function appointments(Request $request)
         // Add a flag to identify if this is a referred appointment where current counselor is the receiver
         $appointment->is_referred_in = (bool) $appointment->is_referred &&
                                      in_array((int) $appointment->referred_to_counselor_id, $counselorIds->map(fn ($id) => (int) $id)->all(), true);
+
+        // Flag for external "Referred Out" (to outside professional/service) from session notes
+        // Check across ALL of the student's appointments, not just this one
+        $latestNote = $appointment->sessionNotes->sortByDesc('created_at')->first();
+        $studentExternalReferredOut = $appointment->student->appointments
+            ->flatMap(fn ($a) => $a->sessionNotes)
+            ->sortByDesc('created_at')
+            ->first(fn ($n) => !empty($n->referred_to_destination));
+        $appointment->has_external_referred_out = !is_null($studentExternalReferredOut);
+        $appointment->external_referred_out_destination = $studentExternalReferredOut?->referred_to_destination ?? null;
 
         return $appointment;
     });
@@ -843,6 +854,10 @@ public function getAppointmentDetails(Appointment $appointment)
             'id' => $appointment->id,
             'case_number' => $appointment->case_number,
             'concern' => $appointment->concern,
+            'mood_rating' => $appointment->mood_rating,
+            'is_appointment_high_risk' => (bool) $appointment->is_appointment_high_risk,
+            'appointment_high_risk_notes' => $appointment->appointment_high_risk_notes,
+            'appointment_high_risk_counselor_flagged' => (bool) $appointment->appointment_high_risk_counselor_flagged,
             'notes' => $appointment->notes,
             'status' => $appointment->status,
             'status_display' => $currentCounselorId
@@ -856,7 +871,10 @@ public function getAppointmentDetails(Appointment $appointment)
             'referral_reason' => $appointment->referral_reason,
             'referral_requested_at' => $appointment->referral_requested_at?->toIso8601String(),
             'referred_by' => $appointment->referred_by,
+            'referred_to_destination' => $appointment->sessionNotes->sortByDesc('created_at')->first()?->referred_to_destination,
             'referral_outcome' => $appointment->referral_outcome,
+            'latest_mood_level' => $appointment->sessionNotes->sortByDesc('created_at')->first()?->mood_level,
+            'latest_mood_level_label' => $appointment->sessionNotes->sortByDesc('created_at')->first()?->mood_level_label,
             'referral_resolved_at' => $appointment->referral_resolved_at?->toIso8601String(),
             'referral_resolved_by_counselor_id' => $appointment->referral_resolved_by_counselor_id,
             'appointment_date' => $appointment->appointment_date->format('Y-m-d'),
@@ -1171,6 +1189,31 @@ public function toggleHighRisk(Request $request, Student $student)
             'high_risk_notes'      => $student->high_risk_notes,
             'high_risk_flagged_at' => $student->high_risk_flagged_at?->format('M j, Y g:i A'),
         ],
+    ]);
+}
+
+public function toggleAppointmentHighRisk(Request $request, Appointment $appointment)
+{
+    $counselorIds = \App\Models\Counselor::where('user_id', auth()->id())->pluck('id');
+    $canManage = $counselorIds->contains(fn($id) => $appointment->canBeManagedBy($id));
+    if (!$canManage) abort(403);
+
+    $request->validate([
+        'is_high_risk' => 'required|boolean',
+        'notes'        => 'nullable|string|max:1000',
+    ]);
+
+    $appointment->update([
+        'is_appointment_high_risk'               => $request->is_high_risk,
+        'appointment_high_risk_notes'            => $request->notes,
+        'appointment_high_risk_counselor_flagged' => $request->is_high_risk,
+    ]);
+
+    return response()->json([
+        'success'       => true,
+        'message'       => $request->is_high_risk ? 'Appointment flagged as high-risk.' : 'High-risk flag removed.',
+        'is_high_risk'  => $appointment->is_appointment_high_risk,
+        'notes'         => $appointment->appointment_high_risk_notes,
     ]);
 }
 

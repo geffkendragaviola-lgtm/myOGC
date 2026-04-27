@@ -19,9 +19,13 @@ class AppointmentRescheduledNotification extends Notification
 
     public function toArray(object $notifiable): array
     {
+        $date      = \Carbon\Carbon::parse($this->appointment->proposed_date ?? $this->appointment->appointment_date)->format('F d, Y');
+        $time      = \Carbon\Carbon::parse($this->appointment->proposed_start_time ?? $this->appointment->start_time)->format('h:i A');
+        $firstName = $this->appointment->student->user->first_name;
+
         return [
             'title'          => 'Reschedule Request',
-            'message'        => 'Your counselor has requested to reschedule your appointment. Case #' . $this->appointment->case_number,
+            'message'        => "Hi {$firstName}, your counselor has requested to reschedule your appointment to {$date} at {$time}.",
             'appointment_id' => $this->appointment->id,
             'case_number'    => $this->appointment->case_number,
             'type'           => 'appointment_rescheduled',

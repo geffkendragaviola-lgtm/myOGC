@@ -6,40 +6,20 @@
         <h2 style="color: #fff; margin: 0;">Reschedule Request</h2>
     </div>
     <div style="border: 1px solid #e5e7eb; border-top: none; padding: 24px; border-radius: 0 0 8px 8px;">
-        <p>Hello, <strong>{{ $appointment->student->user->first_name }} {{ $appointment->student->user->last_name }}</strong>,</p>
+        <p>Hello, <strong>{{ $appointment->student->user->first_name }}</strong>,</p>
         <p>Your counselor has requested to reschedule your appointment. Please log in to accept or reject the new schedule.</p>
 
         <table style="width: 100%; border-collapse: collapse; margin: 16px 0;">
             <tr style="background: #f9fafb;">
-                <td style="padding: 10px; border: 1px solid #e5e7eb; font-weight: bold; width: 40%;">Case Number</td>
-                <td style="padding: 10px; border: 1px solid #e5e7eb;">{{ $appointment->case_number }}</td>
-            </tr>
-            <tr>
-                <td style="padding: 10px; border: 1px solid #e5e7eb; font-weight: bold;">Counselor</td>
-                <td style="padding: 10px; border: 1px solid #e5e7eb;">
-                    {{ $appointment->counselor->user->first_name }} {{ $appointment->counselor->user->last_name }}
-                </td>
-            </tr>
-            <tr style="background: #f9fafb;">
-                <td style="padding: 10px; border: 1px solid #e5e7eb; font-weight: bold;">Original Date</td>
-                <td style="padding: 10px; border: 1px solid #e5e7eb;">{{ \Carbon\Carbon::parse($appointment->appointment_date)->format('F d, Y') }}</td>
-            </tr>
-            <tr>
-                <td style="padding: 10px; border: 1px solid #e5e7eb; font-weight: bold;">Proposed New Date</td>
+                <td style="padding: 10px; border: 1px solid #e5e7eb; font-weight: bold; width: 40%;">Proposed New Date</td>
                 <td style="padding: 10px; border: 1px solid #e5e7eb;">{{ \Carbon\Carbon::parse($appointment->proposed_date)->format('F d, Y') }}</td>
             </tr>
-            <tr style="background: #f9fafb;">
+            <tr>
                 <td style="padding: 10px; border: 1px solid #e5e7eb; font-weight: bold;">Proposed New Time</td>
                 <td style="padding: 10px; border: 1px solid #e5e7eb;">
                     {{ \Carbon\Carbon::parse($appointment->proposed_start_time)->format('h:i A') }} – {{ \Carbon\Carbon::parse($appointment->proposed_end_time)->format('h:i A') }}
                 </td>
             </tr>
-            @if($appointment->reschedule_reason)
-            <tr>
-                <td style="padding: 10px; border: 1px solid #e5e7eb; font-weight: bold;">Reason</td>
-                <td style="padding: 10px; border: 1px solid #e5e7eb;">{{ $appointment->reschedule_reason }}</td>
-            </tr>
-            @endif
         </table>
 
         <p>Please log in to the system to accept or reject this reschedule request.</p>

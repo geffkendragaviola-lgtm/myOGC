@@ -44,6 +44,12 @@
         </table>
 
         <p>The time slot is now available for other bookings.</p>
+        @if($appointment->is_appointment_high_risk)
+        <div style="margin: 16px 0; padding: 12px 16px;  background: #fff5f5; border-radius: 4px;">
+            <p style="margin: 0 0 4px; font-weight: bold; color: #991b1b;">High-Risk Appointment</p>
+            <p style="margin: 0; font-size: 13px; color: #b91c1c;">{{ $appointment->appointment_high_risk_notes }}</p>
+        </div>
+        @endif
         <p style="color: #6b7280; font-size: 13px; margin-top: 24px;">MSU-IIT Guidance Counseling System</p>
     </div>
 </body>

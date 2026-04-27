@@ -19,9 +19,13 @@ class AppointmentReferredNotification extends Notification
 
     public function toArray(object $notifiable): array
     {
+        $date      = \Carbon\Carbon::parse($this->appointment->appointment_date)->format('F d, Y');
+        $time      = \Carbon\Carbon::parse($this->appointment->start_time)->format('h:i A');
+        $firstName = $this->appointment->student->user->first_name;
+
         return [
             'title'          => 'Appointment Referral',
-            'message'        => 'Your appointment has been referred to another counselor. Case #' . $this->appointment->case_number,
+            'message'        => "Hi {$firstName}, your appointment on {$date} at {$time} has been referred to another counselor.",
             'appointment_id' => $this->appointment->id,
             'case_number'    => $this->appointment->case_number,
             'type'           => 'appointment_referred',

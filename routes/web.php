@@ -97,6 +97,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/appointments/available-slots', [AppointmentController::class, 'getAvailableSlots'])->name('appointments.available-slots');
 
         Route::post('/appointments/{appointment}/cancel', [AppointmentController::class, 'cancel'])->name('appointments.cancel');
+        Route::get('/appointments/{appointment}/details', [AppointmentController::class, 'getDetails'])->name('appointments.details');
         Route::patch('/appointments/{appointment}/reschedule/accept', [AppointmentController::class, 'acceptReschedule'])
             ->name('appointments.reschedule.accept');
         Route::patch('/appointments/{appointment}/reschedule/reject', [AppointmentController::class, 'rejectReschedule'])
@@ -172,9 +173,13 @@ Route::middleware('auth')->group(function () {
         Route::get('/students/{student}/profile', [CounselorController::class, 'showStudentProfile'])
             ->name('counselor.students.profile');
         
-        // High-risk flag toggle
+        // High-risk flag toggle (student-level)
         Route::post('/students/{student}/toggle-high-risk', [CounselorController::class, 'toggleHighRisk'])
             ->name('counselor.students.toggle-high-risk');
+
+        // High-risk flag toggle (appointment-level)
+        Route::post('/appointments/{appointment}/toggle-appointment-high-risk', [CounselorController::class, 'toggleAppointmentHighRisk'])
+            ->name('counselor.appointments.toggle-appointment-high-risk');
 
         // Export appointments
         Route::get('/appointments/export', [CounselorController::class, 'exportAppointments'])

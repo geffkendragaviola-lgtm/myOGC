@@ -396,8 +396,8 @@
             ['label' => 'Approved',   'status' => 'approved',  'dir' => '',    'count' => $stats['approved'] ?? 0,     'color' => '#2d7a4f'],
             ['label' => 'Completed',  'status' => 'completed', 'dir' => '',    'count' => $stats['completed'] ?? 0,    'color' => '#2a5a7a'],
             ['label' => 'Cancelled',  'status' => 'cancelled', 'dir' => '',    'count' => $stats['cancelled'] ?? 0,    'color' => '#b91c1c'],
-            ['label' => 'Referred In','status' => 'all',       'dir' => 'in',  'count' => $stats['referred_in'] ?? 0,  'color' => '#c9a227'],
-            ['label' => 'Referred Out','status'=> 'all',       'dir' => 'out', 'count' => $stats['referred_out'] ?? 0, 'color' => '#7c3aed'],
+            ['label' => 'Inbound Referral','status' => 'all',       'dir' => 'in',  'count' => $stats['referred_in'] ?? 0,  'color' => '#c9a227'],
+            ['label' => 'Outbound Referral','status'=> 'all',       'dir' => 'out', 'count' => $stats['referred_out'] ?? 0, 'color' => '#7c3aed'],
         ];
     @endphp
     @foreach($chips as $chip)
@@ -551,12 +551,7 @@
                                     <td class="px-4 sm:px-6 py-3.5">
                                         <div class="flex items-center gap-2.5 sm:gap-3">
                                             @php
-                                                $stressResponses = $appointment->student->needsAssessment?->stress_responses ?? [];
-                                                $stressResponses = is_array($stressResponses) ? $stressResponses : [];
-                                                $riskResponses = ['Hurt myself', 'Attempted to end my life', 'Thought it would be better dead'];
-                                                $hasSelfHarmRisk = !$appointment->student->high_risk_overridden
-                                                    && count(array_intersect($riskResponses, $stressResponses)) > 0;
-                                                $isHighRisk = $appointment->student->is_high_risk || $hasSelfHarmRisk;
+                                                $isHighRisk = $appointment->is_appointment_high_risk;
                                             @endphp
                                             <div class="avatar-badge {{ $isHighRisk ? 'ring-2 ring-red-500' : '' }}">
                                                 <i class="fas fa-user-graduate text-[9px] sm:text-xs"></i>
@@ -564,20 +559,30 @@
                                             <div class="min-w-0">
                                                 <div class="text-xs sm:text-sm font-semibold text-[#2c2420] truncate max-w-[140px] sm:max-w-[180px]">
                                                     {{ $appointment->student->user->first_name }} {{ $appointment->student->user->last_name }}
+                                                </div>
+                                                @if($appointment->is_referred_out || $appointment->is_referred_in || $appointment->has_external_referred_out)
+                                                <div class="flex flex-wrap gap-1 mt-0.5">
                                                     @if($appointment->is_referred_out)
-                                                        <span class="ml-2 text-[10px] sm:text-xs bg-[#fff9e6] text-[#7a2a2a] px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-full">
-                                                            <i class="fas fa-arrow-up-right-from-square text-[8px] sm:text-[9px]"></i> Out
+                                                        <span class="inline-flex items-center gap-1 text-[10px] sm:text-xs bg-[#fff9e6] text-[#7a2a2a] px-1.5 py-0.5 rounded-full whitespace-nowrap">
+                                                            <i class="fas fa-arrow-up-right-from-square text-[8px]"></i> Outbound
                                                         </span>
                                                     @elseif($appointment->is_referred_in)
-                                                        <span class="ml-2 text-[10px] sm:text-xs bg-[#f5f0eb] text-[#7a2a2a] px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-full">
-                                                            <i class="fas fa-arrow-turn-down text-[8px] sm:text-[9px]"></i> In
+                                                        <span class="inline-flex items-center gap-1 text-[10px] sm:text-xs bg-[#f5f0eb] text-[#7a2a2a] px-1.5 py-0.5 rounded-full whitespace-nowrap">
+                                                            <i class="fas fa-arrow-turn-down text-[8px]"></i> Inbound
+                                                        </span>
+                                                    @endif
+                                                    @if($appointment->has_external_referred_out)
+                                                        <span class="inline-flex items-center gap-1 text-[10px] sm:text-xs bg-[#f0f4ff] text-[#3b4fa8] px-1.5 py-0.5 rounded-full whitespace-nowrap" title="{{ $appointment->external_referred_out_destination }}">
+                                                            <i class="fas fa-external-link-alt text-[8px]"></i> Referred Out
                                                         </span>
                                                     @endif
                                                 </div>
+                                                @endif
                                                 @if($isHighRisk)
                                                     <div class="mt-0.5">
                                                         <span class="inline-flex items-center gap-1 text-[10px] bg-red-100 text-red-700 px-1.5 py-0.5 rounded-full border border-red-200 whitespace-nowrap">
-                                                            <i class="fas fa-exclamation-triangle text-[8px]"></i> High-risk individual
+                                                            <i class="fas fa-exclamation-triangle text-[8px]"></i>
+                                                            {{ $appointment->appointment_high_risk_counselor_flagged ? 'Flagged by counselor' : 'High-risk concern' }}
                                                         </span>
                                                     </div>
                                                 @endif
@@ -653,7 +658,15 @@
                                             <span class="status-chip {{ $statusColor }}">
                                                 {{ $statusText }}
                                             </span>
-                                            @if($referralBadgeText)
+                                            @if($appointment->status === 'referred')
+                                                @if($appointment->referredCounselor?->user)
+                                                    <span class="text-[10px] text-[#7a2a2a] font-medium mt-0.5">
+                                                        <i class="fas fa-arrow-right-arrow-left text-[9px] mr-0.5"></i>
+                                                        {{ $appointment->referredCounselor->user->first_name }} {{ $appointment->referredCounselor->user->last_name }}
+                                                    </span>
+                                                 
+                                                @endif
+                                            @elseif($referralBadgeText)
                                                 <span class="status-chip referred">
                                                     {{ $referralBadgeText }}
                                                 </span>
@@ -1768,24 +1781,57 @@
                                     </div>
                                 </div>
                                 ` : ''}
-                            <div>
-                                <label class="field-label">Type of Booking</label>
-                                <p class="mt-1 text-xs sm:text-sm text-[#2c2420]">${data.appointment.booking_type || 'N/A'}</p>
-                            </div>
-                            <div>
-                                <label class="field-label">Booking Category</label>
-                                <p class="mt-1 text-xs sm:text-sm text-[#2c2420]">${data.appointment.booking_category ? data.appointment.booking_category.charAt(0).toUpperCase() + data.appointment.booking_category.slice(1).replace('-', ' ') : 'N/A'}</p>
-                            </div>
-
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                 <div>
-                                    <label class="field-label">Concern</label>
-                                    <p class="mt-1 text-xs sm:text-sm text-[#6b5e57] whitespace-pre-line">${data.appointment.concern}</p>
+                                    <label class="field-label">Type of Booking</label>
+                                    <p class="mt-1 text-xs sm:text-sm text-[#2c2420]">${data.appointment.booking_type || 'N/A'}</p>
                                 </div>
+                                <div>
+                                    <label class="field-label">Booking Category</label>
+                                    <p class="mt-1 text-xs sm:text-sm text-[#2c2420]">${data.appointment.booking_category ? data.appointment.booking_category.charAt(0).toUpperCase() + data.appointment.booking_category.slice(1).replace('-', ' ') : 'N/A'}</p>
+                                </div>
+                            </div>
 
                                 ${data.appointment.referred_by ? `
                                 <div>
-                                    <label class="field-label">Referred By</label>
+                                    <label class="field-label">Source of Referral (Referred)</label>
                                     <p class="mt-1 text-xs sm:text-sm text-[#2c2420]">${data.appointment.referred_by}</p>
+                                </div>
+                                ` : ''}
+
+                                <div>
+                                    <label class="field-label">Reason / Concern</label>
+                                    <p class="mt-1 text-xs sm:text-sm text-[#6b5e57] whitespace-pre-line">${data.appointment.concern}</p>
+                                </div>
+
+                                ${data.appointment.mood_rating ? `
+                                <div>
+                                    <label class="field-label">Mood at Booking</label>
+                                    <p class="mt-1 text-xs sm:text-sm text-[#2c2420]">${data.appointment.mood_rating}</p>
+                                </div>
+                                ` : ''}
+
+                                ${data.appointment.latest_mood_level ? `
+                                <div>
+                                    <label class="field-label">Latest Session Mood</label>
+                                    <div class="mt-1">
+                                        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium
+                                            ${data.appointment.latest_mood_level === 'very_good' ? 'bg-green-100 text-green-800' :
+                                              data.appointment.latest_mood_level === 'good'     ? 'bg-[#f5f0eb] text-[#7a2a2a]' :
+                                              data.appointment.latest_mood_level === 'neutral'  ? 'bg-yellow-100 text-yellow-800' :
+                                              data.appointment.latest_mood_level === 'low'      ? 'bg-orange-100 text-orange-800' :
+                                                                                                  'bg-red-100 text-red-800'}">
+                                            <i class="fas fa-smile text-[10px]"></i>
+                                            ${data.appointment.latest_mood_level_label}
+                                        </span>
+                                    </div>
+                                </div>
+                                ` : ''}
+
+                                ${data.appointment.referred_to_destination ? `
+                                <div>
+                                    <label class="field-label">Referred Out</label>
+                                    <p class="mt-1 text-xs sm:text-sm text-[#2c2420]">${data.appointment.referred_to_destination}</p>
                                 </div>
                                 ` : ''}
 
@@ -1824,6 +1870,30 @@
                                     <span class="mt-1 inline-flex px-2 py-1 text-[10px] font-semibold rounded-full status-chip ${data.appointment.status === 'pending' ? 'pending' : data.appointment.status === 'approved' ? 'approved' : data.appointment.status === 'rejected' ? 'rejected' : data.appointment.status === 'referred' ? 'referred' : 'completed'}">
                                         ${data.appointment.status_display || (data.appointment.status.charAt(0).toUpperCase() + data.appointment.status.slice(1))}
                                     </span>
+                                </div>
+
+                                <div class="border rounded-lg p-3 ${data.appointment.is_appointment_high_risk ? 'border-red-200 bg-red-50' : 'border-[#e5e0db] bg-[#faf8f5]'}">
+                                    <div class="flex items-center justify-between gap-2">
+                                        <div class="flex items-center gap-2">
+                                            <i class="fas fa-exclamation-triangle text-xs ${data.appointment.is_appointment_high_risk ? 'text-red-600' : 'text-[#a89f97]'}"></i>
+                                            <span class="text-xs font-semibold ${data.appointment.is_appointment_high_risk ? 'text-red-700' : 'text-[#6b5e57]'}">
+                                                ${data.appointment.is_appointment_high_risk
+                                                    ? (data.appointment.appointment_high_risk_counselor_flagged ? 'Flagged as high-risk by counselor' : 'High-risk concern detected')
+                                                    : 'Not flagged as high-risk'}
+                                            </span>
+                                        </div>
+                                        <button type="button"
+                                            onclick="toggleAppointmentHighRisk(${data.appointment.id}, ${!data.appointment.is_appointment_high_risk})"
+                                            class="text-[10px] px-2 py-1 rounded border font-medium transition-colors
+                                                ${data.appointment.is_appointment_high_risk
+                                                    ? 'border-red-300 text-red-700 bg-white hover:bg-red-50'
+                                                    : 'border-[#d4b896] text-[#7a5c3a] bg-white hover:bg-[#fdf8f3]'}">
+                                            ${data.appointment.is_appointment_high_risk ? 'Remove Flag' : 'Flag as High-Risk'}
+                                        </button>
+                                    </div>
+                                    ${data.appointment.appointment_high_risk_notes ? `
+                                    <p class="mt-1.5 text-[10px] text-red-600 italic"><span class="font-semibold not-italic">Reason:</span> ${data.appointment.appointment_high_risk_notes}</p>
+                                    ` : ''}
                                 </div>
 
                                 ${data.appointment.cancellation_reason ? `
@@ -1909,6 +1979,36 @@
 
             function closeAppointmentModal() {
                 document.getElementById('appointmentModal').classList.add('hidden');
+            }
+
+            function toggleAppointmentHighRisk(appointmentId, flagValue) {
+                let notes = '';
+                if (flagValue) {
+                    notes = prompt('Add a note for this high-risk flag (optional):') ?? '';
+                }
+                fetch(`/counselor/appointments/${appointmentId}/toggle-appointment-high-risk`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                    },
+                    body: JSON.stringify({ is_high_risk: flagValue, notes }),
+                })
+                .then(r => r.json())
+                .then(data => {
+                    if (data.success) {
+                        showAppointmentDetails(appointmentId);
+                        // Refresh the row badge
+                        const row = document.getElementById('appointment-' + appointmentId);
+                        if (row) {
+                            const avatar = row.querySelector('.avatar-badge');
+                            if (avatar) {
+                                avatar.classList.toggle('ring-2', data.is_high_risk);
+                                avatar.classList.toggle('ring-red-500', data.is_high_risk);
+                            }
+                        }
+                    }
+                });
             }
 
             // Helper functions for styling

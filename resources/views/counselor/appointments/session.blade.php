@@ -489,9 +489,9 @@
                             </div>
                         </div>
 
-                        {{-- Referred By / Referred To --}}
+                        {{-- Source of Referral / Referred Out --}}
                         <div class="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-3">
-                            {{-- Referred By --}}
+                            {{-- Source of Referral (Referred) --}}
                             <div class="rounded-lg border p-3" style="border-color:var(--border-soft);background:rgba(250,248,245,0.6);">
                                 @php $hasReferredBy = old('referred_by_source', $latestSessionNote->referred_by_source ?? $appointment->referred_by ?? ''); @endphp
                                 <label class="flex items-center gap-2 cursor-pointer select-none mb-2">
@@ -499,7 +499,7 @@
                                            class="custom-checkbox"
                                            {{ $hasReferredBy ? 'checked' : '' }}
                                            onchange="toggleReferral('referred_by_source', this.checked)">
-                                    <span class="text-xs font-semibold" style="color:var(--maroon-800)">Referred By</span>
+                                    <span class="text-xs font-semibold" style="color:var(--maroon-800)">Source of Referral (Referred)</span>
                                 </label>
                                 <div id="referred_by_box" class="{{ $hasReferredBy ? '' : 'hidden' }}">
                                     <input type="text"
@@ -515,14 +515,14 @@
                                 </div>
                             </div>
 
-                            {{-- Referred To --}}
+                            {{-- Referred Out --}}
                             <div class="rounded-lg border p-3" style="border-color:var(--border-soft);background:rgba(250,248,245,0.6);">
                                 <label class="flex items-center gap-2 cursor-pointer select-none mb-2">
                                     <input type="checkbox" id="chk_referred_to"
                                            class="custom-checkbox"
                                            {{ old('referred_to_destination', $latestSessionNote->referred_to_destination ?? '') ? 'checked' : '' }}
                                            onchange="toggleReferral('referred_to_destination', this.checked)">
-                                    <span class="text-xs font-semibold" style="color:var(--maroon-800)">Referred To</span>
+                                    <span class="text-xs font-semibold" style="color:var(--maroon-800)">Referred Out</span>
                                 </label>
                                 <div id="referred_to_box" class="{{ old('referred_to_destination', $latestSessionNote->referred_to_destination ?? '') ? '' : 'hidden' }}">
                                     <input type="text"
@@ -644,7 +644,7 @@
                                     <div>
                                         <label for="followup_booking_category" class="field-label">Booking Category <span class="text-[#b91c1c]">*</span></label>
                                         <select name="booking_category" id="followup_booking_category" class="select-field text-xs sm:text-sm" required>
-                                            <option value="online" {{ old('booking_category') === 'online' ? 'selected' : '' }}>Online Booking</option>
+                                           
                                             <option value="walk-in" {{ old('booking_category') === 'walk-in' ? 'selected' : '' }}>Walk-in</option>
                                             <option value="referred" {{ old('booking_category') === 'referred' ? 'selected' : '' }}>Referred</option>
                                             <option value="called-in" {{ old('booking_category') === 'called-in' ? 'selected' : '' }}>Called-in</option>

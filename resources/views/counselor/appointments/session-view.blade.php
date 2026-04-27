@@ -283,7 +283,7 @@
                                 </div>
                             </div>
 
-                            {{-- Referred By / Referred To --}}
+                            {{-- Source of Referral / Referred Out --}}
                             @php
                                 $viewReferredBy = $latestSessionNote->referred_by_source ?: $appointment->referred_by;
                                 $viewReferredTo = $latestSessionNote->referred_to_destination;
@@ -292,13 +292,13 @@
                             <div class="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-3">
                                 @if($viewReferredBy)
                                 <div style="padding:0.6rem 0.75rem;background:rgba(250,248,245,0.8);border:1px solid var(--border-soft);border-radius:0.5rem;">
-                                    <span class="detail-label">Referred By</span>
+                                    <span class="detail-label">Source of Referral (Referred)</span>
                                     <div class="detail-value">{{ $viewReferredBy }}</div>
                                 </div>
                                 @endif
                                 @if($viewReferredTo)
                                 <div style="padding:0.6rem 0.75rem;background:rgba(250,248,245,0.8);border:1px solid var(--border-soft);border-radius:0.5rem;">
-                                    <span class="detail-label">Referred To</span>
+                                    <span class="detail-label">Referred Out</span>
                                     <div class="detail-value">{{ $viewReferredTo }}</div>
                                 </div>
                                 @endif

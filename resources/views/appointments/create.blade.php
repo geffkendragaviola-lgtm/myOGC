@@ -530,35 +530,181 @@
                 <div class="mb-6">
                     <label class="field-label">Booking Category <span style="color:#dc2626;">*</span></label>
                     <select name="booking_category" id="bookingCategory" class="select-field" required>
-                        <option value="online" selected>Online Booking</option>
-                        <option value="walk-in">Walk-in</option>
-                        <option value="referred">Referred</option>
-                        <option value="called-in">Called-in</option>
+                       
+                        <option value="walk-in" {{ old('booking_category') === 'walk-in' ? 'selected' : '' }}>Walk-in</option>
+                        <option value="referred" {{ old('booking_category') === 'referred' ? 'selected' : '' }}>Referred</option>
+                        <option value="called-in" {{ old('booking_category') === 'called-in' ? 'selected' : '' }}>Called-in</option>
                     </select>
                     <p class="field-help">
                         Select how the appointment was initiated.
                     </p>
                 </div>
 
+                <!-- Source of Referral (shown only when "Referred" is selected) -->
+                <div class="mb-6 hidden" id="referredByWrap">
+                    <label class="field-label">Source of Referral (Referred by) </label>
+                    <input type="text"
+                           name="referred_by"
+                           id="referredByInput"
+                           class="input-field"
+                           maxlength="255"
+                           placeholder="e.g. Teacher, Professor, Parent, Friend, Classmate"
+                           value="{{ old('referred_by') }}">
+                    <p class="field-help">If someone referred you to counseling, please indicate who.</p>
+                </div>
+
                 <!-- Reason / Concern Category -->
                 <div class="mb-6">
                     <label class="field-label">Reason / Concern Category <span style="color:#dc2626;">*</span></label>
-                    <select name="concern_category" id="concernCategory" class="select-field" required>
-                        <option value="">Choose a reason or concern</option>
-                        <option value="Academic Stress">Academic Stress</option>
-                        <option value="Personal Problem">Personal Problem</option>
-                        <option value="Family Concern">Family Concern</option>
-                        <option value="Relationship Concern">Relationship Concern</option>
-                        <option value="Emotional / Mental Well-being">Emotional / Mental Well-being</option>
-                        <option value="Peer / Social Concern">Peer / Social Concern</option>
-                        <option value="Career / Future Uncertainty">Career / Future Uncertainty</option>
-                        <option value="Financial Stress">Financial Stress</option>
-                        <option value="Self-esteem / Confidence">Self-esteem / Confidence</option>
-                        <option value="Other">Other</option>
-                    </select>
-                    <p class="field-help">
-                        Select the category that best describes your concern.
-                    </p>
+                    <p class="field-help mb-3">Select the main category, then check all items that apply.</p>
+
+                    {{-- Hidden field that holds the final built concern value --}}
+                    <input type="hidden" name="concern" id="concernHidden">
+                    {{-- Hidden field for concern_category --}}
+                    <input type="hidden" name="concern_category" id="concernCategory">
+
+                    {{-- 3 Category Tabs --}}
+                    <div class="flex gap-2 mb-4 flex-wrap" id="categoryTabs">
+                        @foreach([
+                            'ACADEMIC' => 'Academic / Educational',
+                            'PERSONAL' => 'Personal / Social',
+                            'CAREER'   => 'Career / Vocational',
+                        ] as $key => $label)
+                        <button type="button"
+                                data-cat="{{ $key }}"
+                                onclick="selectCategory('{{ $key }}')"
+                                class="category-tab px-4 py-2 rounded-lg border text-xs font-semibold transition-all"
+                                style="border-color:#d4b896;color:#7a5c3a;background:#fdf8f3;">
+                            {{ $label }}
+                        </button>
+                        @endforeach
+                    </div>
+
+                    {{-- ACADEMIC --}}
+                    <div id="cat-ACADEMIC" class="concern-panel hidden rounded-xl border p-4" style="border-color:#d4b896;background:#fdf8f3;">
+                        <p class="text-xs font-bold uppercase tracking-wide mb-3" style="color:#7a2a2a;">Academic / Educational</p>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-y-2 gap-x-4">
+                            @foreach([
+                                'Has difficulty in subject/s',
+                                'Poor quality of work',
+                                'Inconsistent attendance',
+                                'Dropped out of subjects',
+                                'Absenteeism',
+                                'Struggling for achievement',
+                                'Cheating',
+                                'Difficulty completing work',
+                                'Inconsistency with effort',
+                                'Poorly completed assignment(s)',
+                                'Poorly completed project(s)',
+                            ] as $item)
+                            <label class="flex items-start gap-2 cursor-pointer">
+                                <input type="checkbox" class="concern-checkbox mt-0.5 shrink-0" data-cat="ACADEMIC" value="{{ $item }}">
+                                <span class="text-xs text-[#4a3a2a]">{{ $item }}</span>
+                            </label>
+                            @endforeach
+                            <label class="flex items-start gap-2 cursor-pointer sm:col-span-2">
+                                <input type="checkbox" class="concern-checkbox mt-0.5 shrink-0" data-cat="ACADEMIC" data-other="true" id="academicOtherChk" value="Others">
+                                <span class="text-xs text-[#4a3a2a]">Others, please specify:</span>
+                                <input type="text" id="academicOtherText" class="ml-1 flex-1 border-b border-[#d4b896] bg-transparent text-xs outline-none px-1" placeholder="____________" maxlength="200" disabled>
+                            </label>
+                        </div>
+                    </div>
+
+                    {{-- PERSONAL --}}
+                    <div id="cat-PERSONAL" class="concern-panel hidden rounded-xl border p-4" style="border-color:#d4b896;background:#fdf8f3;">
+                        <p class="text-xs font-bold uppercase tracking-wide mb-3" style="color:#7a2a2a;">Personal / Social</p>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-y-2 gap-x-4">
+                            @foreach([
+                                'Depression / depressive thoughts',
+                                'Poor hygiene/self-care',
+                                'Sleeping in class',
+                                'Consistently tired/sleepy',
+                                'Excessive physical complaints',
+                                'Always sick',
+                                'Family problems',
+                                'New born in family',
+                                'Perfectionism',
+                                'Appears apathetic',
+                                'Appears sad/depressed mood',
+                                'Uses obscene languages',
+                                'Argues frequently',
+                                'Short attention span',
+                                'Has frequent mood swings',
+                                'Overreacts to criticism',
+                                'Has difficulty accepting mistakes',
+                                'Lacks confidence',
+                                'Makes excuses/blames others',
+                                'Hurts self',
+                                'Self-destructive acting out',
+                                'Stealing',
+                                'Frequently off-task',
+                                'Very active or impulsive',
+                                'Difficulty concentrating',
+                                'Disturbs others',
+                                'Defiant of rules',
+                                'Destruction of property',
+                                'Substance abuse',
+                                'Difficulty in relating with others',
+                                'Aggression resulting from conflict/s',
+                                'Bullying / Cyberbullying',
+                            ] as $item)
+                            <label class="flex items-start gap-2 cursor-pointer">
+                                <input type="checkbox" class="concern-checkbox mt-0.5 shrink-0" data-cat="PERSONAL" value="{{ $item }}">
+                                <span class="text-xs text-[#4a3a2a]">{{ $item }}</span>
+                            </label>
+                            @endforeach
+                        </div>
+                        <p class="text-xs font-semibold mt-4 mb-2" style="color:#7a2a2a;">Recently experienced crisis:</p>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-y-2 gap-x-4">
+                            @foreach([
+                                'Death of loved one',
+                                'Tragedy',
+                                'Pregnancy',
+                                'Harassment issues',
+                                'Recent parental separation',
+                                'Recently separated from parents/home',
+                                'Recent change of address',
+                                'Parent(s) re-marry',
+                            ] as $item)
+                            <label class="flex items-start gap-2 cursor-pointer">
+                                <input type="checkbox" class="concern-checkbox mt-0.5 shrink-0" data-cat="PERSONAL" value="{{ $item }}">
+                                <span class="text-xs text-[#4a3a2a]">{{ $item }}</span>
+                            </label>
+                            @endforeach
+                            <label class="flex items-start gap-2 cursor-pointer sm:col-span-2">
+                                <input type="checkbox" class="concern-checkbox mt-0.5 shrink-0" data-cat="PERSONAL" data-other="true" id="personalOtherChk" value="Others">
+                                <span class="text-xs text-[#4a3a2a]">Others, please specify:</span>
+                                <input type="text" id="personalOtherText" class="ml-1 flex-1 border-b border-[#d4b896] bg-transparent text-xs outline-none px-1" placeholder="____________" maxlength="200" disabled>
+                            </label>
+                        </div>
+                    </div>
+
+                    {{-- CAREER --}}
+                    <div id="cat-CAREER" class="concern-panel hidden rounded-xl border p-4" style="border-color:#d4b896;background:#fdf8f3;">
+                        <p class="text-xs font-bold uppercase tracking-wide mb-3" style="color:#7a2a2a;">Career / Vocational</p>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-y-2 gap-x-4">
+                            @foreach([
+                                'Barred student',
+                                'Shifting / plans to shift to another course',
+                                'Undecided about degree/course/career to pursue',
+                                'Difficulty in making career choice/s',
+                                'Does not like course presently enrolled in',
+                            ] as $item)
+                            <label class="flex items-start gap-2 cursor-pointer">
+                                <input type="checkbox" class="concern-checkbox mt-0.5 shrink-0" data-cat="CAREER" value="{{ $item }}">
+                                <span class="text-xs text-[#4a3a2a]">{{ $item }}</span>
+                            </label>
+                            @endforeach
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Presenting Problem (always shown, optional extra detail) -->
+                <div class="mb-6" id="presentingProblemWrap">
+                    <label class="field-label">Share a brief narrative of your concern <span style="color:#dc2626;">*</span></label>
+                    <textarea name="" id="concernTextarea" rows="3" class="textarea-field"
+                              placeholder="In your own words, briefly describe your concern..."></textarea>
+                    <p class="field-help">Please describe your concern in your own words.</p>
                 </div>
 
                 <!-- Mood Rating -->
@@ -622,27 +768,6 @@
                         </div>
                     </div>
                     <input type="hidden" name="start_time" id="selectedTime" required>
-                </div>
-
-                <!-- Concern -->
-                <div class="mb-6" id="presentingProblemWrap" style="display:none;">
-                    <label class="field-label">Presenting Problem <span style="color:#dc2626;">*</span></label>
-                    <textarea name="concern" id="concernTextarea" rows="4" class="textarea-field"
-                              placeholder="Briefly describe your presenting problem"></textarea>
-                    <p class="field-help">Please describe your concern in your own words.</p>
-                </div>
-
-                <!-- Referred By -->
-                <div class="mb-6">
-                    <label class="field-label">Referred By <span style="color:var(--text-muted);font-weight:400;">(Optional)</span></label>
-                    <input type="text"
-                           name="referred_by"
-                           id="referredByInput"
-                           class="input-field"
-                           maxlength="255"
-                           placeholder="e.g. Teacher, Professor, Parent, Friend, Classmate"
-                           value="{{ old('referred_by') }}">
-                    <p class="field-help">If someone referred you to counseling, please indicate who.</p>
                 </div>
 
                 <!-- Submit Button -->
@@ -758,6 +883,22 @@
 </div>
 
 <script>
+// Global concern category function (must be global for onclick attributes)
+function selectCategory(cat) {
+    document.getElementById('concernCategory').value = cat;
+    document.querySelectorAll('.concern-panel').forEach(p => p.classList.add('hidden'));
+    document.getElementById('cat-' + cat)?.classList.remove('hidden');
+    document.querySelectorAll('.category-tab').forEach(btn => {
+        const active = btn.dataset.cat === cat;
+        btn.style.background = active ? '#7a2a2a' : '#fdf8f3';
+        btn.style.color = active ? '#fff' : '#7a5c3a';
+        btn.style.borderColor = active ? '#7a2a2a' : '#d4b896';
+    });
+    document.querySelectorAll(`.concern-checkbox:not([data-cat="${cat}"])`).forEach(cb => {
+        cb.checked = false;
+    });
+}
+
 document.addEventListener('DOMContentLoaded', function() {
     const counselorTypeRadios = document.querySelectorAll('.counselor-type-radio');
     const counselorSelect = document.getElementById('counselorSelect');
@@ -777,7 +918,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const bookingTypeInitial = document.getElementById('bookingTypeInitial');
     const bookingTypeHelp = document.getElementById('bookingTypeHelp');
     const referredCounselorOption = document.getElementById('referredCounselorOption');
-    const concernCategorySelect = document.getElementById('concernCategory');
+    const concernCategorySelect = document.getElementById('concernCategory'); // hidden input
     const moodRatingSelect = document.getElementById('moodRating');
 
     const openConsentModal = document.getElementById('openConsentModal');
@@ -813,6 +954,33 @@ document.addEventListener('DOMContentLoaded', function() {
             'display_text' => $c->user->first_name . ' ' . $c->user->last_name . ' - ' . $c->position . ' (' . ($c->college->name ?? 'N/A') . ')'
         ];
     })) !!};
+
+    // Toggle "Others" text input when its checkbox is checked
+    document.querySelectorAll('.concern-checkbox[data-other]').forEach(cb => {
+        cb.addEventListener('change', function() {
+            const cat = this.dataset.cat.toLowerCase();
+            const textInput = document.getElementById(cat + 'OtherText');
+            if (textInput) {
+                textInput.disabled = !this.checked;
+                if (this.checked) textInput.focus();
+                else textInput.value = '';
+            }
+        });
+    });
+
+    // Booking category: show "Source of Referral" only when "Referred" is selected
+    const bookingCategorySelect = document.getElementById('bookingCategory');
+    const referredByWrap = document.getElementById('referredByWrap');
+    function toggleReferredBy() {
+        const isReferred = bookingCategorySelect?.value === 'referred';
+        referredByWrap?.classList.toggle('hidden', !isReferred);
+        if (!isReferred && document.getElementById('referredByInput')) {
+            document.getElementById('referredByInput').value = '';
+        }
+    }
+    bookingCategorySelect?.addEventListener('change', toggleReferredBy);
+    // Run on load to handle old() repopulation
+    toggleReferredBy();
 
     function showSystemAlert(message, type = 'warning', title = '') {
         if (!alertStack) return;
@@ -871,12 +1039,10 @@ document.addEventListener('DOMContentLoaded', function() {
     function validateForm() {
         const counselorId = getActiveCounselorId();
         const bookingType = bookingTypeSelect.value;
-        const concernCategory = concernCategorySelect.value;
+        const concernCategory = document.getElementById('concernCategory').value;
         const moodRating = moodRatingSelect.value;
         const date = dateSelect.value;
         const time = selectedTime.value;
-        const concernTextarea = document.getElementById('concernTextarea');
-        const concern = concernTextarea ? concernTextarea.value.trim() : '';
 
         if (!counselorId) {
             showSystemAlert('Please select a counselor before proceeding.', 'warning', 'Counselor required');
@@ -887,7 +1053,18 @@ document.addEventListener('DOMContentLoaded', function() {
             return false;
         }
         if (!concernCategory) {
-            showSystemAlert('Please select a reason or concern category.', 'warning', 'Concern category required');
+            showSystemAlert('Please select a concern category and check at least one item.', 'warning', 'Concern category required');
+            return false;
+        }
+        // Ensure at least one checkbox is checked in the active category
+        const checkedItems = document.querySelectorAll(`.concern-checkbox[data-cat="${concernCategory}"]:checked`);
+        if (checkedItems.length === 0) {
+            showSystemAlert('Please check at least one item in the selected category.', 'warning', 'Concern item required');
+            return false;
+        }
+        const narrative = document.getElementById('concernTextarea')?.value.trim();
+        if (!narrative) {
+            showSystemAlert('Please share a brief narrative of your concern.', 'warning', 'Narrative required');
             return false;
         }
         if (!moodRating) {
@@ -900,10 +1077,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         if (!time) {
             showSystemAlert('Please select an available time slot.', 'warning', 'Time slot required');
-            return false;
-        }
-        if (concernCategory === 'Other' && !concern) {
-            showSystemAlert('Please describe your presenting problem.', 'warning', 'Presenting problem required');
             return false;
         }
         return true;
@@ -956,18 +1129,24 @@ document.addEventListener('DOMContentLoaded', function() {
             consentInput.value = '1';
             appointmentForm.appendChild(consentInput);
 
-            // If category is not "Other", inject the category value as the concern
-            const category = concernCategorySelect.value;
-            const concernTextarea = document.getElementById('concernTextarea');
-            if (category !== 'Other') {
-                const hiddenConcern = document.createElement('input');
-                hiddenConcern.type = 'hidden';
-                hiddenConcern.name = 'concern';
-                hiddenConcern.value = category;
-                appointmentForm.appendChild(hiddenConcern);
-                // Disable textarea so it doesn't submit a blank value
-                if (concernTextarea) concernTextarea.disabled = true;
-            }
+            // Build concern value from checked items + optional extra detail
+            const category = document.getElementById('concernCategory').value;
+            const categoryLabels = { ACADEMIC: 'Academic / Educational', PERSONAL: 'Personal / Social', CAREER: 'Career / Vocational' };
+            const checkedBoxes = document.querySelectorAll(`.concern-checkbox[data-cat="${category}"]:checked`);
+            let items = [];
+            checkedBoxes.forEach(cb => {
+                if (cb.dataset.other) {
+                    const otherText = document.getElementById(category.toLowerCase() + 'OtherText')?.value.trim();
+                    if (otherText) items.push('Others: ' + otherText);
+                    else items.push('Others');
+                } else {
+                    items.push(cb.value);
+                }
+            });
+            const extraDetail = document.getElementById('concernTextarea')?.value.trim();
+            let concernValue = '[' + (categoryLabels[category] || category) + '] ' + items.join('; ');
+            if (extraDetail) concernValue += '\n' + extraDetail;
+            document.getElementById('concernHidden').value = concernValue;
 
             appointmentForm.submit();
         }
@@ -1199,24 +1378,12 @@ document.addEventListener('DOMContentLoaded', function() {
             }
             bookingTypeHelp.textContent = studentInitialInterviewCompleted
                 ? 'Initial Interview already completed.'
-                : 'Initial Interview already booked.';
+                : 'Initial Interview already booked. Cancel your existing one to rebook.';
+            bookingTypeHelp.style.color = '#6b7280';
         } else {
             bookingTypeHelp.textContent = '';
         }
     }
-
-    // Concern category toggle — show "Presenting Problem" only when "Other" is selected
-    function togglePresentingProblem() {
-        const wrap = document.getElementById('presentingProblemWrap');
-        const textarea = document.getElementById('concernTextarea');
-        if (!wrap || !textarea) return;
-        const isOther = concernCategorySelect.value === 'Other';
-        wrap.style.display = isOther ? '' : 'none';
-        textarea.required = isOther;
-        if (!isOther) textarea.value = '';
-    }
-    concernCategorySelect?.addEventListener('change', togglePresentingProblem);
-    togglePresentingProblem(); // run on load
 
     function checkReferredCounselorsAvailability() {
         if (allowAllCounselors) {

@@ -23,22 +23,12 @@
         <h2 style="color: #fff; margin: 0;">Appointment {{ $label }}</h2>
     </div>
     <div style="border: 1px solid #e5e7eb; border-top: none; padding: 24px; border-radius: 0 0 8px 8px;">
-        <p>Hello, <strong>{{ $appointment->student->user->first_name }} {{ $appointment->student->user->last_name }}</strong>,</p>
-        <p>Your appointment has been <strong>{{ strtolower($label) }}</strong> by your counselor.</p>
+        <p>Hello, <strong>{{ $appointment->student->user->first_name }}</strong>,</p>
+        <p>Your appointment has been <strong>{{ strtolower($label) }}</strong>.</p>
 
         <table style="width: 100%; border-collapse: collapse; margin: 16px 0;">
             <tr style="background: #f9fafb;">
-                <td style="padding: 10px; border: 1px solid #e5e7eb; font-weight: bold; width: 40%;">Case Number</td>
-                <td style="padding: 10px; border: 1px solid #e5e7eb;">{{ $appointment->case_number }}</td>
-            </tr>
-            <tr>
-                <td style="padding: 10px; border: 1px solid #e5e7eb; font-weight: bold;">Counselor</td>
-                <td style="padding: 10px; border: 1px solid #e5e7eb;">
-                    {{ $appointment->counselor->user->first_name }} {{ $appointment->counselor->user->last_name }}
-                </td>
-            </tr>
-            <tr style="background: #f9fafb;">
-                <td style="padding: 10px; border: 1px solid #e5e7eb; font-weight: bold;">Date</td>
+                <td style="padding: 10px; border: 1px solid #e5e7eb; font-weight: bold; width: 40%;">Date</td>
                 <td style="padding: 10px; border: 1px solid #e5e7eb;">{{ \Carbon\Carbon::parse($appointment->appointment_date)->format('F d, Y') }}</td>
             </tr>
             <tr>
@@ -47,24 +37,6 @@
                     {{ \Carbon\Carbon::parse($appointment->start_time)->format('h:i A') }} – {{ \Carbon\Carbon::parse($appointment->end_time)->format('h:i A') }}
                 </td>
             </tr>
-            <tr style="background: #f9fafb;">
-                <td style="padding: 10px; border: 1px solid #e5e7eb; font-weight: bold;">Status</td>
-                <td style="padding: 10px; border: 1px solid #e5e7eb;">
-                    <span style="color: {{ $color }}; font-weight: bold;">{{ $label }}</span>
-                </td>
-            </tr>
-            @if($appointment->notes)
-            <tr>
-                <td style="padding: 10px; border: 1px solid #e5e7eb; font-weight: bold;">Notes</td>
-                <td style="padding: 10px; border: 1px solid #e5e7eb;">{{ $appointment->notes }}</td>
-            </tr>
-            @endif
-            @if($newStatus === 'cancelled' && $appointment->cancellation_reason)
-            <tr style="background: #f9fafb;">
-                <td style="padding: 10px; border: 1px solid #e5e7eb; font-weight: bold;">Reason</td>
-                <td style="padding: 10px; border: 1px solid #e5e7eb;">{{ $appointment->cancellation_reason }}</td>
-            </tr>
-            @endif
         </table>
 
         <p>Please log in to the system to view your appointment details.</p>

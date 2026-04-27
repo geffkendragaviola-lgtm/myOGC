@@ -522,7 +522,6 @@
                                 <th>Counselor</th>
                                 <th>Concern</th>
                                 <th>Status</th>
-                                <th>Referral</th>
                                 <th>Actions</th>
                             </tr>
                         </thead>
@@ -549,7 +548,7 @@
                                         ?? data_get($appointment, 'counselor.user.fb_link')
                                         ?? '';
                                 @endphp
-                                <tr>
+                                <tr class="cursor-pointer hover:bg-[#faf8f5] transition-colors" onclick="showAppointmentDetails({{ $appointment->id }})">
                                     <td>
                                         <div class="font-semibold text-[#2c2420]">
                                             {{ \Carbon\Carbon::parse($appointment->appointment_date)->format('M j, Y') }}
@@ -623,36 +622,7 @@
                                         </span>
                                     </td>
                                     <td>
-                                        @if($appointment->status === 'referred' && $appointment->is_referred)
-                                            <div class="referral-info">
-                                                <div class="font-medium">
-                                                    <i class="fas fa-user-doctor"></i>
-                                                    {{ $appointment->referredCounselor->user->first_name }}
-                                                </div>
-                                                <div class="text-[#6b5e57] mt-0.5">
-                                                    <i class="fas fa-building-columns"></i>
-                                                    {{ Str::limit($appointment->referredCounselor->college->name ?? 'N/A', 15) }}
-                                                </div>
-                                                @if($appointment->referral_reason)
-                                                    <button type="button"
-                                                            onclick="showReferralReason(
-                                                                '{{ addslashes($appointment->referral_reason) }}',
-                                                                '{{ $appointment->originalCounselor->user->first_name }} {{ $appointment->originalCounselor->user->last_name }}',
-                                                                '{{ $appointment->referredCounselor->user->first_name }} {{ $appointment->referredCounselor->user->last_name }}',
-                                                                {{ $appointment->student->college_id != $appointment->referredCounselor->college_id ? 'true' : 'false' }}
-                                                            )"
-                                                            class="text-[#c9a227] hover:text-[#7a2a2a] mt-1 inline-flex items-center gap-1">
-                                                        <i class="fas fa-circle-info"></i>
-                                                        View reason
-                                                    </button>
-                                                @endif
-                                            </div>
-                                        @else
-                                            <span class="text-[#8b7e76] text-xs">—</span>
-                                        @endif
-                                    </td>
-                                    <td>
-                                        <div class="flex flex-wrap gap-1.5 action-buttons-mobile">
+                                        <div class="flex flex-wrap gap-1.5 action-buttons-mobile" onclick="event.stopPropagation()">
                                             @if(Auth::user()->role === 'student')
                                                 <button type="button"
                                                         class="action-btn info"
@@ -712,7 +682,87 @@
     </div>
 </div>
 
-{{-- Modal for Referral Reason --}}
+{{-- Appointment Details Modal --}}
+<div id="appointmentDetailsModal" class="modal-overlay hidden">
+    <div class="modal-container" style="max-width:540px;max-height:90vh;overflow-y:auto;">
+        <div class="modal-header">
+            <h3 class="modal-title"><i class="fas fa-calendar-check mr-1"></i>Appointment Details</h3>
+            <button onclick="closeAppointmentDetailsModal()" class="modal-close" aria-label="Close">
+                <i class="fas fa-xmark"></i>
+            </button>
+        </div>
+        <div class="modal-body" id="appointmentDetailsBody">
+            <div class="text-center py-8 text-[#8b7e76] text-sm">
+                <i class="fas fa-spinner fa-spin text-2xl mb-3"></i><br>Loading...
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button onclick="closeAppointmentDetailsModal()" class="btn-secondary px-4 py-2 text-xs">
+                <i class="fas fa-xmark"></i> Close
+            </button>
+        </div>
+    </div>
+</div>
+
+{{-- Appointment Details JS --}}
+<script>
+function showAppointmentDetails(id) {
+    const body = document.getElementById('appointmentDetailsBody');
+    body.innerHTML = '<div class="text-center py-8 text-[#8b7e76] text-sm"><i class="fas fa-spinner fa-spin text-2xl mb-3"></i><br>Loading...</div>';
+    document.getElementById('appointmentDetailsModal').classList.remove('hidden');
+
+    fetch(`/appointments/${id}/details`)
+        .then(r => { if (!r.ok) throw new Error(); return r.json(); })
+        .then(data => {
+            const a = data.appointment;
+            const c = data.counselor;
+
+            const field = (label, value) => value
+                ? `<div><label class="field-label">${label}</label><p class="mt-1 text-xs sm:text-sm text-[#2c2420] whitespace-pre-line">${value}</p></div>`
+                : '';
+
+            const statusColors = { pending:'pending', approved:'approved', completed:'approved', referred:'referred', cancelled:'cancelled', rejected:'rejected' };
+            const statusChip = `<span class="mt-1 inline-flex px-2 py-1 text-[10px] font-semibold rounded-full status-chip ${statusColors[a.status] || 'pending'}">${a.status_display}</span>`;
+
+            body.innerHTML = `<div class="space-y-4">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    ${field('Date', data.formatted_date)}
+                    ${field('Time', data.formatted_time)}
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    ${field('Type of Booking', a.booking_type)}
+                    ${field('Booking Category', a.booking_category ? a.booking_category.charAt(0).toUpperCase() + a.booking_category.slice(1).replace('-',' ') : '')}
+                </div>
+                ${field('Counselor', c.name + (c.position ? ' — ' + c.position : ''))}
+                ${a.referred_by ? field('Source of Referral (Referred)', a.referred_by) : ''}
+                ${field('Reason / Concern', a.concern)}
+                ${a.mood_rating ? field('Mood at Booking', a.mood_rating) : ''}
+                <div><label class="field-label">Status</label><div class="mt-1">${statusChip}</div></div>
+                ${a.cancellation_reason ? `
+                <div>
+                    <label class="field-label">Cancellation Reason</label>
+                    <p class="mt-1 text-xs italic" style="color:#b91c1c;background:rgba(239,68,68,0.06);border:1px solid rgba(239,68,68,0.2);border-radius:0.4rem;padding:0.4rem 0.6rem;">${a.cancellation_reason}</p>
+                </div>` : ''}
+                ${a.reschedule_reason ? `
+                <div>
+                    <label class="field-label">Reschedule Reason</label>
+                    <p class="mt-1 text-xs italic" style="color:#92400e;background:rgba(251,191,36,0.06);border:1px solid rgba(251,191,36,0.3);border-radius:0.4rem;padding:0.4rem 0.6rem;">${a.reschedule_reason}</p>
+                </div>` : ''}
+            </div>`;
+        })
+        .catch(() => {
+            body.innerHTML = '<div class="text-center py-8 text-red-500 text-sm"><i class="fas fa-exclamation-triangle text-2xl mb-3"></i><br>Failed to load details. Please try again.</div>';
+        });
+}
+
+function closeAppointmentDetailsModal() {
+    document.getElementById('appointmentDetailsModal').classList.add('hidden');
+}
+
+document.addEventListener('click', function(e) {
+    if (e.target.id === 'appointmentDetailsModal') closeAppointmentDetailsModal();
+});
+</script>
 <div id="referralReasonModal" class="modal-overlay hidden">
     <div class="modal-container">
         <div class="modal-header">
@@ -876,9 +926,9 @@ document.addEventListener('keydown', function(e) {
     if (e.key === 'Escape') {
         closeReferralReasonModal();
         closeCounselorInfoModal();
+        closeAppointmentDetailsModal();
     }
-});
-</script>
+});</script>
 
 <!-- Cancellation/Rejection Reason Modal -->
 <div id="reasonModal" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.45);align-items:center;justify-content:center;">

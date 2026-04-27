@@ -19,9 +19,13 @@ class AppointmentBookedNotification extends Notification
 
     public function toArray(object $notifiable): array
     {
+        $suffix = $this->appointment->is_appointment_high_risk
+            ? ' ⚠ High-risk: ' . $this->appointment->appointment_high_risk_notes
+            : '';
+
         return [
             'title'          => 'New Appointment Booking',
-            'message'        => 'A student has booked an appointment. Case #' . $this->appointment->case_number,
+            'message'        => 'A student has booked an appointment. Case #' . $this->appointment->case_number . $suffix,
             'appointment_id' => $this->appointment->id,
             'case_number'    => $this->appointment->case_number,
             'type'           => 'appointment_booked',

@@ -12,6 +12,10 @@ use App\Models\EventRegistration;
 use Illuminate\Support\Facades\Log;
 use App\Services\GoogleCalendarService;
 use App\Models\Counselor;
+use App\Models\Appointment;
+use App\Mail\EventScheduleConflict;
+use App\Notifications\EventScheduleConflictNotification;
+use Illuminate\Support\Facades\Mail;
 use Carbon\Carbon;
 class EventController extends Controller
 {
@@ -183,6 +187,7 @@ public function updateRegistrationStatus(Request $request, Event $event, EventRe
         if (!empty($counselorIds)) {
             $event->assignedCounselors()->sync($counselorIds);
             app(GoogleCalendarService::class)->syncEventToCounselors($event, $counselorIds);
+            $this->notifyCounselorsOfEventConflicts($event, $counselorIds);
         }
 
         return redirect()->route('counselor.events.index')
@@ -256,6 +261,7 @@ public function updateRegistrationStatus(Request $request, Event $event, EventRe
         // Re-sync all assigned counselors' calendar entries with updated event data
         if (!empty($newCounselorIds)) {
             app(GoogleCalendarService::class)->syncEventToCounselors($event, $newCounselorIds);
+            $this->notifyCounselorsOfEventConflicts($event, $newCounselorIds);
         }
 
         // Sync the event creator's own Google Calendar entry
@@ -626,6 +632,68 @@ public function updateRegistrationStatus(Request $request, Event $event, EventRe
                 'event_id' => $event->id,
                 'error'    => $e->getMessage(),
             ]);
+        }
+    }
+
+    /**
+     * Check for schedule conflicts and notify counselors
+     */
+    private function notifyCounselorsOfEventConflicts(Event $event, array $counselorIds): void
+    {
+        $timezone = config('app.timezone', 'UTC');
+
+        // Build all event days
+        $eventDays = [];
+        $current = $event->event_start_date->copy();
+        while ($current->lte($event->event_end_date)) {
+            $eventDays[] = $current->format('Y-m-d');
+            $current->addDay();
+        }
+
+        $eventStartTime = Carbon::parse($event->start_time, $timezone);
+        $eventEndTime = Carbon::parse($event->end_time, $timezone);
+
+        $counselors = Counselor::with('user')->whereIn('id', $counselorIds)->get();
+
+        foreach ($counselors as $counselor) {
+            try {
+                // Get all counselor assignment IDs (same user might have multiple counselor records)
+                $counselorAssignmentIds = Counselor::where('user_id', $counselor->user_id)->pluck('id')->toArray();
+
+                // Find appointments that overlap with the event
+                $conflictingAppointments = Appointment::with(['student.user'])
+                    ->whereIn('counselor_id', $counselorAssignmentIds)
+                    ->whereIn('appointment_date', $eventDays)
+                    ->whereIn('status', ['pending', 'approved', 'completed', 'rescheduled', 'reschedule_rejected'])
+                    ->get()
+                    ->filter(function ($appointment) use ($eventStartTime, $eventEndTime, $timezone) {
+                        $apptStart = Carbon::parse($appointment->start_time, $timezone);
+                        $apptEnd = Carbon::parse($appointment->end_time, $timezone);
+
+                        // Check if time ranges overlap
+                        return $apptStart->lt($eventEndTime) && $apptEnd->gt($eventStartTime);
+                    });
+
+                if ($conflictingAppointments->isEmpty()) {
+                    continue;
+                }
+
+                // Send email notification
+                Mail::to($counselor->user->email)->send(
+                    new EventScheduleConflict($event, $counselor, $conflictingAppointments)
+                );
+
+                // Send in-app notification
+                $counselor->user->notify(
+                    new EventScheduleConflictNotification($event, $conflictingAppointments->count())
+                );
+            } catch (\Throwable $e) {
+                Log::warning('Failed to send event conflict notification', [
+                    'event_id' => $event->id,
+                    'counselor_id' => $counselor->id,
+                    'error' => $e->getMessage(),
+                ]);
+            }
         }
     }
 }

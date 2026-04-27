@@ -39,6 +39,10 @@ class Appointment extends Model
         'booking_type',
         'booking_category',
         'concern',
+        'mood_rating',
+        'is_appointment_high_risk',
+        'appointment_high_risk_notes',
+        'appointment_high_risk_counselor_flagged',
         'status',
         'notes',
         'referred_by',
@@ -66,6 +70,8 @@ class Appointment extends Model
         'reschedule_requested_at' => 'datetime',
         'referral_requested_at' => 'datetime',
         'referral_resolved_at' => 'datetime',
+        'is_appointment_high_risk' => 'boolean',
+        'appointment_high_risk_counselor_flagged' => 'boolean',
     ];
 
     // Add this method to get all valid statuses
