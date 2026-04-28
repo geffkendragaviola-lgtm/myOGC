@@ -1,181 +1,213 @@
 @extends('layouts.app')
 @section('title', 'Analytics')
-@push('styles')
-<style>
-.an-card{background:#fff;border:1px solid var(--border-soft);border-radius:1rem;box-shadow:0 4px 18px rgba(44,36,32,0.07);padding:1.5rem;}
-.stat-card{background:#fff;border:1px solid var(--border-soft);border-radius:1rem;box-shadow:0 4px 18px rgba(44,36,32,0.07);padding:1.2rem 1.4rem;display:flex;align-items:center;gap:1rem;}
-.stat-icon{width:2.9rem;height:2.9rem;border-radius:0.75rem;display:flex;align-items:center;justify-content:center;font-size:1.1rem;flex-shrink:0;}
-.si-maroon{background:linear-gradient(135deg,#7a2a2a,#5c1a1a);color:#fff;}
-.si-gold{background:linear-gradient(135deg,#d4af37,#c9a227);color:#3a0c0c;}
-.si-green{background:linear-gradient(135deg,#2d7a4f,#1e5c38);color:#fff;}
-.si-blue{background:linear-gradient(135deg,#2a5a7a,#1a3c5c);color:#fff;}
-.si-purple{background:linear-gradient(135deg,#6d28d9,#4c1d95);color:#fff;}
-.si-red{background:linear-gradient(135deg,#b91c1c,#991b1b);color:#fff;}
-.stat-value{font-size:1.5rem;font-weight:800;color:var(--text-primary);line-height:1;}
-.stat-label{font-size:0.78rem;color:var(--text-secondary);margin-top:0.2rem;}
-.sec-title{font-size:0.95rem;font-weight:700;color:var(--text-primary);margin-bottom:1rem;display:flex;align-items:center;gap:0.5rem;}
-.sec-title i{color:var(--maroon-soft);}
-.filter-bar{background:#fff;border:1px solid var(--border-soft);border-radius:1rem;padding:1rem 1.25rem;box-shadow:0 2px 10px rgba(44,36,32,0.05);}
-.filter-bar select,.filter-bar input[type=date]{border:1px solid var(--border-soft);border-radius:0.5rem;padding:0.45rem 0.75rem;font-size:0.875rem;color:var(--text-primary);background:var(--bg-warm);outline:none;transition:border-color 0.2s;}
-.filter-bar select:focus,.filter-bar input[type=date]:focus{border-color:var(--maroon-soft);}
-.btn-maroon{background:linear-gradient(135deg,var(--maroon-soft),var(--maroon-medium));color:#fff;border:none;border-radius:0.5rem;padding:0.5rem 1.1rem;font-size:0.875rem;font-weight:600;cursor:pointer;transition:opacity 0.2s;}
-.btn-maroon:hover{opacity:0.88;}
-.btn-outline{background:transparent;color:var(--maroon-soft);border:1.5px solid var(--maroon-soft);border-radius:0.5rem;padding:0.45rem 1rem;font-size:0.875rem;font-weight:600;cursor:pointer;transition:all 0.2s;text-decoration:none;display:inline-flex;align-items:center;gap:0.4rem;}
-.btn-outline:hover{background:var(--maroon-soft);color:#fff;}
-.college-tabs{display:flex;flex-wrap:wrap;gap:0.5rem;border-bottom:2px solid var(--border-soft);padding-bottom:0;margin-bottom:0;}
-.college-tab-btn{position:relative;display:inline-flex;align-items:center;gap:0.5rem;padding:0.65rem 1.25rem;font-size:0.875rem;font-weight:600;color:var(--text-secondary);background:transparent;border:none;border-bottom:3px solid transparent;margin-bottom:-2px;cursor:pointer;border-radius:0.5rem 0.5rem 0 0;transition:all 0.2s ease;white-space:nowrap;}
-.college-tab-btn:hover{color:var(--maroon-soft);background:rgba(122,42,42,0.04);}
-.college-tab-btn.active{color:var(--maroon-soft);border-bottom-color:var(--maroon-soft);background:rgba(122,42,42,0.05);}
-.college-tab-btn .tab-dot{width:0.5rem;height:0.5rem;border-radius:999px;background:var(--gold-primary);flex-shrink:0;}
-.college-tab-pane{display:none;}
-.college-tab-pane.active{display:block;}
-.empty-state{text-align:center;padding:2.5rem 1rem;color:var(--text-muted);font-size:0.9rem;}
-.empty-state i{font-size:2.2rem;margin-bottom:0.6rem;opacity:0.3;display:block;}
-.reach-card{background:linear-gradient(135deg,rgba(122,42,42,0.04),rgba(212,175,55,0.06));border:1px solid var(--border-soft);border-radius:1rem;padding:1.25rem 1.5rem;}
-.reach-ratio{font-size:1.6rem;font-weight:800;color:var(--maroon-soft);line-height:1;}
-.reach-sub{font-size:0.75rem;color:var(--text-secondary);margin-top:0.2rem;}
-.reach-bar-track{height:0.6rem;background:var(--border-soft);border-radius:999px;overflow:hidden;margin-top:0.6rem;}
-.reach-bar-fill{height:100%;border-radius:999px;}
-.rate-pill{display:inline-flex;align-items:center;gap:0.35rem;padding:0.25rem 0.65rem;border-radius:999px;font-size:0.75rem;font-weight:700;}
-.rate-good{background:rgba(45,122,79,0.12);color:#1e5c38;}
-.rate-warn{background:rgba(234,88,12,0.12);color:#c2410c;}
-.rate-bad{background:rgba(185,28,28,0.12);color:#991b1b;}
-@media print{
-    * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; color-adjust: exact !important; box-sizing: border-box; }
-
-    @page { size: A4 portrait; margin: 1.8cm 1.5cm 2.2cm 1.5cm; }
-    @page { @bottom-left { content: "MSU-IIT OGC — Confidential"; font-size: 7.5pt; color: #8b7e76; font-family: 'Segoe UI', sans-serif; } @bottom-right { content: "Page " counter(page) " of " counter(pages); font-size: 7.5pt; color: #8b7e76; font-family: 'Segoe UI', sans-serif; } }
-
-    body { background: #fff !important; font-size: 9.5pt; color: #1a1a1a; font-family: 'Segoe UI', Arial, sans-serif; line-height: 1.4; }
-
-    .no-print { display: none !important; }
-    .print-only { display: block !important; }
-    .ogc-navbar, #ogcSidebar { display: none !important; }
-    #ogcMainContent { margin-left: 0 !important; padding-top: 0 !important; }
-    .p-6 { padding: 0 !important; }
-
-    /* ── Report header ── */
-    .print-header {
-        display: block !important;
-        margin-bottom: 1.2rem;
-        padding-bottom: 0.8rem;
-        border-bottom: 2.5pt solid #7a2a2a;
-    }
-    .print-header h1 { font-size: 15pt; font-weight: 800; color: #3a0c0c; margin: 0; letter-spacing: -0.02em; }
-    .print-header .ph-subtitle { font-size: 9pt; color: #7a2a2a; font-weight: 600; margin: 0.15rem 0 0; text-transform: uppercase; letter-spacing: 0.06em; }
-    .print-header .report-meta {
-        display: flex;
-        justify-content: space-between;
-        align-items: flex-start;
-        margin-top: 0.5rem;
-        padding-top: 0.4rem;
-        border-top: 0.5pt solid #d4c4bc;
-        font-size: 8pt;
-        color: #6b5e57;
-    }
-    .print-header .report-meta strong { color: #3a0c0c; }
-
-    /* ── Section titles ── */
-    .sec-title {
-        font-size: 9pt !important;
-        font-weight: 700 !important;
-        color: #3a0c0c !important;
-        text-transform: uppercase;
-        letter-spacing: 0.07em;
-        border-bottom: 1pt solid #c9a227 !important;
-        padding-bottom: 0.25rem !important;
-        margin-bottom: 0.6rem !important;
-        display: block !important;
-    }
-    .sec-title i { display: none; }
-
-    /* ── Cards ── */
-    .an-card, .stat-card, .reach-card {
-        box-shadow: none !important;
-        border: 0.5pt solid #d4c4bc !important;
-        border-radius: 0 !important;
-        break-inside: avoid;
-        page-break-inside: avoid;
-        margin-bottom: 0.5rem;
-        background: #fff !important;
-    }
-    .an-card { padding: 0.7rem 0.8rem !important; }
-    .stat-card { padding: 0.45rem 0.6rem !important; gap: 0.4rem !important; }
-    .reach-card { padding: 0.6rem 0.8rem !important; background: #faf8f5 !important; }
-    .stat-value { font-size: 12pt !important; font-weight: 700; }
-    .stat-label { font-size: 7pt !important; }
-    .stat-icon { width: 1.6rem !important; height: 1.6rem !important; font-size: 0.65rem !important; border-radius: 0.25rem !important; }
-    .reach-ratio { font-size: 13pt !important; }
-    .reach-sub { font-size: 7pt !important; }
-    .reach-bar-track { height: 0.35rem !important; margin-top: 0.3rem !important; }
-    .rate-pill { font-size: 6.5pt !important; padding: 0.1rem 0.35rem !important; border: 0.5pt solid currentColor; }
-
-    /* ── College tabs — show all panes ── */
-    .college-tabs { display: none !important; }
-    .college-tab-pane { display: block !important; page-break-before: always; }
-    .college-tab-pane:first-of-type { page-break-before: avoid; }
-
-    /* ── College section divider ── */
-    .print-college-header {
-        display: block !important;
-        border-left: 3pt solid #7a2a2a;
-        padding-left: 0.6rem;
-        margin-bottom: 0.7rem;
-    }
-    .print-college-header h2 { font-size: 12pt; font-weight: 800; color: #3a0c0c; margin: 0; }
-    .print-college-header span { font-size: 8pt; color: #6b5e57; }
-
-    /* ── Grids ── */
-    .grid { display: grid !important; }
-    .grid-cols-2, .lg\:grid-cols-3, .xl\:grid-cols-6 { grid-template-columns: repeat(3, 1fr) !important; gap: 0.35rem !important; }
-    .md\:grid-cols-3 { grid-template-columns: repeat(3, 1fr) !important; gap: 0.4rem !important; }
-    .md\:grid-cols-2, .lg\:grid-cols-2 { grid-template-columns: repeat(2, 1fr) !important; gap: 0.4rem !important; }
-    .lg\:grid-cols-2.gap-5 { gap: 0.4rem !important; }
-
-    /* ── Charts ── */
-    canvas { max-width: 100% !important; height: auto !important; page-break-inside: avoid; }
-    [style*="height:240px"], [style*="height:260px"], [style*="height:200px"] { height: 160px !important; }
-
-    /* ── Print summary table ── */
-    .print-stat-table { display: table !important; width: 100%; border-collapse: collapse; font-size: 8pt; margin-bottom: 0.5rem; }
-    .print-stat-table th { background: #f5f0eb !important; color: #3a0c0c; font-weight: 700; padding: 0.3rem 0.5rem; border: 0.5pt solid #d4c4bc; font-size: 7.5pt; text-transform: uppercase; letter-spacing: 0.04em; }
-    .print-stat-table td { padding: 0.28rem 0.5rem; border: 0.5pt solid #e5e0db; }
-    .print-stat-table tr:nth-child(even) td { background: #faf8f5 !important; }
-    .print-stat-table .val { font-weight: 700; color: #3a0c0c; text-align: right; }
-    .print-stat-table .pct { color: #6b5e57; text-align: right; }
-
-    /* ── Booking type table ── */
-    table { font-size: 7.5pt !important; page-break-inside: avoid; }
-    table th { background: #f5f0eb !important; font-weight: 700; }
-
-    /* ── Signature ── */
-    .print-signature {
-        display: block !important;
-        margin-top: 1.5rem !important;
-        padding-top: 0.8rem;
-        border-top: 0.5pt solid #d4c4bc;
-        page-break-inside: avoid;
-    }
-    .print-sig-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1.5rem; }
-    .print-sig-item { font-size: 8pt; color: #6b5e57; }
-    .print-sig-line { border-top: 0.75pt solid #3a0c0c; margin-top: 1.6rem; padding-top: 0.3rem; }
-    .print-sig-name { font-weight: 700; color: #1a1a1a; font-size: 8.5pt; }
-    .print-sig-role { color: #6b5e57; font-size: 7.5pt; }
-
-    a { color: inherit !important; text-decoration: none !important; }
-    .mb-5 { margin-bottom: 0.5rem !important; }
-    .space-y-5 > * + * { margin-top: 0.5rem !important; }
-    .space-y-6 > * + * { margin-top: 0.5rem !important; }
-}
-.print-header{display:none;}
-.print-only{display:none;}
-.print-signature{display:none;}
-.print-stat-table{display:none;}
-.print-college-header{display:none;}
-</style>
-@endpush
 @section('content')
-<div class="p-6 space-y-6">
+<style>
+    :root {
+        --maroon-900: #3a0c0c; --maroon-800: #5c1a1a; --maroon-700: #7a2a2a;
+        --gold-500: #c9a227; --gold-400: #d4af37;
+        --bg-warm: #faf8f5; --border-soft: #e5e0db;
+        --text-primary: #2c2420; --text-secondary: #6b5e57; --text-muted: #8b7e76;
+    }
+    .an-shell { position:relative; overflow:hidden; background:var(--bg-warm); min-height:100vh; padding-bottom:2rem; }
+    .an-glow { position:absolute; border-radius:50%; filter:blur(80px); pointer-events:none; opacity:0.25; }
+    .an-glow.one { top:-30px; left:-40px; width:200px; height:200px; background:var(--gold-400); }
+    .an-glow.two { bottom:-30px; right:-60px; width:220px; height:220px; background:var(--maroon-800); }
+
+    .hero-card, .panel-card, .glass-card, .an-card, .filter-bar {
+        position:relative; overflow:hidden; border-radius:0.75rem;
+        border:1px solid var(--border-soft); background:rgba(255,255,255,0.95);
+        backdrop-filter:blur(8px); box-shadow:0 2px 8px rgba(44,36,32,0.04);
+        transition:box-shadow 0.2s ease;
+    }
+    .hero-card:hover, .panel-card:hover, .an-card:hover { box-shadow:0 4px 14px rgba(44,36,32,0.06); }
+    .hero-card::before, .panel-card::before, .an-card::before, .filter-bar::before {
+        content:""; position:absolute; inset:0; pointer-events:none;
+        background:radial-gradient(circle at top right, rgba(212,175,55,0.06), transparent 30%);
+    }
+    .hero-icon {
+        display:flex; align-items:center; justify-content:center; flex-shrink:0;
+        width:2.75rem; height:2.75rem; border-radius:0.75rem; color:#fef9e7;
+        background:linear-gradient(135deg, var(--maroon-800) 0%, var(--maroon-700) 100%);
+        box-shadow:0 4px 12px rgba(92,26,26,0.15);
+    }
+    .hero-badge {
+        display:inline-flex; align-items:center; gap:0.4rem; border-radius:999px;
+        border:1px solid rgba(212,175,55,0.3); background:rgba(254,249,231,0.8);
+        padding:0.2rem 0.55rem; font-size:9px; font-weight:700; text-transform:uppercase;
+        letter-spacing:0.16em; color:var(--maroon-700);
+    }
+    .hero-badge-dot { width:0.3rem; height:0.3rem; border-radius:999px; background:var(--gold-400); }
+    .panel-topline { position:absolute; inset-inline:0; top:0; height:3px; background:linear-gradient(90deg, var(--maroon-800) 0%, var(--gold-400) 50%, var(--maroon-800) 100%); }
+    .an-card { padding:1.25rem; }
+
+    .stat-card {
+        position:relative; overflow:hidden; border-radius:0.75rem;
+        border:1px solid var(--border-soft); background:rgba(255,255,255,0.95);
+        backdrop-filter:blur(8px); box-shadow:0 2px 8px rgba(44,36,32,0.04);
+        padding:1rem 1.1rem; display:flex; align-items:center; gap:0.85rem; transition:box-shadow 0.2s ease;
+    }
+    .stat-card:hover { box-shadow:0 4px 14px rgba(44,36,32,0.06); }
+    .stat-card::before { content:""; position:absolute; inset:0; pointer-events:none; background:radial-gradient(circle at top right, rgba(212,175,55,0.06), transparent 30%); }
+    .stat-icon { width:2.5rem; height:2.5rem; border-radius:0.65rem; display:flex; align-items:center; justify-content:center; font-size:1rem; flex-shrink:0; }
+    .si-maroon { background:linear-gradient(135deg,var(--maroon-700),var(--maroon-800)); color:#fff; }
+    .si-gold { background:linear-gradient(135deg,var(--gold-400),var(--gold-500)); color:var(--maroon-900); }
+    .si-green { background:linear-gradient(135deg,#2d7a4f,#1e5c38); color:#fff; }
+    .si-blue { background:linear-gradient(135deg,#2a5a7a,#1a3c5c); color:#fff; }
+    .si-purple { background:linear-gradient(135deg,#6d28d9,#4c1d95); color:#fff; }
+    .si-red { background:linear-gradient(135deg,#b91c1c,#991b1b); color:#fff; }
+    .stat-value { font-size:1.4rem; font-weight:800; color:var(--text-primary); line-height:1; }
+    .stat-label { font-size:0.72rem; color:var(--text-secondary); margin-top:0.2rem; }
+
+    .sec-title {
+        font-size:0.8rem; font-weight:700; color:var(--text-primary);
+        margin-bottom:1rem; display:flex; align-items:center; gap:0.5rem;
+        text-transform:uppercase; letter-spacing:0.06em;
+        padding-bottom:0.5rem; border-bottom:2px solid rgba(212,175,55,0.3);
+    }
+    .sec-title i { color:var(--maroon-700); font-size:0.75rem; }
+
+    .filter-bar { padding:1rem 1.25rem; }
+    .filter-bar select, .filter-bar input[type=date] {
+        border:1px solid var(--border-soft); border-radius:0.6rem;
+        padding:0.5rem 0.75rem; font-size:0.8rem; color:var(--text-primary);
+        background:rgba(255,255,255,0.9); outline:none; transition:border-color 0.2s;
+    }
+    .filter-bar select:focus, .filter-bar input[type=date]:focus { border-color:var(--maroon-700); box-shadow:0 0 0 3px rgba(92,26,26,0.08); }
+
+    .btn-maroon {
+        background:linear-gradient(135deg, var(--maroon-800), var(--maroon-700));
+        color:#fef9e7; border:none; border-radius:0.6rem; padding:0.55rem 1rem;
+        font-size:0.8rem; font-weight:600; cursor:pointer; transition:all 0.2s ease;
+        display:inline-flex; align-items:center; gap:0.4rem;
+        box-shadow:0 4px 10px rgba(92,26,26,0.15);
+    }
+    .btn-maroon:hover { transform:translateY(-1px); box-shadow:0 6px 14px rgba(92,26,26,0.2); }
+    .btn-outline {
+        background:rgba(255,255,255,0.95); color:var(--text-secondary);
+        border:1px solid var(--border-soft); border-radius:0.6rem; padding:0.5rem 1rem;
+        font-size:0.8rem; font-weight:600; cursor:pointer; transition:all 0.2s ease;
+        text-decoration:none; display:inline-flex; align-items:center; gap:0.4rem;
+    }
+    .btn-outline:hover { background:rgba(254,249,231,0.7); border-color:var(--maroon-700); color:var(--maroon-700); }
+
+    .college-tabs { display:flex; flex-wrap:wrap; gap:0.5rem; border-bottom:2px solid var(--border-soft); padding-bottom:0; margin-bottom:0; }
+    .college-tab-btn {
+        position:relative; display:inline-flex; align-items:center; gap:0.5rem;
+        padding:0.65rem 1.1rem; font-size:0.8rem; font-weight:600;
+        color:var(--text-secondary); background:transparent; border:none;
+        border-bottom:3px solid transparent; margin-bottom:-2px;
+        cursor:pointer; border-radius:0.5rem 0.5rem 0 0; transition:all 0.2s ease; white-space:nowrap;
+    }
+    .college-tab-btn:hover { color:var(--maroon-700); background:rgba(122,42,42,0.04); }
+    .college-tab-btn.active { color:var(--maroon-700); border-bottom-color:var(--maroon-700); background:rgba(122,42,42,0.05); }
+    .college-tab-btn .tab-dot { width:0.4rem; height:0.4rem; border-radius:999px; background:var(--gold-400); flex-shrink:0; }
+    .college-tab-pane { display:none; }
+    .college-tab-pane.active { display:block; }
+
+    .empty-state { text-align:center; padding:2.5rem 1rem; color:var(--text-muted); font-size:0.85rem; }
+    .empty-state i { font-size:2rem; margin-bottom:0.6rem; opacity:0.3; display:block; }
+
+    .reach-card {
+        position:relative; overflow:hidden; border-radius:0.75rem;
+        background:linear-gradient(135deg,rgba(122,42,42,0.04),rgba(212,175,55,0.06));
+        border:1px solid var(--border-soft); padding:1.1rem 1.25rem;
+    }
+    .reach-ratio { font-size:1.5rem; font-weight:800; color:var(--maroon-700); line-height:1; }
+    .reach-sub { font-size:0.72rem; color:var(--text-secondary); margin-top:0.2rem; }
+    .reach-bar-track { height:0.5rem; background:var(--border-soft); border-radius:999px; overflow:hidden; margin-top:0.5rem; }
+    .reach-bar-fill { height:100%; border-radius:999px; }
+    .rate-pill { display:inline-flex; align-items:center; gap:0.35rem; padding:0.2rem 0.55rem; border-radius:999px; font-size:0.72rem; font-weight:700; }
+    .rate-good { background:rgba(45,122,79,0.12); color:#1e5c38; }
+    .rate-warn { background:rgba(234,88,12,0.12); color:#c2410c; }
+    .rate-bad { background:rgba(185,28,28,0.12); color:#991b1b; }
+
+    @media print {
+        * { -webkit-print-color-adjust:exact !important; print-color-adjust:exact !important; box-sizing:border-box; }
+        @page { size:A4 landscape; margin:2cm 1.6cm 2.2cm 1.6cm; }
+        html, body { height:auto !important; min-height:0 !important; }
+        body { background:#fff !important; font-size:8.5pt; color:#1a1a1a; font-family:'Segoe UI',Arial,sans-serif; line-height:1.35; width:100%; margin:0 !important; padding:0 !important; }
+        .no-print { display:none !important; }
+        .ogc-navbar, #ogcSidebar { display:none !important; }
+        #ogcMainContent { margin-left:0 !important; padding-top:0 !important; width:100% !important; }
+        .an-shell { padding:0 !important; min-height:auto !important; }
+        .an-glow { display:none !important; }
+        .relative.max-w-7xl, .relative.max-w-4xl { max-width:none !important; width:100% !important; padding-left:0.6cm !important; padding-right:0.6cm !important; padding-top:0.5cm !important; padding-bottom:1cm !important; }
+        .print-header { display:block !important; margin-bottom:0.5rem; padding-bottom:0.35rem; border-bottom:1.25pt solid #7a2a2a; }
+        .print-header h1 { font-size:11pt; font-weight:800; color:#3a0c0c; margin:0; }
+        .print-header .ph-subtitle { font-size:7.5pt; color:#7a2a2a; font-weight:600; margin:0.05rem 0 0; text-transform:uppercase; }
+        .print-header .report-meta { display:flex; justify-content:space-between; margin-top:0.25rem; padding-top:0.2rem; border-top:0.5pt solid #d4c4bc; font-size:7.25pt; color:#6b5e57; }
+        .sec-title { font-size:8pt !important; font-weight:700 !important; color:#3a0c0c !important; text-transform:uppercase; border-bottom:1pt solid #c9a227 !important; padding-bottom:0.2rem !important; margin-bottom:0.5rem !important; display:block !important; }
+        .sec-title i { display:none; }
+        .an-card, .stat-card, .reach-card { box-shadow:none !important; border:0.5pt solid #d4c4bc !important; border-radius:0 !important; margin-bottom:0.4rem; background:#fff !important; }
+        .an-card, .reach-card { break-inside:avoid; page-break-inside:avoid; }
+        .stat-card { break-inside:auto; page-break-inside:auto; }
+        .an-card { padding:0.55rem 0.7rem !important; }
+        .stat-card { padding:0.35rem 0.5rem !important; gap:0.35rem !important; }
+        .reach-card { padding:0.5rem 0.65rem !important; background:#faf8f5 !important; }
+        .stat-value { font-size:11pt !important; } .stat-label { font-size:6.5pt !important; }
+        .stat-icon { width:1.4rem !important; height:1.4rem !important; font-size:0.6rem !important; border-radius:0.2rem !important; }
+        .college-tabs { display:none !important; }
+        .college-tab-pane { display:block !important; break-inside:auto; page-break-inside:auto; }
+        .college-tab-pane + .college-tab-pane { page-break-before:always; break-before:page; }
+        .print-college-header { display:block !important; border-left:3pt solid #7a2a2a; padding-left:0.5rem; margin-bottom:0.6rem; }
+        .print-college-header h2 { font-size:11pt; font-weight:800; color:#3a0c0c; margin:0; }
+        .grid { display:grid !important; }
+        .xl\:grid-cols-6 { grid-template-columns:repeat(3,1fr) !important; gap:0.35rem !important; }
+        .md\:grid-cols-3 { grid-template-columns:repeat(3,1fr) !important; gap:0.35rem !important; }
+        .md\:grid-cols-2, .lg\:grid-cols-2 { grid-template-columns:repeat(2,1fr) !important; gap:0.35rem !important; }
+        .md\:grid-cols-4 { grid-template-columns:repeat(4,1fr) !important; gap:0.3rem !important; }
+        canvas { max-width:100% !important; height:auto !important; page-break-inside:avoid; break-inside:avoid; }
+        canvas, canvas * { page-break-inside:avoid !important; break-inside:avoid !important; }
+        div[style*="position:relative"][style*="height:"] { page-break-inside:avoid; break-inside:avoid; }
+        [style*="height:240px"], [style*="height:260px"] { height:170px !important; }
+        [style*="height:200px"] { height:150px !important; }
+        .print-stat-table { display:table !important; width:100%; border-collapse:collapse; font-size:7.5pt; }
+        .print-stat-table th { background:#f5f0eb !important; color:#3a0c0c; font-weight:700; padding:0.25rem 0.45rem; border:0.5pt solid #d4c4bc; font-size:7pt; text-transform:uppercase; }
+        .print-stat-table td { padding:0.22rem 0.45rem; border:0.5pt solid #e5e0db; }
+        .print-stat-table tr:nth-child(even) td { background:#faf8f5 !important; }
+        .print-stat-table .val { font-weight:700; color:#3a0c0c; text-align:right; }
+        table { font-size:7pt !important; page-break-inside:avoid; width:100% !important; }
+        table th { background:#f5f0eb !important; font-weight:700; }
+        table td, table th { padding:0.22rem 0.4rem !important; }
+        th, td { vertical-align:top; }
+        .print-signature { display:block !important; margin-top:1.2rem !important; margin-bottom:0.8cm !important; padding-top:0.6rem; border-top:0.5pt solid #d4c4bc; page-break-inside:avoid; }
+        .print-sig-grid { display:grid; grid-template-columns:1fr 1fr 1fr; gap:2rem; }
+        .print-sig-item { font-size:7.5pt; color:#6b5e57; }
+        .print-sig-line { border-top:0.75pt solid #3a0c0c; margin-top:1.4rem; padding-top:0.25rem; }
+        .print-sig-name { font-weight:700; color:#1a1a1a; font-size:8pt; }
+        .print-sig-role { color:#6b5e57; font-size:7pt; }
+        a { color:inherit !important; text-decoration:none !important; }
+        .mb-5 { margin-bottom:0.4rem !important; }
+        .space-y-5 > * + * { margin-top:0.4rem !important; }
+        .gap-3 { gap:0.3rem !important; } .gap-4, .gap-5 { gap:0.35rem !important; }
+        .p-5 { padding:0.5rem !important; }
+    }
+    .print-header { display:none; }
+    .print-only { display:none; }
+    .print-signature { display:none; }
+    .print-stat-table { display:none; }
+    .print-college-header { display:none; }
+
+    /* Scope overrides to beat layout specificity (#ogcMainContent .class = 110 vs .class = 10) */
+    #ogcMainContent .hero-card,
+    #ogcMainContent .panel-card,
+    #ogcMainContent .glass-card,
+    #ogcMainContent .an-card,
+    #ogcMainContent .filter-bar {
+        border-radius: 0.75rem !important;
+        box-shadow: 0 2px 8px rgba(44,36,32,0.04) !important;
+    }
+    #ogcMainContent .stat-card { border-radius: 0.75rem !important; box-shadow: 0 2px 8px rgba(44,36,32,0.04) !important; }
+    #ogcMainContent .reach-card { border-radius: 0.75rem !important; }
+    #ogcMainContent .hero-icon { width: 2.75rem !important; height: 2.75rem !important; border-radius: 0.75rem !important; box-shadow: 0 4px 12px rgba(92,26,26,0.15) !important; }
+    #ogcMainContent .btn-maroon, #ogcMainContent .btn-outline { border-radius: 0.6rem !important; font-size: 0.8rem !important; padding: 0.55rem 1rem !important; }
+    #ogcMainContent .filter-bar select, #ogcMainContent .filter-bar input[type=date] { border-radius: 0.6rem !important; font-size: 0.8rem !important; padding: 0.5rem 0.75rem !important; }
+</style>
+<div class="min-h-screen an-shell">
+    <div class="an-glow one"></div>
+    <div class="an-glow two"></div>
+
+    <div class="relative max-w-7xl mx-auto px-4 sm:px-6 py-5 md:py-8 space-y-5">
 
     <div class="print-header mb-4">
         <h1>MSU-IIT Office of Guidance and Counseling</h1>
@@ -192,16 +224,26 @@
         </div>
     </div>
 
-    <div class="flex flex-wrap items-start justify-between gap-3 no-print">
-        <div>
-            <h1 class="text-xl font-bold" style="color:var(--text-primary)">
-                <i class="fas fa-chart-column mr-2" style="color:var(--maroon-soft)"></i>Analytics
-            </h1>
-            <p class="text-sm" style="color:var(--text-secondary)">Per-college counseling insights</p>
+    <!-- Page Header -->
+    <div class="hero-card no-print">
+        <div class="relative p-4 sm:p-5 flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
+            <div class="flex items-start gap-3">
+                <div class="hero-icon">
+                    <i class="fas fa-chart-column text-base sm:text-lg"></i>
+                </div>
+                <div class="min-w-0">
+                    <div class="hero-badge"><span class="hero-badge-dot"></span>Counselor Portal</div>
+                    <h1 class="text-lg sm:text-xl lg:text-2xl font-semibold tracking-tight text-[#2c2420] mt-2">Analytics</h1>
+                    <p class="text-[#6b5e57] text-xs sm:text-sm mt-1.5">Per-college counseling insights</p>
+                </div>
+            </div>
+            <button onclick="window.print()" class="btn-outline self-start">
+                <i class="fas fa-print"></i> Print Report
+            </button>
         </div>
-        <button onclick="window.print()" class="btn-outline no-print"><i class="fas fa-print"></i> Print Report</button>
     </div>
 
+    <!-- Filter Bar -->
     <div class="filter-bar no-print">
         <form method="GET" action="{{ route('counselor.analytics') }}" class="flex flex-wrap gap-3 items-end">
             <div>
@@ -408,7 +450,7 @@
                         <div class="reach-bar-track" style="flex:1;">
                             <div class="reach-bar-fill" style="width:{{ ($count/$rbMax)*100 }}%;background:#7a2a2a;"></div>
                         </div>
-                        <span style="font-size:0.78rem;font-weight:700;color:var(--maroon-soft);min-width:1.5rem;text-align:right;">{{ $count }}</span>
+                        <span style="font-size:0.78rem;font-weight:700;color:var(--maroon-700);min-width:1.5rem;text-align:right;">{{ $count }}</span>
                         <span style="font-size:0.72rem;color:var(--text-secondary);min-width:2.5rem;text-align:right;">{{ round(($count/$rbTotal)*100,1) }}%</span>
                     </div>
                     @endforeach
@@ -473,14 +515,14 @@
                                 @foreach($ca['bookingTypeData'] as $type => $count)
                                 <tr style="border-bottom:1px solid var(--border-soft);">
                                     <td style="padding:0.45rem 0.6rem;">{{ $type }}</td>
-                                    <td style="padding:0.45rem 0.6rem;text-align:right;font-weight:700;color:var(--maroon-soft);">{{ $count }}</td>
+                                    <td style="padding:0.45rem 0.6rem;text-align:right;font-weight:700;color:var(--maroon-700);">{{ $count }}</td>
                                     <td style="padding:0.45rem 0.6rem;text-align:right;color:var(--text-secondary);">{{ round(($count/$btTotal)*100,1) }}%</td>
                                 </tr>
                                 @endforeach
                             </tbody>
                             <tfoot><tr style="border-top:2px solid var(--border-soft);">
                                 <td style="padding:0.45rem 0.6rem;font-weight:700;">Total</td>
-                                <td style="padding:0.45rem 0.6rem;text-align:right;font-weight:800;color:var(--maroon-soft);">{{ $btTotal }}</td>
+                                <td style="padding:0.45rem 0.6rem;text-align:right;font-weight:800;color:var(--maroon-700);">{{ $btTotal }}</td>
                                 <td style="padding:0.45rem 0.6rem;text-align:right;color:var(--text-secondary);">100%</td>
                             </tr></tfoot>
                         </table>
@@ -506,7 +548,7 @@
 
 {{-- Outside-College Students Section --}}
 @if($outsideTotal > 0)
-<div class="mt-6" style="max-width:1200px;margin-left:auto;margin-right:auto;padding:0 1rem;">
+<div class="mt-2">
     <div class="an-card">
         <div class="sec-title" style="margin-bottom:1.25rem;">
             <i class="fas fa-arrow-right-arrow-left"></i>
@@ -644,6 +686,9 @@
             This report is generated from the MSU-IIT Office of Guidance and Counseling Information System. All data is confidential and for official use only.
         </p>
     </div>
+
+    </div><!-- /.space-y-5 / max-w-7xl -->
+</div><!-- /.an-shell -->
 
 @endsection
 
@@ -786,6 +831,16 @@
             initialised.add(first.id);
             buildCharts(first.id);
         }
+    });
+
+    // Before printing: render all college charts so hidden tabs show correctly
+    window.addEventListener('beforeprint', function () {
+        collegeData.forEach(function (d) {
+            if (!initialised.has(d.id)) {
+                initialised.add(d.id);
+                buildCharts(d.id);
+            }
+        });
     });
 })();
 </script>

@@ -161,23 +161,34 @@
         background: rgba(255,255,255,0.98); border-radius: 0.75rem;
         border: 1px solid var(--border-soft); backdrop-filter: blur(8px);
         box-shadow: 0 8px 32px rgba(44,36,32,0.12);
-        max-width: 52rem; width: 100%; max-height: 90vh; overflow-y: auto;
+        max-width: 52rem; width: 100%; max-height: 90vh;
+        overflow: hidden; display: flex; flex-direction: column;
     }
     .modal-header {
         display: flex; align-items: center; justify-content: space-between;
-        padding: 1rem 1.25rem; border-bottom: 1px solid var(--border-soft)/60;
+        padding: 0.85rem 1.25rem; border-bottom: 1px solid var(--border-soft);
+        background: rgba(250,248,245,0.7); flex-shrink: 0; position: relative;
+    }
+    .modal-header::before {
+        content: ""; position: absolute; inset-inline: 0; top: 0; height: 3px;
+        background: linear-gradient(90deg, var(--maroon-800) 0%, var(--gold-400) 50%, var(--maroon-800) 100%);
     }
     .modal-close {
         width: 2rem; height: 2rem; border-radius: 0.5rem;
         display: flex; align-items: center; justify-content: center;
-        color: var(--text-muted); transition: all 0.18s ease;
-        font-size: 1rem;
+        color: var(--text-muted); transition: all 0.18s ease; font-size: 0.9rem;
     }
     .modal-close:hover { background: rgba(254,249,231,0.7); color: var(--maroon-700); }
-    .modal-body { padding: 1.25rem; }
+    .modal-body { padding: 1.25rem; overflow-y: auto; flex: 1; }
     .modal-footer {
-        padding: 1rem 1.25rem; border-top: 1px solid var(--border-soft)/60;
+        padding: 1rem 1.25rem; border-top: 1px solid var(--border-soft);
         display: flex; justify-content: flex-end; gap: 0.75rem;
+        background: rgba(250,248,245,0.5); flex-shrink: 0;
+        position: sticky;
+        bottom: 0;
+        z-index: 10;
+        background: rgba(255,255,255,0.98);
+        backdrop-filter: blur(8px);
     }
 
     .time-slot {
@@ -223,7 +234,7 @@
         .checkbox-option label { font-size: 0.7rem; }
         .time-slot { padding: 0.4rem; font-size: 0.65rem; }
         .modal-card { max-height: 95vh; margin: 0.5rem; }
-        .modal-header { padding: 0.85rem 1rem; }
+        .modal-header { padding: 0.75rem 1rem; }
         .modal-body { padding: 1rem; }
         .hero-card .flex { flex-direction: column; align-items: flex-start !important; }
     }
@@ -242,7 +253,7 @@
     <div class="session-form-glow one"></div>
     <div class="session-form-glow two"></div>
 
-    <div class="relative max-w-5xl mx-auto px-4 sm:px-6 py-5 md:py-8">
+    <div class="relative max-w-7xl mx-auto px-4 sm:px-6 py-5 md:py-8">
         <!-- Header -->
         <div class="mb-5 sm:mb-6">
             <div class="hero-card">
@@ -286,172 +297,198 @@
             </div>
         </div>
 
-        {{-- High-Risk Banner --}}
+        {{-- High-Risk Banner — only show if flagged, no "not flagged" noise --}}
         @if($sessionIsHighRisk)
-        <div style="border-radius:0.75rem;border:1px solid #fecaca;background:#fff5f5;padding:1rem 1.25rem;margin-bottom:1.25rem;display:flex;flex-wrap:wrap;align-items:center;gap:0.75rem;border-left:4px solid #dc2626;">
-            <div style="display:flex;align-items:center;gap:0.6rem;flex:1;min-width:0;">
-                <span style="display:flex;align-items:center;justify-content:center;width:2rem;height:2rem;border-radius:0.5rem;background:#fee2e2;color:#dc2626;flex-shrink:0;">
-                    <i class="fas fa-exclamation-triangle text-sm"></i>
-                </span>
-                <div style="min-width:0;">
-                    <p style="margin:0;font-size:0.82rem;font-weight:700;color:#991b1b;">High-Risk Individual</p>
-                    <div style="display:flex;flex-wrap:wrap;gap:0.5rem;margin-top:0.35rem;">
-                        @if($sessionSelfHarmRisk)
-                            <span style="display:inline-flex;align-items:center;gap:0.3rem;padding:0.2rem 0.6rem;border-radius:999px;font-size:0.7rem;font-weight:600;background:#fff7ed;color:#9a3412;border:1px solid #fed7aa;">
-                                <i class="fas fa-notes-medical text-[9px]"></i> Assessment-Based Risk
-                            </span>
-                        @endif
-                        @if($appointment->student->is_high_risk)
-                            <span style="display:inline-flex;align-items:center;gap:0.3rem;padding:0.2rem 0.6rem;border-radius:999px;font-size:0.7rem;font-weight:600;background:#fee2e2;color:#991b1b;border:1px solid #fecaca;">
-                                <i class="fas fa-flag text-[9px]"></i> Counselor Flagged
-                                @if($appointment->student->high_risk_notes)
-                                    <span style="font-weight:400;"> — {{ Str::limit($appointment->student->high_risk_notes, 60) }}</span>
-                                @endif
-                            </span>
-                        @endif
+        <div class="panel-card mb-5" style="border-left:3px solid #dc2626;">
+            <div class="relative p-3 sm:p-4 flex flex-wrap items-center gap-3">
+                <div class="flex items-center gap-2 flex-1 min-w-0">
+                    <span class="flex-shrink-0 w-7 h-7 rounded-lg flex items-center justify-center bg-red-100 text-red-600 text-xs">
+                        <i class="fas fa-exclamation-triangle"></i>
+                    </span>
+                    <div class="min-w-0">
+                        <p class="text-xs font-700 text-red-800 font-semibold">High-Risk Individual</p>
+                        <div class="flex flex-wrap gap-1.5 mt-1">
+                            @if($sessionSelfHarmRisk)
+                                <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-orange-50 text-orange-800 border border-orange-200">
+                                    <i class="fas fa-notes-medical text-[8px]"></i> Assessment-Based
+                                </span>
+                            @endif
+                            @if($appointment->student->is_high_risk)
+                                <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-red-50 text-red-800 border border-red-200">
+                                    <i class="fas fa-flag text-[8px]"></i> Counselor Flagged{{ $appointment->student->high_risk_notes ? ' — ' . Str::limit($appointment->student->high_risk_notes, 50) : '' }}
+                                </span>
+                            @endif
+                        </div>
                     </div>
                 </div>
+                <button type="button" onclick="toggleHighRiskModal()" class="secondary-btn px-3 py-1.5 text-xs flex-shrink-0">
+                    <i class="fas fa-edit mr-1 text-[9px]"></i>Update Flag
+                </button>
             </div>
-            <button type="button" onclick="toggleHighRiskModal()"
-                    style="flex-shrink:0;padding:0.4rem 0.85rem;border-radius:0.5rem;border:1px solid #fca5a5;background:white;color:#991b1b;font-size:0.75rem;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:0.4rem;">
-                <i class="fas fa-edit text-[10px]"></i> Update Flag
-            </button>
-        </div>
-        @else
-        <div style="border-radius:0.75rem;border:1px solid var(--border-soft);background:white;padding:0.75rem 1.25rem;margin-bottom:1.25rem;display:flex;align-items:center;justify-content:space-between;gap:0.75rem;">
-            <p style="margin:0;font-size:0.8rem;color:var(--text-secondary);display:flex;align-items:center;gap:0.5rem;">
-                <i class="fas fa-shield-halved" style="color:#059669;"></i>
-                This student is not currently flagged as high-risk.
-            </p>
-            <button type="button" onclick="toggleHighRiskModal()"
-                    style="flex-shrink:0;padding:0.35rem 0.75rem;border-radius:0.5rem;border:1px solid var(--border-soft);background:white;color:var(--text-secondary);font-size:0.75rem;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:0.4rem;">
-                <i class="fas fa-flag text-[10px]"></i> Flag as High-Risk
-            </button>
         </div>
         @endif
 
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
-            <!-- Left Sidebar: Details -->
-            <div class="lg:col-span-1 space-y-4 sm:space-y-6">
-                <!-- Appointment Details -->
+            <!-- Left Sidebar -->
+            <div class="lg:col-span-1 space-y-4">
+
+                <!-- Appointment + Student combined -->
                 <div class="detail-card">
                     <div class="panel-topline"></div>
-                    <div class="p-4 sm:p-5">
-                        <h2 class="panel-title mb-4">Appointment Details</h2>
-                        <div class="space-y-3">
-                            <div>
-                                <span class="detail-label">Date</span>
-                                <div class="detail-value">{{ $appointment->appointment_date->format('F j, Y') }}</div>
+                    <div class="p-4">
+                        {{-- Student mini-profile --}}
+                        <div class="flex items-center gap-3 mb-4 pb-3" style="border-bottom:1px solid var(--border-soft);">
+                            <div class="flex-shrink-0 w-10 h-10 rounded-xl flex items-center justify-center font-bold text-sm text-[var(--maroon-700)]" style="background:rgba(254,249,231,0.8);border:1px solid rgba(212,175,55,0.3);">
+                                {{ strtoupper(substr($appointment->student->user->first_name,0,1)) }}{{ strtoupper(substr($appointment->student->user->last_name,0,1)) }}
                             </div>
-                            <div>
-                                <span class="detail-label">Time</span>
-                                <div class="detail-value">
-                                    {{ \Carbon\Carbon::parse($appointment->start_time)->format('g:i A') }} - {{ \Carbon\Carbon::parse($appointment->end_time)->format('g:i A') }}
-                                </div>
+                            <div class="min-w-0">
+                                <div class="text-sm font-semibold text-[#2c2420] truncate">{{ $appointment->student->user->full_name }}</div>
+                                <div class="text-[10px] text-[#8b7e76] font-mono">{{ $appointment->student->student_id }}</div>
+                                <div class="text-[10px] text-[#8b7e76]">{{ $appointment->student->college->name ?? 'N/A' }} · {{ $appointment->student->year_level }}</div>
                             </div>
-                            <div>
-                                <span class="detail-label">Booking Type</span>
-                                <div class="detail-value">{{ $appointment->booking_type ?: '—' }}</div>
+                        </div>
+
+                        {{-- Appointment details as compact rows --}}
+                        <div class="space-y-2.5">
+                            <div class="flex justify-between items-baseline gap-2">
+                                <span class="detail-label" style="margin:0;flex-shrink:0;">Date</span>
+                                <span class="detail-value text-right">{{ $appointment->appointment_date->format('M j, Y') }}</span>
                             </div>
-                            <div>
-                                <span class="detail-label">Booking Category</span>
-                                <div class="detail-value">{{ $appointment->booking_category ? ucwords(str_replace('-', ' ', $appointment->booking_category)) : '—' }}</div>
+                            <div class="flex justify-between items-baseline gap-2">
+                                <span class="detail-label" style="margin:0;flex-shrink:0;">Time</span>
+                                <span class="detail-value text-right">{{ \Carbon\Carbon::parse($appointment->start_time)->format('g:i A') }} – {{ \Carbon\Carbon::parse($appointment->end_time)->format('g:i A') }}</span>
                             </div>
-                            <div>
-                                <span class="detail-label">Status</span>
-                                <div class="detail-value">{{ $appointment->status === 'referred' ? 'Referred' : ucwords(str_replace('_', ' ', $appointment->status)) }}</div>
+                            <div class="flex justify-between items-baseline gap-2">
+                                <span class="detail-label" style="margin:0;flex-shrink:0;">Type</span>
+                                <span class="detail-value text-right">{{ $appointment->booking_type ?: '—' }}</span>
                             </div>
-                            @if($appointment->cancellation_reason)
-                            <div>
-                                <span class="detail-label">Student's Reason</span>
-                                <div class="detail-value" style="color:#b91c1c;background:rgba(239,68,68,0.06);border:1px solid rgba(239,68,68,0.2);border-radius:0.4rem;padding:0.5rem 0.65rem;font-size:0.82rem;">
-                                    {{ $appointment->cancellation_reason }}
-                                </div>
+                            <div class="flex justify-between items-baseline gap-2">
+                                <span class="detail-label" style="margin:0;flex-shrink:0;">Category</span>
+                                <span class="detail-value text-right">{{ $appointment->booking_category ? ucwords(str_replace('-',' ',$appointment->booking_category)) : '—' }}</span>
+                            </div>
+                            <div class="flex justify-between items-baseline gap-2">
+                                <span class="detail-label" style="margin:0;flex-shrink:0;">Status</span>
+                                <span class="detail-value text-right">{{ ucwords(str_replace('_',' ',$appointment->status)) }}</span>
+                            </div>
+                            @if($appointment->case_number)
+                            <div class="flex justify-between items-baseline gap-2">
+                                <span class="detail-label" style="margin:0;flex-shrink:0;">Case #</span>
+                                <span class="detail-value muted text-right font-mono">{{ $appointment->case_number }}</span>
                             </div>
                             @endif
-                            <div>
-                                <span class="detail-label">Case Number</span>
-                                <div class="detail-value muted">{{ $appointment->case_number ?: '—' }}</div>
+                            @if($appointment->cancellation_reason)
+                            <div class="pt-1">
+                                <span class="detail-label">Cancellation Reason</span>
+                                <div class="text-xs mt-1 p-2 rounded-lg" style="background:rgba(239,68,68,0.06);border:1px solid rgba(239,68,68,0.2);color:#b91c1c;">{{ $appointment->cancellation_reason }}</div>
                             </div>
+                            @endif
+                        </div>
+
+                        <div class="mt-3 pt-3 flex items-center justify-between" style="border-top:1px solid var(--border-soft);">
+                            <a href="{{ route('counselor.students.profile', $appointment->student) }}" class="profile-link">
+                                <i class="fas fa-user text-[9px]"></i> View Profile
+                            </a>
+                            @if(!$sessionIsHighRisk)
+                            <button type="button" onclick="toggleHighRiskModal()" class="text-[10px] text-[#8b7e76] hover:text-[var(--maroon-700)] flex items-center gap-1 transition-colors">
+                                <i class="fas fa-flag text-[9px]"></i> Flag
+                            </button>
+                            @endif
                         </div>
                     </div>
                 </div>
 
-                <!-- Follow-up Appointment (if exists) -->
+                <!-- Follow-up (only if exists) -->
                 @if($followupAppointment)
-                <div class="detail-card" style="border-color: rgba(212,175,55,0.4);">
-                    <div class="panel-topline" style="background: linear-gradient(90deg, var(--maroon-800) 0%, var(--gold-400) 50%, var(--maroon-800) 100%);"></div>
-                    <div class="p-4 sm:p-5">
-                        <h2 class="panel-title mb-4">Follow-up Appointment</h2>
-                        <div class="space-y-3">
-                            <div>
-                                <span class="detail-label">Date</span>
-                                <div class="detail-value">{{ \Carbon\Carbon::parse($followupAppointment->appointment_date)->format('F j, Y') }}</div>
+                <div class="detail-card" style="border-color:rgba(212,175,55,0.35);">
+                    <div class="panel-topline"></div>
+                    <div class="p-4">
+                        <h2 class="panel-title mb-3">Follow-up Booked</h2>
+                        <div class="space-y-2.5">
+                            <div class="flex justify-between items-baseline gap-2">
+                                <span class="detail-label" style="margin:0;flex-shrink:0;">Date</span>
+                                <span class="detail-value text-right">{{ \Carbon\Carbon::parse($followupAppointment->appointment_date)->format('M j, Y') }}</span>
                             </div>
-                            <div>
-                                <span class="detail-label">Time</span>
-                                <div class="detail-value">
-                                    {{ \Carbon\Carbon::parse($followupAppointment->start_time)->format('g:i A') }} - {{ \Carbon\Carbon::parse($followupAppointment->end_time)->format('g:i A') }}
-                                </div>
+                            <div class="flex justify-between items-baseline gap-2">
+                                <span class="detail-label" style="margin:0;flex-shrink:0;">Time</span>
+                                <span class="detail-value text-right">{{ \Carbon\Carbon::parse($followupAppointment->start_time)->format('g:i A') }} – {{ \Carbon\Carbon::parse($followupAppointment->end_time)->format('g:i A') }}</span>
                             </div>
-                            <div>
-                                <span class="detail-label">Type</span>
-                                <div class="detail-value">{{ $followupAppointment->booking_type ? ucwords(str_replace('_', ' ', $followupAppointment->booking_type)) : '—' }} - Follow up</div>
+                            <div class="flex justify-between items-baseline gap-2">
+                                <span class="detail-label" style="margin:0;flex-shrink:0;">Status</span>
+                                <span class="detail-value text-right">{{ ucwords(str_replace('_',' ',$followupAppointment->status)) }}</span>
                             </div>
-                            <div>
-                                <span class="detail-label">Category</span>
-                                <div class="detail-value">{{ $followupAppointment->booking_category ? ucwords(str_replace('-', ' ', $followupAppointment->booking_category)) : '—' }}</div>
+                            @if($followupAppointment->referred_by)
+                            <div class="flex justify-between items-baseline gap-2">
+                                <span class="detail-label" style="margin:0;flex-shrink:0;">Referred by</span>
+                                <span class="detail-value text-right">{{ $followupAppointment->referred_by }}</span>
                             </div>
-                            <div>
-                                <span class="detail-label">Status</span>
-                                <div class="detail-value">{{ ucwords(str_replace('_', ' ', $followupAppointment->status)) }}</div>
-                            </div>
+                            @endif
                         </div>
                     </div>
                 </div>
                 @endif
 
-                <!-- Student Details -->
+                <!-- Reason / Concern -->
                 <div class="detail-card">
                     <div class="panel-topline"></div>
-                    <div class="p-4 sm:p-5">
-                        <h2 class="panel-title mb-4">Student Details</h2>
+                    <div class="p-4">
+                        <h2 class="panel-title mb-3">Reason / Concern</h2>
+                        @php
+                            $rawConcern = $appointment->concern ?? '';
+                            $catMatch = preg_match('/^\[([^\]]+)\]\s*/', $rawConcern, $m);
+                            $category  = $catMatch ? $m[1] : '';
+                            $rest      = $catMatch ? ltrim(substr($rawConcern, strlen($m[0]))) : '';
+                            $parts     = $category ? explode("\n", $rest, 2) : [];
+                            $itemsPart = $category ? trim($parts[0] ?? '') : '';
+                            $narrative = $category ? trim($parts[1] ?? '') : '';
+                            $items     = $category && $itemsPart ? array_filter(array_map('trim', explode(';', $itemsPart))) : [];
+                        @endphp
+                        @if(!$rawConcern)
+                            <p class="text-xs text-[var(--text-muted)] italic">No concern recorded.</p>
+                        @else
                         <div class="space-y-3">
+                            @if($appointment->referred_by)
+                            <div class="text-xs p-2 rounded-lg" style="background:rgba(212,175,55,0.07);border:1px solid rgba(212,175,55,0.2);">
+                                <span class="detail-label" style="margin:0 0 0.2rem;">Referred by</span>
+                                <div class="detail-value">{{ $appointment->referred_by }}</div>
+                            </div>
+                            @endif
+                            @if($category)
                             <div>
-                                <span class="detail-label">Name</span>
-                                <div class="detail-value">{{ $appointment->student->user->full_name }}</div>
+                                <span class="detail-label">Category</span>
+                                <div class="text-xs font-semibold" style="color:var(--maroon-700);">{{ $category }}</div>
                             </div>
+                            @endif
+                            @if(count($items))
                             <div>
-                                <span class="detail-label">Age</span>
-                                <div class="detail-value muted">{{ $appointment->student->user->age ?? '—' }}</div>
+                                <span class="detail-label">Items</span>
+                                <ul class="mt-1 space-y-1">
+                                    @foreach($items as $item)
+                                    <li class="flex items-start gap-1.5 text-xs text-[#4a3a2a]">
+                                        <i class="fas fa-check-square text-[9px] mt-0.5 flex-shrink-0" style="color:var(--maroon-700);"></i>{{ $item }}
+                                    </li>
+                                    @endforeach
+                                </ul>
                             </div>
-                            <div>
-                                <span class="detail-label">Date of Birth</span>
-                                <div class="detail-value muted">{{ $appointment->student->user->birthdate ? $appointment->student->user->birthdate->format('Y-m-d') : '—' }}</div>
+                            @endif
+                            @if(!$category)
+                            <div class="text-xs text-[#4a3a2a]">{{ $rawConcern }}</div>
+                            @endif
+                            @if($narrative)
+                            <div class="pt-2" style="border-top:1px solid var(--border-soft);">
+                                <span class="detail-label">Narrative</span>
+                                <p class="text-xs text-[#4a3a2a] mt-1 leading-relaxed italic">"{{ $narrative }}"</p>
                             </div>
-                            <div>
-                                <span class="detail-label">Sex</span>
-                                <div class="detail-value muted">{{ $appointment->student->user->sex ? ucfirst($appointment->student->user->sex) : '—' }}</div>
+                            @endif
+                            @if($appointment->mood_rating)
+                            <div class="flex justify-between items-baseline gap-2">
+                                <span class="detail-label" style="margin:0;flex-shrink:0;">Mood</span>
+                                <span class="detail-value muted text-right">{{ $appointment->mood_rating }}</span>
                             </div>
-                            <div>
-                                <span class="detail-label">Address</span>
-                                <div class="detail-value muted whitespace-pre-line">{{ $appointment->student->user->address ?: '—' }}</div>
-                            </div>
-                            <div>
-                                <span class="detail-label">Phone</span>
-                                <div class="detail-value muted">{{ $appointment->student->user->phone_number ?: '—' }}</div>
-                            </div>
-                            <div class="pt-2">
-                                <a href="{{ route('counselor.students.profile', $appointment->student) }}"
-                                   class="profile-link">
-                                    <i class="fas fa-user text-[9px]"></i> View Student Profile
-                                </a>
-                            </div>
+                            @endif
                         </div>
+                        @endif
                     </div>
                 </div>
-
-                <!-- High-Risk Panel removed from sidebar — shown as banner above -->
             </div>
 
             <!-- Right: Session Notes Form -->
@@ -651,6 +688,13 @@
                                         </select>
                                         @error('booking_category')<p class="error-text">{{ $message }}</p>@enderror
                                     </div>
+                                    <div id="followupReferredByWrap" class="{{ old('booking_category') === 'referred' ? '' : 'hidden' }}">
+                                        <label for="followup_referred_by" class="field-label">Referred by</label>
+                                        <input type="text" name="referred_by" id="followup_referred_by" value="{{ old('referred_by') }}"
+                                               class="input-field text-xs sm:text-sm" maxlength="255"
+                                               placeholder="e.g. Teacher, Parent, Friend">
+                                        @error('referred_by')<p class="error-text">{{ $message }}</p>@enderror
+                                    </div>
                                 </div>
                             </div>
 
@@ -724,7 +768,7 @@
                 </div>
 
                 {{-- Footer --}}
-                <div class="modal-footer" style="padding:1rem 1.5rem;border-top:1px solid var(--border-soft);display:flex;justify-content:flex-end;gap:0.75rem;">
+                <div class="modal-footer">
                     <button type="button" onclick="closeFollowupModal()" class="secondary-btn px-5 py-2.5 text-xs sm:text-sm">
                         Cancel
                     </button>
@@ -748,6 +792,7 @@
             if (overrideCheck) overrideCheck.checked = false;
             toggleFollowupOverride(false);
             updateFollowupSubmitState();
+            updateFollowupReferredByVisibility();
         }
 
         function closeFollowupModal() {
@@ -755,6 +800,15 @@
             if (modal) {
                 modal.classList.add('hidden');
             }
+        }
+
+        function updateFollowupReferredByVisibility() {
+            const category = document.getElementById('followup_booking_category');
+            const wrap = document.getElementById('followupReferredByWrap');
+            const input = document.getElementById('followup_referred_by');
+            if (!category || !wrap) return;
+            const show = String(category.value) === 'referred';
+            wrap.classList.toggle('hidden', !show);
         }
 
         function toggleFollowupOverride(enabled) {
@@ -891,6 +945,21 @@
         // ── Follow-up Calendar ────────────────────────────────────────────────
         document.addEventListener('DOMContentLoaded', () => {
             updateFollowupSubmitState();
+
+            const followupBookingCategory = document.getElementById('followup_booking_category');
+            if (followupBookingCategory) {
+                followupBookingCategory.addEventListener('change', updateFollowupReferredByVisibility);
+            }
+
+            updateFollowupReferredByVisibility();
+        
+            // Ensure modal stays scrolled to top on open
+            const modal = document.getElementById('followupModal');
+            if (modal) {
+                modal.addEventListener('shown.bs.modal', () => {
+                    modal.scrollTop = 0;
+                });
+            }
 
             const counselorId = {{ (int) $effectiveCounselorId }};
             const dateHidden   = document.getElementById('followup_appointment_date');

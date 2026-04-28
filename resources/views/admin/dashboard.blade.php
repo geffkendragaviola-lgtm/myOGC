@@ -314,7 +314,6 @@
                     <div class="p-3 space-y-2">
                         @php
                             $quickLinks = [
-                                ['href'=>route('admin.users.create'),  'icon'=>'fa-user-plus',     'label'=>'Add New User',      'sub'=>'Create a new account',          'ic_bg'=>'background:rgba(253,242,242,0.8);color:#7a2a2a;', 'ic_hover'=>'background:#7a2a2a;color:#fef9e7;'],
                                 ['href'=>route('admin.students'),      'icon'=>'fa-user-graduate', 'label'=>'Student Records',   'sub'=>'Browse all students',           'ic_bg'=>'background:rgba(254,249,231,0.8);color:#7a5a1a;', 'ic_hover'=>'background:#c9a227;color:#3a0c0c;'],
                                 ['href'=>route('admin.counselors'),    'icon'=>'fa-user-doctor',   'label'=>'Counselors',        'sub'=>'View counselor directory',      'ic_bg'=>'background:rgba(240,253,244,0.8);color:#065f46;', 'ic_hover'=>'background:#2d7a4f;color:#fff;'],
                                 ['href'=>route('admin.appointments'),  'icon'=>'fa-calendar-check','label'=>'Appointments',      'sub'=>'Manage all appointments',       'ic_bg'=>'background:rgba(245,240,235,0.8);color:#6b5e57;', 'ic_hover'=>'background:#5c1a1a;color:#fef9e7;'],
@@ -414,10 +413,6 @@
                         <span class="text-[10px] text-[#8b7e76]">
                             Showing <span class="font-semibold text-[#2c2420]">{{ $recentUsers->count() }}</span> recent users
                         </span>
-                        <a href="{{ route('admin.users') }}"
-                           class="inline-flex items-center gap-1.5 text-[10px] font-semibold text-[#7a2a2a] hover:text-[#5c1a1a] transition">
-                            View all <i class="fas fa-arrow-right text-[9px]"></i>
-                        </a>
                     </div>
                 </div>
             </div>

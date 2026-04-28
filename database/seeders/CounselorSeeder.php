@@ -143,7 +143,7 @@ class CounselorSeeder extends Seeder
                 'age' => 24,
                 'sex' => 'female',
                 'birthplace' => 'Iligan City',
-                'religion' => 'Roman Catholic',
+                'religion' => '',
 
                 'civil_status' => 'single',
                 'citizenship' => 'Filipino',
@@ -188,7 +188,7 @@ class CounselorSeeder extends Seeder
                 'position' => 'Guidance Counselor III',
                 'credentials' => 'RPm',
                 'is_head' => false,
-                'google_calendar_id' => 'gabutan@g.msuiit.edu.ph',
+                'google_calendar_id' => 'lindylou.gaviola@g.msuiit.edu.ph',
                 'created_at' => now(),
                 'updated_at' => now(),
             ],

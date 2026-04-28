@@ -55,23 +55,38 @@ class ProfileController extends Controller
         try {
             $user = $request->user();
 
-            if (in_array($user->role, ['student', 'counselor'], true)) {
+            if ($user->role === 'student') {
                 return back()->withErrors(['error' => 'You can only change your password on this page.']);
             }
 
             $request->validate([
-                'first_name' => ['required', 'string', 'max:255'],
-                'middle_name' => ['nullable', 'string', 'max:255'],
-                'last_name' => ['required', 'string', 'max:255'],
-                'email' => ['required', 'string', 'email', 'max:255', 'unique:users,email,' . $request->user()->id],
-                'phone' => ['nullable', 'string', 'max:20'],
-                'address' => ['nullable', 'string', 'max:500'],
+                'first_name'   => ['nullable', 'string', 'max:255'],
+                'middle_name'  => ['nullable', 'string', 'max:255'],
+                'last_name'    => ['nullable', 'string', 'max:255'],
+                'email'        => ['nullable', 'string', 'email', 'max:255', 'unique:users,email,' . $user->id],
+                'phone_number' => ['nullable', 'string', 'max:20'],
+                'address'      => ['nullable', 'string', 'max:500'],
+                'birthdate'    => ['nullable', 'date'],
+                'sex'          => ['nullable', 'string', 'max:20'],
+                'birthplace'   => ['nullable', 'string', 'max:255'],
+                'religion'     => ['nullable', 'string', 'max:255'],
+                'civil_status' => ['nullable', 'string', 'max:50'],
+                'citizenship'  => ['nullable', 'string', 'max:255'],
             ]);
 
-            $user->fill($request->all());
-
-            if ($user->isDirty('email')) {
-                $user->email_verified_at = null;
+            // For counselors: only update fields that are currently empty (lock-once)
+            if ($user->role === 'counselor') {
+                $fillable = ['first_name','middle_name','last_name','birthdate','sex','birthplace','religion','civil_status','citizenship','phone_number','address'];
+                foreach ($fillable as $field) {
+                    if (empty($user->$field) && $request->filled($field)) {
+                        $user->$field = $request->input($field);
+                    }
+                }
+            } else {
+                $user->fill($request->only(['first_name','middle_name','last_name','email','phone_number','address','birthdate','sex','birthplace','religion','civil_status','citizenship']));
+                if ($user->isDirty('email')) {
+                    $user->email_verified_at = null;
+                }
             }
 
             $user->save();
@@ -153,8 +168,10 @@ class ProfileController extends Controller
         try {
             $request->validate([
                 'google_calendar_id' => ['nullable', 'string', 'max:255'],
-                'profile_picture'    => ['nullable', 'image', 'mimes:jpeg,png,jpg,gif,webp', 'max:4096'],
+                'profile_picture'    => ['nullable', 'image', 'mimes:jpeg,png,jpg,gif,webp', 'max:20480'],
                 'facebook_link'      => ['nullable', 'url', 'max:255'],
+                'position'           => ['nullable', 'string', 'max:255'],
+                'credentials'        => ['nullable', 'string', 'max:255'],
             ]);
 
             $user = $request->user();
@@ -179,10 +196,21 @@ class ProfileController extends Controller
                 $user->save();
             }
 
-            Counselor::where('user_id', $user->id)->update([
+            $updateData = [
                 'google_calendar_id' => $request->input('google_calendar_id'),
                 'facebook_link'      => $request->input('facebook_link') ?: null,
-            ]);
+            ];
+
+            // Only save position/credentials if currently empty (lock-once)
+            $firstProfile = $counselorProfiles->first();
+            if (empty($firstProfile->position) && $request->filled('position')) {
+                $updateData['position'] = $request->input('position');
+            }
+            if (empty($firstProfile->credentials) && $request->filled('credentials')) {
+                $updateData['credentials'] = $request->input('credentials');
+            }
+
+            Counselor::where('user_id', $user->id)->update($updateData);
 
             return Redirect::route('profile.edit')->with('status', 'counselor-profile-updated');
         } catch (\Exception $e) {

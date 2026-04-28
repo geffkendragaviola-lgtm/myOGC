@@ -19,40 +19,53 @@
 
     /* Base Layout & Glow */
     .resource-shell {
-        position: relative;
+        position: relative; overflow: hidden;
         background: var(--bg-warm);
         min-height: 100vh;
-        padding-bottom: 3rem;
+        padding-bottom: 2rem;
     }
     .resource-glow {
-        position: absolute; border-radius: 50%; filter: blur(80px); pointer-events: none; opacity: 0.2; z-index: 0;
+        position: absolute; border-radius: 50%; filter: blur(80px); pointer-events: none; opacity: 0.25;
     }
-    .resource-glow.one { top: -50px; left: -50px; width: 250px; height: 250px; background: var(--gold-400); }
-    .resource-glow.two { bottom: 10%; right: -50px; width: 220px; height: 220px; background: var(--maroon-800); }
+    .resource-glow.one { top: -30px; left: -40px; width: 200px; height: 200px; background: var(--gold-400); }
+    .resource-glow.two { bottom: -30px; right: -60px; width: 220px; height: 220px; background: var(--maroon-800); }
 
-    /* Glass Cards */
-    .panel-card {
-        position: relative; z-index: 1; overflow: hidden; border-radius: 0.75rem;
+    /* Cards */
+    .hero-card, .panel-card {
+        position: relative; overflow: hidden; border-radius: 0.75rem;
         border: 1px solid var(--border-soft); background: rgba(255,255,255,0.95);
         backdrop-filter: blur(8px); box-shadow: 0 2px 8px rgba(44,36,32,0.04);
         transition: box-shadow 0.2s ease;
     }
-    .panel-card::before {
+    .hero-card:hover, .panel-card:hover { box-shadow: 0 4px 14px rgba(44,36,32,0.06); }
+    .hero-card::before, .panel-card::before {
         content: ""; position: absolute; inset: 0; pointer-events: none;
         background: radial-gradient(circle at top right, rgba(212,175,55,0.06), transparent 30%);
     }
 
-    /* Header Specifics */
-    .page-header h1 { color: var(--text-primary); font-weight: 700; letter-spacing: -0.02em; }
-    .page-header p { color: var(--text-secondary); }
+    /* Hero */
+    .hero-icon {
+        display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+        width: 2.75rem; height: 2.75rem; border-radius: 0.75rem; color: #fef9e7;
+        background: linear-gradient(135deg, var(--maroon-800) 0%, var(--maroon-700) 100%);
+        box-shadow: 0 4px 12px rgba(92,26,26,0.15);
+    }
+    .hero-badge {
+        display: inline-flex; align-items: center; gap: 0.4rem; border-radius: 999px;
+        border: 1px solid rgba(212,175,55,0.3); background: rgba(254,249,231,0.8);
+        padding: 0.2rem 0.55rem; font-size: 9px; font-weight: 700; text-transform: uppercase;
+        letter-spacing: 0.16em; color: var(--maroon-700);
+    }
+    .hero-badge-dot { width: 0.3rem; height: 0.3rem; border-radius: 999px; background: var(--gold-400); }
+    .panel-topline { position: absolute; inset-inline: 0; top: 0; height: 3px; background: linear-gradient(90deg, var(--maroon-800) 0%, var(--gold-400) 50%, var(--maroon-800) 100%); }
 
     /* Buttons */
     .btn-primary {
         background: linear-gradient(135deg, var(--maroon-800) 0%, var(--maroon-700) 100%);
         color: #fef9e7; font-weight: 600; border-radius: 0.6rem;
-        padding: 0.6rem 1rem; display: inline-flex; align-items: center; justify-content: center;
+        padding: 0.55rem 1rem; display: inline-flex; align-items: center; justify-content: center;
         box-shadow: 0 4px 10px rgba(92,26,26,0.15); transition: all 0.2s ease;
-        border: none; text-decoration: none; white-space: nowrap;
+        border: none; text-decoration: none; white-space: nowrap; font-size: 0.8rem;
     }
     .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 6px 14px rgba(92,26,26,0.2); }
 
@@ -122,10 +135,13 @@
     .action-delete { color: #b91c1c; } .action-delete:hover { background: rgba(185, 28, 28, 0.1); color: #991b1b; }
 
     /* Empty State */
-    .empty-state { padding: 3rem 1rem; text-align: center; }
-    .empty-icon { color: var(--border-soft); font-size: 3.5rem; margin-bottom: 1rem; }
-    .empty-title { color: var(--text-secondary); font-weight: 600; font-size: 1.1rem; }
-    .empty-text { color: var(--text-muted); font-size: 0.85rem; margin-bottom: 1.5rem; }
+    .empty-state { padding: 2.5rem 1rem; text-align: center; color: var(--text-muted); }
+    .empty-state-icon {
+        width: 3.5rem; height: 3.5rem; border-radius: 1rem;
+        display: inline-flex; align-items: center; justify-content: center;
+        background: rgba(254,249,231,0.7); color: var(--maroon-700);
+        margin-bottom: 0.75rem; font-size: 1.1rem;
+    }
 
     /* Alerts (Styled for Theme) */
     .alert-toast {
@@ -156,34 +172,41 @@
     <div class="resource-glow one"></div>
     <div class="resource-glow two"></div>
 
-    <div class="relative max-w-7xl mx-auto px-4 sm:px-6 py-6 md:py-8">
-        
+    <div class="relative max-w-7xl mx-auto px-4 sm:px-6 py-5 md:py-8">
+
         <!-- Header -->
-        <div class="mb-6 panel-card p-5 sm:p-6">
-            <div class="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4">
-                <div class="page-header">
-                    <h1 class="text-xl sm:text-2xl font-bold">Manage Resources</h1>
-                    <p class="text-sm mt-1">Create and manage mental health resources for students.</p>
-                </div>
-                <div class="header-actions flex flex-col sm:flex-row gap-3 w-full lg:w-auto">
-                    <a href="{{ route('counselor.resources.create') }}"
-                       class="btn-primary">
-                        <i class="fas fa-plus mr-2 text-xs"></i> Add New Resource
-                    </a>
+        <div class="mb-5 sm:mb-6">
+            <div class="hero-card">
+                <div class="relative p-4 sm:p-5 flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
+                    <div class="flex items-start gap-3">
+                        <div class="hero-icon">
+                            <i class="fas fa-folder-open text-base sm:text-lg"></i>
+                        </div>
+                        <div class="min-w-0">
+                            <div class="hero-badge"><span class="hero-badge-dot"></span>Counselor Portal</div>
+                            <h1 class="text-lg sm:text-xl lg:text-2xl font-semibold tracking-tight text-[#2c2420] mt-2">Resources</h1>
+                            <p class="text-[#6b5e57] text-xs sm:text-sm mt-1.5">Create and manage mental health resources for students.</p>
+                        </div>
+                    </div>
+                    <div class="flex-shrink-0">
+                        <a href="{{ route('counselor.resources.create') }}" class="btn-primary text-xs sm:text-sm px-4 py-2">
+                            <i class="fas fa-plus mr-1.5 text-[9px] sm:text-xs"></i>Add New Resource
+                        </a>
+                    </div>
                 </div>
             </div>
         </div>
 
         <!-- Resources Table -->
         <div class="panel-card overflow-hidden">
+            <div class="panel-topline"></div>
             @if($resources->isEmpty())
                 <div class="empty-state">
-                    <i class="fas fa-folder-open empty-icon"></i>
-                    <h3 class="empty-title">No Resources Yet</h3>
-                    <p class="empty-text">Get started by creating your first resource.</p>
-                    <a href="{{ route('counselor.resources.create') }}"
-                       class="btn-primary">
-                        Create Resource
+                    <div class="empty-state-icon"><i class="fas fa-folder-open"></i></div>
+                    <p class="text-sm font-medium text-[#2c2420]">No resources yet.</p>
+                    <p class="text-xs text-[#8b7e76] mt-1 mb-4">Get started by creating your first resource.</p>
+                    <a href="{{ route('counselor.resources.create') }}" class="btn-primary text-xs px-4 py-2">
+                        <i class="fas fa-plus mr-1.5 text-[9px]"></i>Create Resource
                     </a>
                 </div>
             @else

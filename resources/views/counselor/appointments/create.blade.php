@@ -154,6 +154,12 @@
     .form-actions {
         display: flex; flex-direction: column-reverse; gap: 0.75rem;
         padding-top: 1rem; border-top: 1px solid var(--border-soft)/60;
+        position: sticky;
+        bottom: 0;
+        background: rgba(255,255,255,0.98);
+        backdrop-filter: blur(8px);
+        z-index: 10;
+        padding-bottom: 1rem;
     }
     @media (min-width: 768px) { 
         .form-actions { flex-direction: row; justify-content: flex-end; } 
@@ -189,7 +195,7 @@
     <div class="book-glow one"></div>
     <div class="book-glow two"></div>
 
-    <div class="relative max-w-4xl mx-auto px-4 sm:px-6 py-5 md:py-8">
+    <div class="relative max-w-7xl mx-auto px-4 sm:px-6 py-5 md:py-8">
         <!-- Header -->
         <div class="mb-5 sm:mb-6">
             <div class="hero-card">
@@ -277,6 +283,16 @@
                     @enderror
                 </div>
 
+                <div class="mt-4 {{ old('booking_category') === 'referred' ? '' : 'hidden' }}" id="referredByWrap">
+                    <label class="field-label">Referred by</label>
+                    <input type="text" name="referred_by" id="referredByInput" value="{{ old('referred_by') }}"
+                           class="input-field text-xs sm:text-sm" maxlength="255"
+                           placeholder="e.g. Teacher, Parent, Friend">
+                    @error('referred_by')
+                        <p class="error-text">{{ $message }}</p>
+                    @enderror
+                </div>
+
                 <div class="mt-6">
                     <label class="field-label">Select Date</label>
                     <div class="calendar-card">
@@ -331,10 +347,29 @@
 
                 <div class="mt-6">
                     <label class="field-label">Concern / Agenda</label>
-                    <textarea name="concern" rows="4" class="textarea-field" required>{{ old('concern') }}</textarea>
+                    <textarea name="concern" rows="3" class="textarea-field" required>{{ old('concern') }}</textarea>
                     @error('concern')
                         <p class="error-text">{{ $message }}</p>
                     @enderror
+                </div>
+
+                <!-- High-Risk Flag -->
+                <div class="mt-5 rounded-lg border p-4" style="border-color:rgba(220,38,38,0.25);background:rgba(254,242,242,0.4);">
+                    <label class="flex items-center gap-2.5 cursor-pointer select-none mb-3">
+                        <input type="checkbox" name="flag_high_risk" id="flagHighRisk" value="1"
+                               class="w-4 h-4 rounded accent-red-600 cursor-pointer"
+                               {{ old('flag_high_risk') ? 'checked' : '' }}
+                               onchange="document.getElementById('highRiskNotesWrap').classList.toggle('hidden', !this.checked)">
+                        <span class="text-sm font-semibold" style="color:#991b1b;">
+                            <i class="fas fa-exclamation-triangle text-xs mr-1"></i>Flag this student as High-Risk
+                        </span>
+                    </label>
+                    <div id="highRiskNotesWrap" class="{{ old('flag_high_risk') ? '' : 'hidden' }}">
+                        <label class="field-label">Reason for High-Risk Flag</label>
+                        <textarea name="high_risk_notes" rows="2" class="textarea-field"
+                                  placeholder="Describe the reason for flagging this student as high-risk..."
+                                  style="border-color:rgba(220,38,38,0.3);">{{ old('high_risk_notes') }}</textarea>
+                    </div>
                 </div>
 
                 <div class="form-actions">
@@ -357,6 +392,9 @@ document.addEventListener('DOMContentLoaded', function() {
     const bookingTypeSelect = document.getElementById('bookingType');
     const bookingTypeInitial = bookingTypeSelect?.querySelector('option[value="Initial Interview"]');
     const bookingTypeHelp = document.getElementById('bookingTypeHelp');
+    const bookingCategorySelect = document.getElementById('bookingCategory');
+    const referredByWrap = document.getElementById('referredByWrap');
+    const referredByInput = document.getElementById('referredByInput');
     const dateSelect = document.getElementById('dateSelect');
     const calendarGrid = document.getElementById('calendarGrid');
     const calendarMonthLabel = document.getElementById('calendarMonthLabel');
@@ -367,10 +405,22 @@ document.addEventListener('DOMContentLoaded', function() {
     const selectedTime = document.getElementById('selectedTime');
     const overrideCheck = document.getElementById('createOverrideCheck');
 
+    function updateReferredByVisibility() {
+        if (!bookingCategorySelect || !referredByWrap) return;
+        const show = String(bookingCategorySelect.value) === 'referred';
+        referredByWrap.classList.toggle('hidden', !show);
+    }
+
+    if (bookingCategorySelect) {
+        bookingCategorySelect.addEventListener('change', updateReferredByVisibility);
+    }
+
     let currentSelectedSlot = null;
     const minDate = new Date();
     minDate.setHours(0, 0, 0, 0);
     // Counselors can book same-day appointments
+
+    updateReferredByVisibility();
 
     let currentMonth = new Date(minDate.getFullYear(), minDate.getMonth(), 1);
     let selectedDate = null;

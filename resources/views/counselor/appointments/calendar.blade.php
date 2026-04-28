@@ -311,14 +311,6 @@
         <!-- Date Navigation -->
         <div class="panel-card mb-6">
             <div class="panel-topline"></div>
-            <div class="panel-header">
-                <div class="panel-icon"><i class="fas fa-calendar-day text-[9px] sm:text-xs"></i></div>
-                <div>
-                    <h2 class="panel-title">Date Navigation</h2>
-                    <p class="panel-subtitle hidden sm:block">Browse your daily schedule</p>
-                </div>
-            </div>
-
             <div class="p-4 sm:p-5">
                 <div class="date-nav">
                     <div class="flex items-center gap-3 sm:gap-4">
@@ -405,7 +397,7 @@
             };
         @endphp
 
-        <div class="grid grid-cols-1 lg:grid-cols-4 gap-4 sm:gap-6">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6 items-start">
             <!-- Morning Session (8AM - 12PM) -->
             <div class="lg:col-span-1">
                 <div class="panel-card">
@@ -603,7 +595,7 @@
             </div>
 
             <!-- Legend & Summary -->
-            <div class="lg:col-span-2 space-y-4 sm:space-y-6">
+            <div class="lg:col-span-1 flex flex-col gap-4 sm:gap-6">
                 <!-- Legend -->
                 <div class="legend-card">
                     <div class="panel-topline"></div>
@@ -621,7 +613,7 @@
                 </div>
 
                 <!-- Daily Summary -->
-                <div class="panel-card">
+                <div class="panel-card flex-1">
                     <div class="panel-topline"></div>
                     <div class="p-4">
                         <h3 class="text-sm font-semibold text-[#2c2420] border-b border-[#e5e0db]/60 pb-2 mb-3">Daily Summary</h3>
@@ -647,13 +639,6 @@
                             <div class="summary-row"><span>Available Slots:</span><span class="summary-value">{{ $availableSlots }}</span></div>
                         </div>
                     </div>
-                </div>
-
-                <!-- Quick Stats -->
-                <div class="quick-stats">
-                    <h4 class="text-xs font-semibold text-[#2c2420] mb-2">Quick Stats</h4>
-                    <p class="text-[10px]">{{ $appointments->whereIn('status', ['pending', 'approved'])->count() }} active appointments today</p>
-                    <p class="text-[10px]">{{ $appointments->where('status', 'pending')->count() }} need your attention</p>
                 </div>
             </div>
         </div>

@@ -447,6 +447,113 @@
             padding: 0.85rem 0.9rem 0.85rem 0.9rem;
         }
     }
+
+    .back-link {
+        display: inline-flex; align-items: center; gap: 0.4rem;
+        color: var(--maroon-700); font-size: 0.75rem; font-weight: 600;
+        transition: all 0.18s ease;
+    }
+    .back-link:hover { color: var(--maroon-900); transform: translateX(-2px); }
+
+    /* Form sections */
+    .form-section { padding:1.5rem 1.25rem; border-bottom:1px solid var(--border-soft); }
+    .form-section:last-of-type { border-bottom:none; }
+    .form-section-header { display:flex; align-items:flex-start; gap:0.75rem; margin-bottom:1.25rem; }
+    .form-step-num {
+        width:2rem; height:2rem; border-radius:50%; flex-shrink:0;
+        background:linear-gradient(135deg, var(--maroon-800), var(--maroon-700));
+        color:white; font-weight:700; font-size:0.85rem;
+        display:flex; align-items:center; justify-content:center;
+        box-shadow:0 2px 6px rgba(92,26,26,0.2);
+    }
+    .form-section-title { font-size:0.9rem; font-weight:700; color:var(--text-primary); line-height:1.2; }
+    .form-section-sub { font-size:0.72rem; color:var(--text-muted); margin-top:0.15rem; }
+    .form-section-body { padding-left:2.75rem; }
+    @media (max-width:640px) { .form-section-body { padding-left:0; } }
+
+    /* Field wrap */
+    .field-wrap { margin-bottom:1.25rem; }
+    .field-label { display:flex; align-items:center; gap:0.4rem; font-size:0.72rem; font-weight:600; color:var(--text-secondary); margin-bottom:0.4rem; text-transform:uppercase; letter-spacing:0.06em; }
+    .field-icon { font-size:0.7rem; color:var(--maroon-700); }
+    .field-help { font-size:0.7rem; color:var(--text-muted); margin-top:0.35rem; }
+    .success-help { color:#065f46; font-weight:500; }
+
+    /* Type radio cards */
+    .type-radio-card { cursor:pointer; }
+    .type-radio-inner {
+        display:flex; align-items:center; gap:0.5rem;
+        padding:0.6rem 1rem; border-radius:0.6rem;
+        border:2px solid var(--border-soft); background:white;
+        font-size:0.78rem; font-weight:600; color:var(--text-primary);
+        transition:all 0.15s ease;
+    }
+    .type-radio-card:hover .type-radio-inner { border-color:var(--maroon-700); background:rgba(254,249,231,0.5); }
+    .type-radio-card input:checked + .type-radio-inner {
+        border-color:var(--maroon-700); background:rgba(212,175,55,0.12);
+        color:var(--maroon-800); box-shadow:0 2px 6px rgba(92,26,26,0.1);
+    }
+    .sr-only { position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border-width:0; }
+
+    /* Category tabs */
+    .category-tab {
+        display:inline-flex; align-items:center; gap:0.4rem;
+        padding:0.55rem 1rem; border-radius:0.6rem; border:2px solid;
+        font-size:0.75rem; font-weight:600; cursor:pointer; transition:all 0.15s ease;
+    }
+    .category-tab:hover { background:rgba(122,42,42,0.05); }
+
+    /* Concern panels */
+    .concern-panel {
+        border:1px solid var(--border-soft); border-radius:0.75rem;
+        background:rgba(250,248,245,0.6); padding:1rem;
+    }
+    .concern-panel-title {
+        font-size:0.8rem; font-weight:700; color:var(--maroon-700);
+        text-transform:uppercase; letter-spacing:0.06em; margin-bottom:0.75rem;
+        display:flex; align-items:center; gap:0.4rem;
+    }
+    .concern-sub-title {
+        font-size:0.75rem; font-weight:600; color:var(--maroon-700);
+        margin:1rem 0 0.5rem; padding-top:0.75rem; border-top:1px dashed var(--border-soft);
+    }
+    .concern-grid { display:grid; grid-template-columns:1fr; gap:0.5rem; }
+    @media (min-width:640px) { .concern-grid { grid-template-columns:1fr 1fr; } }
+    .concern-item {
+        display:flex; align-items:flex-start; gap:0.4rem;
+        font-size:0.75rem; color:var(--text-primary); cursor:pointer;
+        padding:0.4rem 0.5rem; border-radius:0.4rem; transition:background 0.15s ease;
+    }
+    .concern-item:hover { background:rgba(212,175,55,0.08); }
+    .concern-checkbox { width:1rem; height:1rem; margin-top:0.1rem; flex-shrink:0; accent-color:var(--maroon-700); cursor:pointer; }
+    .other-text-input {
+        flex:1; border:none; border-bottom:1px solid var(--border-soft);
+        background:transparent; font-size:0.72rem; padding:0.1rem 0.3rem;
+        outline:none; color:var(--text-primary);
+    }
+    .other-text-input:focus { border-bottom-color:var(--maroon-700); }
+
+    /* Calendar legend */
+    .calendar-legend {
+        display:flex; flex-wrap:wrap; gap:0.75rem; justify-content:center;
+        padding:0.75rem 0.5rem 0; margin-top:0.75rem; border-top:1px solid var(--border-soft);
+    }
+    .legend-item { display:flex; align-items:center; gap:0.35rem; font-size:0.7rem; color:var(--text-secondary); }
+    .legend-dot {
+        width:0.75rem; height:0.75rem; border-radius:50%; border:1px solid;
+    }
+    .legend-dot.available { background:rgba(212,175,55,0.15); border-color:rgba(212,175,55,0.5); }
+    .legend-dot.selected { background:var(--maroon-700); border-color:var(--maroon-700); }
+    .legend-dot.unavailable { background:transparent; border-color:var(--border-soft); }
+
+    /* Form submit bar */
+    .form-submit-bar {
+        display:flex; align-items:center; justify-content:space-between;
+        padding:1.25rem; background:rgba(250,248,245,0.6); border-top:1px solid var(--border-soft);
+    }
+    @media (max-width:640px) {
+        .form-submit-bar { flex-direction:column; gap:0.75rem; }
+        .form-submit-bar .primary-btn, .form-submit-bar .secondary-btn { width:100%; }
+    }
 </style>
 
 <div class="min-h-screen booking-shell">
@@ -455,7 +562,7 @@
     <div class="booking-glow one"></div>
     <div class="booking-glow two"></div>
 
-    <div class="relative max-w-4xl mx-auto px-4 sm:px-6 py-5 md:py-8">
+    <div class="relative max-w-7xl mx-auto px-4 sm:px-6 py-5 md:py-8">
         <!-- Header -->
         <div class="mb-5 sm:mb-6">
             <div class="hero-card">
@@ -464,6 +571,9 @@
                         <i class="fas fa-calendar-plus text-base sm:text-lg"></i>
                     </div>
                     <div class="min-w-0">
+                        <a href="{{ route('mhc') }}" class="back-link mb-2">
+                            <i class="fas fa-arrow-left text-[9px]"></i> Back to Mental Health Corner
+                        </a>
                         <div class="hero-badge">
                             <span class="hero-badge-dot"></span>
                             New Appointment
@@ -478,306 +588,210 @@
         </div>
 
         <div class="form-card">
-            <form id="appointmentForm" action="{{ route('appointments.store') }}" method="POST" class="p-4 sm:p-6">
+            <form id="appointmentForm" action="{{ route('appointments.store') }}" method="POST">
                 @csrf
 
-                <!-- Counselor Selection -->
-                <div class="mb-6">
-                    <label class="field-label">Counselor <span style="color:#dc2626;">*</span></label>
-
-                    <!-- Counselor Type Selection -->
-                    <div class="mb-4" id="counselorTypeWrapper">
-                        <label class="radio-label">
-                            <input type="radio" name="counselor_type" value="college" checked
-                                   class="counselor-type-radio">
-                            <span>{{ ($allowAllCounselors ?? false) ? 'Counselors from all colleges' : 'Counselors from my college' }}</span>
-                        </label>
-                        <label class="radio-label ml-4 sm:ml-6" id="referredCounselorOption">
-                            <input type="radio" name="counselor_type" value="referred"
-                                   class="counselor-type-radio">
-                            <span>Previously referred counselors</span>
-                        </label>
-                    </div>
-
-                    <select name="counselor_id" id="counselorSelect" class="select-field" required>
-                        <option value="">Choose a counselor</option>
-                        <!-- Options will be populated by JavaScript -->
-                    </select>
-                    <input type="hidden" name="counselor_id" id="counselorAutoAssignedInput">
-                    <p id="counselorAutoAssigned" class="hidden mt-2 text-[0.75rem] text-[#6b5e57]"></p>
-
-                    <!-- Loading indicator -->
-                    <div id="counselorLoading" class="hidden mt-2 loading-text">
-                        <i class="fas fa-spinner fa-spin mr-1"></i> Loading counselors...
-                    </div>
-                </div>
-
-                <!-- Booking Type -->
-                <div class="mb-6">
-                    <label class="field-label">Type of Booking <span style="color:#dc2626;">*</span></label>
-                    <select name="booking_type" id="bookingType" class="select-field" required>
-                        <option value="">Choose a booking type</option>
-                        <option value="Initial Interview" id="bookingTypeInitial" {{ ($hasInitialInterviewAppointment ?? false) ? 'disabled hidden' : '' }}>Initial Interview</option>
-                        <option value="Counseling">Counseling</option>
-                        <option value="Consultation">Consultation</option>
-                    </select>
-                    <p class="field-help" id="bookingTypeHelp">
-                        Select the reason for your appointment.
-                    </p>
-                </div>
-
-                <!-- Booking Category -->
-                <div class="mb-6">
-                    <label class="field-label">Booking Category <span style="color:#dc2626;">*</span></label>
-                    <select name="booking_category" id="bookingCategory" class="select-field" required>
-                       
-                        <option value="walk-in" {{ old('booking_category') === 'walk-in' ? 'selected' : '' }}>Walk-in</option>
-                        <option value="referred" {{ old('booking_category') === 'referred' ? 'selected' : '' }}>Referred</option>
-                        <option value="called-in" {{ old('booking_category') === 'called-in' ? 'selected' : '' }}>Called-in</option>
-                    </select>
-                    <p class="field-help">
-                        Select how the appointment was initiated.
-                    </p>
-                </div>
-
-                <!-- Source of Referral (shown only when "Referred" is selected) -->
-                <div class="mb-6 hidden" id="referredByWrap">
-                    <label class="field-label">Source of Referral (Referred by) </label>
-                    <input type="text"
-                           name="referred_by"
-                           id="referredByInput"
-                           class="input-field"
-                           maxlength="255"
-                           placeholder="e.g. Teacher, Professor, Parent, Friend, Classmate"
-                           value="{{ old('referred_by') }}">
-                    <p class="field-help">If someone referred you to counseling, please indicate who.</p>
-                </div>
-
-                <!-- Reason / Concern Category -->
-                <div class="mb-6">
-                    <label class="field-label">Reason / Concern Category <span style="color:#dc2626;">*</span></label>
-                    <p class="field-help mb-3">Select the main category, then check all items that apply.</p>
-
-                    {{-- Hidden field that holds the final built concern value --}}
-                    <input type="hidden" name="concern" id="concernHidden">
-                    {{-- Hidden field for concern_category --}}
-                    <input type="hidden" name="concern_category" id="concernCategory">
-
-                    {{-- 3 Category Tabs --}}
-                    <div class="flex gap-2 mb-4 flex-wrap" id="categoryTabs">
-                        @foreach([
-                            'ACADEMIC' => 'Academic / Educational',
-                            'PERSONAL' => 'Personal / Social',
-                            'CAREER'   => 'Career / Vocational',
-                        ] as $key => $label)
-                        <button type="button"
-                                data-cat="{{ $key }}"
-                                onclick="selectCategory('{{ $key }}')"
-                                class="category-tab px-4 py-2 rounded-lg border text-xs font-semibold transition-all"
-                                style="border-color:#d4b896;color:#7a5c3a;background:#fdf8f3;">
-                            {{ $label }}
-                        </button>
-                        @endforeach
-                    </div>
-
-                    {{-- ACADEMIC --}}
-                    <div id="cat-ACADEMIC" class="concern-panel hidden rounded-xl border p-4" style="border-color:#d4b896;background:#fdf8f3;">
-                        <p class="text-xs font-bold uppercase tracking-wide mb-3" style="color:#7a2a2a;">Academic / Educational</p>
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-y-2 gap-x-4">
-                            @foreach([
-                                'Has difficulty in subject/s',
-                                'Poor quality of work',
-                                'Inconsistent attendance',
-                                'Dropped out of subjects',
-                                'Absenteeism',
-                                'Struggling for achievement',
-                                'Cheating',
-                                'Difficulty completing work',
-                                'Inconsistency with effort',
-                                'Poorly completed assignment(s)',
-                                'Poorly completed project(s)',
-                            ] as $item)
-                            <label class="flex items-start gap-2 cursor-pointer">
-                                <input type="checkbox" class="concern-checkbox mt-0.5 shrink-0" data-cat="ACADEMIC" value="{{ $item }}">
-                                <span class="text-xs text-[#4a3a2a]">{{ $item }}</span>
-                            </label>
-                            @endforeach
-                            <label class="flex items-start gap-2 cursor-pointer sm:col-span-2">
-                                <input type="checkbox" class="concern-checkbox mt-0.5 shrink-0" data-cat="ACADEMIC" data-other="true" id="academicOtherChk" value="Others">
-                                <span class="text-xs text-[#4a3a2a]">Others, please specify:</span>
-                                <input type="text" id="academicOtherText" class="ml-1 flex-1 border-b border-[#d4b896] bg-transparent text-xs outline-none px-1" placeholder="____________" maxlength="200" disabled>
-                            </label>
+                <!-- Step 1: Counselor -->
+                <div class="form-section">
+                    <div class="form-section-header">
+                        <div class="form-step-num">1</div>
+                        <div>
+                            <div class="form-section-title">Choose Your Counselor</div>
+                            <div class="form-section-sub">Select who you'd like to meet with</div>
                         </div>
                     </div>
-
-                    {{-- PERSONAL --}}
-                    <div id="cat-PERSONAL" class="concern-panel hidden rounded-xl border p-4" style="border-color:#d4b896;background:#fdf8f3;">
-                        <p class="text-xs font-bold uppercase tracking-wide mb-3" style="color:#7a2a2a;">Personal / Social</p>
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-y-2 gap-x-4">
-                            @foreach([
-                                'Depression / depressive thoughts',
-                                'Poor hygiene/self-care',
-                                'Sleeping in class',
-                                'Consistently tired/sleepy',
-                                'Excessive physical complaints',
-                                'Always sick',
-                                'Family problems',
-                                'New born in family',
-                                'Perfectionism',
-                                'Appears apathetic',
-                                'Appears sad/depressed mood',
-                                'Uses obscene languages',
-                                'Argues frequently',
-                                'Short attention span',
-                                'Has frequent mood swings',
-                                'Overreacts to criticism',
-                                'Has difficulty accepting mistakes',
-                                'Lacks confidence',
-                                'Makes excuses/blames others',
-                                'Hurts self',
-                                'Self-destructive acting out',
-                                'Stealing',
-                                'Frequently off-task',
-                                'Very active or impulsive',
-                                'Difficulty concentrating',
-                                'Disturbs others',
-                                'Defiant of rules',
-                                'Destruction of property',
-                                'Substance abuse',
-                                'Difficulty in relating with others',
-                                'Aggression resulting from conflict/s',
-                                'Bullying / Cyberbullying',
-                            ] as $item)
-                            <label class="flex items-start gap-2 cursor-pointer">
-                                <input type="checkbox" class="concern-checkbox mt-0.5 shrink-0" data-cat="PERSONAL" value="{{ $item }}">
-                                <span class="text-xs text-[#4a3a2a]">{{ $item }}</span>
-                            </label>
-                            @endforeach
+                    <div class="form-section-body">
+                        <div class="mb-4" id="counselorTypeWrapper">
+                            <div class="flex flex-wrap gap-3">
+                                <label class="type-radio-card">
+                                    <input type="radio" name="counselor_type" value="college" checked class="counselor-type-radio sr-only">
+                                    <div class="type-radio-inner"><i class="fas fa-building-columns"></i><span>{{ ($allowAllCounselors ?? false) ? 'All Colleges' : 'My College' }}</span></div>
+                                </label>
+                                <label class="type-radio-card" id="referredCounselorOption">
+                                    <input type="radio" name="counselor_type" value="referred" class="counselor-type-radio sr-only">
+                                    <div class="type-radio-inner"><i class="fas fa-user-check"></i><span>Previously Referred</span></div>
+                                </label>
+                            </div>
                         </div>
-                        <p class="text-xs font-semibold mt-4 mb-2" style="color:#7a2a2a;">Recently experienced crisis:</p>
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-y-2 gap-x-4">
-                            @foreach([
-                                'Death of loved one',
-                                'Tragedy',
-                                'Pregnancy',
-                                'Harassment issues',
-                                'Recent parental separation',
-                                'Recently separated from parents/home',
-                                'Recent change of address',
-                                'Parent(s) re-marry',
-                            ] as $item)
-                            <label class="flex items-start gap-2 cursor-pointer">
-                                <input type="checkbox" class="concern-checkbox mt-0.5 shrink-0" data-cat="PERSONAL" value="{{ $item }}">
-                                <span class="text-xs text-[#4a3a2a]">{{ $item }}</span>
-                            </label>
-                            @endforeach
-                            <label class="flex items-start gap-2 cursor-pointer sm:col-span-2">
-                                <input type="checkbox" class="concern-checkbox mt-0.5 shrink-0" data-cat="PERSONAL" data-other="true" id="personalOtherChk" value="Others">
-                                <span class="text-xs text-[#4a3a2a]">Others, please specify:</span>
-                                <input type="text" id="personalOtherText" class="ml-1 flex-1 border-b border-[#d4b896] bg-transparent text-xs outline-none px-1" placeholder="____________" maxlength="200" disabled>
-                            </label>
-                        </div>
-                    </div>
-
-                    {{-- CAREER --}}
-                    <div id="cat-CAREER" class="concern-panel hidden rounded-xl border p-4" style="border-color:#d4b896;background:#fdf8f3;">
-                        <p class="text-xs font-bold uppercase tracking-wide mb-3" style="color:#7a2a2a;">Career / Vocational</p>
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-y-2 gap-x-4">
-                            @foreach([
-                                'Barred student',
-                                'Shifting / plans to shift to another course',
-                                'Undecided about degree/course/career to pursue',
-                                'Difficulty in making career choice/s',
-                                'Does not like course presently enrolled in',
-                            ] as $item)
-                            <label class="flex items-start gap-2 cursor-pointer">
-                                <input type="checkbox" class="concern-checkbox mt-0.5 shrink-0" data-cat="CAREER" value="{{ $item }}">
-                                <span class="text-xs text-[#4a3a2a]">{{ $item }}</span>
-                            </label>
-                            @endforeach
+                        <div class="field-wrap">
+                            <label class="field-label"><i class="fas fa-user-tie field-icon"></i> Counselor</label>
+                            <select name="counselor_id" id="counselorSelect" class="select-field" required>
+                                <option value="">Choose a counselor</option>
+                            </select>
+                            <input type="hidden" name="counselor_id" id="counselorAutoAssignedInput">
+                            <p id="counselorAutoAssigned" class="hidden field-help success-help"></p>
+                            <div id="counselorLoading" class="hidden loading-text mt-2"><i class="fas fa-spinner fa-spin"></i> Loading counselors...</div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Presenting Problem (always shown, optional extra detail) -->
-                <div class="mb-6" id="presentingProblemWrap">
-                    <label class="field-label">Share a brief narrative of your concern <span style="color:#dc2626;">*</span></label>
-                    <textarea name="" id="concernTextarea" rows="3" class="textarea-field"
-                              placeholder="In your own words, briefly describe your concern..."></textarea>
-                    <p class="field-help">Please describe your concern in your own words.</p>
-                </div>
-
-                <!-- Mood Rating -->
-                <div class="mb-6">
-                    <label class="field-label">How are you feeling today? <span style="color:#dc2626;">*</span></label>
-                    <select name="mood_rating" id="moodRating" class="select-field" required>
-                        <option value="">Choose your current mood</option>
-                        <option value="1 - Very Overwhelmed">1 - Very Overwhelmed</option>
-                        <option value="2 - Struggling">2 - Struggling</option>
-                        <option value="3 - Not Okay">3 - Not Okay</option>
-                        <option value="4 - A Little Down">4 - A Little Down</option>
-                        <option value="5 - Neutral">5 - Neutral</option>
-                        <option value="6 - A Bit Better">6 - A Bit Better</option>
-                        <option value="7 - Doing Fine">7 - Doing Fine</option>
-                        <option value="8 - Good">8 - Good</option>
-                        <option value="9 - Very Good">9 - Very Good</option>
-                        <option value="10 - Great">10 - Great</option>
-                    </select>
-                    <p class="field-help">
-                        Static mood check-in for future reporting or triage use.
-                    </p>
-                </div>
-
-                <!-- Date Selection -->
-                <div class="mb-6">
-                    <label class="field-label">Select Date <span style="color:#dc2626;">*</span></label>
-                    <div id="appointmentCalendar" class="calendar-card">
-                        <div class="calendar-header">
-                            <button type="button" id="calendarPrev" class="calendar-nav-btn" aria-label="Previous month">
-                                ‹
-                            </button>
-                            <h3 id="calendarMonthLabel" class="calendar-month"></h3>
-                            <button type="button" id="calendarNext" class="calendar-nav-btn" aria-label="Next month">
-                                ›
-                            </button>
-                        </div>
-                        <div class="calendar-days">
-                            <span class="calendar-day-header">Sun</span>
-                            <span class="calendar-day-header">Mon</span>
-                            <span class="calendar-day-header">Tue</span>
-                            <span class="calendar-day-header">Wed</span>
-                            <span class="calendar-day-header">Thu</span>
-                            <span class="calendar-day-header">Fri</span>
-                            <span class="calendar-day-header">Sat</span>
-                        </div>
-                        <div id="calendarGrid" class="calendar-grid"></div>
-                        <p id="calendarStatus" class="calendar-status">
-                            Select a counselor to load available dates.
-                        </p>
-                    </div>
-                    <input type="hidden" name="appointment_date" id="dateSelect"
-                           min="{{ date('Y-m-d', strtotime('+1 day')) }}" required>
-                </div>
-
-                <!-- Time Slots -->
-                <div class="mb-6">
-                    <label class="field-label">Available Time Slots <span style="color:#dc2626;">*</span></label>
-                    <div id="timeSlots" class="time-slots-grid">
-                        <div class="time-slot-placeholder">
-                            Select a counselor and date to see available time slots
+                <!-- Step 2: Appointment Details -->
+                <div class="form-section">
+                    <div class="form-section-header">
+                        <div class="form-step-num">2</div>
+                        <div>
+                            <div class="form-section-title">Appointment Details</div>
+                            <div class="form-section-sub">Tell us about the type of session you need</div>
                         </div>
                     </div>
-                    <input type="hidden" name="start_time" id="selectedTime" required>
+                    <div class="form-section-body">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div class="field-wrap">
+                                <label class="field-label"><i class="fas fa-tag field-icon"></i> Type of Booking</label>
+                                <select name="booking_type" id="bookingType" class="select-field" required>
+                                    <option value="">Choose a type</option>
+                                    <option value="Initial Interview" id="bookingTypeInitial" {{ ($hasInitialInterviewAppointment ?? false) ? 'disabled hidden' : '' }}>Initial Interview</option>
+                                    <option value="Counseling">Counseling</option>
+                                    <option value="Consultation">Consultation</option>
+                                </select>
+                                <p class="field-help" id="bookingTypeHelp">Select the reason for your appointment.</p>
+                            </div>
+                            <div class="field-wrap">
+                                <label class="field-label"><i class="fas fa-door-open field-icon"></i> How did you come in?</label>
+                                <select name="booking_category" id="bookingCategory" class="select-field" required>
+                                    <option value="walk-in" {{ old('booking_category') === 'walk-in' ? 'selected' : '' }}>Walk-in</option>
+                                    <option value="referred" {{ old('booking_category') === 'referred' ? 'selected' : '' }}>Referred</option>
+                                    <option value="called-in" {{ old('booking_category') === 'called-in' ? 'selected' : '' }}>Called-in</option>
+                                </select>
+                                <p class="field-help">How was this appointment initiated?</p>
+                            </div>
+                        </div>
+                        <div class="field-wrap hidden" id="referredByWrap">
+                            <label class="field-label"><i class="fas fa-share-nodes field-icon"></i> Referred by</label>
+                            <input type="text" name="referred_by" id="referredByInput" class="input-field" maxlength="255" placeholder="e.g. Teacher, Professor, Parent, Friend" value="{{ old('referred_by') }}">
+                            <p class="field-help">Who referred you to counseling?</p>
+                        </div>
+                    </div>
                 </div>
 
-                <!-- Submit Button -->
-                <div class="flex justify-end space-x-3 sm:space-x-4 btn-row-mobile">
+                <!-- Step 3: Concern -->
+                <div class="form-section">
+                    <div class="form-section-header">
+                        <div class="form-step-num">3</div>
+                        <div>
+                            <div class="form-section-title">Your Concern</div>
+                            <div class="form-section-sub">Help us understand what you'd like to talk about</div>
+                        </div>
+                    </div>
+                    <div class="form-section-body">
+                        <input type="hidden" name="concern" id="concernHidden">
+                        <input type="hidden" name="concern_category" id="concernCategory">
+
+                        <div class="field-wrap mb-4">
+                            <label class="field-label"><i class="fas fa-layer-group field-icon"></i> Concern Category</label>
+                            <p class="field-help mb-3">Pick the category that best fits, then check all items that apply.</p>
+                            <div class="flex flex-wrap gap-2 mb-4" id="categoryTabs">
+                                @foreach(['ACADEMIC' => ['Academic / Educational','fas fa-graduation-cap'], 'PERSONAL' => ['Personal / Social','fas fa-heart'], 'CAREER' => ['Career / Vocational','fas fa-briefcase']] as $key => [$label, $icon])
+                                <button type="button" data-cat="{{ $key }}" onclick="selectCategory('{{ $key }}')" class="category-tab" style="border-color:#d4b896;color:#7a5c3a;background:#fdf8f3;">
+                                    <i class="{{ $icon }}"></i> {{ $label }}
+                                </button>
+                                @endforeach
+                            </div>
+
+                            <div id="cat-ACADEMIC" class="concern-panel hidden">
+                                <p class="concern-panel-title"><i class="fas fa-graduation-cap"></i> Academic / Educational</p>
+                                <div class="concern-grid">
+                                    @foreach(['Has difficulty in subject/s','Poor quality of work','Inconsistent attendance','Dropped out of subjects','Absenteeism','Struggling for achievement','Cheating','Difficulty completing work','Inconsistency with effort','Poorly completed assignment(s)','Poorly completed project(s)'] as $item)
+                                    <label class="concern-item"><input type="checkbox" class="concern-checkbox" data-cat="ACADEMIC" value="{{ $item }}"><span>{{ $item }}</span></label>
+                                    @endforeach
+                                    <label class="concern-item sm:col-span-2"><input type="checkbox" class="concern-checkbox" data-cat="ACADEMIC" data-other="true" id="academicOtherChk" value="Others"><span>Others: <input type="text" id="academicOtherText" class="other-text-input" placeholder="please specify..." maxlength="200" disabled></span></label>
+                                </div>
+                            </div>
+
+                            <div id="cat-PERSONAL" class="concern-panel hidden">
+                                <p class="concern-panel-title"><i class="fas fa-heart"></i> Personal / Social</p>
+                                <div class="concern-grid">
+                                    @foreach(['Depression / depressive thoughts','Poor hygiene/self-care','Sleeping in class','Consistently tired/sleepy','Excessive physical complaints','Always sick','Family problems','New born in family','Perfectionism','Appears apathetic','Appears sad/depressed mood','Uses obscene languages','Argues frequently','Short attention span','Has frequent mood swings','Overreacts to criticism','Has difficulty accepting mistakes','Lacks confidence','Makes excuses/blames others','Hurts self','Self-destructive acting out','Stealing','Frequently off-task','Very active or impulsive','Difficulty concentrating','Disturbs others','Defiant of rules','Destruction of property','Substance abuse','Difficulty in relating with others','Aggression resulting from conflict/s','Bullying / Cyberbullying'] as $item)
+                                    <label class="concern-item"><input type="checkbox" class="concern-checkbox" data-cat="PERSONAL" value="{{ $item }}"><span>{{ $item }}</span></label>
+                                    @endforeach
+                                </div>
+                                <p class="concern-sub-title">Recently experienced crisis:</p>
+                                <div class="concern-grid">
+                                    @foreach(['Death of loved one','Tragedy','Pregnancy','Harassment issues','Recent parental separation','Recently separated from parents/home','Recent change of address','Parent(s) re-marry'] as $item)
+                                    <label class="concern-item"><input type="checkbox" class="concern-checkbox" data-cat="PERSONAL" value="{{ $item }}"><span>{{ $item }}</span></label>
+                                    @endforeach
+                                    <label class="concern-item sm:col-span-2"><input type="checkbox" class="concern-checkbox" data-cat="PERSONAL" data-other="true" id="personalOtherChk" value="Others"><span>Others: <input type="text" id="personalOtherText" class="other-text-input" placeholder="please specify..." maxlength="200" disabled></span></label>
+                                </div>
+                            </div>
+
+                            <div id="cat-CAREER" class="concern-panel hidden">
+                                <p class="concern-panel-title"><i class="fas fa-briefcase"></i> Career / Vocational</p>
+                                <div class="concern-grid">
+                                    @foreach(['Barred student','Shifting / plans to shift to another course','Undecided about degree/course/career to pursue','Difficulty in making career choice/s','Does not like course presently enrolled in'] as $item)
+                                    <label class="concern-item"><input type="checkbox" class="concern-checkbox" data-cat="CAREER" value="{{ $item }}"><span>{{ $item }}</span></label>
+                                    @endforeach
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="field-wrap">
+                            <label class="field-label"><i class="fas fa-pen-to-square field-icon"></i> Brief narrative of your concern</label>
+                            <textarea name="" id="concernTextarea" rows="3" class="textarea-field" placeholder="In your own words, briefly describe what's on your mind..."></textarea>
+                            <p class="field-help">This helps your counselor prepare for your session.</p>
+                        </div>
+
+                        <div class="field-wrap mt-4">
+                            <label class="field-label"><i class="fas fa-face-smile field-icon"></i> How are you feeling today?</label>
+                            <select name="mood_rating" id="moodRating" class="select-field" required>
+                                <option value="">Choose your current mood</option>
+                                @foreach([['1','Very Overwhelmed'],['2','Struggling'],['3','Not Okay'],['4','A Little Down'],['5','Neutral'],['6','A Bit Better'],['7','Doing Fine'],['8','Good'],['9','Very Good'],['10','Great']] as [$v,$l])
+                                <option value="{{ $v }} - {{ $l }}">{{ $v }} — {{ $l }}</option>
+                                @endforeach
+                            </select>
+                            <p class="field-help">Rate how you're feeling right now on a scale of 1–10.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Step 4: Schedule -->
+                <div class="form-section">
+                    <div class="form-section-header">
+                        <div class="form-step-num">4</div>
+                        <div>
+                            <div class="form-section-title">Pick a Schedule</div>
+                            <div class="form-section-sub">Choose a date and time that works for you</div>
+                        </div>
+                    </div>
+                    <div class="form-section-body">
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
+                            <div>
+                                <label class="field-label mb-2"><i class="fas fa-calendar field-icon"></i> Select Date</label>
+                                <div id="appointmentCalendar" class="calendar-card">
+                                    <div class="calendar-header">
+                                        <button type="button" id="calendarPrev" class="calendar-nav-btn" aria-label="Previous month">‹</button>
+                                        <h3 id="calendarMonthLabel" class="calendar-month"></h3>
+                                        <button type="button" id="calendarNext" class="calendar-nav-btn" aria-label="Next month">›</button>
+                                    </div>
+                                    <div class="calendar-days">
+                                        <span class="calendar-day-header">Sun</span><span class="calendar-day-header">Mon</span><span class="calendar-day-header">Tue</span><span class="calendar-day-header">Wed</span><span class="calendar-day-header">Thu</span><span class="calendar-day-header">Fri</span><span class="calendar-day-header">Sat</span>
+                                    </div>
+                                    <div id="calendarGrid" class="calendar-grid"></div>
+                                    <div class="calendar-legend">
+                                        <span class="legend-item"><span class="legend-dot available"></span>Available</span>
+                                        <span class="legend-item"><span class="legend-dot selected"></span>Selected</span>
+                                        <span class="legend-item"><span class="legend-dot unavailable"></span>Unavailable</span>
+                                    </div>
+                                    <p id="calendarStatus" class="calendar-status">Select a counselor to load available dates.</p>
+                                </div>
+                                <input type="hidden" name="appointment_date" id="dateSelect" min="{{ date('Y-m-d', strtotime('+1 day')) }}" required>
+                            </div>
+                            <div>
+                                <label class="field-label mb-2"><i class="fas fa-clock field-icon"></i> Available Time Slots</label>
+                                <div id="timeSlots" class="time-slots-grid">
+                                    <div class="time-slot-placeholder">Select a counselor and date to see available time slots</div>
+                                </div>
+                                <input type="hidden" name="start_time" id="selectedTime" required>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-submit-bar">
                     <a href="{{ route('appointments.index') }}" class="secondary-btn px-5 py-2.5 text-xs sm:text-sm">
-                        Cancel
+                        <i class="fas fa-arrow-left mr-1"></i> Cancel
                     </a>
-                    <button type="button" id="openConsentModal" class="primary-btn px-5 py-2.5 text-xs sm:text-sm">
-                        <i class="fas fa-calendar-check mr-1.5 text-[9px] sm:text-xs"></i>
-                        <span>Book Now</span>
+                    <button type="button" id="openConsentModal" class="primary-btn px-6 py-2.5 text-xs sm:text-sm">
+                        <i class="fas fa-calendar-check mr-1.5"></i> Book Appointment
                     </button>
                 </div>
             </form>

@@ -413,6 +413,104 @@
                 </div>
             </div>
 
+            @if(Auth::user()->role === 'student')
+            {{-- Student: only picture, email, and password --}}
+            <div class="space-y-6">
+
+                {{-- Profile Picture + Email --}}
+                <div class="p-6 md:p-7 profile-card">
+                    <h2 class="section-title"><i class="fas fa-user-circle"></i> My Profile</h2>
+
+                    <form method="POST" action="{{ route('profile.student.update') }}" enctype="multipart/form-data">
+                        @csrf
+                        @method('patch')
+
+                        {{-- Picture --}}
+                        <div class="flex flex-col sm:flex-row items-center gap-6 mb-6">
+                            <div class="relative flex-shrink-0">
+                                @if($studentProfile?->profile_picture)
+                                    <img id="pic-preview-student"
+                                         src="{{ asset('storage/' . $studentProfile->profile_picture) }}"
+                                         alt="Profile Picture"
+                                         class="w-28 h-28 rounded-full object-cover border-4"
+                                         style="border-color: var(--accent-gold);">
+                                @else
+                                    <div id="pic-placeholder-student"
+                                         class="w-28 h-28 rounded-full flex items-center justify-center text-3xl font-bold text-white"
+                                         style="background: linear-gradient(135deg, var(--primary-red), var(--primary-red-dark));">
+                                        {{ strtoupper(substr(Auth::user()->first_name, 0, 1)) }}
+                                    </div>
+                                    <img id="pic-preview-student" src="" alt="Preview"
+                                         class="w-28 h-28 rounded-full object-cover border-4 hidden"
+                                         style="border-color: var(--accent-gold);">
+                                @endif
+                            </div>
+                            <div>
+                                <p class="label-text mb-2">Profile Picture</p>
+                                <label for="profile_picture_student"
+                                       class="inline-flex items-center gap-2 cursor-pointer px-4 py-2 rounded-xl text-sm font-semibold transition"
+                                       style="background: var(--bg-light); border: 1px solid var(--border-soft); color: var(--text-dark);">
+                                    <i class="fas fa-camera"></i> Choose Photo
+                                </label>
+                                <input type="file" id="profile_picture_student" name="profile_picture"
+                                       accept="image/jpeg,image/png,image/jpg,image/gif,image/webp"
+                                       class="hidden" onchange="previewStudentPic(this)">
+                                <p class="helper-text mt-1">JPG, PNG, GIF or WebP. Max 4MB.</p>
+                                @error('profile_picture') <p class="error-text">{{ $message }}</p> @enderror
+                            </div>
+                        </div>
+
+                        {{-- Email (read-only) --}}
+                        <div class="max-w-md">
+                            <label class="block label-text">Email Address</label>
+                            <input type="email" value="{{ Auth::user()->email }}" disabled class="form-input mt-1">
+                            <p class="helper-text mt-1">Your email address cannot be changed.</p>
+                        </div>
+
+                        <div class="mt-6 flex justify-end">
+                            <button type="submit" class="btn-primary">
+                                <i class="fas fa-save"></i> Save Picture
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                {{-- Change Password --}}
+                <div class="p-6 md:p-7 profile-card">
+                    <h2 class="section-title"><i class="fas fa-shield-alt"></i> Change Password</h2>
+
+                    <form method="POST" action="{{ route('profile.password.update') }}">
+                        @csrf
+                        @method('patch')
+
+                        <div class="space-y-5 max-w-md">
+                            <div>
+                                <label for="current_password" class="block label-text">Current Password</label>
+                                <input type="password" id="current_password" name="current_password" class="form-input mt-1">
+                                @error('current_password') <p class="error-text">{{ $message }}</p> @enderror
+                            </div>
+                            <div>
+                                <label for="password" class="block label-text">New Password</label>
+                                <input type="password" id="password" name="password" class="form-input mt-1">
+                                @error('password') <p class="error-text">{{ $message }}</p> @enderror
+                            </div>
+                            <div>
+                                <label for="password_confirmation" class="block label-text">Confirm New Password</label>
+                                <input type="password" id="password_confirmation" name="password_confirmation" class="form-input mt-1">
+                            </div>
+                        </div>
+
+                        <div class="mt-6 flex justify-end">
+                            <button type="submit" class="btn-primary">
+                                <i class="fas fa-key"></i> Update Password
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+            </div>
+            @else
+            {{-- Non-student: full tabs --}}
             <div class="tabs-wrap mb-6">
                 <div class="flex flex-col md:flex-row">
                     <button id="personal-tab" class="tab-button tab-active">Personal Information</button>
@@ -426,7 +524,11 @@
                     <h2 class="section-title"><i class="fas fa-user"></i> Personal Information</h2>
 
                     @php
-                        $lockPersonalInfo = in_array(Auth::user()->role, ['student', 'counselor'], true);
+                        // For counselors: lock a field only if it already has a value
+                        $lockPersonalInfo = Auth::user()->role === 'counselor'
+                            ? false  // handled per-field below
+                            : in_array(Auth::user()->role, ['student'], true);
+                        $cu = Auth::user(); // shorthand
                     @endphp
 
                     <form method="POST" action="{{ route('profile.update') }}">
@@ -436,25 +538,29 @@
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div>
                                 <label for="first_name" class="block label-text">First Name</label>
-                                <input type="text" id="first_name" name="first_name" value="{{ old('first_name', $user->first_name) }}" @if($lockPersonalInfo) disabled @endif class="form-input">
+                                <input type="text" id="first_name" name="first_name" value="{{ old('first_name', $user->first_name) }}"
+                                    @if(Auth::user()->role === 'counselor' && $user->first_name) disabled @elseif($lockPersonalInfo) disabled @endif class="form-input">
                                 @error('first_name') <p class="error-text">{{ $message }}</p> @enderror
                             </div>
 
                             <div>
                                 <label for="middle_name" class="block label-text">Middle Name</label>
-                                <input type="text" id="middle_name" name="middle_name" value="{{ old('middle_name', $user->middle_name) }}" @if($lockPersonalInfo) disabled @endif class="form-input">
+                                <input type="text" id="middle_name" name="middle_name" value="{{ old('middle_name', $user->middle_name) }}"
+                                    @if(Auth::user()->role === 'counselor' && $user->middle_name) disabled @elseif($lockPersonalInfo) disabled @endif class="form-input">
                                 @error('middle_name') <p class="error-text">{{ $message }}</p> @enderror
                             </div>
 
                             <div>
                                 <label for="last_name" class="block label-text">Last Name</label>
-                                <input type="text" id="last_name" name="last_name" value="{{ old('last_name', $user->last_name) }}" @if($lockPersonalInfo) disabled @endif class="form-input">
+                                <input type="text" id="last_name" name="last_name" value="{{ old('last_name', $user->last_name) }}"
+                                    @if(Auth::user()->role === 'counselor' && $user->last_name) disabled @elseif($lockPersonalInfo) disabled @endif class="form-input">
                                 @error('last_name') <p class="error-text">{{ $message }}</p> @enderror
                             </div>
 
                             <div>
                                 <label for="birthdate" class="block label-text">Birthdate</label>
-                                <input type="date" id="birthdate" name="birthdate" value="{{ old('birthdate', $user->birthdate ? \Carbon\Carbon::parse($user->birthdate)->format('Y-m-d') : '') }}" @if($lockPersonalInfo) disabled @endif class="form-input">
+                                <input type="date" id="birthdate" name="birthdate" value="{{ old('birthdate', $user->birthdate ? \Carbon\Carbon::parse($user->birthdate)->format('Y-m-d') : '') }}"
+                                    @if(Auth::user()->role === 'counselor' && $user->birthdate) disabled @elseif($lockPersonalInfo) disabled @endif class="form-input">
                                 @error('birthdate') <p class="error-text">{{ $message }}</p> @enderror
                             </div>
 
@@ -466,7 +572,8 @@
 
                             <div>
                                 <label for="sex" class="block label-text">Sex</label>
-                                <select id="sex" name="sex" @if($lockPersonalInfo) disabled @endif class="form-select">
+                                <select id="sex" name="sex"
+                                    @if(Auth::user()->role === 'counselor' && $user->sex) disabled @elseif($lockPersonalInfo) disabled @endif class="form-select">
                                     <option value="">Select Sex</option>
                                     <option value="male" {{ old('sex', $user->sex) == 'male' ? 'selected' : '' }}>Male</option>
                                     <option value="female" {{ old('sex', $user->sex) == 'female' ? 'selected' : '' }}>Female</option>
@@ -477,19 +584,22 @@
 
                             <div>
                                 <label for="birthplace" class="block label-text">Birthplace</label>
-                                <input type="text" id="birthplace" name="birthplace" value="{{ old('birthplace', $user->birthplace) }}" @if($lockPersonalInfo) disabled @endif class="form-input">
+                                <input type="text" id="birthplace" name="birthplace" value="{{ old('birthplace', $user->birthplace) }}"
+                                    @if(Auth::user()->role === 'counselor' && $user->birthplace) disabled @elseif($lockPersonalInfo) disabled @endif class="form-input">
                                 @error('birthplace') <p class="error-text">{{ $message }}</p> @enderror
                             </div>
 
                             <div>
                                 <label for="religion" class="block label-text">Religion</label>
-                                <input type="text" id="religion" name="religion" value="{{ old('religion', $user->religion) }}" @if($lockPersonalInfo) disabled @endif class="form-input">
+                                <input type="text" id="religion" name="religion" value="{{ old('religion', $user->religion) }}"
+                                    @if(Auth::user()->role === 'counselor' && $user->religion) disabled @elseif($lockPersonalInfo) disabled @endif class="form-input">
                                 @error('religion') <p class="error-text">{{ $message }}</p> @enderror
                             </div>
 
                             <div>
                                 <label for="civil_status" class="block label-text">Civil Status</label>
-                                <select id="civil_status" name="civil_status" @if($lockPersonalInfo) disabled @endif class="form-select">
+                                <select id="civil_status" name="civil_status"
+                                    @if(Auth::user()->role === 'counselor' && $user->civil_status) disabled @elseif($lockPersonalInfo) disabled @endif class="form-select">
                                     <option value="">Select Civil Status</option>
                                     <option value="single" {{ old('civil_status', $user->civil_status) == 'single' ? 'selected' : '' }}>Single</option>
                                     <option value="married" {{ old('civil_status', $user->civil_status) == 'married' ? 'selected' : '' }}>Married</option>
@@ -501,30 +611,33 @@
 
                             <div>
                                 <label for="citizenship" class="block label-text">Citizenship</label>
-                                <input type="text" id="citizenship" name="citizenship" value="{{ old('citizenship', $user->citizenship) }}" @if($lockPersonalInfo) disabled @endif class="form-input">
+                                <input type="text" id="citizenship" name="citizenship" value="{{ old('citizenship', $user->citizenship) }}"
+                                    @if(Auth::user()->role === 'counselor' && $user->citizenship) disabled @elseif($lockPersonalInfo) disabled @endif class="form-input">
                                 @error('citizenship') <p class="error-text">{{ $message }}</p> @enderror
                             </div>
 
                             <div>
                                 <label for="email" class="block label-text">Email Address</label>
-                                <input type="email" id="email" name="email" value="{{ old('email', $user->email) }}" @if($lockPersonalInfo) disabled @endif class="form-input">
+                                <input type="email" id="email" name="email" value="{{ old('email', $user->email) }}" disabled class="form-input">
                                 @error('email') <p class="error-text">{{ $message }}</p> @enderror
                             </div>
 
                             <div>
                                 <label for="phone_number" class="block label-text">Phone Number</label>
-                                <input type="text" id="phone_number" name="phone_number" value="{{ old('phone_number', $user->phone_number) }}" @if($lockPersonalInfo) disabled @endif class="form-input">
+                                <input type="text" id="phone_number" name="phone_number" value="{{ old('phone_number', $user->phone_number) }}"
+                                    @if(Auth::user()->role === 'counselor' && $user->phone_number) disabled @elseif($lockPersonalInfo) disabled @endif class="form-input">
                                 @error('phone_number') <p class="error-text">{{ $message }}</p> @enderror
                             </div>
 
                             <div class="md:col-span-2">
                                 <label for="address" class="block label-text">Address</label>
-                                <textarea id="address" name="address" rows="3" @if($lockPersonalInfo) disabled @endif class="form-textarea">{{ old('address', $user->address) }}</textarea>
+                                <textarea id="address" name="address" rows="3"
+                                    @if(Auth::user()->role === 'counselor' && $user->address) disabled @elseif($lockPersonalInfo) disabled @endif class="form-textarea">{{ old('address', $user->address) }}</textarea>
                                 @error('address') <p class="error-text">{{ $message }}</p> @enderror
                             </div>
                         </div>
 
-                        @if(!$lockPersonalInfo)
+                        @if(Auth::user()->role !== 'student')
                             <div class="mt-8 flex justify-end">
                                 <button type="submit" class="btn-primary">
                                     <i class="fas fa-save"></i> Save Changes
@@ -662,27 +775,43 @@
                                     <input type="file" id="profile_picture" name="profile_picture"
                                            accept="image/jpeg,image/png,image/jpg,image/gif,image/webp"
                                            class="hidden" onchange="previewPic(this)">
-                                    <p class="helper-text mt-1">JPG, PNG, GIF or WebP. Max 4MB.</p>
+                                    <p class="helper-text mt-1">JPG, PNG, GIF or WebP. Max 20MB.</p>
                                     @error('profile_picture') <p class="error-text">{{ $message }}</p> @enderror
                                 </div>
                             </div>
 
+                            @php
+                                $cp = $counselorProfile;
+                                $lockPosition    = !empty($cp->position);
+                                $lockCredentials = !empty($cp->credentials);
+                            @endphp
+
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div>
                                     <label for="position" class="block label-text">Position</label>
-                                    <input type="text" id="position" name="position" value="{{ old('position', $counselorProfile->position ?? '') }}" disabled class="form-input">
+                                    <input type="text" id="position" name="position"
+                                           value="{{ old('position', $cp->position ?? '') }}"
+                                           @if($lockPosition) disabled @endif
+                                           class="form-input">
+                                    @if($lockPosition)<p class="helper-text mt-1">Contact admin to change your position.</p>@endif
                                     @error('position') <p class="error-text">{{ $message }}</p> @enderror
                                 </div>
 
                                 <div>
                                     <label for="credentials" class="block label-text">Credentials</label>
-                                    <input type="text" id="credentials" name="credentials" value="{{ old('credentials', $counselorProfile->credentials ?? '') }}" disabled class="form-input">
+                                    <input type="text" id="credentials" name="credentials"
+                                           value="{{ old('credentials', $cp->credentials ?? '') }}"
+                                           @if($lockCredentials) disabled @endif
+                                           class="form-input">
+                                    @if($lockCredentials)<p class="helper-text mt-1">Contact admin to change your credentials.</p>@endif
                                     @error('credentials') <p class="error-text">{{ $message }}</p> @enderror
                                 </div>
 
                                 <div class="md:col-span-2">
                                     <label for="google_calendar_id" class="block label-text">Google Calendar ID</label>
-                                    <input type="text" id="google_calendar_id" name="google_calendar_id" value="{{ old('google_calendar_id', $counselorProfile->google_calendar_id ?? '') }}" placeholder="e.g. counselor@yourdomain.com" class="form-input">
+                                    <input type="text" id="google_calendar_id" name="google_calendar_id"
+                                           value="{{ old('google_calendar_id', $cp->google_calendar_id ?? '') }}"
+                                           placeholder="e.g. counselor@yourdomain.com" class="form-input">
                                     <p class="helper-text">Used to sync booked appointments to your calendar.</p>
                                     @error('google_calendar_id') <p class="error-text">{{ $message }}</p> @enderror
                                 </div>
@@ -690,7 +819,7 @@
                                 <div class="md:col-span-2">
                                     <label for="facebook_link" class="block label-text">Facebook Page Link</label>
                                     <input type="url" id="facebook_link" name="facebook_link"
-                                           value="{{ old('facebook_link', $counselorProfile->facebook_link ?? '') }}"
+                                           value="{{ old('facebook_link', $cp->facebook_link ?? '') }}"
                                            placeholder="e.g. https://www.facebook.com/yourpage"
                                            class="form-input">
                                     <p class="helper-text">Students will see this link in their appointment details.</p>
@@ -702,20 +831,12 @@
                                     <select id="college_id" name="college_id" disabled class="form-select">
                                         <option value="">Select College</option>
                                         @foreach(\App\Models\College::all() as $college)
-                                            <option value="{{ $college->id }}" {{ old('college_id', $counselorProfile->college_id ?? '') == $college->id ? 'selected' : '' }}>
+                                            <option value="{{ $college->id }}" {{ old('college_id', $cp->college_id ?? '') == $college->id ? 'selected' : '' }}>
                                                 {{ $college->name }}
                                             </option>
                                         @endforeach
                                     </select>
                                     @error('college_id') <p class="error-text">{{ $message }}</p> @enderror
-                                </div>
-
-                                <div class="md:col-span-2">
-                                    <label class="flex items-center gap-3 rounded-2xl border border-[var(--border-soft)] bg-[#faf4ec] px-4 py-4">
-                                        <input type="checkbox" name="is_head" value="1" {{ old('is_head', $counselorProfile->is_head ?? '') ? 'checked' : '' }} disabled class="checkbox-accent w-4 h-4">
-                                        <span class="text-sm font-medium text-[var(--text-dark)]">Head Counselor</span>
-                                    </label>
-                                    @error('is_head') <p class="error-text">{{ $message }}</p> @enderror
                                 </div>
                             </div>
 
@@ -764,6 +885,7 @@
                     </form>
                 </div>
             </div>
+            @endif
         </div>
 
         <footer class="footer-shell text-white py-8 mt-12">

@@ -25,6 +25,7 @@
         --text-primary: #2c2420;
         --text-secondary: #6b5e57;
         --text-muted: #8b7e76;
+        --primary-red: #8f1d1d;
     }
 
     * {
@@ -918,20 +919,32 @@
                 </button>
                 <div id="notif-panel" class="hidden absolute right-0 top-[calc(100%+10px)] w-80 bg-white rounded-2xl shadow-xl border border-[var(--border-soft)] z-[1002] overflow-hidden">
                     <div class="flex items-center justify-between px-4 py-3 border-b border-[var(--border-soft)]">
-                        <span class="font-semibold text-sm text-[var(--text-dark)]">Notifications</span>
+                        <span class="font-semibold text-sm text-[#2c2420]">Notifications</span>
                         @if($unreadCount > 0)
-                            <button id="mark-all-read-btn" class="text-xs text-[var(--primary-red)] hover:underline font-medium">Mark all as read</button>
+                            <button id="mark-all-read-btn" style="font-size:0.75rem;color:#8f1d1d;font-weight:600;text-decoration:underline;cursor:pointer;background:none;border:none;">Mark all as read</button>
                         @endif
                     </div>
                     <div class="divide-y divide-[var(--border-soft)]" id="notif-list">
                         @forelse($unreadNotifications as $notif)
-                            <div class="notif-item flex items-start gap-3 px-4 py-3 hover:bg-[var(--bg-light)] cursor-pointer bg-blue-50/40" data-id="{{ $notif->id }}">
-                                <div class="mt-0.5 flex-shrink-0 w-8 h-8 rounded-full bg-[var(--primary-red)] flex items-center justify-center">
-                                    <i class="fas fa-bell text-white text-xs"></i>
+                            <div class="notif-item flex items-start gap-3 px-4 py-3 hover:bg-[#faf8f5] cursor-pointer bg-blue-50/40" data-id="{{ $notif->id }}" title="{{ $notif->data['title'] ?? 'Notification' }}: {{ $notif->data['message'] ?? '' }}">
+                                @php
+                                    $nType = $notif->data['type'] ?? '';
+                                    [$nIcon, $nBg] = match($nType) {
+                                        'appointment_booked', 'appointment_booked_by_counselor' => ['fa-calendar-plus', '#2d7a4f'],
+                                        'appointment_cancelled'                                  => ['fa-calendar-xmark', '#b91c1c'],
+                                        'appointment_rescheduled', 'reschedule_response'         => ['fa-calendar-days', '#c2410c'],
+                                        'appointment_referred', 'appointment_referred_to_counselor', 'referral_response' => ['fa-arrow-right-arrow-left', '#7a2a2a'],
+                                        'appointment_status_changed'                             => ['fa-circle-check', '#2a5a7a'],
+                                        'event_counselor_assigned', 'event_schedule_conflict', 'student_event_schedule_conflict' => ['fa-calendar-exclamation', '#92400e'],
+                                        default                                                  => ['fa-bell', '#7a2a2a'],
+                                    };
+                                @endphp
+                                <div class="mt-0.5 flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center" style="background:{{ $nBg }}">
+                                    <i class="fas {{ $nIcon }} text-white text-xs"></i>
                                 </div>
                                 <div class="flex-1 min-w-0">
-                                    <p class="text-xs font-semibold text-[var(--text-dark)] truncate">{{ $notif->data['title'] ?? 'Notification' }}</p>
-                                    <p class="text-xs text-[var(--text-secondary)] mt-0.5 line-clamp-2">{{ $notif->data['message'] ?? '' }}</p>
+                                    <p class="text-xs font-semibold text-[#2c2420] truncate">{{ $notif->data['title'] ?? 'Notification' }}</p>
+                                    <p class="text-xs text-[var(--text-secondary)] mt-0.5">{{ $notif->data['message'] ?? '' }}</p>
                                     <p class="text-[10px] text-[var(--text-muted)] mt-1">{{ $notif->created_at->diffForHumans() }}</p>
                                 </div>
                             </div>
@@ -1113,7 +1126,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 }).then(function () {
                     item.dataset.read = 'true';
                     item.classList.remove('bg-blue-50/40');
-                    item.classList.add('opacity-60');
+                    item.style.opacity = '0.55';
                     updateBadge(-1);
                 });
             });
@@ -1125,12 +1138,14 @@ document.addEventListener('DOMContentLoaded', function () {
                     method: 'POST',
                     headers: { 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || '', 'Accept': 'application/json' }
                 }).then(function () {
-                    notifPanel.querySelectorAll('.notif-item').forEach(el => el.remove());
-                    const list = document.getElementById('notif-list');
-                    if (list) list.innerHTML = '<div class="px-4 py-8 text-center text-sm text-gray-400"><i class="fas fa-bell-slash text-2xl mb-2 block opacity-40"></i>No new notifications</div>';
+                    notifPanel.querySelectorAll('.notif-item').forEach(function (el) {
+                        el.dataset.read = 'true';
+                        el.classList.remove('bg-blue-50/40');
+                        el.style.opacity = '0.55';
+                    });
                     const badge = document.getElementById('notif-badge');
                     if (badge) badge.remove();
-                    markAllBtn.remove();
+                    markAllBtn.style.display = 'none';
                 });
             });
         }

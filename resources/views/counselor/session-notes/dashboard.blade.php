@@ -296,7 +296,7 @@
                         <label for="search" class="field-label">Search</label>
                         <div class="relative">
                             <input type="text" id="search" name="search"
-                                   placeholder="Search by student name, notes, or college..."
+                                   placeholder="‎ ‎ ‎ Search by student name, notes, or college..."
                                    value="{{ request('search') }}"
                                    class="input-field pl-10">
                             <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">

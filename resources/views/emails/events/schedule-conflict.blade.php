@@ -9,7 +9,7 @@
         <p>Hello, <strong>{{ $counselor->user->first_name }} {{ $counselor->user->last_name }}</strong>,</p>
         <p>
             The event <strong>{{ $event->title }}</strong> has been added to your calendar, but it overlaps with
-            {{ $conflictingAppointments->count() }} existing appointment(s). Please review and take action as needed.
+            existing schedule(s). Please review and take action as needed.
         </p>
 
         <h3 style="margin-top: 24px; margin-bottom: 8px; color: #dc2626;">Event Details</h3>
@@ -39,8 +39,10 @@
             </tr>
         </table>
 
+        {{-- Appointment conflicts --}}
+        @if($conflictingAppointments->isNotEmpty())
         <h3 style="margin-top: 24px; margin-bottom: 8px; color: #dc2626;">Conflicting Appointments</h3>
-        <table style="width: 100%; border-collapse: collapse;">
+        <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">
             <thead>
                 <tr style="background: #fee2e2;">
                     <th style="padding: 10px; border: 1px solid #e5e7eb; text-align: left;">Case #</th>
@@ -68,6 +70,34 @@
                 @endforeach
             </tbody>
         </table>
+        @endif
+
+        {{-- Google Calendar conflicts --}}
+        @if($calendarConflicts->isNotEmpty())
+        <h3 style="margin-top: 24px; margin-bottom: 8px; color: #b45309;">Conflicting Google Calendar Events</h3>
+        <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">
+            <thead>
+                <tr style="background: #fef3c7;">
+                    <th style="padding: 10px; border: 1px solid #e5e7eb; text-align: left;">Event Title</th>
+                    <th style="padding: 10px; border: 1px solid #e5e7eb; text-align: left;">Date</th>
+                    <th style="padding: 10px; border: 1px solid #e5e7eb; text-align: left;">Time</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach($calendarConflicts as $conflict)
+                <tr style="{{ $loop->even ? 'background: #f9fafb;' : '' }}">
+                    <td style="padding: 10px; border: 1px solid #e5e7eb;">{{ $conflict['title'] }}</td>
+                    <td style="padding: 10px; border: 1px solid #e5e7eb;">
+                        {{ \Carbon\Carbon::parse($conflict['date'])->format('M d, Y') }}
+                    </td>
+                    <td style="padding: 10px; border: 1px solid #e5e7eb;">
+                        {{ $conflict['start']->format('h:i A') }} – {{ $conflict['end']->format('h:i A') }}
+                    </td>
+                </tr>
+                @endforeach
+            </tbody>
+        </table>
+        @endif
 
         <p style="margin-top: 20px;">Please log in to the system to reschedule or manage the affected appointments.</p>
         <p style="color: #6b7280; font-size: 13px; margin-top: 24px;">MSU-IIT Guidance Counseling System</p>

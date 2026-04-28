@@ -77,7 +77,7 @@
                                            id="search"
                                            name="search"
                                            value="{{ request('search') }}"
-                                           placeholder="Search by student name, counselor, student id, or concern..."
+                                           placeholder="‎ ‎ ‎ Search by student name, counselor, student id, or concern..."
                                            class="filter-input pl-9 sm:pl-10">
                                     <div class="absolute inset-y-0 left-0 pl-3 sm:pl-3.5 flex items-center pointer-events-none">
                                         <i class="fas fa-search text-[#a89f97] text-[10px] sm:text-xs"></i>

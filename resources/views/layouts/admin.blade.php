@@ -1119,9 +1119,9 @@
                     <i class="fas fa-gauge-high"></i>
                     <span>Dashboard</span>
                 </a>
-                <a href="{{ route('admin.users') }}" class="sidebar-link {{ request()->routeIs('admin.users') && !request()->routeIs('admin.users.create') ? 'active' : '' }}">
-                    <i class="fas fa-users-gear"></i>
-                    <span>User Management</span>
+                <a href="{{ route('admin.services.index') }}" class="sidebar-link {{ request()->routeIs('admin.services.*') ? 'active' : '' }}">
+                    <i class="fas fa-layer-group"></i>
+                    <span>Services</span>
                 </a>
                 <a href="{{ route('admin.students') }}" class="sidebar-link {{ request()->routeIs('admin.students') ? 'active' : '' }}">
                     <i class="fas fa-user-graduate"></i>
@@ -1162,10 +1162,6 @@
                     Quick Actions
                 </div>
 
-                <a href="{{ route('admin.users.create') }}" class="sidebar-link {{ request()->routeIs('admin.users.create') ? 'active' : '' }}">
-                    <i class="fas fa-user-plus"></i>
-                    <span>Create User</span>
-                </a>
                 <a href="{{ route('admin.events.create') }}" class="sidebar-link {{ request()->routeIs('admin.events.create') ? 'active' : '' }}">
                     <i class="fas fa-calendar-plus"></i>
                     <span>Create Event</span>

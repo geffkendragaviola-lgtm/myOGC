@@ -16,8 +16,8 @@ class EventRequest extends FormRequest
         $rules = [
             'title' => 'required|string|max:255',
             'description' => 'required|string',
-            'type' => 'required|in:webinar,workshop,seminar,activity,conference',
-            'event_start_date' => 'required|date|after_or_equal:today',
+            'type' => 'required|in:webinar,workshop,seminar,activity,conference,other',
+            'event_start_date' => 'required|date',
             'event_end_date' => 'required|date|after_or_equal:event_start_date',
             'start_time' => 'required',
             'end_time' => 'required|after:start_time',
@@ -31,7 +31,7 @@ class EventRequest extends FormRequest
             'year_levels' => 'nullable|array',
             'year_levels.*' => 'string|in:1st Year,2nd Year,3rd Year,4th Year,5th Year',
             'counselor_ids' => 'nullable|array',
-            'counselor_ids.*' => 'string',
+            'counselor_ids.*' => 'nullable|integer',
         ];
 
         // Add image validation for create and update

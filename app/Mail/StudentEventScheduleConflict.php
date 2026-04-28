@@ -2,7 +2,7 @@
 
 namespace App\Mail;
 
-use App\Models\Counselor;
+use App\Models\Appointment;
 use App\Models\Event;
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
@@ -10,26 +10,23 @@ use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
 
-class EventScheduleConflict extends Mailable
+class StudentEventScheduleConflict extends Mailable
 {
     use Queueable, SerializesModels;
 
     public function __construct(
         public Event $event,
-        public Counselor $counselor,
-        public $conflictingAppointments,
-        public $calendarConflicts = null,
-    ) {
-        $this->calendarConflicts = $calendarConflicts ?? collect();
-    }
+        public Appointment $appointment,
+        public string $studentFirstName
+    ) {}
 
     public function envelope(): Envelope
     {
-        return new Envelope(subject: 'Schedule Conflict Detected – ' . $this->event->title);
+        return new Envelope(subject: 'Appointment Schedule Notice – ' . $this->event->title);
     }
 
     public function content(): Content
     {
-        return new Content(view: 'emails.events.schedule-conflict');
+        return new Content(view: 'emails.events.student-schedule-conflict');
     }
 }

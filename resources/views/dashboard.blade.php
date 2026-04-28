@@ -493,14 +493,8 @@
                                 <a href="{{ route('admin.dashboard') }}" class="dropdown-link">
                                     <i class="fas fa-gauge-high mr-2"></i> Dashboard
                                 </a>
-                                <a href="{{ route('admin.users') }}" class="dropdown-link">
-                                    <i class="fas fa-users mr-2"></i> Manage Users
-                                </a>
                                 <a href="{{ route('admin.events') }}" class="dropdown-link">
                                     <i class="fas fa-calendar-days mr-2"></i> Manage Events
-                                </a>
-                                <a href="{{ route('admin.users.create') }}" class="dropdown-link">
-                                    <i class="fas fa-user-plus mr-2"></i> Create User
                                 </a>
                                 <a href="{{ route('admin.students') }}" class="dropdown-link">
                                     <i class="fas fa-user-graduate mr-2"></i> Students
@@ -570,8 +564,20 @@
                             <div class="overflow-y-auto divide-y divide-[var(--border-soft)]" id="notif-list">
                                 @forelse($unreadNotifications as $notif)
                                     <div class="notif-item flex items-start gap-3 px-4 py-3 hover:bg-[var(--bg-light)] cursor-pointer bg-blue-50/40" data-id="{{ $notif->id }}">
-                                        <div class="mt-0.5 flex-shrink-0 w-8 h-8 rounded-full bg-[var(--primary-red)] flex items-center justify-center">
-                                            <i class="fas fa-bell text-white text-xs"></i>
+                                        @php
+                                            $nType = $notif->data['type'] ?? '';
+                                            [$nIcon, $nBg] = match($nType) {
+                                                'appointment_booked', 'appointment_booked_by_counselor' => ['fa-calendar-plus', '#2d7a4f'],
+                                                'appointment_cancelled'                                  => ['fa-calendar-xmark', '#b91c1c'],
+                                                'appointment_rescheduled', 'reschedule_response'         => ['fa-calendar-days', '#c2410c'],
+                                                'appointment_referred', 'appointment_referred_to_counselor', 'referral_response' => ['fa-arrow-right-arrow-left', '#7a2a2a'],
+                                                'appointment_status_changed'                             => ['fa-circle-check', '#2a5a7a'],
+                                                'event_counselor_assigned', 'event_schedule_conflict', 'student_event_schedule_conflict' => ['fa-calendar-exclamation', '#92400e'],
+                                                default                                                  => ['fa-bell', '#7a2a2a'],
+                                            };
+                                        @endphp
+                                        <div class="mt-0.5 flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center" style="background:{{ $nBg }}">
+                                            <i class="fas {{ $nIcon }} text-white text-xs"></i>
                                         </div>
                                         <div class="flex-1 min-w-0">
                                             <p class="text-xs font-semibold text-[var(--text-dark)] truncate">{{ $notif->data['title'] ?? 'Notification' }}</p>
@@ -836,7 +842,11 @@
                                 @foreach($services as $service)
                                     <div class="service-card-custom overflow-hidden group">
                                         @if($service->image_url)
-                                            <img src="{{ $service->image_url }}"
+                                            @php
+                                                $img = $service->image_url;
+                                                $imgSrc = $img && preg_match('/^https?:\/\//i', $img) ? $img : ($img ? asset('storage/' . $img) : null);
+                                            @endphp
+                                            <img src="{{ $imgSrc }}"
                                                  alt="{{ $service->title }}"
                                                  class="w-full h-48 object-cover group-hover:scale-105 transition duration-500">
                                         @endif
@@ -1116,7 +1126,7 @@
                         }).then(function () {
                             item.dataset.read = 'true';
                             item.classList.remove('bg-blue-50/40');
-                            item.classList.add('opacity-60');
+                            item.style.opacity = '0.55';
                             updateNotifBadge(-1);
                         });
                     });
@@ -1131,11 +1141,11 @@
                             notifPanel.querySelectorAll('.notif-item').forEach(function (el) {
                                 el.dataset.read = 'true';
                                 el.classList.remove('bg-blue-50/40');
-                                el.classList.add('opacity-60');
+                                el.style.opacity = '0.55';
                             });
                             const badge = document.getElementById('notif-badge');
                             if (badge) badge.remove();
-                            markAllBtn.remove();
+                            markAllBtn.style.display = 'none';
                         });
                     });
                 }

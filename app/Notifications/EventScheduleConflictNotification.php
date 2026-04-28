@@ -21,7 +21,7 @@ class EventScheduleConflictNotification extends Notification
     {
         return [
             'title'          => 'Schedule Conflict Detected',
-            'message'        => "The event \"{$this->event->title}\" overlaps with {$this->conflictCount} existing appointment(s) on your calendar.",
+            'message'        => "The event \"{$this->event->title}\" overlaps with {$this->conflictCount} existing schedule(s) on your calendar.",
             'event_id'       => $this->event->id,
             'conflict_count' => $this->conflictCount,
             'type'           => 'event_schedule_conflict',

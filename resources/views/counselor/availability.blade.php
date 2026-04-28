@@ -19,54 +19,66 @@
 
     /* Base Layout & Glow */
     .avail-shell {
-        position: relative;
+        position: relative; overflow: hidden;
         background: var(--bg-warm);
         min-height: 100vh;
-        padding-bottom: 3rem;
+        padding-bottom: 2rem;
     }
     .avail-glow {
-        position: absolute; border-radius: 50%; filter: blur(80px); pointer-events: none; opacity: 0.2; z-index: 0;
+        position: absolute; border-radius: 50%; filter: blur(80px); pointer-events: none; opacity: 0.25;
     }
-    .avail-glow.one { top: -50px; left: -50px; width: 250px; height: 250px; background: var(--gold-400); }
-    .avail-glow.two { bottom: 10%; right: -50px; width: 220px; height: 220px; background: var(--maroon-800); }
+    .avail-glow.one { top: -30px; left: -40px; width: 200px; height: 200px; background: var(--gold-400); }
+    .avail-glow.two { bottom: -30px; right: -60px; width: 220px; height: 220px; background: var(--maroon-800); }
 
-    /* Glass Cards */
-    .panel-card {
-        position: relative; z-index: 1; overflow: hidden; border-radius: 0.75rem;
+    /* Cards */
+    .hero-card, .panel-card {
+        position: relative; overflow: hidden; border-radius: 0.75rem;
         border: 1px solid var(--border-soft); background: rgba(255,255,255,0.95);
         backdrop-filter: blur(8px); box-shadow: 0 2px 8px rgba(44,36,32,0.04);
         transition: box-shadow 0.2s ease;
     }
-    .panel-card::before {
+    .hero-card:hover, .panel-card:hover { box-shadow: 0 4px 14px rgba(44,36,32,0.06); }
+    .hero-card::before, .panel-card::before {
         content: ""; position: absolute; inset: 0; pointer-events: none;
         background: radial-gradient(circle at top right, rgba(212,175,55,0.06), transparent 30%);
     }
 
-    /* Header Specifics */
-    .page-header h1 { color: var(--text-primary); font-weight: 700; letter-spacing: -0.02em; }
-    .page-header p { color: var(--text-secondary); }
+    /* Hero */
+    .hero-icon {
+        display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+        width: 2.75rem; height: 2.75rem; border-radius: 0.75rem; color: #fef9e7;
+        background: linear-gradient(135deg, var(--maroon-800) 0%, var(--maroon-700) 100%);
+        box-shadow: 0 4px 12px rgba(92,26,26,0.15);
+    }
+    .hero-badge {
+        display: inline-flex; align-items: center; gap: 0.4rem; border-radius: 999px;
+        border: 1px solid rgba(212,175,55,0.3); background: rgba(254,249,231,0.8);
+        padding: 0.2rem 0.55rem; font-size: 9px; font-weight: 700; text-transform: uppercase;
+        letter-spacing: 0.16em; color: var(--maroon-700);
+    }
+    .hero-badge-dot { width: 0.3rem; height: 0.3rem; border-radius: 999px; background: var(--gold-400); }
+    .panel-topline { position: absolute; inset-inline: 0; top: 0; height: 3px; background: linear-gradient(90deg, var(--maroon-800) 0%, var(--gold-400) 50%, var(--maroon-800) 100%); }
 
-    /* Alerts */
     .alert-success {
-        background: rgba(209, 250, 229, 0.6); border: 1px solid rgba(16, 185, 129, 0.2);
-        color: #047857; border-radius: 0.75rem; padding: 0.75rem 1rem;
-        display: flex; align-items: center; gap: 0.75rem;
+        background: rgba(240,253,244,0.9); border: 1px solid rgba(16,185,129,0.3);
+        border-left: 3px solid #10b981;
+        color: #065f46; border-radius: 0.6rem; padding: 0.75rem 1rem;
+        display: flex; align-items: center; gap: 0.75rem; font-size: 0.8rem; font-weight: 500;
     }
     .alert-error {
-        background: rgba(254, 226, 226, 0.6); border: 1px solid rgba(185, 28, 28, 0.2);
-        color: #b91c1c; border-radius: 0.75rem; padding: 0.75rem 1rem;
+        background: rgba(253,242,242,0.9); border: 1px solid rgba(185,28,28,0.3);
+        border-left: 3px solid #dc2626;
+        color: #7f1d1d; border-radius: 0.6rem; padding: 0.75rem 1rem; font-size: 0.8rem;
     }
     .alert-title { font-weight: 600; margin-bottom: 0.25rem; display: block; }
-    .alert-list { list-style-type: disc; padding-left: 1.25rem; font-size: 0.85rem; }
+    .alert-list { list-style-type: disc; padding-left: 1.25rem; font-size: 0.8rem; }
 
     /* Form Elements */
     .section-title {
-        font-size: 0.9rem; font-weight: 700; color: var(--maroon-800);
+        font-size: 0.8rem; font-weight: 700; color: var(--maroon-700);
         margin-bottom: 0.75rem; display: flex; align-items: center; gap: 0.5rem;
-    }
-    .section-title::before {
-        content: ""; display: block; width: 4px; height: 18px;
-        background: var(--gold-500); border-radius: 2px;
+        text-transform: uppercase; letter-spacing: 0.06em;
+        padding-bottom: 0.4rem; border-bottom: 2px solid rgba(212,175,55,0.3);
     }
     
     .input-field, .select-field {
@@ -134,19 +146,19 @@
     .btn-primary {
         background: linear-gradient(135deg, var(--maroon-800) 0%, var(--maroon-700) 100%);
         color: #fef9e7; font-weight: 600; border-radius: 0.6rem;
-        padding: 0.75rem 1.5rem; display: inline-flex; align-items: center; justify-content: center;
+        padding: 0.55rem 1.25rem; display: inline-flex; align-items: center; justify-content: center;
         box-shadow: 0 4px 10px rgba(92,26,26,0.15); transition: all 0.2s ease;
-        border: none;
+        border: none; font-size: 0.8rem;
     }
     .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 6px 14px rgba(92,26,26,0.2); }
 
     .btn-back {
-        background: white; color: var(--text-secondary); border: 1px solid var(--border-soft);
-        font-weight: 600; border-radius: 0.6rem; padding: 0.6rem 1rem;
+        background: rgba(255,255,255,0.9); color: var(--text-secondary); border: 1px solid var(--border-soft);
+        font-weight: 600; border-radius: 0.6rem; padding: 0.5rem 1rem;
         display: inline-flex; align-items: center; justify-content: center;
-        transition: all 0.2s ease; text-decoration: none;
+        transition: all 0.2s ease; text-decoration: none; font-size: 0.8rem;
     }
-    .btn-back:hover { background: var(--bg-warm); color: var(--text-primary); border-color: var(--maroon-700); }
+    .btn-back:hover { background: rgba(254,249,231,0.7); color: var(--text-primary); border-color: var(--maroon-700); }
 
     /* Mobile Adjustments */
     @media (max-width: 639px) {
@@ -163,38 +175,43 @@
     <div class="avail-glow one"></div>
     <div class="avail-glow two"></div>
 
-    <div class="relative max-w-5xl mx-auto px-4 sm:px-6 py-6 md:py-8">
-        
+    <div class="relative max-w-7xl mx-auto px-4 sm:px-6 py-5 md:py-8">
+
         <!-- Header -->
-        <div class="mb-6 panel-card p-5 sm:p-6">
-            <div class="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4">
-                <div class="page-header">
-                    <h1 class="text-xl sm:text-2xl font-bold">Availability & Booking Limits</h1>
-                    <p class="text-sm mt-1">Set your weekly availability, daily limits, and date overrides.</p>
-                </div>
-                <div>
-                    <a href="{{ route('counselor.dashboard') }}"
-                       class="btn-back">
-                        <i class="fas fa-arrow-left mr-2"></i> Back to Dashboard
-                    </a>
+        <div class="mb-5 sm:mb-6">
+            <div class="hero-card">
+                <div class="relative p-4 sm:p-5 flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
+                    <div class="flex items-start gap-3">
+                        <div class="hero-icon">
+                            <i class="fas fa-clock text-base sm:text-lg"></i>
+                        </div>
+                        <div class="min-w-0">
+                            <div class="hero-badge"><span class="hero-badge-dot"></span>Counselor Portal</div>
+                            <h1 class="text-lg sm:text-xl lg:text-2xl font-semibold tracking-tight text-[#2c2420] mt-2">Availability & Booking Limits</h1>
+                            <p class="text-[#6b5e57] text-xs sm:text-sm mt-1.5">Set your weekly availability, daily limits, and date overrides.</p>
+                        </div>
+                    </div>
+                    <div class="flex-shrink-0">
+                        <a href="{{ route('counselor.dashboard') }}" class="btn-back text-xs sm:text-sm px-4 py-2">
+                            <i class="fas fa-arrow-left mr-1.5 text-[9px] sm:text-xs"></i>Back to Dashboard
+                        </a>
+                    </div>
                 </div>
             </div>
         </div>
 
         @if($errors->any())
-            <div class="mb-6 alert-error">
-                <div>
-                    <span class="alert-title">Please fix the following errors:</span>
-                    <ul class="alert-list space-y-1">
-                        @foreach($errors->all() as $error)
-                            <li>{{ $error }}</li>
-                        @endforeach
-                    </ul>
-                </div>
+            <div class="mb-5 alert-error">
+                <span class="alert-title">Please fix the following errors:</span>
+                <ul class="alert-list space-y-1">
+                    @foreach($errors->all() as $error)<li>{{ $error }}</li>@endforeach
+                </ul>
             </div>
         @endif
 
-        <div class="panel-card p-5 sm:p-6 md:p-8">
+        <div class="panel-card">
+            <div class="panel-topline"></div>
+            <div class="p-5 sm:p-6">
             <form method="POST" action="{{ route('counselor.availability.update') }}">
                 @csrf
                 @method('patch')
@@ -288,13 +305,13 @@
 
                 <!-- Submit -->
                 <div class="mt-8 action-group flex justify-end">
-                    <button type="submit"
-                            class="btn-primary">
-                        <i class="fas fa-save mr-2 text-xs"></i> Save Availability
+                    <button type="submit" class="btn-primary">
+                        <i class="fas fa-save mr-1.5 text-[9px]"></i>Save Availability
                     </button>
                 </div>
             </form>
-        </div>
+            </div><!-- /.p-5 -->
+        </div><!-- /.panel-card -->
     </div>
 </div>
 

@@ -378,6 +378,104 @@
                         </div>
                     </div>
 
+                    <!-- Attending Counselors -->
+                    <div class="section-card mb-4">
+                        <div class="section-topline"></div>
+                        <div class="section-header">
+                            <div class="section-icon">
+                                <i class="fab fa-google text-[9px] sm:text-xs"></i>
+                            </div>
+                            <div>
+                                <h3 class="section-title">Attending Counselors (Google Calendar)</h3>
+                                <p class="section-subtitle hidden sm:block">Selected counselors will have this event synced to their Google Calendar.</p>
+                            </div>
+                        </div>
+                        <div class="p-3 sm:p-4">
+                            @php $oldCounselorIds = old('counselor_ids') !== null
+                                ? collect(old('counselor_ids'))->map('intval')->filter()->all()
+                                : $selectedCounselors; @endphp
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-2">
+                                @foreach($counselors as $counselor)
+                                    @php $isChecked = in_array($counselor->id, $oldCounselorIds); @endphp
+                                    <label class="option-card cursor-pointer gap-2" style="padding:0.5rem 0.75rem;">
+                                        <input type="checkbox"
+                                               name="counselor_ids[]"
+                                               value="{{ $counselor->id }}"
+                                               {{ $isChecked ? 'checked' : '' }}
+                                               class="w-4 h-4 text-[#7a2a2a] border-[#e5e0db] rounded focus:ring-[#7a2a2a] flex-shrink-0">
+                                        <span class="text-xs font-medium text-[#4a3f3a]">
+                                            {{ trim($counselor->user->first_name . ' ' . $counselor->user->last_name) }}
+                                            @if($counselor->college_names)
+                                                <span class="text-[10px] text-[#8b7e76]">({{ $counselor->college_names }})</span>
+                                            @endif
+                                            @if(!$counselor->google_calendar_id)
+                                                <span class="text-[10px] text-[#b45309]">(no calendar)</span>
+                                            @endif
+                                        </span>
+                                    </label>
+                                @endforeach
+                            </div>
+                            @error('counselor_ids')
+                                <p class="error-text mt-2">{{ $message }}</p>
+                            @enderror
+                        </div>
+                    </div>
+
+                    <!-- College & Year Level -->
+                    <div class="section-card mb-4">
+                        <div class="section-topline"></div>
+                        <div class="section-header">
+                            <div class="section-icon">
+                                <i class="fas fa-users-viewfinder text-[9px] sm:text-xs"></i>
+                            </div>
+                            <div>
+                                <h3 class="section-title">Target Audience</h3>
+                                <p class="section-subtitle hidden sm:block">Colleges and year levels that can access this event.</p>
+                            </div>
+                        </div>
+                        <div class="p-3 sm:p-4 space-y-4">
+                            <input type="hidden" name="for_all_colleges" id="for_all_colleges_hidden"
+                                   value="{{ $event->for_all_colleges ? '1' : '0' }}">
+
+                            <div>
+                                <label class="field-label">Target Colleges <span class="text-[#8b7e76] text-[10px]">(leave empty = all colleges)</span></label>
+                                <select id="colleges" name="colleges[]" multiple class="select-field" size="5">
+                                    @foreach($colleges as $college)
+                                        <option value="{{ $college->id }}"
+                                            {{ in_array($college->id, old('colleges', $selectedColleges)) ? 'selected' : '' }}>
+                                            {{ $college->name }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                                <p class="helper-text">Hold Ctrl/Cmd to select multiple. Leave empty for all colleges.</p>
+                            </div>
+
+                            <div>
+                                <label class="field-label">Year Level Restriction <span class="text-[#8b7e76] text-[10px]">(leave unchecked = all)</span></label>
+                                @php $savedYearLevels = old('year_levels', $event->year_levels ?? []); @endphp
+                                <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-2 mt-1">
+                                    @foreach(['1st Year','2nd Year','3rd Year','4th Year','5th Year'] as $yl)
+                                    <label class="option-card cursor-pointer" style="gap:0.5rem;padding:0.5rem 0.75rem;">
+                                        <input type="checkbox" name="year_levels[]" value="{{ $yl }}"
+                                               {{ in_array($yl, $savedYearLevels) ? 'checked' : '' }}
+                                               class="w-4 h-4 text-[#7a2a2a] border-[#e5e0db] rounded focus:ring-[#7a2a2a] flex-shrink-0">
+                                        <span class="text-xs font-medium text-[#4a3f3a]">{{ $yl }}</span>
+                                    </label>
+                                    @endforeach
+                                </div>
+                            </div>
+
+                            <div class="option-card">
+                                <input type="checkbox" id="is_required" name="is_required" value="1"
+                                       {{ old('is_required', $event->is_required) ? 'checked' : '' }}
+                                       class="w-4 h-4 text-[#7a2a2a] border-[#e5e0db] rounded focus:ring-[#7a2a2a] mt-0.5 flex-shrink-0">
+                                <label for="is_required" class="ml-3 text-xs font-medium text-[#4a3f3a]">
+                                    <span class="font-semibold text-[#7a2a2a]">Required Event</span> — mandatory for selected colleges
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
                     <!-- Current Event Information Card -->
                     <div class="info-card mt-4">
                         <div class="section-topline"></div>
@@ -469,6 +567,15 @@
         endTime.addEventListener('change', validateTimeRange);
         startDate.addEventListener('change', validateTimeRange);
         endDate.addEventListener('change', validateTimeRange);
+
+        // Set for_all_colleges based on college selection
+        const collegesSelect = document.getElementById('colleges');
+        const forAllCollegesHidden = document.getElementById('for_all_colleges_hidden');
+        if (collegesSelect) {
+            collegesSelect.addEventListener('change', function() {
+                forAllCollegesHidden.value = this.selectedOptions.length === 0 ? '1' : '0';
+            });
+        }
 
         // Show confirmation for significant changes
         const form = document.querySelector('form');

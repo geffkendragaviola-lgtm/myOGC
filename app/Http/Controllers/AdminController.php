@@ -14,10 +14,15 @@ use App\Models\Feedback;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rules;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
+use App\Http\Requests\EventRequest;
+use App\Services\GoogleCalendarService;
 
 class AdminController extends Controller
 {
@@ -538,59 +543,59 @@ class AdminController extends Controller
      */
     public function createEvent()
     {
-        $userId = Auth::id();
-        $admin = Admin::with('user')->where('user_id', $userId)->first();
-        $counselors = Counselor::with('user')->get();
+        $colleges = College::all();
+        $counselors = Counselor::with(['user', 'college'])->get()
+            ->groupBy('user_id')
+            ->map(function ($group) {
+                $first = $group->first();
+                $first->college_names = $group->pluck('college.name')->filter()->implode(', ');
+                return $first;
+            })->values();
 
-        return view('admin.events.create', compact('admin', 'counselors'));
+        return view('admin.events.create', compact('colleges', 'counselors'));
     }
 
     /**
      * Store a newly created event as admin
      */
-    public function storeEvent(Request $request)
+    public function storeEvent(EventRequest $request)
     {
-        $request->validate([
-            'title' => 'required|string|max:255',
-            'description' => 'required|string',
-            'type' => 'required|in:workshop,seminar,webinar,conference,other',
-            'event_start_date' => 'required|date',
-            'event_end_date' => 'required|date|after_or_equal:event_start_date',
-            'start_time' => 'required',
-            'end_time' => 'required|after:start_time',
-            'location' => 'required|string|max:255',
-            'max_attendees' => 'nullable|integer|min:1',
-            'user_id' => 'required|exists:users,id',
-            'is_active' => 'boolean'
-        ]);
+        $data = $request->validated();
+        $rawCounselorIds = $data['counselor_ids'] ?? [];
+        unset($data['counselor_ids']);
 
-        DB::beginTransaction();
+        // Admin must pick which counselor owns the event
+        $data['user_id'] = $request->input('user_id');
 
-        try {
-            $event = Event::create([
-                'user_id' => $request->user_id,
-                'title' => strip_tags($request->title),
-                'description' => strip_tags($request->description),
-                'type' => $request->type,
-                'event_start_date' => $request->event_start_date,
-                'event_end_date' => $request->event_end_date,
-                'start_time' => $request->start_time,
-                'end_time' => $request->end_time,
-                'location' => strip_tags($request->location),
-                'max_attendees' => $request->max_attendees,
-                'is_active' => $request->has('is_active'),
-            ]);
-
-            DB::commit();
-
-            return redirect()->route('admin.events')->with('success', 'Event created successfully!');
-
-        } catch (\Exception $e) {
-            DB::rollBack();
-            return redirect()->back()
-                ->withInput()
-                ->withErrors(['error' => 'Failed to create event: ' . $e->getMessage()]);
+        if (empty($data['year_levels'])) {
+            $data['year_levels'] = null;
         }
+
+        if ($request->hasFile('image')) {
+            $data['image'] = basename($request->file('image')->store('events', 'public'));
+        }
+
+        $event = Event::create($data);
+
+        if (!$request->for_all_colleges && $request->has('colleges')) {
+            $event->colleges()->sync($request->colleges);
+        }
+
+        if ($event->is_required) {
+            $event->registerRequiredStudents();
+        }
+
+        $counselorIds = collect($rawCounselorIds)
+            ->map(fn($id) => (int) $id)->unique()->filter()->values()->toArray();
+
+        if (!empty($counselorIds)) {
+            $event->assignedCounselors()->sync($counselorIds);
+            app(GoogleCalendarService::class)->syncEventToCounselors($event, $counselorIds);
+            $this->notifyCounselorsOfEventConflicts($event, $counselorIds);
+            $this->notifyAssignedCounselors($event, $counselorIds);
+        }
+
+        return redirect()->route('admin.events')->with('success', 'Event created successfully!');
     }
 
     /**
@@ -598,59 +603,90 @@ class AdminController extends Controller
      */
     public function editEvent(Event $event)
     {
-        $userId = Auth::id();
-        $admin = Admin::with('user')->where('user_id', $userId)->first();
-        $counselors = Counselor::with('user')->get();
+        $colleges = College::all();
+        $selectedColleges = $event->colleges->pluck('id')->toArray();
 
-        return view('admin.events.edit', compact('admin', 'event', 'counselors'));
+        $counselors = Counselor::with(['user', 'college'])->get()
+            ->groupBy('user_id')
+            ->map(function ($group) {
+                $first = $group->first();
+                $first->college_names = $group->pluck('college.name')->filter()->implode(', ');
+                return $first;
+            })->values();
+
+        // Normalize selected counselors to primary IDs
+        $assignedUserIds = $event->assignedCounselors->pluck('user_id')->unique()->toArray();
+        $selectedCounselors = $counselors
+            ->filter(fn($c) => in_array($c->user_id, $assignedUserIds))
+            ->pluck('id')->toArray();
+
+        return view('admin.events.edit', compact('event', 'colleges', 'selectedColleges', 'counselors', 'selectedCounselors'));
     }
 
     /**
      * Update the specified event as admin
      */
-    public function updateEvent(Request $request, Event $event)
+    public function updateEvent(EventRequest $request, Event $event)
     {
-        $request->validate([
-            'title' => 'required|string|max:255',
-            'description' => 'required|string',
-            'type' => 'required|in:workshop,seminar,webinar,conference,other',
-            'event_start_date' => 'required|date',
-            'event_end_date' => 'required|date|after_or_equal:event_start_date',
-            'start_time' => 'required',
-            'end_time' => 'required|after:start_time',
-            'location' => 'required|string|max:255',
-            'max_attendees' => 'nullable|integer|min:1',
-            'user_id' => 'required|exists:users,id',
-            'is_active' => 'boolean'
-        ]);
+        $data = $request->validated();
+        $rawCounselorIds = $data['counselor_ids'] ?? [];
+        unset($data['counselor_ids']);
 
-        DB::beginTransaction();
+        // Admin can reassign the owning counselor
+        $data['user_id'] = $request->input('user_id');
 
-        try {
-            $event->update([
-                'user_id' => $request->user_id,
-                'title' => strip_tags($request->title),
-                'description' => strip_tags($request->description),
-                'type' => $request->type,
-                'event_start_date' => $request->event_start_date,
-                'event_end_date' => $request->event_end_date,
-                'start_time' => $request->start_time,
-                'end_time' => $request->end_time,
-                'location' => strip_tags($request->location),
-                'max_attendees' => $request->max_attendees,
-                'is_active' => $request->has('is_active'),
-            ]);
-
-            DB::commit();
-
-            return redirect()->route('admin.events')->with('success', 'Event updated successfully!');
-
-        } catch (\Exception $e) {
-            DB::rollBack();
-            return redirect()->back()
-                ->withInput()
-                ->withErrors(['error' => 'Failed to update event: ' . $e->getMessage()]);
+        if (empty($data['year_levels'])) {
+            $data['year_levels'] = null;
         }
+
+        if ($request->hasFile('image')) {
+            if ($event->image) {
+                Storage::disk('public')->delete('events/' . $event->image);
+            }
+            $data['image'] = basename($request->file('image')->store('events', 'public'));
+        }
+
+        $event->update($data);
+
+        if ($request->for_all_colleges) {
+            $event->colleges()->detach();
+        } else {
+            $event->colleges()->sync($request->colleges ?? []);
+        }
+
+        if ($event->is_required && $event->shouldAutoRegister()) {
+            $event->registerRequiredStudents();
+        }
+
+        $newCounselorIds = collect($rawCounselorIds)
+            ->map(fn($id) => (int) $id)->unique()->filter()->values()->toArray();
+
+        $previousCounselorIds = $event->assignedCounselors()->pluck('counselors.id')->toArray();
+        $addedCounselorIds    = array_values(array_diff($newCounselorIds, $previousCounselorIds));
+        $keptCounselorIds     = array_values(array_intersect($newCounselorIds, $previousCounselorIds));
+
+        $removedIds = array_diff($previousCounselorIds, $newCounselorIds);
+        if (!empty($removedIds)) {
+            app(GoogleCalendarService::class)->removeEventFromCounselors($event, $removedIds);
+        }
+
+        $event->assignedCounselors()->sync($newCounselorIds);
+        $event->refresh();
+
+        if (!empty($newCounselorIds)) {
+            app(GoogleCalendarService::class)->syncEventToCounselors($event, $newCounselorIds);
+            $this->notifyCounselorsOfEventConflicts($event, $newCounselorIds);
+        }
+
+        if (!empty($addedCounselorIds)) {
+            $this->notifyAssignedCounselors($event, $addedCounselorIds, isUpdate: false);
+        }
+
+        if (!empty($keptCounselorIds)) {
+            $this->notifyAssignedCounselors($event, $keptCounselorIds, isUpdate: true);
+        }
+
+        return redirect()->route('admin.events')->with('success', 'Event updated successfully!');
     }
 
     /**
@@ -1631,5 +1667,106 @@ class AdminController extends Controller
         $colleges = College::orderBy('name')->get();
 
         return view('admin.dashboards.counselor', compact('admin', 'counselors', 'colleges', 'search', 'college'));
+    }
+
+    // ─── Private helpers (mirrors EventController) ───────────────────────────
+
+    private function notifyAssignedCounselors(Event $event, array $counselorIds, bool $isUpdate = false): void
+    {
+        $counselors = Counselor::with('user')->whereIn('id', $counselorIds)->get()
+            ->groupBy('user_id')->map(fn($g) => $g->first())->values();
+
+        foreach ($counselors as $counselor) {
+            try {
+                Mail::to($counselor->user->email)
+                    ->send(new \App\Mail\EventCounselorAssigned($event, $counselor, $isUpdate));
+                $counselor->user->notify(
+                    new \App\Notifications\EventCounselorAssignedNotification($event, $isUpdate)
+                );
+            } catch (\Throwable $e) {
+                Log::warning('Admin: failed to notify counselor of event assignment', [
+                    'event_id' => $event->id, 'counselor_id' => $counselor->id, 'error' => $e->getMessage(),
+                ]);
+            }
+        }
+    }
+
+    private function notifyCounselorsOfEventConflicts(Event $event, array $counselorIds): void
+    {
+        $timezone = config('app.timezone', 'UTC');
+
+        $eventDays = [];
+        $current = $event->event_start_date->copy();
+        while ($current->lte($event->event_end_date)) {
+            $eventDays[] = $current->format('Y-m-d');
+            $current->addDay();
+        }
+
+        $eventStartTime = Carbon::parse($event->start_time, $timezone);
+        $eventEndTime   = Carbon::parse($event->end_time, $timezone);
+
+        $counselors = Counselor::with('user')->whereIn('id', $counselorIds)->get()
+            ->groupBy('user_id')->map(fn($g) => $g->first())->values();
+
+        $googleCalendarService = app(GoogleCalendarService::class);
+
+        foreach ($counselors as $counselor) {
+            try {
+                $allIds = Counselor::where('user_id', $counselor->user_id)->pluck('id')->toArray();
+
+                $conflictingAppointments = Appointment::with(['student.user'])
+                    ->whereIn('counselor_id', $allIds)
+                    ->whereIn('appointment_date', $eventDays)
+                    ->whereIn('status', ['pending', 'approved', 'completed', 'rescheduled', 'reschedule_rejected'])
+                    ->get()
+                    ->filter(function ($appt) use ($eventStartTime, $eventEndTime, $timezone) {
+                        $s = Carbon::parse($appt->start_time, $timezone);
+                        $e = Carbon::parse($appt->end_time, $timezone);
+                        return $s->lt($eventEndTime) && $e->gt($eventStartTime);
+                    });
+
+                $calendarConflicts = collect();
+                if ($counselor->google_calendar_id) {
+                    foreach ($eventDays as $day) {
+                        try {
+                            $intervals = $googleCalendarService->getBusyIntervalsForDate(
+                                $counselor->google_calendar_id,
+                                Carbon::parse($day, $timezone)
+                            );
+                            $dayStart = Carbon::parse($day . ' ' . $event->start_time, $timezone);
+                            $dayEnd   = Carbon::parse($day . ' ' . $event->end_time, $timezone);
+                            foreach ($intervals as $interval) {
+                                if ($interval['start']->lt($dayEnd) && $interval['end']->gt($dayStart)) {
+                                    $calendarConflicts->push([
+                                        'title' => $interval['title'],
+                                        'date'  => $day,
+                                        'start' => $interval['start'],
+                                        'end'   => $interval['end'],
+                                    ]);
+                                }
+                            }
+                        } catch (\Throwable) {}
+                    }
+                }
+
+                if ($conflictingAppointments->isEmpty() && $calendarConflicts->isEmpty()) {
+                    continue;
+                }
+
+                Mail::to($counselor->user->email)->send(
+                    new \App\Mail\EventScheduleConflict($event, $counselor, $conflictingAppointments, $calendarConflicts)
+                );
+                $counselor->user->notify(
+                    new \App\Notifications\EventScheduleConflictNotification(
+                        $event,
+                        $conflictingAppointments->count() + $calendarConflicts->count()
+                    )
+                );
+            } catch (\Throwable $e) {
+                Log::warning('Admin: failed to send event conflict notification', [
+                    'event_id' => $event->id, 'counselor_id' => $counselor->id, 'error' => $e->getMessage(),
+                ]);
+            }
+        }
     }
 }

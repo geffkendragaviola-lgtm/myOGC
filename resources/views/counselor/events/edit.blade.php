@@ -176,7 +176,7 @@
     <div class="event-glow one"></div>
     <div class="event-glow two"></div>
 
-    <div class="relative max-w-4xl mx-auto px-4 sm:px-6 py-6 md:py-10">
+    <div class="relative max-w-7xl mx-auto px-4 sm:px-6 py-6 md:py-10">
         
         <!-- Header -->
         <div class="mb-6 panel-card p-5 sm:p-6">
@@ -453,17 +453,23 @@
                             <i class="fab fa-google text-[var(--gold-500)]"></i>
                             Selected counselors will have this event added to their Google Calendar.
                         </p>
+                        @php
+                            $oldCounselorIds = old('counselor_ids') !== null
+                                ? collect(old('counselor_ids'))->map('intval')->filter()->all()
+                                : $selectedCounselors;
+                        @endphp
                         <div class="college-grid">
                             <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-2">
                                 @foreach($counselors as $counselor)
+                                    @php $isChecked = in_array($counselor->id, $oldCounselorIds); @endphp
                                     <div class="college-item">
-                                        <input type="checkbox" id="counselor_{{ $counselor->id }}" name="counselor_ids[]"
-                                               value="{{ implode(',', $counselor->all_ids) }}"
-                                               {{ count(array_intersect($counselor->all_ids, old('counselor_ids', $selectedCounselors))) > 0 ? 'checked' : '' }}
-                                               class="custom-checkbox counselor-multi-check"
-                                               data-ids="{{ implode(',', $counselor->all_ids) }}"
-                                               {{ !$counselor->google_calendar_id ? 'disabled' : '' }}>
-                                        <label for="counselor_{{ $counselor->id }}" class="custom-control-label {{ !$counselor->google_calendar_id ? 'opacity-50' : '' }}">
+                                        <input type="checkbox"
+                                               id="counselor_ui_{{ $counselor->id }}"
+                                               name="counselor_ids[]"
+                                               value="{{ $counselor->id }}"
+                                               class="custom-checkbox"
+                                               {{ $isChecked ? 'checked' : '' }}>
+                                        <label for="counselor_ui_{{ $counselor->id }}" class="custom-control-label">
                                             {{ trim($counselor->user->first_name . ' ' . $counselor->user->last_name) }}
                                             @if($counselor->college_names)
                                                 <span class="text-xs text-[var(--text-muted)]">({{ $counselor->college_names }})</span>

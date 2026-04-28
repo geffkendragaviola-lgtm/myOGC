@@ -164,7 +164,7 @@
     <div class="session-glow one"></div>
     <div class="session-glow two"></div>
 
-    <div class="relative max-w-6xl mx-auto px-4 sm:px-6 py-5 md:py-8">
+    <div class="relative max-w-7xl mx-auto px-4 sm:px-6 py-5 md:py-8">
         <!-- Header -->
         <div class="mb-5 sm:mb-6">
             <div class="hero-card">
@@ -193,52 +193,52 @@
         </div>
 
         <!-- Filters -->
-        <form method="GET" action="{{ route('counselor.appointment-sessions.dashboard') }}" class="panel-card mb-6 p-4 sm:p-5">
+        <div class="panel-card mb-6">
             <div class="panel-topline"></div>
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
-                <div class="md:col-span-2">
-                    <label for="search" class="field-label">Search</label>
-                    <div class="relative">
-                        <i class="fas fa-search absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 text-[#a89f97] text-xs"></i>
-                        <input type="text"
-                               id="search"
-                               name="search"
-                               value="{{ request('search') }}"
-                               placeholder="Search by student name, student id, or concern..."
-                               class="input-field pl-9 sm:pl-11 text-xs sm:text-sm">
+            <form method="GET" action="{{ route('counselor.appointment-sessions.dashboard') }}" class="p-4 sm:p-5">
+                <div class="flex flex-wrap items-end gap-3">
+                    <div class="flex-1 min-w-[180px]">
+                        <label for="search" class="field-label">Search</label>
+                        <div class="relative">
+                            <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-[#a89f97] text-xs"></i>
+                            <input type="text" id="search" name="search"
+                                   value="{{ request('search') }}"
+                                   placeholder="‎ ‎ ‎ Student name, ID, or concern..."
+                                   class="input-field pl-9 text-xs sm:text-sm">
+                        </div>
+                    </div>
+                    <div class="w-36 sm:w-40">
+                        <label for="status" class="field-label">Status</label>
+                        <select id="status" name="status" class="select-field text-xs sm:text-sm">
+                            <option value="all"     {{ request('status', 'all') === 'all'     ? 'selected' : '' }}>All</option>
+                            <option value="pending"  {{ request('status') === 'pending'  ? 'selected' : '' }}>Pending</option>
+                            <option value="approved" {{ request('status') === 'approved' ? 'selected' : '' }}>Approved</option>
+                            <option value="completed"{{ request('status') === 'completed'? 'selected' : '' }}>Completed</option>
+                            <option value="referred" {{ request('status') === 'referred' ? 'selected' : '' }}>Referred</option>
+                        </select>
+                    </div>
+                    <div class="w-36 sm:w-40">
+                        <label for="date_range" class="field-label">Date Range</label>
+                        <select id="date_range" name="date_range" class="select-field text-xs sm:text-sm">
+                            <option value=""        {{ request('date_range') === null     ? 'selected' : '' }}>All Time</option>
+                            <option value="today"   {{ request('date_range') === 'today'   ? 'selected' : '' }}>Today</option>
+                            <option value="week"    {{ request('date_range') === 'week'    ? 'selected' : '' }}>This Week</option>
+                            <option value="month"   {{ request('date_range') === 'month'   ? 'selected' : '' }}>This Month</option>
+                            <option value="upcoming"{{ request('date_range') === 'upcoming'? 'selected' : '' }}>Upcoming</option>
+                            <option value="past"    {{ request('date_range') === 'past'    ? 'selected' : '' }}>Past</option>
+                        </select>
+                    </div>
+                    <div class="flex items-end gap-2 pb-0.5">
+                        <a href="{{ route('counselor.appointment-sessions.dashboard') }}" class="secondary-btn px-3 py-2 text-xs sm:text-sm">
+                            <i class="fas fa-rotate-left mr-1 text-[9px]"></i>Reset
+                        </a>
+                        <button type="submit" class="primary-btn px-3 py-2 text-xs sm:text-sm">
+                            <i class="fas fa-magnifying-glass mr-1 text-[9px]"></i>Apply
+                        </button>
                     </div>
                 </div>
-
-                <div>
-                    <label for="status" class="field-label">Status</label>
-                    <select id="status" name="status" class="select-field text-xs sm:text-sm">
-                        <option value="all" {{ request('status', 'all') === 'all' ? 'selected' : '' }}>All</option>
-                        <option value="pending" {{ request('status') === 'pending' ? 'selected' : '' }}>Pending</option>
-                        <option value="approved" {{ request('status') === 'approved' ? 'selected' : '' }}>Approved</option>
-                        <option value="completed" {{ request('status') === 'completed' ? 'selected' : '' }}>Completed</option>
-                        <option value="referred" {{ request('status') === 'referred' ? 'selected' : '' }}>Referred</option>
-                    </select>
-                </div>
-
-                <div>
-                    <label for="date_range" class="field-label">Date Range</label>
-                    <select id="date_range" name="date_range" class="select-field text-xs sm:text-sm">
-                        <option value="" {{ request('date_range') === null ? 'selected' : '' }}>All Time</option>
-                        <option value="today" {{ request('date_range') === 'today' ? 'selected' : '' }}>Today</option>
-                        <option value="week" {{ request('date_range') === 'week' ? 'selected' : '' }}>This Week</option>
-                        <option value="month" {{ request('date_range') === 'month' ? 'selected' : '' }}>This Month</option>
-                        <option value="upcoming" {{ request('date_range') === 'upcoming' ? 'selected' : '' }}>Upcoming</option>
-                        <option value="past" {{ request('date_range') === 'past' ? 'selected' : '' }}>Past</option>
-                    </select>
-                </div>
-            </div>
-
-            <div class="flex justify-end mt-4">
-                <button type="submit" class="primary-btn px-4 py-2 text-xs sm:text-sm">
-                    <i class="fas fa-filter mr-1.5 text-[9px] sm:text-xs"></i>Apply Filters
-                </button>
-            </div>
-        </form>
+            </form>
+        </div>
 
         <!-- Appointments List -->
         <div class="panel-card overflow-hidden">

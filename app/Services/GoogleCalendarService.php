@@ -163,6 +163,11 @@ class GoogleCalendarService
     {
         $timezone = config('app.timezone', 'UTC');
 
+        Log::info('GoogleCalendar syncEventToCounselors - requested counselor IDs', [
+            'event_id' => $event->id,
+            'counselorIds' => array_values($counselorIds),
+        ]);
+
         // Build one calendar entry per day so only the specific time window is blocked
         // each day — matching appointment booking logic and allowing other slots to remain open.
         $days = [];
@@ -173,9 +178,20 @@ class GoogleCalendarService
             $current->addDay();
         }
 
-        $counselors = \App\Models\Counselor::whereIn('id', $counselorIds)
-            ->whereNotNull('google_calendar_id')
-            ->get();
+        $selectedCounselors = \App\Models\Counselor::whereIn('id', $counselorIds)->get();
+        $counselors = $selectedCounselors
+            ->groupBy('user_id')
+            ->map(function ($group) {
+                return $group->firstWhere(fn ($c) => !empty($c->google_calendar_id)) ?? $group->first();
+            })
+            ->filter(fn ($c) => !empty($c?->google_calendar_id))
+            ->values();
+
+        Log::info('GoogleCalendar syncEventToCounselors - counselors loaded', [
+            'event_id' => $event->id,
+            'loaded_counselor_ids' => $counselors->pluck('id')->values()->all(),
+            'loaded_calendar_ids' => $counselors->pluck('google_calendar_id')->values()->all(),
+        ]);
 
         foreach ($counselors as $counselor) {
             try {
@@ -225,9 +241,14 @@ class GoogleCalendarService
 
     public function removeEventFromCounselors(\App\Models\Event $event, array $counselorIds): void
     {
-        $counselors = \App\Models\Counselor::whereIn('id', $counselorIds)
-            ->whereNotNull('google_calendar_id')
-            ->get();
+        $selectedCounselors = \App\Models\Counselor::whereIn('id', $counselorIds)->get();
+        $counselors = $selectedCounselors
+            ->groupBy('user_id')
+            ->map(function ($group) {
+                return $group->firstWhere(fn ($c) => !empty($c->google_calendar_id)) ?? $group->first();
+            })
+            ->filter(fn ($c) => !empty($c?->google_calendar_id))
+            ->values();
 
         foreach ($counselors as $counselor) {
             try {

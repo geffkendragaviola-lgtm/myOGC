@@ -297,52 +297,44 @@
                 $eventTypes = collect();
             }
         @endphp
+<!-- Filters Section -->
+<div class="panel-card mb-5 sm:mb-6">
+    <div class="panel-topline"></div>
 
-        <!-- Filters Section -->
-        <div class="panel-card mb-5 sm:mb-6">
-            <div class="panel-topline"></div>
-            <div class="panel-header">
-                <div class="panel-icon"><i class="fas fa-sliders text-[9px] sm:text-xs"></i></div>
-                <div>
-                    <h3 class="panel-title">Filter Events</h3>
-                    <p class="panel-subtitle hidden sm:block">Find events by type or registration status.</p>
+    <div class="p-4 sm:p-5">
+        <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+            <div class="filters-scroll w-full">
+                <div class="flex flex-wrap gap-3">
+                    <div class="min-w-[140px]">
+                        <label class="field-label">Event Type</label>
+                        <select id="typeFilter" class="select-field">
+                            <option value="">All Event Types</option>
+                            @foreach($eventTypes as $type)
+                                <option value="{{ $type }}">{{ ucfirst($type) }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+
+                    <div class="min-w-[160px]">
+                        <label class="field-label">Status</label>
+                        <select id="statusFilter" class="select-field">
+                            <option value="">All Events</option>
+                            <option value="required">Required Events</option>
+                            <option value="optional">Optional Events</option>
+                            <option value="registered">My Registrations</option>
+                            <option value="available">Available to Register</option>
+                        </select>
+                    </div>
                 </div>
             </div>
 
-            <div class="p-4 sm:p-5">
-                <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-                    <div class="filters-scroll w-full">
-                        <div class="flex flex-wrap gap-3">
-                            <div class="min-w-[140px]">
-                                <label class="field-label">Event Type</label>
-                                <select id="typeFilter" class="select-field">
-                                    <option value="">All Event Types</option>
-                                    @foreach($eventTypes as $type)
-                                        <option value="{{ $type }}">{{ ucfirst($type) }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
-
-                            <div class="min-w-[160px]">
-                                <label class="field-label">Status</label>
-                                <select id="statusFilter" class="select-field">
-                                    <option value="">All Events</option>
-                                    <option value="required">Required Events</option>
-                                    <option value="optional">Optional Events</option>
-                                    <option value="registered">My Registrations</option>
-                                    <option value="available">Available to Register</option>
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="text-[0.75rem] text-[#6b5e57] flex items-center gap-1.5">
-                        <i class="fas fa-search text-[#8b7e76]"></i>
-                        <span><strong style="color:var(--text-primary)">{{ $events->count() }}</strong> events found</span>
-                    </div>
-                </div>
+            <div class="text-[0.75rem] text-[#6b5e57] flex items-center gap-1.5">
+                <i class="fas fa-search text-[#8b7e76]"></i>
+                <span><strong style="color:var(--text-primary)">{{ $events->count() }}</strong> events found</span>
             </div>
         </div>
+    </div>
+</div>
 
         @if(!$student)
             <!-- Student Profile Not Complete -->

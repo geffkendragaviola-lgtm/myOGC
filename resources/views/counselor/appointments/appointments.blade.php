@@ -72,15 +72,16 @@
         display: block; font-size: 0.65rem; font-weight: 600; color: var(--text-secondary); 
         margin-bottom: 0.35rem; text-transform: uppercase; letter-spacing: 0.08em; 
     }
-    .input-field, .select-field {
+    .input-field, .select-field, .textarea-field {
         width: 100%; border: 1px solid var(--border-soft); border-radius: 0.6rem;
         background: rgba(255,255,255,0.9); color: var(--text-primary); outline: none;
         transition: all 0.2s ease; font-size: 0.8rem; padding: 0.55rem 0.75rem;
         box-shadow: inset 0 1px 2px rgba(44,36,32,0.02);
     }
-    .input-field:focus, .select-field:focus { 
+    .input-field:focus, .select-field:focus, .textarea-field:focus { 
         border-color: var(--maroon-700); box-shadow: 0 0 0 3px rgba(92,26,26,0.08); 
     }
+    .textarea-field { resize: vertical; line-height: 1.5; }
 
     /* Updated Stat Card Styles - Replace existing .stat-card rules */
 .stat-card {
@@ -226,25 +227,45 @@
         background: rgba(255,255,255,0.98); border-radius: 0.75rem;
         border: 1px solid var(--border-soft); backdrop-filter: blur(8px);
         box-shadow: 0 8px 32px rgba(44,36,32,0.12);
-        max-width: 56rem; width: 100%; max-height: 90vh; overflow-y: auto;
+        max-width: 56rem; width: 100%; max-height: 90vh;
+        overflow: hidden; display: flex; flex-direction: column;
     }
     .modal-card-sm { max-width: 28rem; }
     .modal-card-md { max-width: 42rem; }
     .modal-header {
         display: flex; align-items: center; justify-content: space-between;
-        padding: 1rem 1.25rem; border-bottom: 1px solid var(--border-soft)/60;
+        padding: 0.85rem 1.25rem; border-bottom: 1px solid var(--border-soft);
+        background: rgba(250,248,245,0.7); flex-shrink: 0;
+        position: relative;
     }
+    .modal-header::before {
+        content: ""; position: absolute; inset-inline: 0; top: 0; height: 3px;
+        background: linear-gradient(90deg, var(--maroon-800) 0%, var(--gold-400) 50%, var(--maroon-800) 100%);
+    }
+    .modal-header-icon {
+        width: 1.75rem; height: 1.75rem; border-radius: 0.5rem; flex-shrink: 0;
+        display: flex; align-items: center; justify-content: center;
+        background: linear-gradient(135deg, var(--maroon-800), var(--maroon-700));
+        color: #fef9e7; font-size: 0.7rem;
+    }
+    .modal-title { font-size: 0.85rem; font-weight: 700; color: var(--text-primary); }
     .modal-close {
         width: 2rem; height: 2rem; border-radius: 0.5rem;
         display: flex; align-items: center; justify-content: center;
         color: var(--text-muted); transition: all 0.18s ease;
-        font-size: 1rem;
+        font-size: 0.9rem;
     }
     .modal-close:hover { background: rgba(254,249,231,0.7); color: var(--maroon-700); }
-    .modal-body { padding: 1.25rem; }
+    .modal-body { padding: 0; overflow-y: auto; flex: 1; }
     .modal-footer {
-        padding: 1rem 1.25rem; border-top: 1px solid var(--border-soft)/60;
+        padding: 1rem 1.25rem; border-top: 1px solid var(--border-soft);
         display: flex; justify-content: flex-end; gap: 0.75rem;
+        background: rgba(250,248,245,0.5); flex-shrink: 0;
+        position: sticky;
+        bottom: 0;
+        z-index: 10;
+        background: rgba(255,255,255,0.98);
+        backdrop-filter: blur(8px);
     }
 
     .calendar-nav {
@@ -324,8 +345,8 @@
         .table-scroll { overflow-x: auto; }
         .action-icon { width: 2rem; height: 2rem; }
         .modal-card { max-height: 95vh; margin: 0.5rem; }
-        .modal-header { padding: 0.85rem 1rem; }
-        .modal-body { padding: 1rem; }
+        .modal-header { padding: 0.75rem 1rem; }
+        .modal-body { padding: 0; }
         .calendar-day { width: 2rem; height: 2rem; font-size: 0.7rem; }
         .time-slot { padding: 0.5rem; font-size: 0.7rem; }
         .college-badge { font-size: 0.6rem; padding: 0.15rem 0.35rem; }
@@ -418,48 +439,38 @@
     @endforeach
 </div>
 
-        <!-- Search and Filters Section -->
+        <!-- Filters -->
         <div class="panel-card mb-6">
             <div class="panel-topline"></div>
-            <div class="panel-header">
-                <div class="panel-icon"><i class="fas fa-sliders text-[9px] sm:text-xs"></i></div>
-                <div>
-                    <h2 class="panel-title">Search and Filter</h2>
-                    <p class="panel-subtitle hidden sm:block">Find appointments by student, date, or college</p>
-                </div>
-            </div>
-
             <form method="GET" action="{{ route('counselor.appointments') }}" class="p-4 sm:p-5">
-                <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <div class="flex flex-wrap items-end gap-3">
                     <!-- Search -->
-                    <div class="md:col-span-2">
+                    <div class="flex-1 min-w-[180px]">
                         <label for="search" class="field-label">Search</label>
                         <div class="relative">
-                            <i class="fas fa-search absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 text-[#a89f97] text-xs"></i>
-                            <input type="text"
-                                id="search"
-                                name="search"
-                                placeholder="Search by student name, ID, college, or concern..."
+                            <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-[#a89f97] text-xs"></i>
+                            <input type="text" id="search" name="search"
+                                placeholder="‎‎ ‎ ‎  Student name, ID, college, or concern..."
                                 value="{{ request('search') }}"
-                                class="input-field pl-9 sm:pl-11 text-xs sm:text-sm">
+                                class="input-field pl-9 text-xs sm:text-sm">
                         </div>
                     </div>
 
-                    <!-- Date Range Filter -->
-                    <div>
+                    <!-- Date Range -->
+                    <div class="w-36 sm:w-40">
                         <label for="date_range" class="field-label">Date Range</label>
                         <select id="date_range" name="date_range" class="select-field text-xs sm:text-sm">
                             <option value="">All Dates</option>
-                            <option value="today" {{ request('date_range') == 'today' ? 'selected' : '' }}>Today</option>
-                            <option value="week" {{ request('date_range') == 'week' ? 'selected' : '' }}>This Week</option>
-                            <option value="month" {{ request('date_range') == 'month' ? 'selected' : '' }}>This Month</option>
+                            <option value="today"    {{ request('date_range') == 'today'    ? 'selected' : '' }}>Today</option>
+                            <option value="week"     {{ request('date_range') == 'week'     ? 'selected' : '' }}>This Week</option>
+                            <option value="month"    {{ request('date_range') == 'month'    ? 'selected' : '' }}>This Month</option>
                             <option value="upcoming" {{ request('date_range') == 'upcoming' ? 'selected' : '' }}>Upcoming</option>
-                            <option value="past" {{ request('date_range') == 'past' ? 'selected' : '' }}>Past Appointments</option>
+                            <option value="past"     {{ request('date_range') == 'past'     ? 'selected' : '' }}>Past</option>
                         </select>
                     </div>
 
-                    <!-- College Filter -->
-                    <div>
+                    <!-- College -->
+                    <div class="w-36 sm:w-44">
                         <label for="college" class="field-label">College</label>
                         <select id="college" name="college" class="select-field text-xs sm:text-sm">
                             <option value="">All Colleges</option>
@@ -470,25 +481,24 @@
                             @endforeach
                         </select>
                     </div>
-                </div>
 
-                <!-- Action Buttons -->
-                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mt-4">
-                    <div class="text-[10px] sm:text-xs text-[#8b7e76]">
-                        Showing {{ $appointments->firstItem() ?? 0 }}-{{ $appointments->lastItem() ?? 0 }} of {{ $appointments->total() }} appointments
-                        @if(isset($allColleges) && $allColleges->count() > 1)
-                            <span class="text-[#7a2a2a] ml-1">(Across {{ $allColleges->count() }} colleges)</span>
-                        @endif
-                    </div>
-                    <div class="flex flex-wrap gap-2">
-                        <a href="{{ route('counselor.appointments') }}"
-                        class="secondary-btn px-4 py-2 text-xs sm:text-sm">
-                            <i class="fas fa-rotate-left mr-1.5 text-[9px] sm:text-xs"></i>Reset
+                    <!-- Buttons -->
+                    <div class="flex items-end gap-2 pb-0.5">
+                        <a href="{{ route('counselor.appointments') }}" class="secondary-btn px-3 py-2 text-xs sm:text-sm">
+                            <i class="fas fa-rotate-left mr-1 text-[9px]"></i>Reset
                         </a>
-                        <button type="submit" class="primary-btn px-4 py-2 text-xs sm:text-sm">
-                            <i class="fas fa-magnifying-glass mr-1.5 text-[9px] sm:text-xs"></i>Apply Filters
+                        <button type="submit" class="primary-btn px-3 py-2 text-xs sm:text-sm">
+                            <i class="fas fa-magnifying-glass mr-1 text-[9px]"></i>Apply
                         </button>
                     </div>
+                </div>
+
+                <!-- Result count -->
+                <div class="mt-3 text-[10px] sm:text-xs text-[#8b7e76]">
+                    Showing {{ $appointments->firstItem() ?? 0 }}–{{ $appointments->lastItem() ?? 0 }} of {{ $appointments->total() }} appointments
+                    @if(isset($allColleges) && $allColleges->count() > 1)
+                        <span class="text-[#7a2a2a] ml-1">(Across {{ $allColleges->count() }} colleges)</span>
+                    @endif
                 </div>
             </form>
         </div>
@@ -649,6 +659,11 @@
                                             <span class="text-[10px] text-[#8b7e76]">
                                                 {{ $appointment->session_sequence_label ?? '' }}
                                             </span>
+                                            @if($appointment->notes && str_contains(strtolower($appointment->notes), 'booked by counselor'))
+                                                <span class="text-[10px] font-semibold" style="color:#059669;">
+                                                    Booked by you
+                                                </span>
+                                            @endif
                                         </div>
                                     </td>
 
@@ -780,7 +795,10 @@
         <div id="appointmentModal" class="modal-backdrop hidden">
             <div class="modal-card">
                 <div class="modal-header">
-                    <h3 class="text-sm font-semibold text-[#2c2420]">Appointment Details</h3>
+                    <div class="flex items-center gap-2.5">
+                        <div class="modal-header-icon"><i class="fas fa-calendar-check"></i></div>
+                        <h3 class="modal-title">Appointment Details</h3>
+                    </div>
                     <button onclick="closeAppointmentModal()" class="modal-close" title="Close">
                         <i class="fas fa-xmark"></i>
                     </button>
@@ -830,16 +848,19 @@
         <div id="referralModal" class="modal-backdrop hidden">
             <div class="modal-card modal-card-md">
                 <div class="modal-header">
-                    <h3 class="text-sm font-semibold text-[#2c2420]">Refer Appointment</h3>
+                    <div class="flex items-center gap-2">
+                        <div class="modal-header-icon"><i class="fas fa-share-square"></i></div>
+                        <h3 class="modal-title">Refer Appointment</h3>
+                    </div>
                     <button onclick="closeReferralModal()" class="modal-close" title="Close">
                         <i class="fas fa-xmark"></i>
                     </button>
                 </div>
-                <div class="modal-body">
-                    <form id="referralForm" method="POST">
-                        @csrf
-                        @method('PATCH')
-                        <div class="space-y-4">
+                <form id="referralForm" method="POST" class="flex flex-col flex-1 min-h-0">
+                    @csrf
+                    @method('PATCH')
+                    <div class="modal-body">
+                        <div class="p-4 sm:p-5 space-y-4">
                             <div>
                                 <label for="referralCounselorSelect" class="field-label">Select Counselor</label>
                                 <select id="referralCounselorSelect" name="referred_to_counselor_id"
@@ -887,39 +908,43 @@
 
                             <div>
                                 <label for="referral_reason" class="field-label">Reason (optional)</label>
-                                <textarea id="referral_reason" name="referral_reason" rows="3"
-                                          class="textarea-field"
-                                          placeholder="Explain the reason for referring the student..."></textarea>
-                            </div>
-
-                            <div class="flex flex-col sm:flex-row justify-end gap-2 pt-2">
-                                <button type="button" onclick="closeReferralModal()" class="secondary-btn px-4 py-2 text-xs sm:text-sm">
-                                    Cancel
-                                </button>
-                                <button type="submit" class="primary-btn px-4 py-2 text-xs sm:text-sm">
-                                    Send Referral Request
-                                </button>
+                                <div class="border border-[#e5e0db] rounded-xl bg-white p-4 shadow-sm">
+                                    <textarea id="referral_reason" name="referral_reason" rows="3"
+                                              class="textarea-field"
+                                              placeholder="Explain the reason for referring the student..."></textarea>
+                                </div>
                             </div>
                         </div>
-                    </form>
-                </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" onclick="closeReferralModal()" class="secondary-btn px-4 py-2 text-xs sm:text-sm">
+                            Cancel
+                        </button>
+                        <button type="submit" class="primary-btn px-4 py-2 text-xs sm:text-sm">
+                            Send Referral Request
+                        </button>
+                    </div>
+                </form>
             </div>
         </div>
 
         <!-- Reschedule Modal -->
         <div id="rescheduleModal" class="modal-backdrop hidden">
-            <div class="modal-card modal-card-sm">
+            <div class="modal-card modal-card-md">
                 <div class="modal-header">
-                    <h3 class="text-sm font-semibold text-[#2c2420]">Reschedule Appointment</h3>
+                    <div class="flex items-center gap-2">
+                        <div class="modal-header-icon"><i class="fas fa-calendar-alt"></i></div>
+                        <h3 class="modal-title">Reschedule Appointment</h3>
+                    </div>
                     <button onclick="closeRescheduleModal()" class="modal-close" title="Close">
                         <i class="fas fa-xmark"></i>
                     </button>
                 </div>
-                <div class="modal-body">
-                    <form id="rescheduleForm" method="POST">
-                        @csrf
-                        @method('PATCH')
-                        <div class="space-y-4">
+                <form id="rescheduleForm" method="POST" class="flex flex-col flex-1 min-h-0">
+                    @csrf
+                    @method('PATCH')
+                    <div class="modal-body">
+                        <div class="p-4 sm:p-5 space-y-4">
 
                             {{-- Override Availability Toggle --}}
                             <label id="rescheduleOverrideToggle" style="display:flex;align-items:center;gap:0.6rem;cursor:pointer;padding:0.65rem 0.85rem;border:1px solid #fca5a5;border-radius:0.6rem;background:rgba(255,241,242,0.5);">
@@ -967,19 +992,21 @@
                             </div>
                             <div>
                                 <label for="reschedule_reason" class="field-label">Reason (optional)</label>
-                                <textarea id="reschedule_reason" name="reason" rows="3" class="textarea-field" placeholder="Explain the reason for rescheduling..."></textarea>
-                            </div>
-                            <div class="flex flex-col sm:flex-row justify-end gap-2 pt-2">
-                                <button type="button" onclick="closeRescheduleModal()" class="secondary-btn px-4 py-2 text-xs sm:text-sm">
-                                    Cancel
-                                </button>
-                                <button type="submit" class="primary-btn px-4 py-2 text-xs sm:text-sm">
-                                    Save Changes
-                                </button>
+                                <div class="border border-[#e5e0db] rounded-xl bg-white p-4 shadow-sm">
+                                    <textarea id="reschedule_reason" name="reason" rows="3" class="textarea-field" placeholder="Explain the reason for rescheduling..."></textarea>
+                                </div>
                             </div>
                         </div>
-                    </form>
-                </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" onclick="closeRescheduleModal()" class="secondary-btn px-4 py-2 text-xs sm:text-sm">
+                            Cancel
+                        </button>
+                        <button type="submit" class="primary-btn px-4 py-2 text-xs sm:text-sm">
+                            Save Changes
+                        </button>
+                    </div>
+                </form>
             </div>
         </div>
 
@@ -1722,265 +1749,193 @@
 
             // Appointment Details Modal
             function showAppointmentDetails(appointmentId) {
+                const modal = document.getElementById('appointmentModal');
+                const details = document.getElementById('appointmentDetails');
+                details.innerHTML = `<div class="flex items-center justify-center py-12 text-[#8b7e76]"><i class="fas fa-spinner fa-spin text-2xl mr-3"></i>Loading...</div>`;
+                modal.classList.remove('hidden');
+
                 fetch(`/counselor/appointments/${appointmentId}/details`)
-                    .then(response => {
-                        if (!response.ok) {
-                            throw new Error('Network response was not ok');
-                        }
-                        return response.json();
-                    })
+                    .then(r => { if (!r.ok) throw new Error(); return r.json(); })
                     .then(data => {
-                        const modal = document.getElementById('appointmentModal');
-                        const details = document.getElementById('appointmentDetails');
+                        const a = data.appointment;
+                        const s = data.student;
+                        const r = data.referral;
 
-                        details.innerHTML = `
-                            <div class="space-y-4">
-                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                    <div>
-                                        <label class="field-label">Student Name</label>
-                                        <p class="mt-1 text-xs sm:text-sm text-[#2c2420]">${data.student.user.first_name} ${data.student.user.last_name}</p>
-                                    </div>
-                                    <div>
-                                        <label class="field-label">Student ID</label>
-                                        <p class="mt-1 text-xs sm:text-sm text-[#2c2420]">${data.student.student_id}</p>
-                                    </div>
-                                </div>
+                        // helpers
+                        const chip = (label, color) => `<span style="display:inline-flex;align-items:center;padding:0.2rem 0.65rem;border-radius:999px;font-size:0.7rem;font-weight:600;background:${color.bg};color:${color.text};border:1px solid ${color.border}">${label}</span>`;
+                        const statusColors = {
+                            pending:   {bg:'rgba(251,191,36,0.12)', text:'#92400e', border:'rgba(251,191,36,0.3)'},
+                            approved:  {bg:'rgba(16,185,129,0.1)',  text:'#065f46', border:'rgba(16,185,129,0.25)'},
+                            completed: {bg:'rgba(59,130,246,0.1)',  text:'#1e40af', border:'rgba(59,130,246,0.25)'},
+                            cancelled: {bg:'rgba(239,68,68,0.08)',  text:'#991b1b', border:'rgba(239,68,68,0.2)'},
+                            referred:  {bg:'rgba(212,175,55,0.12)', text:'#7a2a2a', border:'rgba(212,175,55,0.3)'},
+                            no_show:   {bg:'rgba(156,163,175,0.12)',text:'#374151', border:'rgba(156,163,175,0.3)'},
+                        };
+                        const sc = statusColors[a.status] || statusColors.pending;
+                        const statusLabel = a.status_display || a.status.charAt(0).toUpperCase() + a.status.slice(1).replace(/_/g,' ');
 
-                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                    <div>
-                                        <label class="field-label">College</label>
-                                        <p class="mt-1 text-xs sm:text-sm text-[#2c2420]">${data.student.college?.name || 'N/A'}</p>
-                                    </div>
-                                    <div>
-                                        <label class="field-label">Year Level</label>
-                                        <p class="mt-1 text-xs sm:text-sm text-[#2c2420]">${data.student.year_level}</p>
-                                    </div>
-                                </div>
-                            
+                        const moodColors = {
+                            very_good:{bg:'rgba(16,185,129,0.1)',text:'#065f46',border:'rgba(16,185,129,0.25)'},
+                            good:     {bg:'rgba(212,175,55,0.1)', text:'#7a2a2a',border:'rgba(212,175,55,0.25)'},
+                            neutral:  {bg:'rgba(251,191,36,0.1)', text:'#92400e',border:'rgba(251,191,36,0.25)'},
+                            low:      {bg:'rgba(249,115,22,0.1)', text:'#9a3412',border:'rgba(249,115,22,0.25)'},
+                            very_low: {bg:'rgba(239,68,68,0.1)',  text:'#991b1b',border:'rgba(239,68,68,0.25)'},
+                        };
 
-                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                    <div>
-                                        <label class="field-label">Date</label>
-                                        <p class="mt-1 text-xs sm:text-sm text-[#2c2420]">${data.formatted_date}</p>
-                                    </div>
-                                    <div>
-                                        <label class="field-label">Time</label>
-                                        <p class="mt-1 text-xs sm:text-sm text-[#2c2420]">${data.formatted_time}</p>
-                                    </div>
+                        const section = (icon, title, content) => `
+                            <div style="border:1px solid var(--border-soft);border-radius:0.75rem;overflow:hidden;margin-bottom:0.75rem;">
+                                <div style="padding:0.5rem 0.875rem;background:rgba(250,248,245,0.8);border-bottom:1px solid var(--border-soft);display:flex;align-items:center;gap:0.5rem;">
+                                    <i class="fas ${icon}" style="color:var(--maroon-700);font-size:0.7rem;"></i>
+                                    <span style="font-size:0.65rem;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-secondary);">${title}</span>
                                 </div>
+                                <div style="padding:0.875rem;">${content}</div>
+                            </div>`;
 
-                                ${(data.appointment.status === 'referred' && data.formatted_proposed_date && data.formatted_proposed_time) ? `
-                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                    <div>
-                                        <label class="field-label" style="color: var(--maroon-700);">Proposed Date</label>
-                                        <p class="mt-1 text-xs sm:text-sm" style="color: var(--maroon-700);">${data.formatted_proposed_date}</p>
-                                    </div>
-                                    <div>
-                                        <label class="field-label" style="color: var(--maroon-700);">Proposed Time</label>
-                                        <p class="mt-1 text-xs sm:text-sm" style="color: var(--maroon-700);">${data.formatted_proposed_time}</p>
-                                    </div>
-                                </div>
-                                ` : ''}
-                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                <div>
-                                    <label class="field-label">Type of Booking</label>
-                                    <p class="mt-1 text-xs sm:text-sm text-[#2c2420]">${data.appointment.booking_type || 'N/A'}</p>
-                                </div>
-                                <div>
-                                    <label class="field-label">Booking Category</label>
-                                    <p class="mt-1 text-xs sm:text-sm text-[#2c2420]">${data.appointment.booking_category ? data.appointment.booking_category.charAt(0).toUpperCase() + data.appointment.booking_category.slice(1).replace('-', ' ') : 'N/A'}</p>
-                                </div>
-                            </div>
+                        const row2 = (l1,v1,l2,v2) => `
+                            <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.75rem;">
+                                <div><p style="font-size:0.6rem;font-weight:600;text-transform:uppercase;letter-spacing:0.07em;color:var(--text-muted);margin-bottom:0.2rem;">${l1}</p><p style="font-size:0.8rem;color:#2c2420;">${v1}</p></div>
+                                <div><p style="font-size:0.6rem;font-weight:600;text-transform:uppercase;letter-spacing:0.07em;color:var(--text-muted);margin-bottom:0.2rem;">${l2}</p><p style="font-size:0.8rem;color:#2c2420;">${v2}</p></div>
+                            </div>`;
 
-                                ${data.appointment.referred_by ? `
-                                <div>
-                                    <label class="field-label">Source of Referral (Referred)</label>
-                                    <p class="mt-1 text-xs sm:text-sm text-[#2c2420]">${data.appointment.referred_by}</p>
-                                </div>
-                                ` : ''}
+                        const row1 = (l,v,muted=false) => `
+                            <div style="margin-top:0.6rem;">
+                                <p style="font-size:0.6rem;font-weight:600;text-transform:uppercase;letter-spacing:0.07em;color:var(--text-muted);margin-bottom:0.2rem;">${l}</p>
+                                <p style="font-size:0.8rem;color:${muted?'#6b5e57':'#2c2420'};white-space:pre-line;">${v}</p>
+                            </div>`;
 
-                                <div>
-                                    <label class="field-label">Reason / Concern</label>
-                                    <p class="mt-1 text-xs sm:text-sm text-[#6b5e57] whitespace-pre-line">${data.appointment.concern}</p>
+                        // ── Student header ──
+                        const studentHeader = `
+                            <div style="display:flex;align-items:center;gap:0.875rem;padding:1rem 1.25rem;background:linear-gradient(135deg,rgba(122,42,42,0.06),rgba(212,175,55,0.06));border-bottom:1px solid var(--border-soft);">
+                                <div style="width:2.75rem;height:2.75rem;border-radius:50%;background:linear-gradient(135deg,var(--maroon-800),var(--maroon-700));display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:1rem;font-weight:700;color:#fff;">
+                                    ${s.user.first_name.charAt(0)}${s.user.last_name.charAt(0)}
                                 </div>
-
-                                ${data.appointment.mood_rating ? `
-                                <div>
-                                    <label class="field-label">Mood at Booking</label>
-                                    <p class="mt-1 text-xs sm:text-sm text-[#2c2420]">${data.appointment.mood_rating}</p>
+                                <div style="flex:1;min-width:0;">
+                                    <div style="font-size:0.95rem;font-weight:700;color:#2c2420;">${s.user.first_name} ${s.user.last_name}</div>
+                                    <div style="font-size:0.72rem;color:var(--text-secondary);margin-top:0.1rem;">${s.student_id} &nbsp;·&nbsp; ${s.college?.name || 'N/A'} &nbsp;·&nbsp; ${s.year_level}</div>
                                 </div>
-                                ` : ''}
-
-                                ${data.appointment.latest_mood_level ? `
-                                <div>
-                                    <label class="field-label">Latest Session Mood</label>
-                                    <div class="mt-1">
-                                        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium
-                                            ${data.appointment.latest_mood_level === 'very_good' ? 'bg-green-100 text-green-800' :
-                                              data.appointment.latest_mood_level === 'good'     ? 'bg-[#f5f0eb] text-[#7a2a2a]' :
-                                              data.appointment.latest_mood_level === 'neutral'  ? 'bg-yellow-100 text-yellow-800' :
-                                              data.appointment.latest_mood_level === 'low'      ? 'bg-orange-100 text-orange-800' :
-                                                                                                  'bg-red-100 text-red-800'}">
-                                            <i class="fas fa-smile text-[10px]"></i>
-                                            ${data.appointment.latest_mood_level_label}
-                                        </span>
-                                    </div>
+                                <div style="display:flex;flex-direction:column;align-items:flex-end;gap:0.35rem;">
+                                    ${chip(statusLabel, sc)}
+                                    ${a.is_appointment_high_risk ? chip('⚠ High-Risk', {bg:'rgba(239,68,68,0.1)',text:'#991b1b',border:'rgba(239,68,68,0.25)'}) : ''}
                                 </div>
-                                ` : ''}
+                            </div>`;
 
-                                ${data.appointment.referred_to_destination ? `
-                                <div>
-                                    <label class="field-label">Referred Out</label>
-                                    <p class="mt-1 text-xs sm:text-sm text-[#2c2420]">${data.appointment.referred_to_destination}</p>
-                                </div>
-                                ` : ''}
+                        // ── Appointment info ──
+                        const apptInfo = section('fa-calendar-check', 'Appointment',
+                            row2('Date', data.formatted_date, 'Time', data.formatted_time) +
+                            row2('Type', a.booking_type || '—', 'Category', a.booking_category ? a.booking_category.charAt(0).toUpperCase()+a.booking_category.slice(1).replace('-',' ') : '—') +
+                            (a.status === 'referred' && data.formatted_proposed_date ? `
+                                <div style="margin-top:0.6rem;padding:0.5rem 0.75rem;border-radius:0.5rem;background:rgba(212,175,55,0.08);border:1px solid rgba(212,175,55,0.25);">
+                                    <p style="font-size:0.65rem;font-weight:600;color:#7a2a2a;margin-bottom:0.3rem;"><i class="fas fa-arrow-right-arrow-left" style="margin-right:0.3rem;"></i>Proposed Schedule</p>
+                                    <p style="font-size:0.78rem;color:#7a2a2a;">${data.formatted_proposed_date} &nbsp;·&nbsp; ${data.formatted_proposed_time || ''}</p>
+                                </div>` : '')
+                        );
 
-                                ${data.appointment.notes ? `
-                                <div>
-                                    <label class="field-label">Counselor Notes</label>
-                                    <p class="mt-1 text-xs sm:text-sm text-[#6b5e57] whitespace-pre-line">${data.appointment.notes}</p>
-                                </div>
-                                ` : ''}
+                        // ── Concern ──
+                        // Parse stored format: "[Category] Item1; Item2\nNarrative"
+                        // If there is no [Category] prefix, treat the concern as plain text.
+                        const parseConcern = (raw) => {
+                            if (!raw) return { category: '', items: [], narrative: '' };
+                            const catMatch = raw.match(/^\[([^\]]+)\]\s*/);
+                            const category = catMatch ? catMatch[1] : '';
+                            if (!category) {
+                                return { category: '', items: [], narrative: '' };
+                            }
+                            const rest = raw.slice(catMatch[0].length);
+                            const parts = rest.split('\n');
+                            const itemsPart = parts[0] || '';
+                            const narrative = parts.slice(1).join('\n').trim();
+                            const items = itemsPart ? itemsPart.split(';').map(s => s.trim()).filter(Boolean) : [];
+                            return { category, items, narrative };
+                        };
+                        const pc = parseConcern(a.concern);
 
-                                ${(data.appointment.is_referred || data.appointment.referral_reason || data.referral?.referred_to_name || data.referral?.referred_from_name) ? `
-                                <div>
-                                    <label class="field-label">Referral Details</label>
-                                    <div class="mt-1 p-3 rounded-lg border border-[#d4af37]/40 bg-[#fff9e6] space-y-1">
-                                        ${data.referral?.referred_from_name ? `
-                                        <p class="text-xs text-[#7a2a2a]"><span class="font-medium">Referred from:</span> ${data.referral.referred_from_name}</p>
-                                        ` : ''}
-                                        ${data.referral?.referred_to_name ? `
-                                        <p class="text-xs text-[#7a2a2a]"><span class="font-medium">Referred to:</span> ${data.referral.referred_to_name}</p>
-                                        ` : ''}
-                                        ${data.formatted_referral_date ? `
-                                        <p class="text-xs text-[#7a2a2a]"><span class="font-medium">Referral date:</span> ${data.formatted_referral_date}</p>
-                                        ` : ''}
-                                        ${data.appointment.referral_reason ? `
-                                        <div class="pt-2">
-                                            <p class="text-[10px] font-medium text-[#7a2a2a]">Reason:</p>
-                                            <p class="text-xs text-[#7a2a2a] whitespace-pre-line">${data.appointment.referral_reason}</p>
-                                        </div>
-                                        ` : ''}
-                                    </div>
-                                </div>
-                                ` : ''}
+                        const concernInfo = section('fa-comment-medical', 'Reason / Concern',
+                            (a.referred_by ? `<div style="margin-bottom:0.75rem;padding:0.4rem 0.65rem;border-radius:0.4rem;background:rgba(212,175,55,0.07);border:1px solid rgba(212,175,55,0.2);font-size:0.75rem;color:#7a5c3a;"><i class="fas fa-user-tag" style="margin-right:0.35rem;"></i><strong>Source of Referral:</strong> ${a.referred_by}</div>` : '') +
+                            (pc.category ? `<div style="margin-bottom:0.5rem;"><span style="font-size:0.6rem;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;color:var(--text-muted);">Category</span><p style="margin-top:0.2rem;font-size:0.82rem;font-weight:600;color:#7a2a2a;">${pc.category}</p></div>` : '') +
+                            (pc.items.length ? `<div style="margin-bottom:0.5rem;"><span style="font-size:0.6rem;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;color:var(--text-muted);">Checked Items</span><ul style="margin-top:0.35rem;padding-left:0;list-style:none;">${pc.items.map(i => `<li style="display:flex;align-items:flex-start;gap:0.4rem;font-size:0.78rem;color:#4a3a2a;margin-bottom:0.25rem;"><i class="fas fa-check-square" style="color:#7a2a2a;font-size:0.65rem;margin-top:0.2rem;flex-shrink:0;"></i>${i}</li>`).join('')}</ul></div>` : (!pc.category ? `<p style="font-size:0.8rem;color:#4a3a2a;">${a.concern || '—'}</p>` : '')) +
+                            (pc.narrative ? `<div style="margin-top:0.5rem;padding-top:0.5rem;border-top:1px solid var(--border-soft);"><span style="font-size:0.6rem;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;color:var(--text-muted);">Narrative of Concern</span><p style="margin-top:0.3rem;font-size:0.8rem;color:#4a3a2a;white-space:pre-line;line-height:1.6;font-style:italic;">"${pc.narrative}"</p></div>` : '') +
+                            (a.mood_rating ? `<div style="margin-top:0.5rem;padding-top:0.5rem;border-top:1px solid var(--border-soft);"><span style="font-size:0.6rem;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;color:var(--text-muted);">Mood at Booking</span><p style="margin-top:0.3rem;font-size:0.8rem;color:#4a3a2a;">${a.mood_rating}</p></div>` : '') +
+                            (a.latest_mood_level ? `<div style="margin-top:0.4rem;display:flex;align-items:center;gap:0.5rem;"><span style="font-size:0.6rem;font-weight:600;text-transform:uppercase;letter-spacing:0.07em;color:var(--text-muted);">Latest Session Mood:</span>${chip(a.latest_mood_level_label, moodColors[a.latest_mood_level] || moodColors.neutral)}</div>` : '')
+                        );
 
-                                <div>
-                                    <label class="field-label">Status</label>
-                                    <span class="mt-1 inline-flex px-2 py-1 text-[10px] font-semibold rounded-full status-chip ${data.appointment.status === 'pending' ? 'pending' : data.appointment.status === 'approved' ? 'approved' : data.appointment.status === 'rejected' ? 'rejected' : data.appointment.status === 'referred' ? 'referred' : 'completed'}">
-                                        ${data.appointment.status_display || (data.appointment.status.charAt(0).toUpperCase() + data.appointment.status.slice(1))}
+                        // ── Referral details ──
+                        const referralInfo = (a.is_referred || r?.referred_to_name || r?.referred_from_name) ? section('fa-arrow-right-arrow-left', 'Referral Details',
+                            (r?.referred_from_name ? `<div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.4rem;"><i class="fas fa-arrow-left" style="color:#7a2a2a;font-size:0.65rem;"></i><span style="font-size:0.75rem;color:#2c2420;"><strong>From:</strong> ${r.referred_from_name}</span></div>` : '') +
+                            (r?.referred_to_name   ? `<div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.4rem;"><i class="fas fa-arrow-right" style="color:#2d7a4f;font-size:0.65rem;"></i><span style="font-size:0.75rem;color:#2c2420;"><strong>To:</strong> ${r.referred_to_name}</span></div>` : '') +
+                            (data.formatted_referral_date ? `<p style="font-size:0.72rem;color:var(--text-secondary);margin-top:0.3rem;"><i class="fas fa-clock" style="margin-right:0.3rem;"></i>${data.formatted_referral_date}</p>` : '') +
+                            (a.referral_reason ? `<p style="font-size:0.75rem;color:#4a3a2a;margin-top:0.5rem;padding-top:0.5rem;border-top:1px solid var(--border-soft);white-space:pre-line;">${a.referral_reason}</p>` : '')
+                        ) : '';
+
+                        // ── Referred Out (external) ──
+                        const referredOutInfo = a.referred_to_destination ? section('fa-external-link-alt', 'Referred Out (External)',
+                            `<p style="font-size:0.8rem;color:#2c2420;">${a.referred_to_destination}</p>`
+                        ) : '';
+
+                        // ── High-risk ──
+                        const highRiskInfo = section('fa-shield-halved', 'Risk Assessment',
+                            `<div style="display:flex;align-items:center;justify-content:space-between;gap:0.75rem;flex-wrap:wrap;">
+                                <div style="display:flex;align-items:center;gap:0.5rem;">
+                                    <i class="fas fa-exclamation-triangle" style="font-size:0.8rem;color:${a.is_appointment_high_risk?'#dc2626':'#a89f97'};"></i>
+                                    <span style="font-size:0.78rem;font-weight:600;color:${a.is_appointment_high_risk?'#991b1b':'#6b5e57'};">
+                                        ${a.is_appointment_high_risk ? (a.appointment_high_risk_counselor_flagged ? 'Flagged by counselor' : 'High-risk concern detected') : 'No high-risk flag'}
                                     </span>
                                 </div>
-
-                                <div class="border rounded-lg p-3 ${data.appointment.is_appointment_high_risk ? 'border-red-200 bg-red-50' : 'border-[#e5e0db] bg-[#faf8f5]'}">
-                                    <div class="flex items-center justify-between gap-2">
-                                        <div class="flex items-center gap-2">
-                                            <i class="fas fa-exclamation-triangle text-xs ${data.appointment.is_appointment_high_risk ? 'text-red-600' : 'text-[#a89f97]'}"></i>
-                                            <span class="text-xs font-semibold ${data.appointment.is_appointment_high_risk ? 'text-red-700' : 'text-[#6b5e57]'}">
-                                                ${data.appointment.is_appointment_high_risk
-                                                    ? (data.appointment.appointment_high_risk_counselor_flagged ? 'Flagged as high-risk by counselor' : 'High-risk concern detected')
-                                                    : 'Not flagged as high-risk'}
-                                            </span>
-                                        </div>
-                                        <button type="button"
-                                            onclick="toggleAppointmentHighRisk(${data.appointment.id}, ${!data.appointment.is_appointment_high_risk})"
-                                            class="text-[10px] px-2 py-1 rounded border font-medium transition-colors
-                                                ${data.appointment.is_appointment_high_risk
-                                                    ? 'border-red-300 text-red-700 bg-white hover:bg-red-50'
-                                                    : 'border-[#d4b896] text-[#7a5c3a] bg-white hover:bg-[#fdf8f3]'}">
-                                            ${data.appointment.is_appointment_high_risk ? 'Remove Flag' : 'Flag as High-Risk'}
-                                        </button>
-                                    </div>
-                                    ${data.appointment.appointment_high_risk_notes ? `
-                                    <p class="mt-1.5 text-[10px] text-red-600 italic"><span class="font-semibold not-italic">Reason:</span> ${data.appointment.appointment_high_risk_notes}</p>
-                                    ` : ''}
-                                </div>
-
-                                ${data.appointment.cancellation_reason ? `
-                                <div>
-                                    <label class="field-label">Student's Reason</label>
-                                    <p class="mt-1 text-xs italic" style="color:#b91c1c;background:rgba(239,68,68,0.06);border:1px solid rgba(239,68,68,0.2);border-radius:0.4rem;padding:0.4rem 0.6rem;">${data.appointment.cancellation_reason}</p>
-                                </div>
-                                ` : ''}
-
-                                ${data.appointment.has_session_notes ? `
-                                <div class="border-t pt-4 mt-4" style="border-color: var(--border-soft)/60;">
-                                    <h4 class="text-xs font-semibold text-[#2c2420] mb-2">Session Notes</h4>
-                                    <div class="space-y-3">
-                                        ${data.session_notes.map(note => `
-                                            <div class="bg-[#faf8f5] rounded-lg p-3">
-                                                <div class="flex justify-between items-start mb-2">
-                                                    <span class="text-[10px] font-medium text-[#6b5e57]">
-                                                        ${note.session_date} • ${note.session_type_label}
-                                                    </span>
-                                                    ${note.mood_level ? `
-                                                    <span class="text-[10px] px-2 py-1 rounded-full
-                                                        ${note.mood_level === 'very_good' ? 'bg-green-100 text-green-800' :
-                                                        note.mood_level === 'good' ? 'bg-[#f5f0eb] text-[#7a2a2a]' :
-                                                        note.mood_level === 'neutral' ? 'bg-yellow-100 text-yellow-800' :
-                                                        note.mood_level === 'low' ? 'bg-orange-100 text-orange-800' :
-                                                        'bg-red-100 text-red-800'}">
-                                                        ${note.mood_level_label}
-                                                    </span>
-                                                    ` : ''}
-                                                </div>
-                                                <p class="text-xs text-[#6b5e57] whitespace-pre-line">${note.notes}</p>
-                                                ${note.follow_up_actions ? `
-                                                <div class="mt-2">
-                                                    <p class="text-[10px] font-medium text-[#6b5e57]">Follow-up:</p>
-                                                    <p class="text-xs text-[#6b5e57] whitespace-pre-line">${note.follow_up_actions}</p>
-                                                </div>
-                                                ` : ''}
-                                            </div>
-                                        `).join('')}
-                                    </div>
-                                </div>
-                                ` : ''}
-
-                                ${data.appointment.status === 'completed' && !data.appointment.has_session_notes ? `
-                                <div class="border-t pt-4 mt-4" style="border-color: var(--border-soft)/60;">
-                                    <a href="/counselor/appointments/${data.appointment.id}/session"
-                                    class="inline-flex items-center text-[#7a2a2a] hover:text-[#5c1a1a] text-xs">
-                                        <i class="fas fa-plus mr-1"></i> Add Session Notes
-                                    </a>
-                                </div>
-                                ` : ''}
-
-                                <div class="border-t pt-4 mt-4 flex flex-col sm:flex-row justify-end gap-2" style="border-color: var(--border-soft)/60;">
-                                    ${data.appointment.session_url ? `
-                                    <a href="${data.appointment.session_url}"
-                                       class="primary-btn px-4 py-2 text-xs" style="background: linear-gradient(135deg, var(--maroon-800) 0%, var(--maroon-700) 100%);">
-                                        <i class="fas fa-file-lines mr-1.5 text-[9px]"></i> Open Session
-                                    </a>
-                                    ` : ''}
-                                    <a href="${data.student.profile_url}"
-                                       class="primary-btn px-4 py-2 text-xs">
-                                        <i class="fas fa-id-card mr-1.5 text-[9px]"></i> View Profile
-                                    </a>
-                                </div>
+                                <button type="button" onclick="toggleAppointmentHighRisk(${a.id}, ${!a.is_appointment_high_risk})"
+                                    style="font-size:0.7rem;padding:0.3rem 0.7rem;border-radius:0.4rem;border:1px solid ${a.is_appointment_high_risk?'#fca5a5':'#d4b896'};background:#fff;color:${a.is_appointment_high_risk?'#991b1b':'#7a5c3a'};cursor:pointer;font-weight:600;">
+                                    ${a.is_appointment_high_risk ? 'Remove Flag' : 'Flag as High-Risk'}
+                                </button>
                             </div>
-                        `;
+                            ${a.appointment_high_risk_notes ? `<p style="margin-top:0.5rem;font-size:0.72rem;color:#b91c1c;padding:0.4rem 0.6rem;background:rgba(239,68,68,0.05);border-radius:0.4rem;border:1px solid rgba(239,68,68,0.15);"><strong>Reason:</strong> ${a.appointment_high_risk_notes}</p>` : ''}`
+                        );
+
+                        // ── Cancellation ──
+                        const cancelInfo = a.cancellation_reason ? section('fa-ban', 'Cancellation Reason',
+                            `<p style="font-size:0.8rem;color:#991b1b;font-style:italic;">"${a.cancellation_reason}"</p>`
+                        ) : '';
+
+                        // ── Counselor notes ──
+                        const notesInfo = a.notes ? section('fa-pen-to-square', 'Counselor Notes',
+                            `<p style="font-size:0.78rem;color:#6b5e57;white-space:pre-line;line-height:1.6;">${a.notes}</p>`
+                        ) : '';
+
+                        // ── Session notes ──
+                        const sessionNotesInfo = a.has_session_notes ? section('fa-notes-medical', 'Session Notes',
+                            data.session_notes.map(note => `
+                                <div style="padding:0.65rem 0.75rem;border-radius:0.5rem;background:#faf8f5;border:1px solid var(--border-soft);margin-bottom:0.5rem;">
+                                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.4rem;">
+                                        <span style="font-size:0.7rem;font-weight:600;color:var(--text-secondary);">${note.session_date} · ${note.session_type_label}</span>
+                                        ${note.mood_level ? chip(note.mood_level_label, moodColors[note.mood_level] || moodColors.neutral) : ''}
+                                    </div>
+                                    <p style="font-size:0.75rem;color:#6b5e57;white-space:pre-line;">${note.notes}</p>
+                                    ${note.follow_up_actions ? `<p style="font-size:0.72rem;color:var(--text-secondary);margin-top:0.35rem;padding-top:0.35rem;border-top:1px solid var(--border-soft);"><strong>Follow-up:</strong> ${note.follow_up_actions}</p>` : ''}
+                                </div>`).join('')
+                        ) : '';
+
+                        // ── Footer actions ──
+                        const footerActions = `
+                            <div style="display:flex;gap:0.5rem;justify-content:flex-end;flex-wrap:wrap;padding-top:0.75rem;border-top:1px solid var(--border-soft);margin-top:0.25rem;">
+                                ${a.session_url ? `<a href="${a.session_url}" class="primary-btn px-4 py-2 text-xs" style="background:linear-gradient(135deg,var(--maroon-800),var(--maroon-700));"><i class="fas fa-file-lines mr-1.5 text-[9px]"></i>Open Session</a>` : ''}
+                                <a href="${s.profile_url}" class="primary-btn px-4 py-2 text-xs"><i class="fas fa-id-card mr-1.5 text-[9px]"></i>View Profile</a>
+                            </div>`;
+
+                        details.innerHTML = studentHeader +
+                            `<div style="padding:1rem;">` +
+                            apptInfo + concernInfo + referralInfo + referredOutInfo +
+                            highRiskInfo + cancelInfo + notesInfo + sessionNotesInfo +
+                            footerActions +
+                            `</div>`;
 
                         modal.classList.remove('hidden');
                     })
-                    .catch(error => {
-                        console.error('Error fetching appointment details:', error);
-                        const modal = document.getElementById('appointmentModal');
-                        const details = document.getElementById('appointmentDetails');
-                        details.innerHTML = `
-                            <div class="text-center py-8">
-                                <i class="fas fa-exclamation-triangle text-4xl text-red-300 mb-4"></i>
-                                <p class="text-red-500">Error loading appointment details. Please try again.</p>
-                            </div>
-                        `;
-                        modal.classList.remove('hidden');
+                    .catch(() => {
+                        details.innerHTML = `<div class="text-center py-10"><i class="fas fa-exclamation-triangle text-3xl text-red-300 mb-3 block"></i><p class="text-red-500 text-sm">Error loading details. Please try again.</p></div>`;
+                        document.getElementById('appointmentModal').classList.remove('hidden');
                     });
             }
 
             function closeAppointmentModal() {
                 document.getElementById('appointmentModal').classList.add('hidden');
             }
-
             function toggleAppointmentHighRisk(appointmentId, flagValue) {
                 let notes = '';
                 if (flagValue) {

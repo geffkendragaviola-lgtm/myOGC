@@ -125,11 +125,16 @@ class FeedbackController extends Controller
      */
     public function create()
     {
-        $counselors = Counselor::with('user')
+        $counselors = Counselor::with('user', 'college')
             ->whereHas('user', function ($q) {
                 $q->where('role', 'counselor');
             })
             ->get()
+            ->unique(function ($counselor) {
+                // Ensure each counselor appears only once by their user ID
+                // This prevents duplicates if a counselor handles multiple colleges
+                return $counselor->user_id;
+            })
             ->sortBy(function ($c) {
                 return strtolower(trim(($c->user->last_name ?? '') . ' ' . ($c->user->first_name ?? '')));
             })

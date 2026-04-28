@@ -623,18 +623,7 @@
                                 </div>
                             </div>
 
-                            <!-- Concern Section -->
-                            ${data.appointment?.concern ? `
-                            <div class="bg-[#faf8f5] rounded-lg p-3.5 sm:p-4 border border-[#e5e0db]/60">
-                                <div class="flex items-center gap-2 mb-2.5 sm:mb-3">
-                                    <div class="w-7 h-7 sm:w-8 sm:h-8 bg-[#fdf2f2] rounded-md flex items-center justify-center">
-                                        <i class="fas fa-comment-dots text-[#7a2a2a] text-xs sm:text-sm"></i>
-                                    </div>
-                                    <h4 class="text-sm font-medium text-[#4a3f3a]">Student's Concern</h4>
-                                </div>
-                                <p class="text-sm text-[#4a3f3a] whitespace-pre-line leading-relaxed">${data.appointment.concern}</p>
-                            </div>
-                            ` : ''}
+
 
                             <!-- Counselor Notes Section -->
                             ${data.appointment?.notes ? `

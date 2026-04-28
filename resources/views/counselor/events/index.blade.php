@@ -1,3 +1,8 @@
+﻿@extends('layouts.app')
+
+@section('title', 'Events - OGC')
+
+@section('content')
 <style>
     :root {
         --maroon-900: #3a0c0c;
@@ -12,30 +17,42 @@
         --text-muted: #8b7e76;
     }
 
-    .events-shell {
+    .ev-shell {
         position: relative;
         overflow: hidden;
         background: var(--bg-warm);
         min-height: 100vh;
-        padding-bottom: 2rem;
     }
-    .events-glow {
-        position: absolute; border-radius: 50%; filter: blur(80px); pointer-events: none; opacity: 0.25;
-    }
-    .events-glow.one { top: -30px; left: -40px; width: 200px; height: 200px; background: var(--gold-400); }
-    .events-glow.two { bottom: -30px; right: -60px; width: 220px; height: 220px; background: var(--maroon-800); }
 
-    .hero-card, .panel-card, .glass-card, .stat-card, .event-card {
-        position: relative; overflow: hidden; border-radius: 0.75rem;
-        border: 1px solid var(--border-soft); background: rgba(255,255,255,0.95);
-        backdrop-filter: blur(8px); box-shadow: 0 2px 8px rgba(44,36,32,0.04);
+    .ev-glow {
+        position: absolute;
+        border-radius: 50%;
+        filter: blur(80px);
+        pointer-events: none;
+        opacity: 0.25;
+    }
+    .ev-glow.one { top: -30px; left: -40px; width: 200px; height: 200px; background: var(--gold-400); }
+    .ev-glow.two { bottom: -30px; right: -60px; width: 220px; height: 220px; background: var(--maroon-800); }
+
+    .glass-card, .hero-card, .panel-card, .stats-card, .event-card-new {
+        position: relative;
+        overflow: hidden;
+        border-radius: 0.75rem;
+        border: 1px solid var(--border-soft);
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(8px);
+        box-shadow: 0 2px 8px rgba(44, 36, 32, 0.04);
         transition: box-shadow 0.2s ease;
     }
-    .hero-card:hover, .panel-card:hover, .glass-card:hover, .stat-card:hover, .event-card:hover { 
-        box-shadow: 0 4px 14px rgba(44,36,32,0.06); 
+    .glass-card:hover, .panel-card:hover, .event-card-new:hover {
+        box-shadow: 0 4px 14px rgba(44, 36, 32, 0.06);
     }
-    .hero-card::before, .panel-card::before, .glass-card::before, .stat-card::before, .event-card::before {
-        content: ""; position: absolute; inset: 0; pointer-events: none;
+
+    .hero-card::before, .panel-card::before, .event-card-new::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        pointer-events: none;
         background: radial-gradient(circle at top right, rgba(212,175,55,0.06), transparent 30%);
     }
 
@@ -53,430 +70,347 @@
     }
     .hero-badge-dot { width: 0.3rem; height: 0.3rem; border-radius: 999px; background: var(--gold-400); }
 
-    .panel-topline { position: absolute; inset-inline: 0; top: 0; height: 3px; background: linear-gradient(90deg, var(--maroon-800) 0%, var(--gold-400) 50%, var(--maroon-800) 100%); }
-    .panel-header { display: flex; align-items: center; gap: 0.7rem; padding: 0.85rem 1.25rem; border-bottom: 1px solid var(--border-soft)/60; }
-    .panel-icon { 
-        width: 2rem; height: 2rem; border-radius: 0.6rem; display: flex; 
-        align-items: center; justify-content: center; 
-        background: rgba(254,249,231,0.7); color: var(--maroon-700); 
+    .summary-card {
+        position: relative; overflow: hidden; border-radius: 0.75rem;
+        border: 1px solid rgba(92,26,26,0.15);
+        background: linear-gradient(135deg, var(--maroon-800) 0%, var(--maroon-900) 100%); color: white;
+        box-shadow: 0 4px 12px rgba(58,12,12,0.15);
     }
+    .summary-card::before {
+        content: ""; position: absolute; inset: 0; opacity: 0.15;
+        background: radial-gradient(circle at top right, var(--gold-400), transparent 40%);
+        pointer-events: none;
+    }
+    .summary-label { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.2em; color: rgba(255,255,255,0.7); }
+
+    .filter-btn, .primary-btn {
+        border-radius: 0.6rem; color: #fef9e7;
+        background: linear-gradient(135deg, var(--maroon-800) 0%, var(--maroon-700) 100%);
+        box-shadow: 0 4px 10px rgba(92,26,26,0.15); transition: all 0.2s ease;
+    }
+    .filter-btn:hover, .primary-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 14px rgba(92,26,26,0.2); }
+
+    .panel-topline { position: absolute; inset-inline: 0; top: 0; height: 3px; background: linear-gradient(90deg, var(--maroon-800) 0%, var(--gold-400) 50%, var(--maroon-800) 100%); }
+    .panel-header { display: flex; align-items: center; gap: 0.7rem; padding: 0.85rem 1.25rem; border-bottom: 1px solid var(--border-soft); }
+    .panel-icon { width: 2rem; height: 2rem; border-radius: 0.6rem; display: flex; align-items: center; justify-content: center; background: rgba(254,249,231,0.7); color: var(--maroon-700); }
     .panel-title { font-size: 0.8rem; font-weight: 600; color: var(--text-primary); }
     .panel-subtitle { font-size: 0.68rem; color: var(--text-muted); margin-top: 0.1rem; }
 
-    .stat-card {
-        display: block; text-decoration: none;
+    .input-field {
+        border: 1px solid var(--border-soft); border-radius: 0.6rem;
+        background: rgba(255,255,255,0.9); color: var(--text-primary);
+        outline: none; transition: all 0.2s ease; font-size: 0.8rem;
     }
-    .stat-icon {
-        width: 2.5rem; height: 2.5rem; border-radius: 0.75rem; display: flex;
-        align-items: center; justify-content: center; flex-shrink: 0;
-        background: rgba(254,249,231,0.7); color: var(--maroon-700);
-    }
-    .stat-label { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.16em; color: var(--text-secondary); }
-    .stat-value { font-size: 1.2rem; font-weight: 800; color: var(--text-primary); margin-top: 0.25rem; }
+    .input-field:focus { border-color: var(--maroon-700); box-shadow: 0 0 0 3px rgba(92,26,26,0.08); }
 
-    .alert-success, .alert-error {
-        display: flex; align-items: flex-start; gap: 0.5rem;
-        border-radius: 0.6rem; padding: 0.75rem 1rem; font-size: 0.8rem; font-weight: 500;
-    }
-    .alert-success {
-        border: 1px solid rgba(16,185,129,0.3); background: rgba(240,253,244,0.9); color: #065f46;
-    }
-    .alert-error {
-        border: 1px solid rgba(185,28,28,0.3); background: rgba(253,242,242,0.9); color: #7a2a2a;
-    }
+    .stats-card { transition: all 0.2s ease; }
+    .stats-card:hover { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(44,36,32,0.06); }
+    .stats-icon { width: 2rem; height: 2rem; border-radius: 0.6rem; display: flex; align-items: center; justify-content: center; }
+    .mini-progress { width: 100%; background: #f5f0eb; border-radius: 999px; height: 0.3rem; overflow: hidden; }
+    .mini-progress > div { height: 100%; border-radius: 999px; }
 
-    .event-card {
-        border-left: 3px solid var(--maroon-700);
-        transition: transform 0.2s ease, box-shadow 0.2s ease;
-    }
-    .event-card.required { border-left-color: #b91c1c; }
-    .event-card:hover { transform: translateY(-2px); }
+    .event-card-new { transition: all 0.22s ease; }
+    .event-card-new:hover { transform: translateY(-2px); box-shadow: 0 8px 18px rgba(44,36,32,0.06); }
 
-    .event-header {
-        position: relative; height: 10rem; overflow: hidden;
-        border-radius: 0.5rem 0.5rem 0 0;
+    .event-banner {
+        position: relative; overflow: hidden; padding: 0.85rem; color: white;
+        background: linear-gradient(135deg, var(--maroon-800) 0%, var(--maroon-700) 100%);
     }
-    .event-header img {
-        width: 100%; height: 100%; object-fit: cover;
-        transition: transform 0.3s ease;
+    .event-banner::before {
+        content: ""; position: absolute; inset: 0; opacity: 0.15;
+        background: radial-gradient(circle at top right, var(--gold-400), transparent 35%); pointer-events: none;
     }
-    .event-card:hover .event-header img { transform: scale(1.05); }
-    .event-overlay {
-        position: absolute; inset: 0;
-        background: linear-gradient(to top, rgba(44,36,32,0.7), transparent);
+    .event-type-pill {
+        display: inline-flex; align-items: center; border-radius: 999px; background: rgba(255,255,255,0.18);
+        border: 1px solid rgba(255,255,255,0.12); backdrop-filter: blur(6px);
+        font-size: 9px; padding: 0.2rem 0.5rem; font-weight: 600; text-transform: capitalize;
     }
-    .event-header-content {
-        position: absolute; bottom: 0; left: 0; right: 0;
-        padding: 0.75rem; color: white;
-    }
+    .status-badge { font-size: 0.65rem; padding: 0.2rem 0.5rem; border-radius: 9999px; font-weight: 700; }
+    .status-active { background-color: rgba(209,250,229,0.95); color: #059669; }
+    .status-inactive { background-color: rgba(254,226,226,0.95); color: #b91c1c; }
 
-    .event-type, .event-badge, .event-status, .college-chip {
-        display: inline-flex; align-items: center; gap: 0.3rem;
-        padding: 0.2rem 0.45rem; border-radius: 999px;
-        font-size: 0.65rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em;
-    }
-    .event-type { background: rgba(122,42,42,0.9); color: #fef9e7; }
-    .event-badge.required { background: rgba(185,28,28,0.9); color: #fef9e7; }
-    .event-status.active { background: rgba(16,185,129,0.9); color: #fef9e7; }
-    .event-status.inactive { background: rgba(185,28,28,0.9); color: #fef9e7; }
-    .college-chip.all { background: rgba(16,185,129,0.9); color: white; }
-    .college-chip.specific { background: rgba(122,42,42,0.9); color: white; }
+    .event-meta-row { display: flex; align-items: center; gap: 0.5rem; color: var(--text-secondary); font-size: 0.8rem; }
+    .event-meta-icon { width: 1.5rem; height: 1.5rem; border-radius: 0.45rem; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; }
 
-    .event-title { font-size: 0.85rem; font-weight: 600; color: white; margin-top: 0.25rem; }
+    .action-btn-soft {
+        display: inline-flex; align-items: center; justify-content: center; border-radius: 0.6rem;
+        padding: 0.45rem 0.55rem; font-size: 0.7rem; font-weight: 600; transition: all 0.15s ease;
+    }
+    .action-btn-soft:hover { transform: translateY(-1px); }
 
-    .event-body { padding: 0.75rem; }
-    .event-meta { font-size: 0.65rem; color: var(--text-secondary); display: flex; align-items: center; gap: 0.3rem; margin-bottom: 0.25rem; }
-    .event-meta i { font-size: 0.6rem; color: var(--text-muted); width: 0.8rem; text-align: center; }
-    .event-desc { font-size: 0.7rem; color: var(--text-secondary); margin: 0.5rem 0; line-height: 1.4; }
-    .event-colleges { display: flex; flex-wrap: wrap; gap: 0.25rem; margin: 0.5rem 0; }
-    .event-college-tag {
-        font-size: 0.6rem; padding: 0.15rem 0.4rem; border-radius: 999px;
-        background: rgba(240,253,244,0.9); color: #065f46; border: 1px solid rgba(16,185,129,0.3);
-    }
-
-    .event-actions {
-        display: flex; flex-wrap: wrap; gap: 0.35rem; margin-top: 0.5rem;
-    }
-    .action-btn {
-        flex: 1; min-width: 2rem;
-        padding: 0.35rem 0.5rem; border-radius: 0.4rem;
-        font-size: 0.65rem; font-weight: 500; text-align: center;
-        transition: all 0.18s ease; display: inline-flex; align-items: center; justify-content: center; gap: 0.25rem;
-    }
-    .action-btn.registrations {
-        color: var(--maroon-700); background: rgba(254,249,231,0.9); border: 1px solid rgba(212,175,55,0.3);
-    }
-    .action-btn.registrations:hover { background: rgba(212,175,55,0.2); border-color: var(--gold-400); }
-    .action-btn.edit {
-        color: var(--text-secondary); background: rgba(245,240,235,0.9); border: 1px solid var(--border-soft);
-    }
-    .action-btn.edit:hover { background: rgba(254,249,231,0.7); border-color: var(--maroon-700); color: var(--maroon-700); }
-    .action-btn.toggle {
-        color: #7a2a2a; background: rgba(254,249,231,0.9); border: 1px solid rgba(212,175,55,0.3);
-    }
-    .action-btn.toggle:hover { background: rgba(212,175,55,0.2); border-color: var(--gold-400); }
-    .action-btn.delete {
-        color: #b91c1c; background: rgba(253,242,242,0.9); border: 1px solid rgba(185,28,28,0.3);
-    }
-    .action-btn.delete:hover { background: rgba(253,242,242,0.7); border-color: #b91c1c; }
-
-    .event-footer {
-        display: flex; justify-content: space-between; align-items: center;
-        padding-top: 0.5rem; margin-top: 0.5rem; border-top: 1px solid var(--border-soft)/60;
-        font-size: 0.6rem; color: var(--text-muted);
-    }
-    .event-period {
-        display: inline-flex; align-items: center; gap: 0.2rem;
-        padding: 0.15rem 0.4rem; border-radius: 999px;
-        background: rgba(245,240,235,0.9); color: var(--text-secondary);
-    }
-
-    .empty-state {
-        text-align: center; padding: 2.5rem 1rem; color: var(--text-muted);
-    }
     .empty-state-icon {
-        width: 4rem; height: 4rem; border-radius: 1rem;
-        display: inline-flex; align-items: center; justify-content: center;
-        background: rgba(254,249,231,0.7); color: var(--maroon-700);
-        margin-bottom: 1rem; font-size: 1.25rem;
+        width: 3rem; height: 3rem; border-radius: 999px; display: flex;
+        align-items: center; justify-content: center; background: rgba(245,240,235,0.6);
+        box-shadow: inset 0 1px 2px rgba(44,36,32,0.04); margin-inline: auto;
     }
 
-    .overview-grid {
-        display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.5rem;
-        background: rgba(255,255,255,0.95); border: 1px solid var(--border-soft);
-        border-radius: 0.6rem; padding: 0.75rem;
-    }
-    .overview-item {
-        text-align: center; padding: 0.5rem; border-radius: 0.4rem;
-    }
-    .overview-item.active { background: rgba(254,249,231,0.9); }
-    .overview-item.upcoming { background: rgba(240,253,244,0.9); }
-    .overview-item.required { background: rgba(254,249,231,0.9); }
-    .overview-item.registrations { background: rgba(255,244,229,0.9); }
-    .overview-value { font-size: 0.9rem; font-weight: 700; }
-    .overview-value.active { color: var(--maroon-700); }
-    .overview-value.upcoming { color: #065f46; }
-    .overview-value.required { color: var(--maroon-700); }
-    .overview-value.registrations { color: #92400e; }
-    .overview-label { font-size: 0.6rem; color: var(--text-secondary); margin-top: 0.1rem; }
-
-    .primary-btn {
-        border-radius: 0.6rem; font-weight: 600; transition: all 0.2s ease;
-        display: inline-flex; align-items: center; justify-content: center; white-space: nowrap;
-        color: #fef9e7; background: linear-gradient(135deg, var(--maroon-800) 0%, var(--maroon-700) 100%);
-        box-shadow: 0 4px 10px rgba(92,26,26,0.15);
-    }
-    .primary-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 14px rgba(92,26,26,0.2); }
+    .pagination-btn { border-radius: 0.6rem; transition: all 0.2s ease; }
 
     @media (max-width: 639px) {
-        .hero-card .flex { flex-direction: column; align-items: flex-start !important; }
-        .primary-btn { width: 100%; justify-content: center; }
-        .stat-card { text-align: center; }
-        .stat-card .flex { flex-direction: column; align-items: center !important; gap: 0.35rem !important; }
-        .stat-icon { margin: 0 auto; }
-        .event-header { height: 8rem; }
-        .event-title { font-size: 0.8rem; }
-        .event-meta { font-size: 0.6rem; }
-        .event-desc { font-size: 0.65rem; }
-        .action-btn { padding: 0.3rem 0.4rem; font-size: 0.6rem; }
-        .action-btn span { display: none; }
-        .event-footer { flex-direction: column; align-items: flex-start; gap: 0.25rem; }
-        .overview-grid { grid-template-columns: repeat(2, 1fr); }
-        .overview-value { font-size: 0.85rem; }
-        .overview-label { font-size: 0.55rem; }
+        .panel-header { padding: 0.75rem 1rem; }
+        .stats-icon { width: 1.75rem; height: 1.75rem; }
     }
 </style>
 
-@extends('layouts.app')
-
-@section('title', 'Counselor Dashboard - OGC')
-
-@section('content')
-<div class="min-h-screen events-shell">
-    <div class="events-glow one"></div>
-    <div class="events-glow two"></div>
+<div class="min-h-screen ev-shell">
+    <div class="ev-glow one"></div>
+    <div class="ev-glow two"></div>
 
     <div class="relative max-w-7xl mx-auto px-4 sm:px-6 py-5 md:py-8">
-        <!-- Header -->
+
+        {{-- Header --}}
         <div class="mb-5 sm:mb-6">
-            <div class="hero-card">
-                <div class="relative p-4 sm:p-5 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-                    <div class="flex items-start gap-3">
+            <div class="grid grid-cols-1 xl:grid-cols-[1fr_auto] gap-4 items-stretch">
+                <div class="hero-card">
+                    <div class="relative p-4 sm:p-5 flex items-start gap-3">
                         <div class="hero-icon">
                             <i class="fas fa-calendar-days text-base sm:text-lg"></i>
                         </div>
                         <div class="min-w-0">
                             <div class="hero-badge">
-                                <span class="hero-badge-dot"></span>
-                                Counselor Portal
+                                <span class="hero-badge-dot"></span> Events Management
                             </div>
                             <h1 class="text-lg sm:text-xl lg:text-2xl font-semibold tracking-tight text-[#2c2420] mt-2">Manage Events</h1>
-                            <p class="text-[#6b5e57] text-xs sm:text-sm mt-1.5 max-w-2xl">
-                                Create and manage mental health events, workshops, and seminars
-                            </p>
+                            <p class="text-[#6b5e57] text-xs sm:text-sm mt-1.5 max-w-2xl">Create and manage mental health events, workshops, and seminars.</p>
                         </div>
                     </div>
-                    <a href="{{ route('counselor.events.create') }}"
-                       class="primary-btn px-4 py-2 text-xs sm:text-sm w-full md:w-auto">
-                        <i class="fas fa-plus mr-1.5 text-[9px] sm:text-xs"></i> Create New Event
-                    </a>
+                </div>
+                <div class="summary-card">
+                    <div class="relative h-full flex flex-col sm:flex-row items-center justify-between gap-3 p-4">
+                        <div class="min-w-0 text-center sm:text-left">
+                            <p class="summary-label">Quick Action</p>
+                            <p class="text-base sm:text-lg font-semibold mt-1 sm:mt-1.5">Create New Event</p>
+                            <p class="text-[10px] sm:text-xs text-white/80 mt-0.5">Add workshops, webinars, seminars, and conferences.</p>
+                        </div>
+                        <a href="{{ route('counselor.events.create') }}"
+                           class="inline-flex items-center justify-center w-full sm:w-auto px-3 py-2 bg-[#fef9e7] text-[#7a2a2a] rounded-lg hover:bg-[#f5e6b8] transition font-semibold shadow-sm whitespace-nowrap text-xs sm:text-sm">
+                            <i class="fas fa-plus mr-1.5 text-[9px] sm:text-xs"></i> Create
+                        </a>
+                    </div>
                 </div>
             </div>
         </div>
 
-        <!-- Stats (clickable filters) -->
-        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 mb-6">
-            <a href="{{ route('counselor.events.index') }}" class="stat-card">
-                <div class="relative p-3 sm:p-4 flex items-center gap-2 sm:gap-3">
-                    <div class="stat-icon flex-shrink-0">
-                        <i class="fas fa-calendar text-[10px] sm:text-sm"></i>
+        {{-- Stats --}}
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-5 sm:mb-6">
+            <div class="stats-card p-3.5">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-[9px] sm:text-[10px] font-semibold text-[#8b7e76] uppercase tracking-[0.16em]">Total Events</p>
+                        <p class="text-xl sm:text-2xl font-semibold text-[#2c2420] mt-1.5">{{ $events->count() }}</p>
                     </div>
-                    <div class="min-w-0">
-                        <p class="stat-label">Total</p>
-                        <p class="stat-value">{{ $events->count() }}</p>
-                    </div>
+                    <div class="stats-icon bg-[#eff6ff]"><i class="fas fa-calendar text-sky-600 text-sm sm:text-base"></i></div>
                 </div>
-            </a>
-
-            <a href="{{ route('counselor.events.index') }}?filter=active" class="stat-card">
-                <div class="relative p-3 sm:p-4 flex items-center gap-2 sm:gap-3">
-                    <div class="stat-icon flex-shrink-0" style="background: rgba(254,249,231,0.9); color: #c9a227;">
-                        <i class="fas fa-circle-play text-[10px] sm:text-sm"></i>
+                <div class="mt-3 mini-progress"><div class="bg-gradient-to-r from-sky-500 to-sky-600" style="width:100%"></div></div>
+            </div>
+            <div class="stats-card p-3.5">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-[9px] sm:text-[10px] font-semibold text-[#8b7e76] uppercase tracking-[0.16em]">Active Events</p>
+                        <p class="text-xl sm:text-2xl font-semibold text-[#2c2420] mt-1.5">{{ $events->where('is_active', true)->count() }}</p>
                     </div>
-                    <div class="min-w-0">
-                        <p class="stat-label">Active</p>
-                        <p class="stat-value">{{ $events->where('is_active', true)->count() }}</p>
-                    </div>
+                    <div class="stats-icon bg-[#ecfdf5]"><i class="fas fa-circle-play text-emerald-600 text-sm sm:text-base"></i></div>
                 </div>
-            </a>
-
-            <a href="{{ route('counselor.events.index') }}?filter=upcoming" class="stat-card">
-                <div class="relative p-3 sm:p-4 flex items-center gap-2 sm:gap-3">
-                    <div class="stat-icon flex-shrink-0" style="background: rgba(254,249,231,0.9); color: var(--maroon-700);">
-                        <i class="fas fa-users text-[10px] sm:text-sm"></i>
+                <div class="mt-3 mini-progress"><div class="bg-gradient-to-r from-emerald-500 to-emerald-600" style="width:{{ $events->count() > 0 ? ($events->where('is_active',true)->count()/$events->count())*100 : 0 }}%"></div></div>
+            </div>
+            <div class="stats-card p-3.5">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-[9px] sm:text-[10px] font-semibold text-[#8b7e76] uppercase tracking-[0.16em]">Upcoming</p>
+                        <p class="text-xl sm:text-2xl font-semibold text-[#2c2420] mt-1.5">{{ $events->where('event_start_date', '>=', now()->toDateString())->count() }}</p>
                     </div>
-                    <div class="min-w-0">
-                        <p class="stat-label">Upcoming</p>
-                        <p class="stat-value">{{ $events->where('event_start_date', '>=', now()->toDateString())->count() }}</p>
-                    </div>
+                    <div class="stats-icon bg-[#fffbeb]"><i class="fas fa-clock text-amber-600 text-sm sm:text-base"></i></div>
                 </div>
-            </a>
-
-            <a href="{{ route('counselor.events.index') }}?filter=required" class="stat-card">
-                <div class="relative p-3 sm:p-4 flex items-center gap-2 sm:gap-3">
-                    <div class="stat-icon flex-shrink-0" style="background: rgba(255,244,229,0.9); color: #92400e;">
-                        <i class="fas fa-circle-exclamation text-[10px] sm:text-sm"></i>
+                <div class="mt-3 mini-progress"><div class="bg-gradient-to-r from-amber-500 to-amber-600" style="width:{{ $events->count() > 0 ? ($events->where('event_start_date','>=',now()->toDateString())->count()/$events->count())*100 : 0 }}%"></div></div>
+            </div>
+            <div class="stats-card p-3.5">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-[9px] sm:text-[10px] font-semibold text-[#8b7e76] uppercase tracking-[0.16em]">Required</p>
+                        <p class="text-xl sm:text-2xl font-semibold text-[#2c2420] mt-1.5">{{ $events->where('is_required', true)->count() }}</p>
                     </div>
-                    <div class="min-w-0">
-                        <p class="stat-label">Required</p>
-                        <p class="stat-value">{{ $events->where('is_required', true)->count() }}</p>
-                    </div>
+                    <div class="stats-icon bg-[#fdf2f2]"><i class="fas fa-circle-exclamation text-[#7a2a2a] text-sm sm:text-base"></i></div>
                 </div>
-            </a>
+                <div class="mt-3 mini-progress"><div class="bg-gradient-to-r from-[#7a2a2a] to-[#9a2a3a]" style="width:{{ $events->count() > 0 ? ($events->where('is_required',true)->count()/$events->count())*100 : 0 }}%"></div></div>
+            </div>
         </div>
 
-        <!-- Status Messages -->
+        {{-- Flash --}}
+        @if(session('success'))
+            <div class="mb-4 bg-[#ecfdf5] border border-emerald-200 text-emerald-800 rounded-lg p-3 flex items-center gap-2 text-xs sm:text-sm">
+                <i class="fas fa-circle-check text-emerald-500"></i> {{ session('success') }}
+            </div>
+        @endif
 
-        <!-- Events Grid -->
-        @if($events->isEmpty())
-            <div class="empty-state">
-                <div class="empty-state-icon">
-                    <i class="fas fa-calendar-plus"></i>
+        {{-- Filter bar --}}
+        <div class="panel-card mb-5 sm:mb-6">
+            <div class="panel-topline"></div>
+            <div class="panel-header">
+                <div class="panel-icon"><i class="fas fa-sliders text-[9px] sm:text-xs"></i></div>
+                <div>
+                    <h2 class="panel-title">Filter Events</h2>
+                    <p class="panel-subtitle hidden sm:block">Search and refine the events list by status and type.</p>
                 </div>
-                <p class="text-sm sm:text-base font-medium text-[#2c2420]">No Events Created Yet</p>
-                <p class="text-xs sm:text-sm text-[#8b7e76] mt-1">Start by creating your first event to help students with mental health awareness.</p>
+            </div>
+            <div class="p-3 sm:p-4">
+                <form method="GET" action="{{ route('counselor.events.index') }}">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+                        <div class="sm:col-span-2 lg:col-span-1">
+                            <div class="relative">
+                                <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-[#a89f97] text-[9px] sm:text-xs"></i>
+                                <input type="text" name="search"
+                                       class="input-field w-full pl-8 sm:pl-9 pr-3 py-2 sm:py-2.5 text-xs sm:text-sm"
+                                       placeholder="Search events..." value="{{ request('search') }}">
+                            </div>
+                        </div>
+                        <div>
+                            <select name="status" class="input-field w-full px-3 py-2 sm:py-2.5 bg-white text-[#4a3f3a] text-xs sm:text-sm">
+                                <option value="all" {{ request('status','all') == 'all' ? 'selected' : '' }}>All Status</option>
+                                <option value="active" {{ request('status') == 'active' ? 'selected' : '' }}>Active</option>
+                                <option value="inactive" {{ request('status') == 'inactive' ? 'selected' : '' }}>Inactive</option>
+                                <option value="upcoming" {{ request('status') == 'upcoming' ? 'selected' : '' }}>Upcoming</option>
+                            </select>
+                        </div>
+                        <div>
+                            <select name="type" class="input-field w-full px-3 py-2 sm:py-2.5 bg-white text-[#4a3f3a] text-xs sm:text-sm">
+                                <option value="all" {{ request('type','all') == 'all' ? 'selected' : '' }}>All Types</option>
+                                <option value="workshop" {{ request('type') == 'workshop' ? 'selected' : '' }}>Workshop</option>
+                                <option value="seminar" {{ request('type') == 'seminar' ? 'selected' : '' }}>Seminar</option>
+                                <option value="webinar" {{ request('type') == 'webinar' ? 'selected' : '' }}>Webinar</option>
+                                <option value="conference" {{ request('type') == 'conference' ? 'selected' : '' }}>Conference</option>
+                                <option value="other" {{ request('type') == 'other' ? 'selected' : '' }}>Other</option>
+                            </select>
+                        </div>
+                        <div class="flex items-end">
+                            <button type="submit" class="filter-btn w-full px-4 py-2 sm:py-2.5 font-medium flex items-center justify-center gap-2 text-xs sm:text-sm rounded-lg">
+                                <i class="fas fa-filter text-[9px] sm:text-xs"></i> Filter
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        {{-- Events grid --}}
+        @if($events->isEmpty())
+            <div class="glass-card p-6 sm:p-8 text-center">
+                <div class="empty-state-icon mb-3">
+                    <i class="fas fa-calendar-plus text-[#a89f97] text-xl sm:text-2xl"></i>
+                </div>
+                <h3 class="text-base sm:text-lg font-semibold text-[#4a3f3a] mb-1.5">No Events Found</h3>
+                <p class="text-[#8b7e76] text-xs sm:text-sm mb-4">No events match your current filters or none have been created yet.</p>
                 <a href="{{ route('counselor.events.create') }}"
-                   class="primary-btn px-4 py-2 text-xs sm:text-sm mt-4">
+                   class="inline-flex items-center px-4 py-2.5 primary-btn font-medium text-xs sm:text-sm rounded-lg">
                     <i class="fas fa-plus mr-1.5 text-[9px] sm:text-xs"></i> Create Your First Event
                 </a>
             </div>
         @else
-            <div class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
                 @foreach($events as $event)
-                    <div class="event-card {{ $event->is_required ? 'required' : '' }}">
-                        <!-- Event Image Header -->
-                        <div class="event-header">
-                            <img src="{{ $event->image_url }}" alt="{{ $event->title }}">
-                            <div class="event-overlay"></div>
-                            <div class="event-header-content">
-                                <div class="flex justify-between items-start mb-2">
-                                    <div class="flex flex-wrap gap-1.5">
-                                        <span class="event-type">{{ $event->type }}</span>
+                    <div class="event-card-new flex flex-col h-full">
+                        {{-- Banner --}}
+                        <div class="event-banner flex-shrink-0">
+                            <div class="relative flex justify-between items-start gap-2">
+                                <div class="min-w-0">
+                                    <div class="flex flex-wrap gap-1 mb-1.5">
+                                        <span class="event-type-pill">{{ $event->type }}</span>
                                         @if($event->is_required)
-                                            <span class="event-badge required">
-                                                <i class="fas fa-circle-exclamation text-[8px]"></i> Required
+                                            <span class="event-type-pill" style="background:rgba(185,28,28,0.5);">
+                                                <i class="fas fa-circle-exclamation text-[8px] mr-0.5"></i> Required
                                             </span>
                                         @endif
                                     </div>
-                                    <span class="event-status {{ $event->is_active ? 'active' : 'inactive' }}">
-                                        {{ $event->is_active ? 'Active' : 'Inactive' }}
-                                    </span>
+                                    <h3 class="text-sm sm:text-base font-semibold leading-tight truncate">{{ $event->title }}</h3>
+                                    <p class="text-[10px] sm:text-xs text-white/80 mt-1">
+                                        @if($event->for_all_colleges)
+                                            <i class="fas fa-globe mr-1"></i> All Colleges
+                                        @else
+                                            <i class="fas fa-building-columns mr-1"></i> {{ $event->colleges->count() }} college(s)
+                                        @endif
+                                    </p>
                                 </div>
-                                <h3 class="event-title line-clamp-2">{{ $event->title }}</h3>
-                            </div>
-                            <!-- College Badge -->
-                            <div class="absolute top-3 right-3">
-                                @if($event->for_all_colleges)
-                                    <span class="college-chip all">
-                                        <i class="fas fa-globe text-[8px]"></i> All
-                                    </span>
-                                @else
-                                    <span class="college-chip specific">
-                                        <i class="fas fa-building-columns text-[8px]"></i> {{ $event->colleges->count() }}
-                                    </span>
-                                @endif
+                                <span class="status-badge flex-shrink-0 {{ $event->is_active ? 'status-active' : 'status-inactive' }}">
+                                    {{ $event->is_active ? 'Active' : 'Inactive' }}
+                                </span>
                             </div>
                         </div>
 
-                        <!-- Event Details -->
-                        <div class="event-body">
-                            <!-- Date and Time -->
-                            <div class="space-y-1 mb-3">
-                                <div class="event-meta">
-                                    <i class="fas fa-calendar-days"></i>
-                                    <span>{{ $event->date_range }}</span>
+                        {{-- Body --}}
+                        <div class="p-4 flex flex-col flex-1">
+                            <div class="space-y-2 mb-3">
+                                <div class="event-meta-row">
+                                    <span class="event-meta-icon bg-[#eff6ff] text-sky-500"><i class="fas fa-calendar-days text-[9px] sm:text-xs"></i></span>
+                                    <span class="text-xs sm:text-sm truncate">{{ $event->date_range }}</span>
                                 </div>
-                                <div class="event-meta">
-                                    <i class="fas fa-clock"></i>
-                                    <span>{{ $event->time_range }}</span>
+                                <div class="event-meta-row">
+                                    <span class="event-meta-icon bg-[#fffbeb] text-amber-500"><i class="fas fa-clock text-[9px] sm:text-xs"></i></span>
+                                    <span class="text-xs sm:text-sm truncate">{{ $event->time_range }}</span>
                                 </div>
-                                <div class="event-meta">
-                                    <i class="fas fa-location-dot"></i>
-                                    <span class="truncate">{{ $event->location }}</span>
+                                <div class="event-meta-row">
+                                    <span class="event-meta-icon bg-[#fdf2f2] text-[#7a2a2a]/60"><i class="fas fa-location-dot text-[9px] sm:text-xs"></i></span>
+                                    <span class="text-xs sm:text-sm truncate">{{ $event->location }}</span>
                                 </div>
-                                @if($event->max_attendees)
-                                    <div class="event-meta">
-                                        <i class="fas fa-users"></i>
-                                        <span>{{ $event->registered_count }}/{{ $event->max_attendees }} registered</span>
-                                    </div>
-                                @else
-                                    <div class="event-meta">
-                                        <i class="fas fa-users"></i>
-                                        <span>{{ $event->registered_count }} registered (Unlimited)</span>
-                                    </div>
-                                @endif
+                                <div class="event-meta-row">
+                                    <span class="event-meta-icon bg-[#ecfdf5] text-emerald-500"><i class="fas fa-users text-[9px] sm:text-xs"></i></span>
+                                    <span class="text-xs sm:text-sm truncate">
+                                        {{ $event->registered_count }} registered
+                                        @if($event->max_attendees) / {{ $event->max_attendees }} max @endif
+                                    </span>
+                                </div>
                             </div>
 
-                            <!-- Description -->
-                            <p class="event-desc line-clamp-2">
-                                {{ Str::limit($event->description, 120) }}
+                            <p class="text-[#8b7e76] text-[10px] sm:text-xs mb-3 line-clamp-2 leading-relaxed flex-1">
+                                {{ Str::limit($event->description, 100) }}
                             </p>
 
-                            <!-- Specific Colleges -->
-                            @if(!$event->for_all_colleges && $event->colleges->isNotEmpty())
-                                <div class="mb-3">
-                                    <p class="text-[10px] font-semibold text-[#6b5e57] mb-1">Available for:</p>
-                                    <div class="event-colleges">
-                                        @foreach($event->colleges->take(2) as $college)
-                                            <span class="event-college-tag">{{ $college->name }}</span>
-                                        @endforeach
-                                        @if($event->colleges->count() > 2)
-                                            <span class="event-college-tag">+{{ $event->colleges->count() - 2 }} more</span>
-                                        @endif
-                                    </div>
-                                </div>
-                            @endif
-
-                            <!-- Action Buttons -->
-                            <div class="event-actions">
+                            {{-- Actions --}}
+                            <div class="grid grid-cols-2 gap-2 mb-3">
                                 <a href="{{ route('counselor.events.registrations', $event) }}"
-                                   class="action-btn registrations">
-                                    <i class="fas fa-users text-[9px]"></i>
-                                    <span>Registrations</span>
+                                   class="action-btn-soft bg-[#fffbeb] text-[#9a7b0a] hover:bg-[#fef3d1] text-center">
+                                    <i class="fas fa-users mr-1.5 text-[9px]"></i> Registrations
                                 </a>
-
                                 <a href="{{ route('counselor.events.edit', $event) }}"
-                                   class="action-btn edit">
-                                    <i class="fas fa-pen-to-square text-[9px]"></i>
-                                    <span>Edit</span>
+                                   class="action-btn-soft bg-[#f5f0eb] text-[#6b5e57] hover:bg-[#e5e0db] text-center">
+                                    <i class="fas fa-pen-to-square mr-1.5 text-[9px]"></i> Edit
                                 </a>
-
-                                <form action="{{ route('counselor.events.toggle-status', $event) }}" method="POST" class="flex-1">
-                                    @csrf
-                                    @method('PATCH')
+                                <form action="{{ route('counselor.events.toggle-status', $event) }}" method="POST" class="contents">
+                                    @csrf @method('PATCH')
                                     <button type="submit"
-                                            class="action-btn toggle w-full">
-                                        <i class="fas {{ $event->is_active ? 'fa-pause' : 'fa-play' }} text-[9px]"></i>
-                                        <span>{{ $event->is_active ? 'Deactivate' : 'Activate' }}</span>
+                                            class="action-btn-soft {{ $event->is_active ? 'bg-[#fffbeb] text-[#9a7b0a] hover:bg-[#fef3d1]' : 'bg-[#ecfdf5] text-[#059669] hover:bg-[#d1fae5]' }} text-center w-full">
+                                        <i class="fas {{ $event->is_active ? 'fa-pause' : 'fa-play' }} mr-1.5 text-[9px]"></i>
+                                        {{ $event->is_active ? 'Deactivate' : 'Activate' }}
                                     </button>
                                 </form>
-
-                                <form action="{{ route('counselor.events.destroy', $event) }}" method="POST" class="flex-1"
-                                      onsubmit="return confirm('Are you sure you want to delete this event? This action cannot be undone.')">
-                                    @csrf
-                                    @method('DELETE')
+                                <form action="{{ route('counselor.events.destroy', $event) }}" method="POST" class="contents"
+                                      onsubmit="return confirm('Delete this event? This cannot be undone.')">
+                                    @csrf @method('DELETE')
                                     <button type="submit"
-                                            class="action-btn delete w-full">
-                                        <i class="fas fa-trash-can-can text-[9px]"></i>
-                                        <span>Delete</span>
+                                            class="action-btn-soft bg-[#fdf2f2] text-[#b91c1c] hover:bg-[#fce4e4] text-center w-full">
+                                        <i class="fas fa-trash-can mr-1.5 text-[9px]"></i> Delete
                                     </button>
                                 </form>
                             </div>
 
-                            <!-- Event Status and Created Info -->
-                            <div class="event-footer">
-                                <div>
-                                    <i class="fas fa-calendar-days-plus mr-1"></i>
-                                    {{ $event->created_at->format('M j, Y') }}
-                                </div>
-                                <div>
-                                    @if($event->is_upcoming)
-                                        <span class="event-period">
-                                            <i class="fas fa-clock text-[8px]"></i> Upcoming
-                                        </span>
-                                    @else
-                                        <span class="event-period">
-                                            <i class="fas fa-clock-rotate-left text-[8px]"></i> Past
-                                        </span>
-                                    @endif
-                                </div>
+                            <div class="pt-2.5 border-t border-[#e5e0db]/60 mt-auto">
+                                <p class="text-[10px] text-[#8b7e76]">
+                                    <i class="fas fa-clock mr-1"></i>
+                                    Created: {{ $event->created_at->format('M j, Y g:i A') }}
+                                </p>
                             </div>
                         </div>
                     </div>
                 @endforeach
             </div>
 
+            {{-- Pagination info --}}
+            <div class="mt-5 sm:mt-6 glass-card p-4">
+                <div class="flex items-center justify-center gap-2 text-[10px] sm:text-xs text-[#8b7e76]">
+                    <i class="fas fa-circle-check text-[#059669]"></i>
+                    <span>Showing all <span class="font-semibold text-[#2c2420]">{{ $events->count() }}</span> events</span>
+                </div>
+            </div>
         @endif
+
     </div>
 </div>
 @endsection

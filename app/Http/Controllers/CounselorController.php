@@ -1008,7 +1008,13 @@ public function viewAppointmentSession(Appointment $appointment)
         ->sortByDesc('created_at')
         ->first();
 
-    return view('counselor.appointments.session-view', compact('appointment', 'latestSessionNote'));
+    $followupAppointment = Appointment::where('student_id', $appointment->student_id)
+        ->where('notes', 'like', '%Follow-up appointment booked by counselor for appointment #' . $appointment->id . '%')
+        ->orderByDesc('appointment_date')
+        ->orderByDesc('start_time')
+        ->first();
+
+    return view('counselor.appointments.session-view', compact('appointment', 'latestSessionNote', 'followupAppointment'));
 }
 
 public function storeAppointmentSession(Request $request, Appointment $appointment)
@@ -1062,7 +1068,7 @@ public function storeAppointmentSession(Request $request, Appointment $appointme
     }
 
     return redirect()
-        ->route('counselor.appointments.session', $appointment)
+        ->route('counselor.appointments.session.view', $appointment)
         ->with('success', 'Session notes saved successfully!');
 }
 

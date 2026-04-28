@@ -24,70 +24,75 @@
         min-height: 100vh;
     }
     .appointments-glow {
-        position: absolute; border-radius: 50%; filter: blur(80px); pointer-events: none; opacity: 0.25;
+        position: absolute; border-radius: 50%; filter: blur(80px); pointer-events: none; opacity: 0.2;
     }
-    .appointments-glow.one { top: -30px; left: -40px; width: 200px; height: 200px; background: var(--gold-400); }
-    .appointments-glow.two { bottom: -30px; right: -60px; width: 220px; height: 220px; background: var(--maroon-800); }
+    .appointments-glow.one { top: -40px; left: -50px; width: 240px; height: 240px; background: var(--gold-400); }
+    .appointments-glow.two { bottom: -50px; right: -70px; width: 280px; height: 280px; background: var(--maroon-800); }
 
     /* Cards */
     .hero-card, .panel-card, .glass-card, .stat-card {
-        position: relative; overflow: hidden; border-radius: 1rem;
-        border: 1px solid var(--border-soft); background: rgba(255,255,255,0.96);
-        box-shadow: 0 1px 3px rgba(44,36,32,0.04), 0 1px 2px rgba(44,36,32,0.03);
-        transition: box-shadow 0.2s ease;
+        position: relative; overflow: hidden; border-radius: 0.75rem;
+        border: 1px solid var(--border-soft); background: rgba(255,255,255,0.95);
+        backdrop-filter: blur(8px); box-shadow: 0 2px 8px rgba(44,36,32,0.04);
+        transition: box-shadow 0.2s ease, transform 0.2s ease;
     }
-    .hero-card:hover, .panel-card:hover, .glass-card:hover, .stat-card:hover { box-shadow: 0 4px 12px rgba(44,36,32,0.06); }
+    .hero-card:hover, .panel-card:hover, .glass-card:hover, .stat-card:hover { box-shadow: 0 4px 14px rgba(44,36,32,0.06); }
+    .hero-card::before, .panel-card::before, .glass-card::before, .stat-card::before {
+        content: ""; position: absolute; inset: 0; pointer-events: none;
+        background: radial-gradient(circle at top right, rgba(212,175,55,0.05), transparent 35%);
+    }
 
     /* Hero Section */
     .hero-icon {
-        width: 3rem; height: 3rem; border-radius: 1rem; color: #fef9e7;
+        width: 2.75rem; height: 2.75rem; border-radius: 0.75rem; color: #fef9e7;
         background: linear-gradient(135deg, var(--maroon-800) 0%, var(--maroon-700) 100%);
+        box-shadow: 0 4px 12px rgba(92,26,26,0.15);
         display: flex; align-items: center; justify-content: center; flex-shrink: 0;
     }
     .hero-badge {
         display: inline-flex; align-items: center; gap: 0.4rem; border-radius: 999px;
-        background: rgba(212,175,55,0.12); padding: 0.2rem 0.65rem;
-        font-size: 0.7rem; font-weight: 600; letter-spacing: 0.08em;
-        color: var(--maroon-700); text-transform: uppercase;
+        border: 1px solid rgba(212,175,55,0.3); background: rgba(254,249,231,0.9);
+        padding: 0.2rem 0.55rem; font-size: 9px; font-weight: 700; text-transform: uppercase;
+        letter-spacing: 0.16em; color: var(--maroon-700);
     }
     .hero-badge-dot { width: 0.3rem; height: 0.3rem; border-radius: 999px; background: var(--gold-400); }
 
     /* Summary Card */
     .summary-card {
-        position: relative; overflow: hidden; border-radius: 1rem;
-        border: 1px solid rgba(92,26,26,0.2);
-        background: linear-gradient(135deg, var(--maroon-800) 0%, var(--maroon-900) 100%);
-        box-shadow: 0 4px 14px rgba(58,12,12,0.2);
+        position: relative; overflow: hidden; border-radius: 0.75rem;
+        border: 1px solid rgba(92,26,26,0.15);
+        background: linear-gradient(135deg, var(--maroon-800) 0%, var(--maroon-900) 100%); color: white;
+        box-shadow: 0 4px 12px rgba(58,12,12,0.15);
     }
     .summary-card::before {
-        content: ""; position: absolute; inset: 0; opacity: 0.12;
-        background: radial-gradient(circle at top right, var(--gold-400), transparent 50%);
-        pointer-events: none;
+        content: ""; position: absolute; inset: 0; opacity: 0.15;
+        background: radial-gradient(circle at top right, var(--gold-400), transparent 40%); pointer-events: none;
     }
     .summary-icon {
         width: 2.5rem; height: 2.5rem; border-radius: 0.75rem;
-        background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.15);
-        display: flex; align-items: center; justify-content: center; color: var(--gold-400);
+        background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.1);
+        display: flex; align-items: center; justify-content: center; color: #fef9e7; flex-shrink: 0;
     }
-    .summary-label { font-size: 0.7rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em; color: rgba(255,255,255,0.7); }
-    .summary-value { font-size: 1.1rem; font-weight: 700; color: white; margin-top: 0.2rem; }
+    .summary-label { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.2em; color: rgba(255,255,255,0.7); }
+    .summary-value { font-size: 1.2rem; line-height: 1.2; font-weight: 800; margin-top: 0.35rem; }
+    .summary-subtext { font-size: 0.7rem; color: rgba(255,255,255,0.8); margin-top: 0.2rem; }
 
     /* Buttons */
-    .btn-primary, .btn-secondary, .btn-filter {
-        border-radius: 0.5rem; font-weight: 500; transition: all 0.2s ease;
-        display: inline-flex; align-items: center; justify-content: center;
-        font-size: 0.75rem; padding: 0.5rem 1rem; gap: 0.5rem;
+    .btn-primary, .primary-btn, .btn-secondary, .secondary-btn, .btn-filter {
+        border-radius: 0.6rem; font-weight: 600; transition: all 0.2s ease;
+        display: inline-flex; align-items: center; justify-content: center; white-space: nowrap;
+        font-size: 0.8rem; padding: 0.55rem 1rem; gap: 0.4rem;
     }
-    .btn-primary {
-        background: linear-gradient(135deg, var(--maroon-800) 0%, var(--maroon-700) 100%);
-        color: white; box-shadow: 0 2px 6px rgba(92,26,26,0.2);
+    .btn-primary, .primary-btn {
+        color: #fef9e7; background: linear-gradient(135deg, var(--maroon-800) 0%, var(--maroon-700) 100%);
+        box-shadow: 0 4px 10px rgba(92,26,26,0.15);
     }
-    .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 4px 10px rgba(92,26,26,0.25); }
-    .btn-secondary {
-        background: rgba(255,255,255,0.95); color: var(--text-primary);
+    .btn-primary:hover, .primary-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 14px rgba(92,26,26,0.2); }
+    .btn-secondary, .secondary-btn {
+        color: var(--text-primary); background: rgba(255,255,255,0.95);
         border: 1px solid var(--border-soft);
     }
-    .btn-secondary:hover { background: rgba(254,249,231,0.8); border-color: var(--maroon-700); }
+    .btn-secondary:hover, .secondary-btn:hover { background: rgba(254,249,231,0.7); border-color: var(--maroon-700); }
     .btn-filter {
         background: white; color: var(--text-secondary);
         border: 1px solid var(--border-soft);
@@ -97,17 +102,18 @@
     }
 
     /* Panel */
+    .panel-topline { position: absolute; inset-inline: 0; top: 0; height: 3px; background: linear-gradient(90deg, var(--maroon-800) 0%, var(--gold-400) 50%, var(--maroon-800) 100%); }
     .panel-header {
-        display: flex; align-items: center; gap: 0.75rem;
-        padding: 1rem 1.25rem; border-bottom: 1px solid var(--border-soft);
+        display: flex; align-items: center; gap: 0.7rem;
+        padding: 0.85rem 1.25rem; border-bottom: 1px solid var(--border-soft);
     }
     .panel-icon {
-        width: 2rem; height: 2rem; border-radius: 0.5rem;
-        background: rgba(122,42,42,0.08); color: var(--maroon-700);
+        width: 2rem; height: 2rem; border-radius: 0.6rem;
+        background: rgba(254,249,231,0.7); color: var(--maroon-700);
         display: flex; align-items: center; justify-content: center;
     }
-    .panel-title { font-size: 0.85rem; font-weight: 600; color: var(--text-primary); }
-    .panel-subtitle { font-size: 0.7rem; color: var(--text-muted); margin-top: 0.1rem; }
+    .panel-title { font-size: 0.8rem; font-weight: 600; color: var(--text-primary); }
+    .panel-subtitle { font-size: 0.68rem; color: var(--text-muted); margin-top: 0.1rem; }
 
     /* Form Elements */
     .form-label {
@@ -205,7 +211,7 @@
     /* Empty State */
     .empty-state {
         text-align: center; padding: 3rem 1.5rem;
-        background: rgba(255,255,255,0.96); border-radius: 1rem;
+        background: rgba(255,255,255,0.95); border-radius: 0.75rem;
     }
     .empty-icon {
         width: 4rem; height: 4rem; border-radius: 999px;
@@ -222,19 +228,30 @@
     }
     .modal-overlay.hidden { display: none; }
     .modal-container {
-        background: white; border-radius: 1rem; border: 1px solid var(--border-soft);
-        box-shadow: 0 20px 35px rgba(44,36,32,0.15); max-width: 32rem; width: 100%;
-        overflow: hidden;
+        background: rgba(255,255,255,0.98); border-radius: 0.75rem;
+        border: 1px solid var(--border-soft);
+        box-shadow: 0 8px 32px rgba(44,36,32,0.12); max-width: 32rem; width: 100%;
+        overflow: hidden; display: flex; flex-direction: column; max-height: 90vh;
     }
     .modal-header {
         display: flex; align-items: center; justify-content: space-between;
-        padding: 1rem 1.25rem; border-bottom: 1px solid var(--border-soft);
-        background: rgba(250,248,245,0.5);
+        padding: 0.85rem 1.25rem; border-bottom: 1px solid var(--border-soft);
+        background: rgba(250,248,245,0.7); flex-shrink: 0; position: relative;
     }
-    .modal-title { font-size: 0.9rem; font-weight: 700; color: var(--text-primary); display: flex; align-items: center; gap: 0.5rem; }
-    .modal-close { background: none; border: none; color: var(--text-muted); cursor: pointer; font-size: 1rem; }
-    .modal-close:hover { color: var(--maroon-700); }
-    .modal-body { padding: 1.25rem; }
+    .modal-header::before {
+        content: ""; position: absolute; inset-inline: 0; top: 0; height: 3px;
+        background: linear-gradient(90deg, var(--maroon-800) 0%, var(--gold-400) 50%, var(--maroon-800) 100%);
+    }
+    .modal-header-icon {
+        width: 1.75rem; height: 1.75rem; border-radius: 0.5rem; flex-shrink: 0;
+        display: flex; align-items: center; justify-content: center;
+        background: linear-gradient(135deg, var(--maroon-800), var(--maroon-700));
+        color: #fef9e7; font-size: 0.7rem;
+    }
+    .modal-title { font-size: 0.85rem; font-weight: 700; color: var(--text-primary); }
+    .modal-close { background: none; border: none; color: var(--text-muted); cursor: pointer; font-size: 0.9rem; width: 2rem; height: 2rem; border-radius: 0.5rem; display: flex; align-items: center; justify-content: center; transition: all 0.15s ease; }
+    .modal-close:hover { background: rgba(254,249,231,0.7); color: var(--maroon-700); }
+    .modal-body { padding: 0; overflow-y: auto; flex: 1; }
     .modal-info {
         background: rgba(254,249,231,0.8); border: 1px solid rgba(212,175,55,0.25);
         border-radius: 0.75rem; padding: 0.75rem; margin-bottom: 1rem;
@@ -245,7 +262,7 @@
         border-radius: 0.75rem; padding: 1rem; font-size: 0.8rem;
         line-height: 1.5; max-height: 16rem; overflow-y: auto;
     }
-    .modal-footer { padding: 1rem 1.25rem; border-top: 1px solid var(--border-soft); display: flex; justify-content: flex-end; }
+    .modal-footer { padding: 0.85rem 1.25rem; border-top: 1px solid var(--border-soft); display: flex; justify-content: flex-end; background: rgba(250,248,245,0.5); flex-shrink: 0; }
 
     /* Referral Info */
     .referral-info { font-size: 0.7rem; color: var(--maroon-700); }
@@ -324,17 +341,17 @@
         <div class="mb-6">
             <div class="grid grid-cols-1 lg:grid-cols-[1fr_auto] gap-4">
                 <div class="hero-card">
-                    <div class="p-5 flex items-start gap-4">
+                    <div class="relative p-4 sm:p-5 flex items-start gap-3">
                         <div class="hero-icon">
-                            <i class="fas fa-calendar-check text-lg"></i>
+                            <i class="fas fa-calendar-check text-base sm:text-lg"></i>
                         </div>
-                        <div>
+                        <div class="min-w-0">
                             <div class="hero-badge mb-2">
                                 <span class="hero-badge-dot"></span>
                                 My Appointments
                             </div>
-                            <h1 class="text-xl font-semibold tracking-tight text-[#2c2420]">Counseling Sessions</h1>
-                            <p class="text-sm text-[#6b5e57] mt-1">
+                            <h1 class="text-lg sm:text-xl lg:text-2xl font-semibold tracking-tight text-[#2c2420] mt-2">Counseling Sessions</h1>
+                            <p class="text-[#6b5e57] text-xs sm:text-sm mt-1.5">
                                 Manage and track your counseling appointments
                             </p>
                         </div>
@@ -342,10 +359,10 @@
                 </div>
 
                 <div class="summary-card">
-                    <div class="h-full flex items-center justify-between gap-3 p-5">
+                    <div class="relative h-full flex items-center justify-between gap-3 p-4">
                         <div class="flex items-center gap-3">
                             <div class="summary-icon">
-                                <i class="fas fa-plus"></i>
+                                <i class="fas fa-plus text-sm"></i>
                             </div>
                             <div>
                                 <p class="summary-label">Quick Action</p>
@@ -684,9 +701,12 @@
 
 {{-- Appointment Details Modal --}}
 <div id="appointmentDetailsModal" class="modal-overlay hidden">
-    <div class="modal-container" style="max-width:540px;max-height:90vh;overflow-y:auto;">
+    <div class="modal-container" style="max-width:540px;">
         <div class="modal-header">
-            <h3 class="modal-title"><i class="fas fa-calendar-check mr-1"></i>Appointment Details</h3>
+            <div class="flex items-center gap-2.5">
+                <div class="modal-header-icon"><i class="fas fa-calendar-check"></i></div>
+                <h3 class="modal-title">Appointment Details</h3>
+            </div>
             <button onclick="closeAppointmentDetailsModal()" class="modal-close" aria-label="Close">
                 <i class="fas fa-xmark"></i>
             </button>
@@ -698,7 +718,7 @@
         </div>
         <div class="modal-footer">
             <button onclick="closeAppointmentDetailsModal()" class="btn-secondary px-4 py-2 text-xs">
-                <i class="fas fa-xmark"></i> Close
+                <i class="fas fa-xmark mr-1"></i> Close
             </button>
         </div>
     </div>
@@ -708,7 +728,7 @@
 <script>
 function showAppointmentDetails(id) {
     const body = document.getElementById('appointmentDetailsBody');
-    body.innerHTML = '<div class="text-center py-8 text-[#8b7e76] text-sm"><i class="fas fa-spinner fa-spin text-2xl mb-3"></i><br>Loading...</div>';
+    body.innerHTML = '<div class="text-center py-8 text-[#8b7e76] text-sm"><i class="fas fa-spinner fa-spin text-2xl mb-3 block"></i>Loading...</div>';
     document.getElementById('appointmentDetailsModal').classList.remove('hidden');
 
     fetch(`/appointments/${id}/details`)
@@ -717,41 +737,88 @@ function showAppointmentDetails(id) {
             const a = data.appointment;
             const c = data.counselor;
 
-            const field = (label, value) => value
-                ? `<div><label class="field-label">${label}</label><p class="mt-1 text-xs sm:text-sm text-[#2c2420] whitespace-pre-line">${value}</p></div>`
-                : '';
+            const chip = (label, bg, text, border) =>
+                `<span style="display:inline-flex;align-items:center;padding:0.2rem 0.65rem;border-radius:999px;font-size:0.7rem;font-weight:600;background:${bg};color:${text};border:1px solid ${border}">${label}</span>`;
 
-            const statusColors = { pending:'pending', approved:'approved', completed:'approved', referred:'referred', cancelled:'cancelled', rejected:'rejected' };
-            const statusChip = `<span class="mt-1 inline-flex px-2 py-1 text-[10px] font-semibold rounded-full status-chip ${statusColors[a.status] || 'pending'}">${a.status_display}</span>`;
+            const statusColors = {
+                pending:   ['rgba(251,191,36,0.12)','#92400e','rgba(251,191,36,0.3)'],
+                approved:  ['rgba(16,185,129,0.1)','#065f46','rgba(16,185,129,0.25)'],
+                completed: ['rgba(59,130,246,0.1)','#1e40af','rgba(59,130,246,0.25)'],
+                cancelled: ['rgba(239,68,68,0.08)','#991b1b','rgba(239,68,68,0.2)'],
+                referred:  ['rgba(212,175,55,0.12)','#7a2a2a','rgba(212,175,55,0.3)'],
+                rejected:  ['rgba(239,68,68,0.08)','#991b1b','rgba(239,68,68,0.2)'],
+            };
+            const sc = statusColors[a.status] || statusColors.pending;
+            const statusLabel = a.status_display || a.status.charAt(0).toUpperCase() + a.status.slice(1).replace(/_/g,' ');
 
-            body.innerHTML = `<div class="space-y-4">
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    ${field('Date', data.formatted_date)}
-                    ${field('Time', data.formatted_time)}
-                </div>
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    ${field('Type of Booking', a.booking_type)}
-                    ${field('Booking Category', a.booking_category ? a.booking_category.charAt(0).toUpperCase() + a.booking_category.slice(1).replace('-',' ') : '')}
-                </div>
-                ${field('Counselor', c.name + (c.position ? ' — ' + c.position : ''))}
-                ${a.referred_by ? field('Source of Referral (Referred)', a.referred_by) : ''}
-                ${field('Reason / Concern', a.concern)}
-                ${a.mood_rating ? field('Mood at Booking', a.mood_rating) : ''}
-                <div><label class="field-label">Status</label><div class="mt-1">${statusChip}</div></div>
-                ${a.cancellation_reason ? `
-                <div>
-                    <label class="field-label">Cancellation Reason</label>
-                    <p class="mt-1 text-xs italic" style="color:#b91c1c;background:rgba(239,68,68,0.06);border:1px solid rgba(239,68,68,0.2);border-radius:0.4rem;padding:0.4rem 0.6rem;">${a.cancellation_reason}</p>
-                </div>` : ''}
-                ${a.reschedule_reason ? `
-                <div>
-                    <label class="field-label">Reschedule Reason</label>
-                    <p class="mt-1 text-xs italic" style="color:#92400e;background:rgba(251,191,36,0.06);border:1px solid rgba(251,191,36,0.3);border-radius:0.4rem;padding:0.4rem 0.6rem;">${a.reschedule_reason}</p>
-                </div>` : ''}
-            </div>`;
+            const section = (icon, title, content) => `
+                <div style="border:1px solid var(--border-soft);border-radius:0.6rem;overflow:hidden;margin-bottom:0.65rem;">
+                    <div style="padding:0.45rem 0.85rem;background:rgba(250,248,245,0.8);border-bottom:1px solid var(--border-soft);display:flex;align-items:center;gap:0.45rem;">
+                        <i class="fas ${icon}" style="color:var(--maroon-700);font-size:0.65rem;"></i>
+                        <span style="font-size:0.6rem;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-secondary);">${title}</span>
+                    </div>
+                    <div style="padding:0.75rem 0.85rem;">${content}</div>
+                </div>`;
+
+            const row2 = (l1,v1,l2,v2) => `
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.6rem;">
+                    <div><p style="font-size:0.58rem;font-weight:600;text-transform:uppercase;letter-spacing:0.07em;color:var(--text-muted);margin-bottom:0.15rem;">${l1}</p><p style="font-size:0.78rem;color:#2c2420;">${v1}</p></div>
+                    <div><p style="font-size:0.58rem;font-weight:600;text-transform:uppercase;letter-spacing:0.07em;color:var(--text-muted);margin-bottom:0.15rem;">${l2}</p><p style="font-size:0.78rem;color:#2c2420;">${v2}</p></div>
+                </div>`;
+
+            // Parse concern
+            const parseConcern = (raw) => {
+                if (!raw) return { category: '', items: [], narrative: '' };
+                const catMatch = raw.match(/^\[([^\]]+)\]\s*/);
+                const category = catMatch ? catMatch[1] : '';
+                const rest = catMatch ? raw.slice(catMatch[0].length) : raw;
+                const parts = rest.split('\n');
+                const items = parts[0] ? parts[0].split(';').map(s => s.trim()).filter(Boolean) : [];
+                const narrative = parts.slice(1).join('\n').trim();
+                return { category, items, narrative };
+            };
+            const pc = parseConcern(a.concern);
+
+            // Counselor header
+            const counselorHeader = `
+                <div style="display:flex;align-items:center;gap:0.75rem;padding:0.85rem 1rem;background:linear-gradient(135deg,rgba(122,42,42,0.06),rgba(212,175,55,0.06));border-bottom:1px solid var(--border-soft);">
+                    <div style="width:2.25rem;height:2.25rem;border-radius:0.6rem;background:linear-gradient(135deg,var(--maroon-800),var(--maroon-700));display:flex;align-items:center;justify-content:center;flex-shrink:0;color:#fff;font-size:0.75rem;">
+                        <i class="fas fa-user-tie"></i>
+                    </div>
+                    <div style="flex:1;min-width:0;">
+                        <div style="font-size:0.85rem;font-weight:700;color:#2c2420;">${c.name}</div>
+                        <div style="font-size:0.7rem;color:var(--text-secondary);margin-top:0.1rem;">${c.position || 'Guidance Counselor'}</div>
+                    </div>
+                    <div>${chip(statusLabel, sc[0], sc[1], sc[2])}</div>
+                </div>`;
+
+            // Appointment info section
+            const apptSection = section('fa-calendar-check', 'Appointment',
+                row2('Date', data.formatted_date, 'Time', data.formatted_time) +
+                `<div style="margin-top:0.5rem;">` +
+                row2('Type', a.booking_type || '—', 'Category', a.booking_category ? a.booking_category.charAt(0).toUpperCase()+a.booking_category.slice(1).replace('-',' ') : '—') +
+                `</div>`
+            );
+
+            // Concern section
+            const concernSection = (a.concern) ? section('fa-comment-medical', 'Reason / Concern',
+                (a.referred_by ? `<div style="margin-bottom:0.5rem;padding:0.35rem 0.6rem;border-radius:0.4rem;background:rgba(212,175,55,0.07);border:1px solid rgba(212,175,55,0.2);font-size:0.75rem;color:#7a5c3a;"><i class="fas fa-user-tag" style="margin-right:0.3rem;"></i><strong>Referred by:</strong> ${a.referred_by}</div>` : '') +
+                (pc.category ? `<p style="font-size:0.6rem;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;color:var(--text-muted);margin-bottom:0.2rem;">Category</p><p style="font-size:0.82rem;font-weight:600;color:#7a2a2a;margin-bottom:0.4rem;">${pc.category}</p>` : '') +
+                (pc.items.length ? `<ul style="padding-left:0;list-style:none;margin-bottom:0.4rem;">${pc.items.map(i => `<li style="display:flex;align-items:flex-start;gap:0.4rem;font-size:0.78rem;color:#4a3a2a;margin-bottom:0.2rem;"><i class="fas fa-check-square" style="color:#7a2a2a;font-size:0.65rem;margin-top:0.2rem;flex-shrink:0;"></i>${i}</li>`).join('')}</ul>` : (!pc.category ? `<p style="font-size:0.8rem;color:#4a3a2a;">${a.concern}</p>` : '')) +
+                (pc.narrative ? `<div style="margin-top:0.4rem;padding-top:0.4rem;border-top:1px solid var(--border-soft);"><p style="font-size:0.6rem;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;color:var(--text-muted);margin-bottom:0.2rem;">Narrative</p><p style="font-size:0.8rem;color:#4a3a2a;white-space:pre-line;line-height:1.6;font-style:italic;">"${pc.narrative}"</p></div>` : '') +
+                (a.mood_rating ? `<div style="margin-top:0.4rem;padding-top:0.4rem;border-top:1px solid var(--border-soft);"><p style="font-size:0.6rem;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;color:var(--text-muted);margin-bottom:0.2rem;">Mood at Booking</p><p style="font-size:0.78rem;color:#4a3a2a;">${a.mood_rating}</p></div>` : '')
+            ) : '';
+
+            // Extra notes
+            const extrasSection = (a.cancellation_reason || a.reschedule_reason) ? section('fa-circle-info', 'Additional Info',
+                (a.cancellation_reason ? `<p style="font-size:0.6rem;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;color:var(--text-muted);margin-bottom:0.2rem;">Cancellation Reason</p><p style="font-size:0.78rem;color:#b91c1c;font-style:italic;padding:0.35rem 0.5rem;background:rgba(239,68,68,0.06);border:1px solid rgba(239,68,68,0.2);border-radius:0.4rem;">${a.cancellation_reason}</p>` : '') +
+                (a.reschedule_reason ? `<p style="font-size:0.6rem;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;color:var(--text-muted);margin-bottom:0.2rem;margin-top:0.4rem;">Reschedule Reason</p><p style="font-size:0.78rem;color:#92400e;font-style:italic;padding:0.35rem 0.5rem;background:rgba(251,191,36,0.06);border:1px solid rgba(251,191,36,0.3);border-radius:0.4rem;">${a.reschedule_reason}</p>` : '')
+            ) : '';
+
+            body.innerHTML = counselorHeader + `<div style="padding:0.85rem;">` + apptSection + concernSection + extrasSection + `</div>`;
         })
         .catch(() => {
-            body.innerHTML = '<div class="text-center py-8 text-red-500 text-sm"><i class="fas fa-exclamation-triangle text-2xl mb-3"></i><br>Failed to load details. Please try again.</div>';
+            body.innerHTML = '<div class="text-center py-8 text-red-500 text-sm"><i class="fas fa-exclamation-triangle text-2xl mb-3 block"></i>Failed to load details. Please try again.</div>';
         });
 }
 

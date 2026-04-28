@@ -1,24 +1,25 @@
-<?php
+﻿<?php
 
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Auth\RegisteredUserController;
-use App\Http\Controllers\FeedbackController;
+use App\Http\Controllers\AdminController;
+use App\Http\Controllers\AdminServiceController;
+use App\Http\Controllers\AnalyticsController;
 use App\Http\Controllers\AppointmentController;
 use App\Http\Controllers\CounselorController;
 use App\Http\Middleware\CounselorMiddleware;
 use App\Http\Controllers\EventController;
+use App\Http\Controllers\FeedbackController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\EventRegistrationController;
 use App\Http\Controllers\ResourceController;
 use App\Http\Controllers\SessionNoteController;
 use App\Http\Controllers\CounselorAnnouncementController;
+use App\Http\Controllers\Auth\RegisteredUserController;
 use Illuminate\Support\Facades\Auth;
-use App\Http\Controllers\AdminController;
 use App\Http\Controllers\StudentController;
 use App\Http\Controllers\AdminResourceController;
 use App\Http\Controllers\AdminFAQController;
-use App\Http\Controllers\AnalyticsController;
 
 Route::get('/', function () {
     return redirect()->route('login');
@@ -237,12 +238,10 @@ Route::middleware(['auth'])->group(function () {
 // Admin routes - REMOVED role:admin middleware
 Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('dashboard');
-    Route::get('/users', [AdminController::class, 'users'])->name('users');
-    Route::get('/users/create', [AdminController::class, 'createUser'])->name('users.create');
-    Route::post('/users', [AdminController::class, 'storeUser'])->name('users.store');
-    Route::get('/users/{user}/edit', [AdminController::class, 'editUser'])->name('users.edit');
-    Route::put('/users/{user}', [AdminController::class, 'updateUser'])->name('users.update');
-    Route::delete('/users/{user}', [AdminController::class, 'deleteUser'])->name('users.delete');
+
+    Route::get('/services', [AdminServiceController::class, 'index'])->name('services.index');
+    Route::get('/services/{service}/edit', [AdminServiceController::class, 'edit'])->name('services.edit');
+    Route::patch('/services/{service}', [AdminServiceController::class, 'update'])->name('services.update');
 
     Route::get('/students', [AdminController::class, 'students'])->name('students');
     Route::get('/students/{student}/edit', [AdminController::class, 'editStudent'])->name('students.edit');

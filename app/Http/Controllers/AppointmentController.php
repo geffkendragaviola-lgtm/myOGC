@@ -105,6 +105,7 @@ class AppointmentController extends Controller
             'start_time' => 'required|date_format:H:i',
             'booking_type' => 'required|in:Counseling,Consultation',
             'booking_category' => 'nullable|in:online,walk-in,referred,called-in',
+            'referred_by' => 'nullable|required_if:booking_category,referred|string|max:255',
             'concern' => 'required|string|max:500',
             'auto_approve' => 'nullable|boolean',
         ]);
@@ -208,6 +209,7 @@ class AppointmentController extends Controller
                 'booking_type' => $request->booking_type,
                 'booking_category' => $request->input('booking_category', 'online'),
                 'concern' => $request->concern,
+                'referred_by' => $request->input('booking_category') === 'referred' ? $request->input('referred_by') : null,
                 'status' => $request->boolean('auto_approve', true) ? 'approved' : 'pending',
                 'notes' => $followupNote,
             ]);
@@ -265,7 +267,12 @@ public function create()
             ->whereHas('user', function($query) {
                 $query->where('role', 'counselor');
             })
-            ->get();
+            ->get()
+            ->unique(function ($counselor) {
+                // Ensure each counselor appears only once by their user ID
+                // This prevents duplicates if a counselor handles multiple colleges
+                return $counselor->user_id;
+            });
     } else {
         // Get counselors from the same college OR counselors who have received referrals from this student
         $counselors = Counselor::with('user', 'college')
@@ -279,7 +286,11 @@ public function create()
                       ->where('status', 'referred');
             })
             ->get()
-            ->unique('id'); // Remove duplicates
+            ->unique(function ($counselor) {
+                // Ensure each counselor appears only once by their user ID
+                // This prevents duplicates if a counselor handles multiple colleges
+                return $counselor->user_id;
+            });
     }
 
     $hasInitialInterviewAppointment = Appointment::where('student_id', $student->id)
@@ -357,7 +368,10 @@ public function storeByCounselor(Request $request)
         'start_time' => 'required|date_format:H:i',
         'booking_type' => 'required|in:Initial Interview,Counseling,Consultation',
         'booking_category' => 'required|in:online,walk-in,referred,called-in',
+        'referred_by' => 'nullable|required_if:booking_category,referred|string|max:255',
         'concern' => 'required|string|max:500',
+        'flag_high_risk' => 'nullable|boolean',
+        'high_risk_notes' => 'nullable|string|max:2000',
     ]);
 
     $counselor = Counselor::where('user_id', $user->id)
@@ -451,6 +465,16 @@ public function storeByCounselor(Request $request)
 
     DB::beginTransaction();
     try {
+        $flagStudentHighRisk = $request->boolean('flag_high_risk', false);
+        if ($flagStudentHighRisk) {
+            $student->forceFill([
+                'is_high_risk' => true,
+                'high_risk_notes' => $request->input('high_risk_notes'),
+                'high_risk_flagged_at' => now(),
+                'high_risk_flagged_by' => $user->id,
+            ])->save();
+        }
+
         $appointment = Appointment::create([
             'student_id' => $student->id,
             'counselor_id' => $counselor->id,
@@ -460,6 +484,10 @@ public function storeByCounselor(Request $request)
             'booking_type' => $request->booking_type,
             'booking_category' => $request->booking_category,
             'concern' => $request->concern,
+            'referred_by' => $request->booking_category === 'referred' ? $request->input('referred_by') : null,
+            'is_appointment_high_risk' => $flagStudentHighRisk,
+            'appointment_high_risk_notes' => $flagStudentHighRisk ? $request->input('high_risk_notes') : null,
+            'appointment_high_risk_counselor_flagged' => $flagStudentHighRisk,
             'status' => 'approved',
             'notes' => 'Booked by counselor on ' . now()->toDateTimeString(),
         ]);
@@ -528,6 +556,11 @@ public function getReferredCounselors(Request $request)
                   ->where('status', 'referred');
         })
         ->get()
+        ->unique(function ($counselor) {
+            // Ensure each counselor appears only once by their user ID
+            // This prevents duplicates if a counselor handles multiple colleges
+            return $counselor->user_id;
+        })
         ->map(function($counselor) {
             return [
                 'id' => $counselor->id,
@@ -2144,6 +2177,11 @@ public function rejectReferral(Request $request, Appointment $appointment)
             })
             ->where('user_id', '!=', $currentCounselor->user_id)
             ->get()
+            ->unique(function ($counselor) {
+                // Ensure each counselor appears only once by their user ID
+                // This prevents duplicates if a counselor handles multiple colleges
+                return $counselor->user_id;
+            })
             ->groupBy('user_id')
             ->map(function($assignments) use ($student) {
                 $first = $assignments->first();

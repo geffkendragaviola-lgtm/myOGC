@@ -106,21 +106,30 @@ public function updateRegistrationStatus(Request $request, Event $event, EventRe
 }
  public function index(Request $request)
     {
-        $query = Event::with('user')
+        $query = Event::with(['user', 'colleges'])
             ->where('user_id', Auth::id())
             ->orderBy('event_start_date', 'desc')
             ->orderBy('start_time', 'desc');
 
-        switch ($request->input('filter')) {
-            case 'active':
-                $query->where('is_active', true);
-                break;
-            case 'upcoming':
-                $query->where('event_start_date', '>=', now()->toDateString());
-                break;
-            case 'required':
-                $query->where('is_required', true);
-                break;
+        if ($request->filled('search')) {
+            $query->where(function ($q) use ($request) {
+                $q->where('title', 'like', '%' . $request->search . '%')
+                  ->orWhere('description', 'like', '%' . $request->search . '%')
+                  ->orWhere('location', 'like', '%' . $request->search . '%');
+            });
+        }
+
+        if ($request->filled('status') && $request->status !== 'all') {
+            match ($request->status) {
+                'active'   => $query->where('is_active', true),
+                'inactive' => $query->where('is_active', false),
+                'upcoming' => $query->where('event_start_date', '>=', now()->toDateString()),
+                default    => null,
+            };
+        }
+
+        if ($request->filled('type') && $request->type !== 'all') {
+            $query->where('type', $request->type);
         }
 
         $events = $query->get();
@@ -138,12 +147,11 @@ public function updateRegistrationStatus(Request $request, Event $event, EventRe
   public function create()
     {
         $colleges = College::all();
-        // Group counselors by user so multi-college counselors appear once
+        // Group counselors by user_id, keep only the first (primary) record per person
         $counselors = Counselor::with(['user', 'college'])->get()
             ->groupBy('user_id')
             ->map(function ($group) {
                 $first = $group->first();
-                $first->all_ids       = $group->pluck('id')->toArray();
                 $first->college_names = $group->pluck('college.name')->filter()->implode(', ');
                 return $first;
             })->values();
@@ -168,6 +176,16 @@ public function updateRegistrationStatus(Request $request, Event $event, EventRe
             $data['image'] = basename($imagePath);
         }
 
+        // Sync to selected counselors' Google Calendars
+        // Extract counselor_ids before creating the event (not a model attribute)
+        $rawCounselorIds = $request->input('counselor_ids', []);
+        unset($data['counselor_ids']);
+
+        Log::info('Event create - raw counselor_ids received', [
+            'rawCounselorIds' => $rawCounselorIds,
+            'request_user_id' => Auth::id(),
+        ]);
+
         $event = Event::create($data);
 
         // Attach colleges if not for all colleges
@@ -180,14 +198,18 @@ public function updateRegistrationStatus(Request $request, Event $event, EventRe
             $event->registerRequiredStudents();
         }
 
-        // Sync to selected counselors' Google Calendars
-        $counselorIds = collect($request->input('counselor_ids', []))
-            ->flatMap(fn($v) => explode(',', $v))
-            ->map('intval')->unique()->filter()->values()->toArray();
+        $counselorIds = collect($rawCounselorIds)
+            ->map(fn($id) => (int) $id)->unique()->filter()->values()->toArray();
+
+        Log::info('Event create - normalized counselor_ids', [
+            'counselorIds' => $counselorIds,
+            'event_id' => $event->id,
+        ]);
         if (!empty($counselorIds)) {
             $event->assignedCounselors()->sync($counselorIds);
             app(GoogleCalendarService::class)->syncEventToCounselors($event, $counselorIds);
             $this->notifyCounselorsOfEventConflicts($event, $counselorIds);
+            $this->notifyAssignedCounselors($event, $counselorIds);
         }
 
         return redirect()->route('counselor.events.index')
@@ -204,6 +226,10 @@ public function updateRegistrationStatus(Request $request, Event $event, EventRe
         $previousColleges = $event->colleges->pluck('id')->toArray();
 
         $data = $request->validated();
+
+        // Remove counselor_ids — not a model attribute, handled separately
+        $rawCounselorIds = $data['counselor_ids'] ?? [];
+        unset($data['counselor_ids']);
 
         // Normalize year_levels: null means all year levels
         if (empty($data['year_levels'])) {
@@ -239,12 +265,15 @@ public function updateRegistrationStatus(Request $request, Event $event, EventRe
         }
 
         // Sync counselors' Google Calendars
-        $newCounselorIds = collect($request->input('counselor_ids', []))
-            ->flatMap(fn($v) => explode(',', $v))
-            ->map('intval')->unique()->filter()->values()->toArray();
+        $newCounselorIds = collect($rawCounselorIds)
+            ->map(fn($id) => (int) $id)->unique()->filter()->values()->toArray();
 
         // Capture previous counselors BEFORE sync so we know who to remove
         $previousCounselorIds = $event->assignedCounselors()->pluck('counselors.id')->toArray();
+
+        // Split into newly added vs already assigned
+        $addedCounselorIds   = array_values(array_diff($newCounselorIds, $previousCounselorIds));
+        $keptCounselorIds    = array_values(array_intersect($newCounselorIds, $previousCounselorIds));
 
         // Remove calendar entries for deselected counselors first
         $removedIds = array_diff($previousCounselorIds, $newCounselorIds);
@@ -264,6 +293,16 @@ public function updateRegistrationStatus(Request $request, Event $event, EventRe
             $this->notifyCounselorsOfEventConflicts($event, $newCounselorIds);
         }
 
+        // Notify newly added counselors as a fresh assignment
+        if (!empty($addedCounselorIds)) {
+            $this->notifyAssignedCounselors($event, $addedCounselorIds, isUpdate: false);
+        }
+
+        // Notify already-assigned counselors that the event was updated
+        if (!empty($keptCounselorIds)) {
+            $this->notifyAssignedCounselors($event, $keptCounselorIds, isUpdate: true);
+        }
+
         // Sync the event creator's own Google Calendar entry
         $this->syncEventToCalendar($event, update: true);
 
@@ -277,19 +316,32 @@ public function updateRegistrationStatus(Request $request, Event $event, EventRe
             abort(403, 'Unauthorized action.');
         }
 
-        // Remove from counselor's Google Calendar
+        // Remove from all assigned counselors' Google Calendars
+        $assignedCounselorIds = $event->assignedCounselors()->pluck('counselors.id')->toArray();
+        if (!empty($assignedCounselorIds)) {
+            try {
+                app(GoogleCalendarService::class)->removeEventFromCounselors($event, $assignedCounselorIds);
+            } catch (\Throwable $e) {
+                Log::warning('Failed to remove event from assigned counselors\' calendars', [
+                    'event_id' => $event->id,
+                    'error'    => $e->getMessage(),
+                ]);
+            }
+        }
+
+        // Remove from event creator's Google Calendar
         if ($event->google_calendar_event_id) {
             $counselor = Counselor::where('user_id', Auth::id())->first();
             if ($counselor && $counselor->google_calendar_id) {
                 try {
-                    app(GoogleCalendarService::class)->deleteEvent(
-                        $event->google_calendar_event_id,
-                        $counselor->google_calendar_id
-                    );
+                    $ids = json_decode($event->google_calendar_event_id, true) ?? [$event->google_calendar_event_id];
+                    foreach ((array) $ids as $calId) {
+                        app(GoogleCalendarService::class)->deleteEvent($calId, $counselor->google_calendar_id);
+                    }
                 } catch (\Throwable $e) {
-                    Log::warning('Failed to delete event from Google Calendar', [
+                    Log::warning('Failed to delete event from creator\'s Google Calendar', [
                         'event_id' => $event->id,
-                        'error' => $e->getMessage(),
+                        'error'    => $e->getMessage(),
                     ]);
                 }
             }
@@ -336,17 +388,21 @@ public function updateRegistrationStatus(Request $request, Event $event, EventRe
 
         $colleges = College::all();
         $selectedColleges = $event->colleges->pluck('id')->toArray();
-        $selectedCounselors = $event->assignedCounselors->pluck('id')->toArray();
 
-        // Group counselors by user so multi-college counselors appear once
+        // Group counselors by user_id, keep only the first (primary) record per person
         $counselors = Counselor::with(['user', 'college'])->get()
             ->groupBy('user_id')
             ->map(function ($group) {
                 $first = $group->first();
-                $first->all_ids       = $group->pluck('id')->toArray();
                 $first->college_names = $group->pluck('college.name')->filter()->implode(', ');
                 return $first;
             })->values();
+
+        // Normalize selectedCounselors to primary IDs only
+        $assignedUserIds = $event->assignedCounselors->pluck('user_id')->unique()->toArray();
+        $selectedCounselors = $counselors
+            ->filter(fn($c) => in_array($c->user_id, $assignedUserIds))
+            ->pluck('id')->toArray();
 
         return view('counselor.events.edit', compact('event', 'colleges', 'selectedColleges', 'counselors', 'selectedCounselors'));
     }
@@ -636,7 +692,7 @@ public function updateRegistrationStatus(Request $request, Event $event, EventRe
     }
 
     /**
-     * Check for schedule conflicts and notify counselors
+     * Check for schedule conflicts and notify counselors and affected students
      */
     private function notifyCounselorsOfEventConflicts(Event $event, array $counselorIds): void
     {
@@ -653,14 +709,19 @@ public function updateRegistrationStatus(Request $request, Event $event, EventRe
         $eventStartTime = Carbon::parse($event->start_time, $timezone);
         $eventEndTime = Carbon::parse($event->end_time, $timezone);
 
-        $counselors = Counselor::with('user')->whereIn('id', $counselorIds)->get();
+        // Group by user_id to avoid duplicate notifications for multi-college counselors
+        $counselors = Counselor::with('user')->whereIn('id', $counselorIds)->get()
+            ->groupBy('user_id')
+            ->map(fn($group) => $group->first())
+            ->values();
+
+        $googleCalendarService = app(GoogleCalendarService::class);
 
         foreach ($counselors as $counselor) {
             try {
-                // Get all counselor assignment IDs (same user might have multiple counselor records)
                 $counselorAssignmentIds = Counselor::where('user_id', $counselor->user_id)->pluck('id')->toArray();
 
-                // Find appointments that overlap with the event
+                // Check appointment conflicts in DB
                 $conflictingAppointments = Appointment::with(['student.user'])
                     ->whereIn('counselor_id', $counselorAssignmentIds)
                     ->whereIn('appointment_date', $eventDays)
@@ -668,30 +729,88 @@ public function updateRegistrationStatus(Request $request, Event $event, EventRe
                     ->get()
                     ->filter(function ($appointment) use ($eventStartTime, $eventEndTime, $timezone) {
                         $apptStart = Carbon::parse($appointment->start_time, $timezone);
-                        $apptEnd = Carbon::parse($appointment->end_time, $timezone);
-
-                        // Check if time ranges overlap
+                        $apptEnd   = Carbon::parse($appointment->end_time, $timezone);
                         return $apptStart->lt($eventEndTime) && $apptEnd->gt($eventStartTime);
                     });
 
-                if ($conflictingAppointments->isEmpty()) {
+                // Check Google Calendar conflicts
+                $calendarConflicts = collect();
+                if ($counselor->google_calendar_id) {
+                    foreach ($eventDays as $day) {
+                        try {
+                            $dayDate = Carbon::parse($day, $timezone);
+                            $busyIntervals = $googleCalendarService->getBusyIntervalsForDate(
+                                $counselor->google_calendar_id,
+                                $dayDate
+                            );
+
+                            foreach ($busyIntervals as $interval) {
+                                // Build event start/end for this specific day
+                                $eventDayStart = Carbon::parse($day . ' ' . $event->start_time, $timezone);
+                                $eventDayEnd = Carbon::parse($day . ' ' . $event->end_time, $timezone);
+
+                                // Check if this interval overlaps with the event
+                                if ($interval['start']->lt($eventDayEnd) && $interval['end']->gt($eventDayStart)) {
+                                    $calendarConflicts->push([
+                                        'title' => $interval['title'],
+                                        'date' => $day,
+                                        'start' => $interval['start'],
+                                        'end' => $interval['end'],
+                                        'description' => $interval['description'] ?? null,
+                                        'location' => $interval['location'] ?? null,
+                                    ]);
+                                }
+                            }
+                        } catch (\Throwable $e) {
+                            Log::warning('Failed to check Google Calendar conflicts for day', [
+                                'counselor_id' => $counselor->id,
+                                'day' => $day,
+                                'error' => $e->getMessage(),
+                            ]);
+                        }
+                    }
+                }
+
+                // Only notify if there are conflicts
+                if ($conflictingAppointments->isEmpty() && $calendarConflicts->isEmpty()) {
                     continue;
                 }
 
-                // Send email notification
+                // Notify counselor
                 Mail::to($counselor->user->email)->send(
-                    new EventScheduleConflict($event, $counselor, $conflictingAppointments)
+                    new EventScheduleConflict($event, $counselor, $conflictingAppointments, $calendarConflicts)
                 );
-
-                // Send in-app notification
+                $totalConflicts = $conflictingAppointments->count() + $calendarConflicts->count();
                 $counselor->user->notify(
-                    new EventScheduleConflictNotification($event, $conflictingAppointments->count())
+                    new EventScheduleConflictNotification($event, $totalConflicts)
                 );
             } catch (\Throwable $e) {
                 Log::warning('Failed to send event conflict notification', [
-                    'event_id' => $event->id,
+                    'event_id'    => $event->id,
+                    'counselor_id'=> $counselor->id,
+                    'error'       => $e->getMessage(),
+                ]);
+            }
+        }
+    }
+
+    private function notifyAssignedCounselors(Event $event, array $counselorIds, bool $isUpdate = false): void
+    {
+        // Group by user_id to avoid duplicate emails for multi-college counselors
+        $counselors = Counselor::with('user')->whereIn('id', $counselorIds)->get()
+            ->groupBy('user_id')
+            ->map(fn($group) => $group->first())
+            ->values();
+
+        foreach ($counselors as $counselor) {
+            try {
+                Mail::to($counselor->user->email)->send(new \App\Mail\EventCounselorAssigned($event, $counselor, $isUpdate));
+                $counselor->user->notify(new \App\Notifications\EventCounselorAssignedNotification($event, $isUpdate));
+            } catch (\Throwable $e) {
+                Log::warning('Failed to send event assignment notification to counselor', [
+                    'event_id'     => $event->id,
                     'counselor_id' => $counselor->id,
-                    'error' => $e->getMessage(),
+                    'error'        => $e->getMessage(),
                 ]);
             }
         }

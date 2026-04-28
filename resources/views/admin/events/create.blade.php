@@ -381,6 +381,47 @@
                         </div>
                     </div>
 
+                    <!-- Attending Counselors (Google Calendar) -->
+                    <div class="section-card mb-4">
+                        <div class="section-topline"></div>
+                        <div class="section-header">
+                            <div class="section-icon">
+                                <i class="fab fa-google text-[9px] sm:text-xs"></i>
+                            </div>
+                            <div>
+                                <h3 class="section-title">Attending Counselors (Google Calendar)</h3>
+                                <p class="section-subtitle hidden sm:block">Selected counselors will have this event added to their Google Calendar and receive an assignment notification.</p>
+                            </div>
+                        </div>
+                        <div class="p-3 sm:p-4">
+                            @php $oldCounselorIds = collect(old('counselor_ids', []))->map('intval')->filter()->all(); @endphp
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-2">
+                                @foreach($counselors as $counselor)
+                                    @php $isChecked = in_array($counselor->id, $oldCounselorIds); @endphp
+                                    <label class="option-card cursor-pointer gap-2" style="padding:0.5rem 0.75rem;">
+                                        <input type="checkbox"
+                                               name="counselor_ids[]"
+                                               value="{{ $counselor->id }}"
+                                               {{ $isChecked ? 'checked' : '' }}
+                                               class="w-4 h-4 text-[#7a2a2a] border-[#e5e0db] rounded focus:ring-[#7a2a2a] flex-shrink-0">
+                                        <span class="text-xs font-medium text-[#4a3f3a]">
+                                            {{ trim($counselor->user->first_name . ' ' . $counselor->user->last_name) }}
+                                            @if($counselor->college_names)
+                                                <span class="text-[10px] text-[#8b7e76]">({{ $counselor->college_names }})</span>
+                                            @endif
+                                            @if(!$counselor->google_calendar_id)
+                                                <span class="text-[10px] text-[#b45309]">(no calendar)</span>
+                                            @endif
+                                        </span>
+                                    </label>
+                                @endforeach
+                            </div>
+                            @error('counselor_ids')
+                                <p class="error-text mt-2">{{ $message }}</p>
+                            @enderror
+                        </div>
+                    </div>
+
                     <!-- Target Audience Section -->
                     <div class="section-card mb-4">
                         <div class="section-topline"></div>
@@ -479,6 +520,8 @@
 
                     <!-- Submit Buttons -->
                     <div class="flex flex-col sm:flex-row justify-end gap-2 sm:gap-3 pt-2">
+                        {{-- Pass for_all_colleges based on whether colleges were selected --}}
+                        <input type="hidden" name="for_all_colleges" id="for_all_colleges_hidden" value="1">
                         <button type="reset"
                                 class="form-action-secondary">
                             <i class="fas fa-redo mr-2 text-[9px] sm:text-xs"></i> Reset Form
@@ -526,6 +569,15 @@
             endTime.addEventListener('change', validateTimeRange);
             startDate.addEventListener('change', validateTimeRange);
             endDate.addEventListener('change', validateTimeRange);
+
+            // Set for_all_colleges based on college selection
+            const collegesSelect = document.getElementById('colleges');
+            const forAllCollegesHidden = document.getElementById('for_all_colleges_hidden');
+            if (collegesSelect) {
+                collegesSelect.addEventListener('change', function() {
+                    forAllCollegesHidden.value = this.selectedOptions.length === 0 ? '1' : '0';
+                });
+            }
         });
     </script>
 @endsection
