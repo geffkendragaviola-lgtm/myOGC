@@ -272,12 +272,11 @@
                             </div>
 
                             <div>
-                                <label for="order" class="field-label">Display Order</label>
-                                <input type="number" name="order" id="order" value="{{ old('order', 0) }}" min="0"
-                                       class="input-field">
-                                @error('order')
-                                    <p class="error-text">{{ $message }}</p>
-                                @enderror
+                                <label class="field-label">Pin to Top</label>
+                                <label class="inline-flex items-center gap-2 cursor-pointer">
+                                    <input type="checkbox" name="is_pinned" value="1" {{ old('is_pinned') ? 'checked' : '' }} class="w-4 h-4 accent-[#7a2a2a]">
+                                    <span class="text-sm text-[#6b5e57]">Pin this resource to appear first</span>
+                                </label>
                             </div>
 
                             <div class="md:col-span-2">

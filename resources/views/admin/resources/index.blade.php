@@ -116,13 +116,9 @@
         text-transform: capitalize;
     }
 
-    .order-badge {
-        display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.25rem 0.45rem;
-        border-radius: 0.55rem; background: rgba(245,240,235,0.7); border: 1px solid var(--border-soft)/60;
-    }
-
     .action-link { color: var(--text-secondary); transition: all 0.18s ease; }
-    .action-link:hover { color: var(--maroon-700); transform: translateY(-1px); }
+    .action-link:hover { color: var(--maroon-800); transform: translateY(-1px); }
+    .pin-active { color: #7a2a2a !important; }
     .delete-link { color: #b91c1c; transition: all 0.18s ease; }
     .delete-link:hover { color: var(--maroon-900); transform: translateY(-1px); }
     .empty-state-icon {
@@ -137,6 +133,29 @@
     .visit-link:hover { color: var(--maroon-900); transform: translateY(-1px); }
     .status-btn { transition: all 0.2s ease; }
     .status-btn:hover { transform: translateY(-1px); }
+
+    .filter-label {
+        display: block;
+        font-size: 0.65rem;
+        font-weight: 600;
+        color: var(--text-secondary);
+        margin-bottom: 0.35rem;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+    }
+    .filter-input {
+        width: 100%;
+        border: 1px solid var(--border-soft);
+        border-radius: 0.6rem;
+        background: rgba(255,255,255,0.9);
+        color: var(--text-primary);
+        outline: none;
+        transition: all 0.2s ease;
+        font-size: 0.8rem;
+        padding: 0.55rem 0.75rem;
+        box-shadow: inset 0 1px 2px rgba(44,36,32,0.02);
+    }
+    .filter-input:focus { border-color: var(--maroon-700); box-shadow: 0 0 0 3px rgba(92,26,26,0.08); }
 
     @media (max-width: 639px) {
         .primary-btn { width: 100%; justify-content: center; }
@@ -192,9 +211,72 @@
             </div>
         </div>
 
+        <div class="panel-card mb-5 sm:mb-6 overflow-hidden">
+            <div class="table-header-bar">
+                <div class="flex items-center gap-3">
+                    <div class="table-header-icon">
+                        <i class="fas fa-sliders text-[#7a2a2a] text-[10px] sm:text-xs"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-sm font-medium text-[#2c2420]">Filters</h2>
+                        <p class="text-[10px] sm:text-xs text-[#8b7e76]">Search and filter resources</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="p-4 sm:p-5">
+                <form method="GET" action="{{ route('admin.resources.index') }}" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 items-end">
+                    <div class="lg:col-span-2">
+                        <label class="filter-label">Search</label>
+                        <div class="relative">
+                            <i class="fas fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-[#a89f97] text-xs"></i>
+                            <input type="text" name="search" value="{{ $search ?? '' }}" placeholder="Title, description, button text..." class="filter-input pl-9" />
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="filter-label">Category</label>
+                        <select name="category" class="filter-input bg-white">
+                            <option value="all" {{ ($category ?? 'all') === 'all' ? 'selected' : '' }}>All</option>
+                            @foreach(($categories ?? []) as $key => $label)
+                                <option value="{{ $key }}" {{ ($category ?? '') === (string)$key ? 'selected' : '' }}>{{ $label }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="filter-label">Status</label>
+                        <select name="status" class="filter-input bg-white">
+                            <option value="all" {{ ($status ?? 'all') === 'all' ? 'selected' : '' }}>All</option>
+                            <option value="active" {{ ($status ?? '') === 'active' ? 'selected' : '' }}>Active</option>
+                            <option value="inactive" {{ ($status ?? '') === 'inactive' ? 'selected' : '' }}>Inactive</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="filter-label">Pinned</label>
+                        <select name="pinned" class="filter-input bg-white">
+                            <option value="all" {{ ($pinned ?? 'all') === 'all' ? 'selected' : '' }}>All</option>
+                            <option value="pinned" {{ ($pinned ?? '') === 'pinned' ? 'selected' : '' }}>Pinned</option>
+                            <option value="unpinned" {{ ($pinned ?? '') === 'unpinned' ? 'selected' : '' }}>Unpinned</option>
+                        </select>
+                    </div>
+
+                    <div class="sm:col-span-2 lg:col-span-4 flex flex-col sm:flex-row justify-end gap-2 sm:gap-3 pt-1">
+                        <button type="submit" class="primary-btn px-4 py-2 text-xs sm:text-sm rounded-lg">
+                            <i class="fas fa-filter mr-1.5 text-[9px] sm:text-xs"></i> Apply
+                        </button>
+                        <a href="{{ route('admin.resources.index') }}" class="secondary-btn px-4 py-2 text-xs sm:text-sm rounded-lg text-center">
+                            <i class="fas fa-rotate-left mr-1.5 text-[9px] sm:text-xs"></i> Reset
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+
         <!-- Main Content Card -->
         <div class="panel-card overflow-hidden">
-            @if($resources->isEmpty())
+            @if($resources->count() === 0)
                 <div class="p-6 sm:p-10 md:p-12 text-center">
                     <div class="empty-state-icon mb-4">
                         <i class="fas fa-folder-open text-[#a89f97] text-2xl sm:text-3xl"></i>
@@ -215,7 +297,7 @@
                         </div>
                         <div>
                             <h2 class="text-sm font-medium text-[#2c2420]">Resource Library</h2>
-                            <p class="text-[10px] sm:text-xs text-[#8b7e76]">Total resources: {{ $resources->count() }}</p>
+                            <p class="text-[10px] sm:text-xs text-[#8b7e76]">Total resources: {{ $resources->total() }}</p>
                         </div>
                     </div>
                     <div class="flex items-center gap-2">
@@ -233,7 +315,6 @@
                                 <th class="px-3 sm:px-6 py-3 text-left text-[10px] sm:text-xs font-semibold text-[#8b7e76] uppercase tracking-wider whitespace-nowrap">Category</th>
                                 <th class="px-3 sm:px-6 py-3 text-left text-[10px] sm:text-xs font-semibold text-[#8b7e76] uppercase tracking-wider whitespace-nowrap">Link</th>
                                 <th class="px-3 sm:px-6 py-3 text-left text-[10px] sm:text-xs font-semibold text-[#8b7e76] uppercase tracking-wider whitespace-nowrap">Status</th>
-                                <th class="px-3 sm:px-6 py-3 text-left text-[10px] sm:text-xs font-semibold text-[#8b7e76] uppercase tracking-wider whitespace-nowrap">Order</th>
                                 <th class="px-3 sm:px-6 py-3 text-left text-[10px] sm:text-xs font-semibold text-[#8b7e76] uppercase tracking-wider whitespace-nowrap">Actions</th>
                             </tr>
                         </thead>
@@ -297,16 +378,12 @@
                                     </td>
 
                                     <td class="px-3 sm:px-6 py-3.5 whitespace-nowrap">
-                                        <div class="order-badge">
-                                            <div class="h-4 sm:h-5 w-4 sm:w-5 rounded-md bg-[#f5f0eb] flex items-center justify-center flex-shrink-0">
-                                                <i class="fas fa-sort-numeric-down-alt text-[#a89f97] text-[9px] sm:text-[11px]"></i>
-                                            </div>
-                                            <span class="text-[10px] sm:text-sm font-mono text-[#4a3f3a]">{{ $resource->order }}</span>
-                                        </div>
-                                    </td>
-
-                                    <td class="px-3 sm:px-6 py-3.5 whitespace-nowrap">
                                         <div class="flex items-center gap-1.5 sm:gap-3">
+                                            <button onclick="togglePin('resource', {{ $resource->id }}, this)"
+                                                    class="action-link {{ $resource->is_pinned ? 'pin-active' : '' }}"
+                                                    title="{{ $resource->is_pinned ? 'Unpin' : 'Pin to top' }}">
+                                                <i class="fas fa-thumbtack text-[10px] sm:text-base {{ $resource->is_pinned ? '' : 'opacity-40' }}"></i>
+                                            </button>
                                             <a href="{{ route('admin.resources.edit', $resource) }}"
                                                class="action-link"
                                                title="Edit Resource">
@@ -330,6 +407,44 @@
                         </tbody>
                     </table>
                 </div>
+
+                <!-- Enhanced Pagination Section -->
+                @if($resources->hasPages())
+                <div class="px-4 sm:px-5 py-3 sm:py-3.5 border-t border-[#e5e0db]/60 bg-[#faf8f5]/40">
+                    <div class="flex items-center justify-center">
+                        <div class="pagination-wrap flex items-center gap-2 justify-center">
+                            {{ $resources->appends(request()->query())->links() }}
+                        </div>
+                    </div>
+                </div>
+
+                <style>
+                    .pagination-wrap nav { display: inline-flex; }
+                    .pagination-wrap .relative { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
+                    .pagination-wrap span, .pagination-wrap a {
+                        display: inline-flex; align-items: center; justify-content: center;
+                        min-width: 28px; height: 28px; padding: 0 8px; border-radius: 8px;
+                        font-size: 11px; font-weight: 600; transition: all 0.2s ease;
+                    }
+                    .pagination-wrap span[aria-current="page"] span {
+                        background: #5c1a1a;
+                        color: white;
+                    }
+                    .pagination-wrap a {
+                        background: white; color: #6b5e57; border: 1px solid #e5e0db;
+                    }
+                    .pagination-wrap a:hover {
+                        background: #fdf2f2; color: #5c1a1a; border-color: rgba(212, 175, 55, 0.4);
+                    }
+                </style>
+                @else
+                <div class="px-4 sm:px-5 py-3 sm:py-3.5 border-t border-[#e5e0db]/60 bg-[#faf8f5]/40">
+                    <div class="flex items-center justify-center gap-2 text-[10px] sm:text-xs text-[#8b7e76]">
+                        <i class="fas fa-circle-check text-[#059669]"></i>
+                        <span>Showing all <span class="font-semibold text-[#2c2420]">{{ $resources->count() }}</span> resources</span>
+                    </div>
+                </div>
+                @endif
             @endif
         </div>
     </div>
@@ -363,5 +478,36 @@
             });
         });
     });
+
+    function togglePin(type, id, btn) {
+        const url = type === 'faq'
+            ? `/admin/faqs/${id}/pin`
+            : `/admin/resources/${id}/pin`;
+
+        const tokenMeta = document.querySelector('meta[name=csrf-token]');
+        const csrfToken = tokenMeta ? tokenMeta.content : '{{ csrf_token() }}';
+
+        fetch(url, {
+            method: 'PATCH',
+            headers: {
+                'X-CSRF-TOKEN': csrfToken,
+                'Accept': 'application/json',
+            }
+        })
+        .then(r => r.json())
+        .then(data => {
+            const icon = btn.querySelector('i');
+            if (data.is_pinned) {
+                btn.classList.add('pin-active');
+                icon.classList.remove('opacity-40');
+                btn.title = 'Unpin';
+            } else {
+                btn.classList.remove('pin-active');
+                icon.classList.add('opacity-40');
+                btn.title = 'Pin to top';
+            }
+        })
+        .catch(() => window.location.reload());
+    }
 </script>
 @endsection

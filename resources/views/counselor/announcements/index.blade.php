@@ -174,7 +174,7 @@
                         <div class="min-w-0">
                             <div class="hero-badge">
                                 <span class="hero-badge-dot"></span>
-                                Counselor Portal
+                                Outreach
                             </div>
                             <h1 class="text-lg sm:text-xl lg:text-2xl font-semibold tracking-tight text-[#2c2420] mt-2">Manage Announcements</h1>
                             <p class="text-[#6b5e57] text-xs sm:text-sm mt-1.5 max-w-2xl">
@@ -336,6 +336,12 @@
                                 </td>
                                 <td class="px-4 sm:px-6 py-3.5 whitespace-nowrap">
                                     <div class="flex items-center gap-1.5 sm:gap-2">
+                                        <button onclick="togglePin({{ $announcement->id }}, this)"
+                                                class="action-icon {{ $announcement->is_pinned ? 'text-yellow-500' : '' }}"
+                                                title="{{ $announcement->is_pinned ? 'Unpin' : 'Pin to top' }}">
+                                            <i class="fas fa-thumbtack {{ $announcement->is_pinned ? '' : 'opacity-40' }}"></i>
+                                        </button>
+
                                         <a href="{{ route('counselor.announcements.edit', $announcement) }}"
                                            class="action-icon" title="Edit">
                                             <i class="fas fa-pen-to-square"></i>
@@ -438,4 +444,29 @@
         </div>
     </div>
 </div>
+
+<script>
+function togglePin(id, btn) {
+    fetch(`/counselor/announcements/${id}/toggle-pin`, {
+        method: 'PATCH',
+        headers: {
+            'X-CSRF-TOKEN': document.querySelector('meta[name=csrf-token]').content,
+            'Accept': 'application/json',
+        }
+    })
+    .then(r => r.json())
+    .then(data => {
+        const icon = btn.querySelector('i');
+        if (data.is_pinned) {
+            btn.classList.add('text-yellow-500');
+            icon.classList.remove('opacity-40');
+            btn.title = 'Unpin';
+        } else {
+            btn.classList.remove('text-yellow-500');
+            icon.classList.add('opacity-40');
+            btn.title = 'Pin to top';
+        }
+    });
+}
+</script>
 @endsection

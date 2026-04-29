@@ -106,7 +106,7 @@ When a student books an appointment:
 3. **App creates Google Calendar event:**
    - Reads the counselor's `google_calendar_id` (e.g., `'primary'`)
    - Reads the token file (e.g., `tokens/8.json`)
-   - Uses the token to authenticate with Google
+   - Uses the token to authenticate with Googlek
    - Creates an event on the counselor's calendar
    - Saves the event ID in the appointment record
 

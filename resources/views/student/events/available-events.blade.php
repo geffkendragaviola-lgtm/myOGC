@@ -21,17 +21,17 @@
         --student-error: #fee2e2;
     }
 
-    .events-shell {
+    .ogc-shell {
         position: relative;
         overflow: hidden;
         background: var(--bg-warm);
         min-height: 100vh;
     }
-    .events-glow {
+    .ogc-glow {
         position: absolute; border-radius: 50%; filter: blur(80px); pointer-events: none; opacity: 0.2;
     }
-    .events-glow.one { top: -40px; left: -50px; width: 240px; height: 240px; background: var(--gold-400); }
-    .events-glow.two { bottom: -50px; right: -70px; width: 280px; height: 280px; background: var(--maroon-800); }
+    .ogc-glow.one { top: -40px; left: -50px; width: 240px; height: 240px; background: var(--gold-400); }
+    .ogc-glow.two { bottom: -50px; right: -70px; width: 280px; height: 280px; background: var(--maroon-800); }
 
     .hero-card, .panel-card, .glass-card, .event-card {
         position: relative; overflow: hidden; border-radius: 0.75rem;
@@ -54,6 +54,7 @@
         background: linear-gradient(135deg, var(--maroon-800) 0%, var(--maroon-700) 100%);
         box-shadow: 0 4px 12px rgba(92,26,26,0.15);
     }
+    .hero-card { min-height: 100px; }
     .hero-badge {
         display: inline-flex; align-items: center; gap: 0.4rem; border-radius: 999px;
         border: 1px solid rgba(212,175,55,0.3); background: rgba(254,249,231,0.9);
@@ -67,22 +68,37 @@
         border: 1px solid rgba(92,26,26,0.15);
         background: linear-gradient(135deg, var(--maroon-800) 0%, var(--maroon-900) 100%); color: white;
         box-shadow: 0 4px 12px rgba(58,12,12,0.15);
+        min-width: 280px;
+    }
+    @media (min-width: 1024px) {
+        .summary-card {
+        width: 500px;
+            min-width: 500px;
+        }
     }
     .summary-card::before {
         content: ""; position: absolute; inset: 0; opacity: 0.15;
         background: radial-gradient(circle at top right, var(--gold-400), transparent 40%); pointer-events: none;
     }
 
-    .primary-btn, .secondary-btn, .action-btn {
+    .summary-icon {
+        width: 2.5rem; height: 2.5rem; border-radius: 0.75rem;
+        background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.1);
+        display: flex; align-items: center; justify-content: center; color: #fef9e7; flex-shrink: 0;
+    }
+    .summary-label { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.2em; color: rgba(255,255,255,0.7); }
+    .summary-value { font-size: 1.2rem; line-height: 1.2; font-weight: 800; margin-top: 0.35rem; }
+
+    .primary-btn, .btn-primary, .secondary-btn, .action-btn {
         border-radius: 0.6rem; font-weight: 600; transition: all 0.2s ease;
         display: inline-flex; align-items: center; justify-content: center; white-space: nowrap;
-        font-size: 0.8rem; padding: 0.55rem 1rem;
+        font-size: 0.8rem; padding: 0.55rem 1rem; gap: 0.4rem;
     }
-    .primary-btn {
+    .primary-btn, .btn-primary {
         color: #fef9e7; background: linear-gradient(135deg, var(--maroon-800) 0%, var(--maroon-700) 100%);
         box-shadow: 0 4px 10px rgba(92,26,26,0.15);
     }
-    .primary-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 14px rgba(92,26,26,0.2); }
+    .primary-btn:hover, .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 6px 14px rgba(92,26,26,0.2); }
     .secondary-btn {
         color: var(--text-primary); background: rgba(255,255,255,0.95);
         border: 1px solid var(--border-soft);
@@ -229,15 +245,15 @@
     }
 </style>
 
-<div class="min-h-screen events-shell">
-    <div class="events-glow one"></div>
-    <div class="events-glow two"></div>
+<div class="min-h-screen ogc-shell">
+    <div class="ogc-glow one"></div>
+    <div class="ogc-glow two"></div>
 
     <div class="relative max-w-7xl mx-auto px-4 sm:px-6 py-5 md:py-8">
         <!-- Page Header -->
         <div class="mb-5 sm:mb-6">
-            <div class="grid grid-cols-1 xl:grid-cols-[1fr_auto] gap-4 items-stretch">
-                <div class="hero-card">
+            <div class="grid grid-cols-1 lg:grid-cols-[1fr_auto] gap-4 items-stretch">
+                <div class="hero-card h-full">
                     <div class="relative p-4 sm:p-5 flex items-start gap-3">
                         <div class="hero-icon">
                             <i class="fas fa-calendar-days text-base sm:text-lg"></i>
@@ -258,18 +274,21 @@
                     </div>
                 </div>
 
-                <div class="summary-card">
-                    <div class="relative h-full flex flex-col sm:flex-row items-center justify-between gap-3 p-4">
-                        <div class="flex items-center gap-3 text-center sm:text-left">
-                            <div class="summary-icon flex-shrink-0" style="width:2.5rem;height:2.5rem;border-radius:0.75rem;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.15);color:#fef9e7">
+                <div class="summary-card h-full">
+                    <div class="relative h-full flex items-center justify-between gap-3 p-4">
+                        <div class="flex items-center gap-3">
+                            <div class="summary-icon">
                                 <i class="fas fa-heart text-sm"></i>
                             </div>
-                            <div class="min-w-0">
-                                <p class="summary-label" style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.2em;color:rgba(255,255,255,0.7)">Your Wellness</p>
-                                <p class="summary-value" style="font-size:1.1rem;line-height:1.2;font-weight:700;margin-top:0.2rem">Take Care of You</p>
-                                <p class="summary-subtext hidden sm:block" style="font-size:0.7rem;color:rgba(255,255,255,0.85);margin-top:0.15rem">Events to support your mental health journey.</p>
+                            <div>
+                                <p class="summary-label">Your Wellness</p>
+                                <p class="summary-value">Take Care of You</p>
                             </div>
                         </div>
+                        <a href="{{ route('student.events.my-registrations') }}" class="btn-primary">
+                            <i class="fas fa-list-check"></i>
+                            <span>My Registrations</span>
+                        </a>
                     </div>
                 </div>
             </div>
@@ -286,6 +305,7 @@
                     ->active()
                     ->forCollege($student->college_id)
                     ->forYearLevel($student->year_level)
+                    ->orderBy('is_pinned', 'desc')
                     ->orderBy('event_start_date')
                     ->orderBy('start_time')
                     ->get();

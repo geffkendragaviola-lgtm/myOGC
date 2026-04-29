@@ -183,7 +183,7 @@
                             <i class="fas fa-folder-open text-base sm:text-lg"></i>
                         </div>
                         <div class="min-w-0">
-                            <div class="hero-badge"><span class="hero-badge-dot"></span>Counselor Portal</div>
+                            <div class="hero-badge"><span class="hero-badge-dot"></span>Resource Library</div>
                             <h1 class="text-lg sm:text-xl lg:text-2xl font-semibold tracking-tight text-[#2c2420] mt-2">Resources</h1>
                             <p class="text-[#6b5e57] text-xs sm:text-sm mt-1.5">Create and manage mental health resources for students.</p>
                         </div>

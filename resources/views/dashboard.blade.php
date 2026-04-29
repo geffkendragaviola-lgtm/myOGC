@@ -445,13 +445,22 @@
 <body class="bg-[var(--bg-light)]">
     <div class="dashboard-container">
         <nav class="dashboard-navbar py-4" id="mainNavbar">
-            <div class="container mx-auto px-6 flex justify-between items-center">
+            <div class="container mx-auto px-6 flex items-center" style="display:grid;grid-template-columns:1fr auto 1fr;align-items:center;">
+                <!-- Left: Logo -->
                 <div class="flex items-center">
-                    <div class="text-white font-bold text-2xl mr-10 tracking-wide">
-                        <span>my.OGC</span>
-                    </div>
+                    <a href="{{ route('dashboard') }}" class="flex items-center gap-3 no-underline" style="text-decoration:none;">
+                        <div style="width:2.6rem;height:2.6rem;border-radius:0.9rem;background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.10);display:flex;align-items:center;justify-content:center;box-shadow:inset 0 1px 0 rgba(255,255,255,0.12);flex-shrink:0;">
+                            <img src="{{ asset('images/msu-iit-logo.png') }}" alt="MSU-IIT" class="h-8 w-8 object-contain" onerror="this.style.display='none'">
+                        </div>
+                        <span class="text-white font-bold text-sm hidden md:block" style="line-height:1.1;letter-spacing:0.01em;">
+                            my.OGC<br>
+                            <span class="font-medium text-xs" style="color:#d4af37;">MSU-IIT Office of Guidance & Counseling</span>
+                        </span>
+                    </a>
+                </div>
 
-                    <div class="hidden md:flex space-x-8">
+                <!-- Center: Nav Links -->
+                <div class="hidden md:flex items-center space-x-8">
                         @if(Auth::user()->role === 'counselor')
                         <div class="relative" id="counselor-dropdown">
                             <button class="nav-link flex items-center" id="counselor-dropdown-btn">
@@ -530,9 +539,9 @@
                             <a href="{{ route('feedback') }}" class="nav-link">Feedback</a>
                         @endif
                     </div>
-                </div>
 
-                <div class="flex items-center space-x-4">
+                <!-- Right: Icons -->
+                <div class="flex items-center space-x-4 justify-end">
                     @if(Auth::user()->role === 'counselor')
                         <a href="{{ route('counselor.appointments') }}"
                            class="btn-brand font-semibold py-2 px-4 rounded-lg flex items-center hover:shadow-lg">
@@ -709,6 +718,7 @@
                             ->when($userYearLevel, function($query) use ($userYearLevel) {
                                 return $query->forYearLevel($userYearLevel);
                             })
+                            ->orderBy('is_pinned', 'desc')
                             ->orderBy('created_at', 'desc')
                             ->get()
                             ->unique(function ($announcement) {
@@ -1000,7 +1010,7 @@
             </div>
         </div>
 
-        <footer class="dashboard-footer py-8 mt-8">
+        <footer class="dashboard-footer py-4 mt-4">
             <div class="container mx-auto px-6 text-center">
                 <p class="text-[#f3e8df]">&copy; 2025 Office of Guidance and Counseling. All rights reserved.</p>
                 <p class="text-sm text-[#e5caa9] mt-2">Committed to student support, wellness, and accessible guidance services</p>

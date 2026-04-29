@@ -129,12 +129,24 @@
     .event-card-new:hover { transform: translateY(-2px); box-shadow: 0 8px 18px rgba(44,36,32,0.06); }
 
     .event-banner {
-        position: relative; overflow: hidden; padding: 0.85rem; color: white;
+        position: relative; overflow: hidden; color: white;
+        height: 9rem;
         background: linear-gradient(135deg, var(--maroon-800) 0%, var(--maroon-700) 100%);
     }
-    .event-banner::before {
-        content: ""; position: absolute; inset: 0; opacity: 0.15;
-        background: radial-gradient(circle at top right, var(--gold-400), transparent 35%); pointer-events: none;
+    .event-banner img {
+        position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover;
+        transition: transform 0.3s ease;
+    }
+    .event-card-new:hover .event-banner img { transform: scale(1.04); }
+    .event-banner-overlay {
+        position: absolute; inset: 0;
+        background: linear-gradient(to top, rgba(44,20,20,0.82) 0%, rgba(44,20,20,0.25) 60%, transparent 100%);
+    }
+    .event-banner-content {
+        position: absolute; bottom: 0; left: 0; right: 0; padding: 0.65rem 0.85rem;
+    }
+    .event-banner-top {
+        position: absolute; top: 0.5rem; right: 0.5rem;
     }
     .event-type-pill {
         display: inline-flex; align-items: center; border-radius: 999px; background: rgba(255,255,255,0.18);
@@ -285,16 +297,6 @@
         <div class="panel-card mb-5 sm:mb-6">
             <div class="panel-topline"></div>
 
-            <div class="panel-header">
-                <div class="panel-icon">
-                    <i class="fas fa-sliders text-[9px] sm:text-xs"></i>
-                </div>
-                <div>
-                    <h2 class="panel-title">Filter Events</h2>
-                    <p class="panel-subtitle hidden sm:block">Search and refine the events directory by status, type, and counselor.</p>
-                </div>
-            </div>
-
             <div class="p-3 sm:p-4">
                 <form method="GET" action="{{ route('admin.events') }}">
                     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
@@ -365,22 +367,27 @@
                     <div class="event-card-new flex flex-col h-full">
                         <!-- Event Header -->
                         <div class="event-banner flex-shrink-0">
-                            <div class="relative flex justify-between items-start gap-2">
-                                <div class="min-w-0">
-                                    <span class="event-type-pill mb-1.5">
-                                        {{ $event->type }}
-                                    </span>
-                                    <h3 class="text-sm sm:text-base font-semibold leading-tight truncate">{{ $event->title }}</h3>
-                                    <p class="text-[10px] sm:text-xs text-white/80 mt-1 truncate">
-                                        <i class="fas fa-user-doctor mr-1"></i>
-                                        {{ $event->user->first_name }} {{ $event->user->last_name }}
-                                    </p>
-                                </div>
-                                <div class="flex-shrink-0">
-                                    <span class="status-badge {{ $event->is_active ? 'status-active' : 'status-inactive' }}">
-                                        {{ $event->is_active ? 'Active' : 'Inactive' }}
-                                    </span>
-                                </div>
+                            @if($event->image_url)
+                                <img src="{{ $event->image_url }}" alt="{{ $event->title }}"
+                                     onerror="this.style.display='none'">
+                            @endif
+                            <div class="event-banner-overlay"></div>
+
+                            <!-- Status badge top-right -->
+                            <div class="event-banner-top">
+                                <span class="status-badge {{ $event->is_active ? 'status-active' : 'status-inactive' }}">
+                                    {{ $event->is_active ? 'Active' : 'Inactive' }}
+                                </span>
+                            </div>
+
+                            <!-- Title + type bottom -->
+                            <div class="event-banner-content">
+                                <span class="event-type-pill mb-1">{{ $event->type }}</span>
+                                <h3 class="text-sm sm:text-base font-semibold leading-tight line-clamp-2">{{ $event->title }}</h3>
+                                <p class="text-[10px] sm:text-xs text-white/80 mt-0.5 truncate">
+                                    <i class="fas fa-user-doctor mr-1"></i>
+                                    {{ $event->user->first_name }} {{ $event->user->last_name }}
+                                </p>
                             </div>
                         </div>
 
@@ -437,6 +444,13 @@
                                     <i class="fas fa-pen-to-square mr-1.5 text-[9px]"></i> Edit
                                 </a>
 
+                                <button onclick="togglePin('event', {{ $event->id }}, this)"
+                                        class="action-btn-soft {{ $event->is_pinned ? 'bg-[#fef9e7] text-[#c9a227]' : 'bg-[#f5f0eb] text-[#8b7e76]' }} hover:bg-[#fef3c7] text-center"
+                                        title="{{ $event->is_pinned ? 'Unpin event' : 'Pin to top' }}">
+                                    <i class="fas fa-thumbtack mr-1.5 text-[9px] {{ $event->is_pinned ? '' : 'opacity-50' }}"></i>
+                                    {{ $event->is_pinned ? 'Pinned' : 'Pin' }}
+                                </button>
+
                                 <form action="{{ route('admin.events.toggle-status', $event) }}" method="POST" class="contents">
                                     @csrf
                                     @method('PATCH')
@@ -471,33 +485,34 @@
 
             <!-- Enhanced Pagination -->
             @if($events->hasPages())
-            <div class="mt-5 sm:mt-6 glass-card p-4">
-                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-                    <div class="flex items-center gap-2 text-[10px] sm:text-xs text-[#8b7e76]">
-                        <i class="fas fa-database text-[#a89f97]"></i>
-                        <span>Showing 
-                            <span class="font-semibold text-[#2c2420]">{{ $events->firstItem() ?? 0 }}</span> 
-                            to 
-                            <span class="font-semibold text-[#2c2420]">{{ $events->lastItem() ?? 0 }}</span> 
-                            of 
-                            <span class="font-semibold text-[#2c2420]">{{ $events->total() }}</span> 
-                            events
-                        </span>
-                    </div>
-                    <div class="flex items-center gap-2 justify-center sm:justify-end">
-                        @if($events->onFirstPage())
-                            <span class="px-3 py-1.5 bg-[#f5f0eb] text-[#a89f97] rounded-lg cursor-not-allowed pagination-btn text-xs sm:text-sm">Previous</span>
-                        @else
-                            <a href="{{ $events->previousPageUrl() }}" class="px-3 py-1.5 primary-btn pagination-btn text-xs sm:text-sm rounded-lg">Previous</a>
-                        @endif
-
-                        @if($events->hasMorePages())
-                            <a href="{{ $events->nextPageUrl() }}" class="px-3 py-1.5 primary-btn pagination-btn text-xs sm:text-sm rounded-lg">Next</a>
-                        @else
-                            <span class="px-3 py-1.5 bg-[#f5f0eb] text-[#a89f97] rounded-lg cursor-not-allowed pagination-btn text-xs sm:text-sm">Next</span>
-                        @endif
+            <div class="mt-5 sm:mt-6 glass-card overflow-hidden">
+                <div class="px-4 sm:px-5 py-3 sm:py-3.5 border-t border-[#e5e0db]/60 bg-[#faf8f5]/40">
+                    <div class="flex items-center justify-center">
+                        <div class="pagination-wrap flex items-center gap-2 justify-center">
+                            {{ $events->appends(request()->query())->links() }}
+                        </div>
                     </div>
                 </div>
+
+                <style>
+                    .pagination-wrap nav { display: inline-flex; }
+                    .pagination-wrap .relative { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
+                    .pagination-wrap span, .pagination-wrap a {
+                        display: inline-flex; align-items: center; justify-content: center;
+                        min-width: 28px; height: 28px; padding: 0 8px; border-radius: 8px;
+                        font-size: 11px; font-weight: 600; transition: all 0.2s ease;
+                    }
+                    .pagination-wrap span[aria-current="page"] span {
+                        background: #5c1a1a;
+                        color: white;
+                    }
+                    .pagination-wrap a {
+                        background: white; color: #6b5e57; border: 1px solid #e5e0db;
+                    }
+                    .pagination-wrap a:hover {
+                        background: #fdf2f2; color: #5c1a1a; border-color: rgba(212, 175, 55, 0.4);
+                    }
+                </style>
             </div>
             @else
             <div class="mt-5 sm:mt-6 glass-card p-4">
@@ -510,4 +525,34 @@
         @endif
     </div>
 </div>
+
+<script>
+function togglePin(type, id, btn) {
+    const url = `/admin/events/${id}/toggle-pin`;
+    fetch(url, {
+        method: 'PATCH',
+        headers: {
+            'X-CSRF-TOKEN': document.querySelector('meta[name=csrf-token]').content,
+            'Accept': 'application/json',
+        }
+    })
+    .then(r => r.json())
+    .then(data => {
+        const icon = btn.querySelector('i');
+        const label = btn.querySelector('span') ?? btn.childNodes[btn.childNodes.length - 1];
+        if (data.is_pinned) {
+            btn.classList.remove('bg-[#f5f0eb]', 'text-[#8b7e76]');
+            btn.classList.add('bg-[#fef9e7]', 'text-[#c9a227]');
+            icon.classList.remove('opacity-50');
+            btn.title = 'Unpin event';
+            btn.innerHTML = '<i class="fas fa-thumbtack mr-1.5 text-[9px]"></i> Pinned';
+        } else {
+            btn.classList.remove('bg-[#fef9e7]', 'text-[#c9a227]');
+            btn.classList.add('bg-[#f5f0eb]', 'text-[#8b7e76]');
+            btn.title = 'Pin to top';
+            btn.innerHTML = '<i class="fas fa-thumbtack mr-1.5 text-[9px] opacity-50"></i> Pin';
+        }
+    });
+}
+</script>
 @endsection

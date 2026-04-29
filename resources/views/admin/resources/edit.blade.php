@@ -145,7 +145,7 @@
     <div class="edit-resource-glow one"></div>
     <div class="edit-resource-glow two"></div>
 
-    <div class="relative max-w-4xl mx-auto px-4 sm:px-6 py-5 md:py-8">
+    <div class="relative max-w-7xl mx-auto px-4 sm:px-6 py-5 md:py-8">
         <div class="mb-5 sm:mb-6">
             <div class="grid grid-cols-1 xl:grid-cols-[1fr_auto] gap-4 items-stretch">
                 <div class="hero-card">
@@ -237,13 +237,21 @@
 
                             <div>
                                 <label for="icon" class="field-label">Icon *</label>
-                                <select name="icon" id="icon"
-                                        class="select-field" required>
-                                    <option value="">Select an icon</option>
+                                <div class="grid grid-cols-5 sm:grid-cols-6 md:grid-cols-7 gap-2">
                                     @foreach($icons as $icon)
-                                        <option value="{{ $icon }}" {{ old('icon', $resource->icon) == $icon ? 'selected' : '' }}>{{ $icon }}</option>
+                                        <label class="option-card cursor-pointer flex items-center justify-center gap-2 p-2 sm:p-2.5">
+                                            <input type="radio"
+                                                   name="icon"
+                                                   value="{{ $icon }}"
+                                                   class="sr-only peer"
+                                                   {{ old('icon', $resource->icon) == $icon ? 'checked' : '' }}
+                                                   required>
+                                            <span class="inline-flex items-center justify-center w-9 h-9 rounded-lg bg-white border border-[#e5e0db] text-[#6b5e57] peer-checked:border-[#7a2a2a] peer-checked:text-[#7a2a2a] peer-checked:bg-[#fef9e7]">
+                                                <i class="{{ $icon }}"></i>
+                                            </span>
+                                        </label>
                                     @endforeach
-                                </select>
+                                </div>
                                 @error('icon')
                                     <p class="error-text">{{ $message }}</p>
                                 @enderror
@@ -273,12 +281,11 @@
                             </div>
 
                             <div>
-                                <label for="order" class="field-label">Display Order</label>
-                                <input type="number" name="order" id="order" value="{{ old('order', $resource->order ?? 0) }}" min="0"
-                                       class="input-field">
-                                @error('order')
-                                    <p class="error-text">{{ $message }}</p>
-                                @enderror
+                                <label class="field-label">Pin to Top</label>
+                                <label class="inline-flex items-center gap-2 cursor-pointer">
+                                    <input type="checkbox" name="is_pinned" value="1" {{ old('is_pinned', $resource->is_pinned ?? false) ? 'checked' : '' }} class="w-4 h-4 accent-[#7a2a2a]">
+                                    <span class="text-sm text-[#6b5e57]">Pin this resource to appear first</span>
+                                </label>
                             </div>
 
                             <div class="md:col-span-2">

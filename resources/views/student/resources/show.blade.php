@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>{{ $resource->title }} — Mental Health Corner</title>
     <link rel="icon" type="image/png" href="{{ asset('images/msu-iit-logo.png') }}">
     <script src="https://cdn.tailwindcss.com"></script>
@@ -30,29 +31,55 @@
         min-height: 100vh;
     }
 
-    /* ── Topbar ── */
-    .topbar {
-        position: sticky; top: 0; z-index: 50;
-        background: linear-gradient(90deg, var(--maroon-900) 0%, var(--maroon-800) 55%, var(--maroon-700) 100%);
-        border-bottom: 1px solid rgba(212,175,55,0.25);
-        box-shadow: 0 4px 20px rgba(58,12,12,0.2);
-        padding: 0.85rem 1.5rem;
-        display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+    /* ── MHC Navbar ── */
+    .mhc-navbar {
+        position: sticky;
+        top: 0;
+        left: 0;
+        right: 0;
+        z-index: 1000;
+        background: linear-gradient(90deg, #5b0f0f, #8f1d1d, #a11f2f);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        box-shadow: 0 8px 24px rgba(91, 15, 15, 0.18);
+        backdrop-filter: blur(10px);
+        transition: all 0.3s ease;
     }
-    .topbar-brand {
-        display: flex; align-items: center; gap: 0.65rem;
-        color: #fff; font-weight: 800; font-size: 1rem; text-decoration: none;
+    .mhc-navbar.scrolled { box-shadow: 0 12px 28px rgba(91, 15, 15, 0.24); }
+    .nav-link { color: white; font-weight: 600; transition: 0.25s ease; }
+    .nav-link:hover { color: rgba(255, 245, 235, 0.88); }
+    .dropdown-panel {
+        position: absolute;
+        top: calc(100% + 10px);
+        left: 0;
+        background: #fffdfb;
+        box-shadow: 0 16px 40px rgba(91, 15, 15, 0.12);
+        border-radius: 16px;
+        padding: 0.5rem;
+        width: 220px;
+        z-index: 1001;
+        border: 1px solid #e8ddd2;
     }
-    .topbar-brand span { color: var(--gold-400); }
-    .topbar-back {
-        display: inline-flex; align-items: center; gap: 0.5rem;
-        color: rgba(255,255,255,0.85); font-size: 0.8rem; font-weight: 600;
-        padding: 0.45rem 1rem; border-radius: 999px;
-        border: 1px solid rgba(255,255,255,0.18);
-        background: rgba(255,255,255,0.08);
-        transition: all 0.2s; text-decoration: none;
+    .dropdown-link {
+        display: block;
+        padding: 0.75rem 0.9rem;
+        border-radius: 12px;
+        color: #2f2522;
+        transition: all 0.2s ease;
     }
-    .topbar-back:hover { background: rgba(255,255,255,0.16); color: #fff; }
+    .dropdown-link:hover { color: #8f1d1d; background: #f8f1e8; }
+    .profile-dropdown-content {
+        position: absolute;
+        right: 0;
+        top: 100%;
+        background: linear-gradient(180deg, #fffdfa, #faf4ed);
+        box-shadow: 0 16px 40px rgba(91, 15, 15, 0.12);
+        border-radius: 16px;
+        padding: 1rem;
+        min-width: 240px;
+        z-index: 1001;
+        margin-top: 0.7rem;
+        border: 1px solid #e8ddd2;
+    }
 
     /* ── Page shell ── */
     .page-shell {
@@ -238,30 +265,105 @@
     }
     .related-sub { font-size: 0.72rem; color: var(--text-muted); margin-top: 0.2rem; }
 
-    /* ── Footer ── */
-    .page-footer {
-        background: linear-gradient(180deg, var(--maroon-900) 0%, #2a0808 100%);
-        color: rgba(255,255,255,0.7);
-        text-align: center; padding: 2rem 1rem;
-        font-size: 0.8rem;
+    .footer-shell {
+        background: linear-gradient(180deg, #4d1212 0%, #3f0e0e 100%);
+        color: white;
         border-top: 1px solid rgba(255,255,255,0.06);
     }
-    .page-footer span { color: var(--gold-400); font-weight: 700; }
     </style>
 </head>
 <body class="page-shell">
 
-    {{-- Topbar --}}
-    <header class="topbar">
-        <a href="{{ route('mhc') }}" class="topbar-brand">
-            <img src="{{ asset('images/msu-iit-logo.png') }}" alt="MSU-IIT" class="h-7 w-7 object-contain" onerror="this.style.display='none'">
-            <span>my.OGC</span>
-        </a>
-        <a href="{{ route('student.resources.category', $category) }}" class="topbar-back">
-            <i class="fas fa-arrow-left text-[10px]"></i>
-            Back to {{ $categories[$category] }}
-        </a>
-    </header>
+    <nav class="mhc-navbar py-4" id="mainNavbar">
+        <div class="container mx-auto px-6 flex items-center" style="display:grid;grid-template-columns:1fr auto 1fr;align-items:center;">
+            <div class="flex items-center">
+                <a href="{{ route('dashboard') }}" class="flex items-center gap-3 no-underline" style="text-decoration:none;">
+                    <div style="width:2.6rem;height:2.6rem;border-radius:0.9rem;background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.10);display:flex;align-items:center;justify-content:center;box-shadow:inset 0 1px 0 rgba(255,255,255,0.12);flex-shrink:0;">
+                        <img src="{{ asset('images/msu-iit-logo.png') }}" alt="MSU-IIT" class="h-8 w-8 object-contain" onerror="this.style.display='none'">
+                    </div>
+                    <span class="text-white font-bold text-sm hidden md:block" style="line-height:1.1;letter-spacing:0.01em;">
+                        my.OGC<br>
+                        <span class="font-medium text-xs" style="color:#d4af37;">MSU-IIT Office of Guidance & Counseling</span>
+                    </span>
+                </a>
+            </div>
+
+            <div class="hidden md:flex items-center space-x-8">
+                <a href="{{ route('dashboard') }}" class="nav-link">Home</a>
+
+                @if(Auth::check() && Auth::user()->role === 'student')
+                    <a href="{{ route('student.show', Auth::user()->student->id) }}" class="nav-link">Profile</a>
+                    <div class="relative" id="services-dropdown">
+                        <button class="nav-link flex items-center" id="services-dropdown-btn">
+                            Services <i class="fas fa-chevron-down ml-1 text-sm"></i>
+                        </button>
+                        <div class="dropdown-panel hidden" id="services-dropdown-menu">
+                            <a href="{{ route('bap') }}" class="dropdown-link">Book an Appointment</a>
+                            <a href="{{ route('mhc') }}" class="dropdown-link" style="color:#8f1d1d;background:rgba(143,29,29,0.05);font-weight:600;">Mental Health Corner</a>
+                        </div>
+                    </div>
+                    <a href="{{ route('feedback') }}" class="nav-link">Feedback</a>
+                @endif
+            </div>
+
+            <div class="flex items-center space-x-4 justify-end">
+                <div class="relative" id="notif-dropdown-wrapper">
+                    <button id="notif-bell-btn" class="text-white p-2 rounded-full hover:bg-white/10 transition relative" aria-label="Notifications">
+                        <i class="fas fa-bell"></i>
+                        @if(($unreadCount ?? 0) > 0)
+                            <span id="notif-badge" class="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold rounded-full min-w-[16px] h-4 flex items-center justify-center px-1 leading-none">
+                                {{ ($unreadCount ?? 0) > 99 ? '99+' : ($unreadCount ?? 0) }}
+                            </span>
+                        @endif
+                    </button>
+                    <div id="notif-panel" class="hidden absolute right-0 top-[calc(100%+10px)] w-80 bg-white rounded-2xl shadow-xl border border-[#e8ddd2] z-[1002] overflow-hidden">
+                        <div class="flex items-center justify-between px-4 py-3 border-b border-[#e8ddd2]">
+                            <span class="font-semibold text-sm text-[#2f2522]">Notifications</span>
+                            @if(($unreadCount ?? 0) > 0)
+                                <button id="mark-all-read-btn" class="text-xs text-[#8f1d1d] hover:underline font-medium">Mark all as read</button>
+                            @endif
+                        </div>
+                        <div class="overflow-y-auto divide-y divide-[#e8ddd2]" id="notif-list">
+                            @forelse(($unreadNotifications ?? collect()) as $notif)
+                                <div class="notif-item px-4 py-3 hover:bg-[#f6f1ea] cursor-pointer bg-blue-50/40" data-id="{{ $notif->id }}">
+                                    <div class="text-xs font-semibold text-[#2f2522] truncate">{{ $notif->data['title'] ?? 'Notification' }}</div>
+                                    <div class="text-xs text-[#766864] mt-0.5 line-clamp-2">{{ $notif->data['message'] ?? '' }}</div>
+                                    <p class="text-[10px] text-[#a09490] mt-1">{{ $notif->created_at->diffForHumans() }}</p>
+                                </div>
+                            @empty
+                                <div class="px-4 py-8 text-center text-sm text-[#a09490]">
+                                    <i class="fas fa-bell-slash text-2xl mb-2 block opacity-40"></i>
+                                    No new notifications
+                                </div>
+                            @endforelse
+                        </div>
+                    </div>
+                </div>
+
+                <div class="relative">
+                    <button class="text-white p-2 rounded-full hover:bg-white/10 transition focus:outline-none" id="profileBtn">
+                        <i class="fas fa-user"></i>
+                    </button>
+                    <div class="profile-dropdown-content hidden" id="profileMenu">
+                        <div class="mb-3 border-b pb-2 border-[#e8ddd2]">
+                            <div class="font-semibold text-[#2f2522]">{{ Auth::user()->first_name }} {{ Auth::user()->last_name }}</div>
+                            <div class="text-sm text-[#766864]">{{ Auth::user()->email }}</div>
+                            <div class="text-xs text-[#8f1d1d] capitalize font-semibold mt-1">Role: {{ Auth::user()->role }}</div>
+                        </div>
+                        <a href="{{ route('profile.edit') }}" class="block py-2 text-[#2f2522] hover:text-[#8f1d1d] transition">
+                            <i class="fas fa-circle-user mr-2"></i> Profile
+                        </a>
+                        <form method="POST" action="{{ route('logout') }}" class="border-t pt-2 mt-2 border-[#e8ddd2]">
+                            @csrf
+                            <button type="submit" class="w-full text-left block py-2 text-[#2f2522] hover:text-[#8f1d1d] transition">
+                                <i class="fas fa-arrow-right-from-bracket mr-2"></i> Logout
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
 
     {{-- Hero banner --}}
     <div class="hero-banner">
@@ -442,18 +544,83 @@
         </div>
     </main>
 
-    <footer class="page-footer">
-        <p><span>MSU-IIT</span> Office of Guidance and Counseling &mdash; Mental Health Corner</p>
-        <p class="mt-1 text-xs opacity-60">We're here whenever you need us.</p>
+    <footer style="background:linear-gradient(to right,#5b0f0f,#7b1717,#8f1d1d);color:white;" class="py-4 mt-auto footer-shell">
+        <div class="container mx-auto px-6 text-center">
+            <p class="text-[#f3e8df]">&copy; {{ date('Y') }} Office of Guidance and Counseling. All rights reserved.</p>
+            <p class="text-sm text-[#e5caa9] mt-2">Committed to student support, wellness, and accessible guidance services</p>
+        </div>
     </footer>
 
     <script>
-    function toggleDisclaimer() {
-        const body = document.getElementById('disc-body');
-        const icon = document.getElementById('disc-icon');
-        body.classList.toggle('hidden');
-        icon.style.transform = body.classList.contains('hidden') ? '' : 'rotate(180deg)';
-    }
+        // Navbar scroll effect
+        const navbar = document.getElementById('mainNavbar');
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 10) navbar?.classList.add('scrolled');
+            else navbar?.classList.remove('scrolled');
+        });
+
+        // Profile dropdown
+        const profileBtn = document.getElementById('profileBtn');
+        const profileMenu = document.getElementById('profileMenu');
+        const notifBellBtn = document.getElementById('notif-bell-btn');
+        const notifPanel = document.getElementById('notif-panel');
+
+        if (profileBtn && profileMenu) {
+            profileBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                profileMenu.classList.toggle('hidden');
+                notifPanel?.classList.add('hidden');
+            });
+            document.addEventListener('click', () => profileMenu.classList.add('hidden'));
+            profileMenu.addEventListener('click', (e) => e.stopPropagation());
+        }
+
+        if (notifBellBtn && notifPanel) {
+            notifBellBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                notifPanel.classList.toggle('hidden');
+                profileMenu?.classList.add('hidden');
+            });
+            document.addEventListener('click', () => notifPanel.classList.add('hidden'));
+            notifPanel.addEventListener('click', (e) => e.stopPropagation());
+        }
+
+        // Mark all read
+        const markAllBtn = document.getElementById('mark-all-read-btn');
+        if (markAllBtn) {
+            markAllBtn.addEventListener('click', () => {
+                fetch('/notifications/read-all', { method: 'POST', headers: { 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content } })
+                    .then(() => {
+                        document.getElementById('notif-badge')?.remove();
+                        document.getElementById('notif-list').innerHTML = '<div class="px-4 py-8 text-center text-sm text-[#a09490]"><i class="fas fa-bell-slash text-2xl mb-2 block opacity-40"></i>No new notifications</div>';
+                        markAllBtn.remove();
+                    });
+            });
+        }
+
+        document.querySelectorAll('.notif-item').forEach(item => {
+            item.addEventListener('click', function() {
+                const id = this.dataset.id;
+                fetch(`/notifications/${id}/read`, { method: 'POST', headers: { 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content } })
+                    .then(() => { this.remove(); });
+            });
+        });
+
+        // Services dropdown
+        const servicesBtn = document.getElementById('services-dropdown-btn');
+        const servicesMenu = document.getElementById('services-dropdown-menu');
+        if (servicesBtn && servicesMenu) {
+            servicesBtn.addEventListener('click', (e) => { e.stopPropagation(); servicesMenu.classList.toggle('hidden'); });
+            document.addEventListener('click', () => servicesMenu.classList.add('hidden'));
+            servicesMenu.addEventListener('click', (e) => e.stopPropagation());
+        }
+
+        function toggleDisclaimer() {
+            const body = document.getElementById('disc-body');
+            const icon = document.getElementById('disc-icon');
+            body.classList.toggle('hidden');
+            icon.style.transform = body.classList.contains('hidden') ? '' : 'rotate(180deg)';
+        }
     </script>
 </body>
 </html>

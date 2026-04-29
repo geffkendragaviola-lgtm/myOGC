@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>@yield('title', 'Admin Dashboard - OGC')</title>
     <link rel="icon" type="image/png" href="{{ asset('images/msu-iit-logo.png') }}">
     <link rel="shortcut icon" type="image/png" href="{{ asset('images/msu-iit-logo.png') }}">
@@ -1123,11 +1124,11 @@
                     <i class="fas fa-layer-group"></i>
                     <span>Services</span>
                 </a>
-                <a href="{{ route('admin.students') }}" class="sidebar-link {{ request()->routeIs('admin.students') ? 'active' : '' }}">
+                <a href="{{ route('admin.students') }}" class="sidebar-link {{ request()->routeIs('admin.students', 'admin.students.*') ? 'active' : '' }}">
                     <i class="fas fa-user-graduate"></i>
                     <span>Students</span>
                 </a>
-                <a href="{{ route('admin.counselors') }}" class="sidebar-link {{ request()->routeIs('admin.counselors') ? 'active' : '' }}">
+                <a href="{{ route('admin.counselors') }}" class="sidebar-link {{ request()->routeIs('admin.counselors', 'admin.counselors.*') ? 'active' : '' }}">
                     <i class="fas fa-user-doctor"></i>
                     <span>Counselors</span>
                 </a>

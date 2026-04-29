@@ -48,29 +48,44 @@
     }
 
     /* ── Navbar ── */
-    .ogc-navbar {
-        height: 4rem;
-        /* Dashboard Gradient: Soft Maroon to Medium Maroon */
-        background: linear-gradient(135deg, var(--maroon-soft) 0%, var(--maroon-medium) 100%);
-        backdrop-filter: blur(14px);
-        -webkit-backdrop-filter: blur(14px);
-        border-bottom: 1px solid rgba(212, 175, 55, 0.3); /* Gold tint border */
-        box-shadow: 0 4px 20px rgba(122, 42, 42, 0.25);
-        position: relative;
-        z-index: 50;
+    :root {
+        --navbar-h: 4.5rem;
     }
 
-    .ogc-navbar::after {
-        content: "";
-        position: absolute;
-        inset: auto 0 0 0;
-        height: 1px;
-        background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+    .ogc-navbar {
+        height: var(--navbar-h);
+        display: flex;
+        align-items: center;
+        background: linear-gradient(90deg, #5b0f0f, #8f1d1d, #a11f2f);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        box-shadow: 0 8px 24px rgba(91, 15, 15, 0.18);
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        z-index: 1000;
+        transition: all 0.3s ease;
+    }
+
+    .ogc-navbar.scrolled {
+        box-shadow: 0 12px 28px rgba(91, 15, 15, 0.24);
     }
 
     .ogc-navbar a,
     .ogc-navbar button {
         color: #fff;
+    }
+
+    .nav-link {
+        color: white;
+        font-weight: 600;
+        transition: 0.25s ease;
+    }
+
+    .nav-link:hover {
+        color: rgba(255, 245, 235, 0.88);
     }
 
     .ogc-nav-icon {
@@ -90,7 +105,6 @@
         background: rgba(255,255,255,0.20);
         transform: translateY(-1px);
         box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-        color: var(--gold-primary); /* Gold hover effect */
     }
 
     .ogc-brand-badge {
@@ -112,22 +126,51 @@
     }
 
     .ogc-brand-text .sub {
-        color: var(--gold-primary); /* Gold subtext */
+        color: var(--gold-primary);
         font-weight: 500;
     }
 
-    .student-top-link,
-    .student-top-button {
-        position: relative;
-        font-size: 0.9rem;
-        font-weight: 600;
-        color: rgba(255,255,255,0.9);
+    .dropdown-panel {
+        position: absolute;
+        top: calc(100% + 10px);
+        left: 0;
+        background: #fffdfb;
+        box-shadow: 0 16px 40px rgba(91,15,15,0.12);
+        border-radius: 16px;
+        padding: 0.5rem;
+        width: 220px;
+        z-index: 1001;
+        border: 1px solid #e8ddd2;
+    }
+
+    .dropdown-link {
+        display: block;
+        padding: 0.75rem 0.9rem;
+        border-radius: 12px;
+        color: #2f2522;
         transition: all 0.2s ease;
     }
 
-    .student-top-link:hover,
-    .student-top-button:hover {
-        color: var(--gold-primary); /* Gold hover */
+    .dropdown-link:hover {
+        color: #8f1d1d;
+        background: #f8f1e8;
+    }
+
+    .ogc-profile-dropdown {
+        position: relative;
+    }
+
+    .ogc-profile-menu {
+        position: absolute;
+        right: 0;
+        top: calc(100% + 10px);
+        background: #fffdfb;
+        box-shadow: 0 16px 40px rgba(91,15,15,0.12);
+        border-radius: 16px;
+        padding: 1rem;
+        min-width: 220px;
+        z-index: 1001;
+        border: 1px solid #e8ddd2;
     }
 
     #sidebar-toggle-btn i {
@@ -871,118 +914,126 @@
 @if(Auth::check() && Auth::user()->role === 'student')
 
     {{-- ── TOP NAVBAR (Student) ── --}}
-    <nav class="ogc-navbar fixed top-0 left-0 right-0 flex items-center justify-between px-6 z-40">
-        <div class="flex items-center space-x-3">
-            <button type="button" class="ogc-nav-icon transition" id="sidebar-toggle-btn" title="Toggle Sidebar">
-                <i class="fas fa-bars"></i>
-            </button>
-
-            <div class="ogc-brand-badge">
-                <img src="{{ asset('images/msu-iit-logo.png') }}" alt="MSU-IIT" class="h-8 w-8 object-contain" onerror="this.style.display='none'">
+    <nav class="ogc-navbar" id="mainNavbar">
+        <!-- Sidebar toggle: fixed to left edge of navbar, never affects logo position -->
+        <button type="button" class="ogc-nav-icon transition" id="sidebar-toggle-btn" title="Toggle Sidebar"
+            style="position:absolute;left:1.5rem;top:50%;transform:translateY(-50%);z-index:10;">
+            <i class="fas fa-bars"></i>
+        </button>
+        <div class="container mx-auto px-6 h-full w-full" style="display:grid;grid-template-columns:1fr auto 1fr;align-items:center;">
+            <!-- Left: Logo only (toggle is fixed-position, doesn't affect logo) -->
+            <div class="flex items-center">
+                <a href="{{ route('dashboard') }}" class="flex items-center gap-3 no-underline" style="text-decoration:none;">
+                    <div style="width:2.6rem;height:2.6rem;border-radius:0.9rem;background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.10);display:flex;align-items:center;justify-content:center;box-shadow:inset 0 1px 0 rgba(255,255,255,0.12);flex-shrink:0;">
+                        <img src="{{ asset('images/msu-iit-logo.png') }}" alt="MSU-IIT" class="h-8 w-8 object-contain" onerror="this.style.display='none'">
+                    </div>
+                    <span class="text-white font-bold text-sm hidden md:block" style="line-height:1.1;letter-spacing:0.01em;">
+                        my.OGC<br>
+                        <span class="font-medium text-xs" style="color:#d4af37;">MSU-IIT Office of Guidance & Counseling</span>
+                    </span>
+                </a>
             </div>
-            <span class="ogc-brand-text text-white font-bold text-sm hidden md:block">
-                my.OGC<br>
-                <span class="sub font-medium text-xs">MSU-IIT Office of Guidance & Counseling</span>
-            </span>
-        </div>
 
-        <div class="hidden md:flex items-center space-x-6 absolute left-1/2 -translate-x-1/2">
-            <a href="{{ route('dashboard') }}" class="student-top-link">Home</a>
-
-            <div class="ogc-nav-dropdown" id="dd-services">
-                <button class="student-top-button flex items-center" id="dd-services-btn">
-                    Services <i class="fas fa-chevron-down ml-2 text-[10px]"></i>
-                </button>
-                <div class="ogc-nav-dropdown-menu hidden" id="dd-services-menu">
-                    <a href="{{ route('bap') }}"><i class="fas fa-calendar-plus mr-2 text-[var(--maroon-soft)]"></i> Book Appointment</a>
-                    <a href="{{ route('mhc') }}"><i class="fas fa-heart-pulse mr-2 text-[var(--maroon-soft)]"></i> Mental Health Corner</a>
+            <!-- Center: Nav Links -->
+            <div class="hidden md:flex items-center space-x-8">
+                <a href="{{ route('dashboard') }}" class="nav-link">Home</a>
+                <a href="{{ route('student.show', Auth::user()->student->id) }}" class="nav-link">Profile</a>
+                <div class="relative" id="services-dropdown">
+                    <button class="nav-link flex items-center" id="services-dropdown-btn">
+                        Services <i class="fas fa-chevron-down ml-1 text-sm"></i>
+                    </button>
+                    <div class="dropdown-panel hidden" id="services-dropdown-menu">
+                        <a href="{{ route('bap') }}" class="dropdown-link"><i class="fas fa-calendar-plus mr-2 text-[#8f1d1d]"></i> Book Appointment</a>
+                        <a href="{{ route('mhc') }}" class="dropdown-link"><i class="fas fa-heart-pulse mr-2 text-[#8f1d1d]"></i> Mental Health Corner</a>
+                    </div>
                 </div>
+                <a href="{{ route('feedback') }}" class="nav-link">Feedback</a>
             </div>
 
-            <a href="{{ route('feedback') }}" class="student-top-link">Feedback</a>
-        </div>
-
-        <div class="flex items-center space-x-3 ml-auto">
-            {{-- Notification Bell --}}
-            @php
-                $unreadNotifications = Auth::user()->unreadNotifications->take(5);
-                $unreadCount = Auth::user()->unreadNotifications->count();
-            @endphp
-            <div class="relative" id="notif-dropdown-wrapper">
-                <button id="notif-bell-btn" class="ogc-nav-icon transition relative" aria-label="Notifications">
-                    <i class="fas fa-bell"></i>
-                    @if($unreadCount > 0)
-                        <span id="notif-badge" class="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold rounded-full min-w-[16px] h-4 flex items-center justify-center px-1 leading-none">
-                            {{ $unreadCount > 99 ? '99+' : $unreadCount }}
-                        </span>
-                    @endif
-                </button>
-                <div id="notif-panel" class="hidden absolute right-0 top-[calc(100%+10px)] w-80 bg-white rounded-2xl shadow-xl border border-[var(--border-soft)] z-[1002] overflow-hidden">
-                    <div class="flex items-center justify-between px-4 py-3 border-b border-[var(--border-soft)]">
-                        <span class="font-semibold text-sm text-[#2c2420]">Notifications</span>
+            <!-- Right: Bell + Profile -->
+            <div class="flex items-center space-x-3 justify-end">
+                {{-- Notification Bell --}}
+                @php
+                    $unreadNotifications = Auth::user()->unreadNotifications->take(5);
+                    $unreadCount = Auth::user()->unreadNotifications->count();
+                @endphp
+                <div class="relative" id="notif-dropdown-wrapper">
+                    <button id="notif-bell-btn" class="text-white p-2 rounded-full hover:bg-white/10 transition relative" aria-label="Notifications">
+                        <i class="fas fa-bell"></i>
                         @if($unreadCount > 0)
-                            <button id="mark-all-read-btn" style="font-size:0.75rem;color:#8f1d1d;font-weight:600;text-decoration:underline;cursor:pointer;background:none;border:none;">Mark all as read</button>
+                            <span id="notif-badge" class="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold rounded-full min-w-[16px] h-4 flex items-center justify-center px-1 leading-none">
+                                {{ $unreadCount > 99 ? '99+' : $unreadCount }}
+                            </span>
                         @endif
-                    </div>
-                    <div class="divide-y divide-[var(--border-soft)]" id="notif-list">
-                        @forelse($unreadNotifications as $notif)
-                            <div class="notif-item flex items-start gap-3 px-4 py-3 hover:bg-[#faf8f5] cursor-pointer bg-blue-50/40" data-id="{{ $notif->id }}" title="{{ $notif->data['title'] ?? 'Notification' }}: {{ $notif->data['message'] ?? '' }}">
-                                @php
-                                    $nType = $notif->data['type'] ?? '';
-                                    [$nIcon, $nBg] = match($nType) {
-                                        'appointment_booked', 'appointment_booked_by_counselor' => ['fa-calendar-plus', '#2d7a4f'],
-                                        'appointment_cancelled'                                  => ['fa-calendar-xmark', '#b91c1c'],
-                                        'appointment_rescheduled', 'reschedule_response'         => ['fa-calendar-days', '#c2410c'],
-                                        'appointment_referred', 'appointment_referred_to_counselor', 'referral_response' => ['fa-arrow-right-arrow-left', '#7a2a2a'],
-                                        'appointment_status_changed'                             => ['fa-circle-check', '#2a5a7a'],
-                                        'event_counselor_assigned', 'event_schedule_conflict', 'student_event_schedule_conflict' => ['fa-calendar-exclamation', '#92400e'],
-                                        default                                                  => ['fa-bell', '#7a2a2a'],
-                                    };
-                                @endphp
-                                <div class="mt-0.5 flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center" style="background:{{ $nBg }}">
-                                    <i class="fas {{ $nIcon }} text-white text-xs"></i>
+                    </button>
+                    <div id="notif-panel" class="hidden absolute right-0 top-[calc(100%+10px)] w-80 bg-white rounded-2xl shadow-xl border border-[#e8ddd2] z-[1002] overflow-hidden">
+                        <div class="flex items-center justify-between px-4 py-3 border-b border-[#e8ddd2]">
+                            <span class="font-semibold text-sm text-[#2c2420]">Notifications</span>
+                            @if($unreadCount > 0)
+                                <button id="mark-all-read-btn" class="text-xs text-[#8f1d1d] hover:underline font-medium">Mark all as read</button>
+                            @endif
+                        </div>
+                        <div class="divide-y divide-[#e8ddd2]" id="notif-list">
+                            @forelse($unreadNotifications as $notif)
+                                <div class="notif-item flex items-start gap-3 px-4 py-3 hover:bg-[#faf8f5] cursor-pointer bg-blue-50/40" data-id="{{ $notif->id }}">
+                                    @php
+                                        $nType = $notif->data['type'] ?? '';
+                                        [$nIcon, $nBg] = match($nType) {
+                                            'appointment_booked', 'appointment_booked_by_counselor' => ['fa-calendar-plus', '#2d7a4f'],
+                                            'appointment_cancelled'                                  => ['fa-calendar-xmark', '#b91c1c'],
+                                            'appointment_rescheduled', 'reschedule_response'         => ['fa-calendar-days', '#c2410c'],
+                                            'appointment_referred', 'appointment_referred_to_counselor', 'referral_response' => ['fa-arrow-right-arrow-left', '#7a2a2a'],
+                                            'appointment_status_changed'                             => ['fa-circle-check', '#2a5a7a'],
+                                            'event_counselor_assigned', 'event_schedule_conflict', 'student_event_schedule_conflict' => ['fa-calendar-exclamation', '#92400e'],
+                                            default                                                  => ['fa-bell', '#7a2a2a'],
+                                        };
+                                    @endphp
+                                    <div class="mt-0.5 flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center" style="background:{{ $nBg }}">
+                                        <i class="fas {{ $nIcon }} text-white text-xs"></i>
+                                    </div>
+                                    <div class="flex-1 min-w-0">
+                                        <p class="text-xs font-semibold text-[#2c2420] truncate">{{ $notif->data['title'] ?? 'Notification' }}</p>
+                                        <p class="text-xs text-[var(--text-secondary)] mt-0.5 line-clamp-2">{{ $notif->data['message'] ?? '' }}</p>
+                                        <p class="text-[10px] text-[var(--text-muted)] mt-1">{{ $notif->created_at->diffForHumans() }}</p>
+                                    </div>
                                 </div>
-                                <div class="flex-1 min-w-0">
-                                    <p class="text-xs font-semibold text-[#2c2420] truncate">{{ $notif->data['title'] ?? 'Notification' }}</p>
-                                    <p class="text-xs text-[var(--text-secondary)] mt-0.5">{{ $notif->data['message'] ?? '' }}</p>
-                                    <p class="text-[10px] text-[var(--text-muted)] mt-1">{{ $notif->created_at->diffForHumans() }}</p>
+                            @empty
+                                <div class="px-4 py-8 text-center text-sm text-[var(--text-muted)]">
+                                    <i class="fas fa-bell-slash text-2xl mb-2 block opacity-40"></i>
+                                    No new notifications
                                 </div>
-                            </div>
-                        @empty
-                            <div class="px-4 py-8 text-center text-sm text-[var(--text-muted)]">
-                                <i class="fas fa-bell-slash text-2xl mb-2 block opacity-40"></i>
-                                No new notifications
-                            </div>
-                        @endforelse
+                            @endforelse
+                        </div>
                     </div>
                 </div>
-            </div>
-            <div class="ogc-profile-dropdown">
-                <button class="ogc-nav-icon transition" id="profile-dropdown-btn">
-                    <i class="fas fa-circle-user text-lg"></i>
-                </button>
-                <div class="ogc-profile-menu hidden" id="profile-dropdown-menu">
-                    <div class="ogc-profile-summary">
-                        <div class="name">{{ Auth::user()->first_name }} {{ Auth::user()->last_name }}</div>
-                        <div class="email">{{ Auth::user()->email }}</div>
-                        <span class="ogc-profile-role capitalize">{{ Auth::user()->role }}</span>
+
+                <div class="ogc-profile-dropdown">
+                    <button class="text-white p-2 rounded-full hover:bg-white/10 transition" id="profile-dropdown-btn">
+                        <i class="fas fa-user"></i>
+                    </button>
+                    <div class="ogc-profile-menu hidden" id="profile-dropdown-menu">
+                        <div class="mb-3 border-b pb-2 border-[#e8ddd2]">
+                            <div class="font-semibold text-[#2f2522]">{{ Auth::user()->first_name }} {{ Auth::user()->last_name }}</div>
+                            <div class="text-sm text-[#766864]">{{ Auth::user()->email }}</div>
+                            <div class="text-xs text-[#8f1d1d] capitalize font-semibold">Role: {{ Auth::user()->role }}</div>
+                        </div>
+                        <a href="{{ route('profile.edit') }}" class="block py-2 text-[#2f2522] hover:text-[#8f1d1d]">
+                            <i class="fas fa-circle-user mr-2"></i> Profile Settings
+                        </a>
+                        <form method="POST" action="{{ route('logout') }}">
+                            @csrf
+                            <button type="submit" class="w-full text-left block py-2 text-[#2f2522] hover:text-[#8f1d1d]">
+                                <i class="fas fa-arrow-right-from-bracket mr-2"></i> Logout
+                            </button>
+                        </form>
                     </div>
-                    <a href="{{ route('profile.edit') }}">
-                        <i class="fas fa-circle-user mr-3 text-[var(--maroon-soft)]"></i> Profile Settings
-                    </a>
-                    <form method="POST" action="{{ route('logout') }}">
-                        @csrf
-                        <button type="submit" onclick="return confirm('Are you sure you want to log out?')">
-                            <i class="fas fa-arrow-right-from-bracket mr-3 text-[var(--maroon-soft)]"></i> Logout
-                        </button>
-                    </form>
                 </div>
             </div>
         </div>
     </nav>
 
     {{-- ── SIDEBAR (Student) ── --}}
-    <nav id="ogcSidebar" class="ogc-sidebar fixed top-16 left-0 h-[calc(100vh-4rem)] w-64 flex flex-col z-30">
+    <nav id="ogcSidebar" class="ogc-sidebar fixed left-0 w-64 flex flex-col z-30" style="top:var(--navbar-h);height:calc(100vh - var(--navbar-h));">
         <div class="sidebar-user-section">
             <div class="sidebar-user-card">
                 <div class="flex items-center gap-3">
@@ -1047,7 +1098,7 @@
         </div>
     </nav>
 
-    <div id="ogcMainContent" class="ml-64 pt-16 min-h-screen ogc-main-shell">
+    <div id="ogcMainContent" class="ml-64 min-h-screen ogc-main-shell" style="padding-top:var(--navbar-h);">
         @yield('content')
     </div>
 
@@ -1072,7 +1123,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
         btn.addEventListener('click', function (e) {
             e.stopPropagation();
-            document.querySelectorAll('.ogc-nav-dropdown-menu, .ogc-profile-menu').forEach(m => {
+            document.querySelectorAll('.dropdown-panel, .ogc-profile-menu').forEach(m => {
                 if (m !== menu) m.classList.add('hidden');
             });
             menu.classList.toggle('hidden');
@@ -1081,7 +1132,7 @@ document.addEventListener('DOMContentLoaded', function () {
         menu.addEventListener('click', e => e.stopPropagation());
     }
 
-    bindDropdown('dd-services-btn', 'dd-services-menu');
+    bindDropdown('services-dropdown-btn', 'services-dropdown-menu');
 
     // Profile dropdown functionality
     const profileBtn = document.getElementById('profile-dropdown-btn');
@@ -1091,7 +1142,7 @@ document.addEventListener('DOMContentLoaded', function () {
     if (profileBtn && profileMenu) {
         profileBtn.addEventListener('click', function (e) {
             e.stopPropagation();
-            document.querySelectorAll('.ogc-nav-dropdown-menu, .ogc-profile-menu').forEach(m => {
+            document.querySelectorAll('.dropdown-panel, .ogc-profile-menu').forEach(m => {
                 if (m !== profileMenu) m.classList.add('hidden');
             });
             profileMenu.classList.toggle('hidden');
@@ -1110,7 +1161,7 @@ document.addEventListener('DOMContentLoaded', function () {
     if (notifBtn && notifPanel) {
         notifBtn.addEventListener('click', function (e) {
             e.stopPropagation();
-            document.querySelectorAll('.ogc-nav-dropdown-menu, .ogc-profile-menu').forEach(m => m.classList.add('hidden'));
+            document.querySelectorAll('.dropdown-panel, .ogc-profile-menu').forEach(m => m.classList.add('hidden'));
             notifPanel.classList.toggle('hidden');
         });
 
@@ -1162,7 +1213,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Close dropdown when clicking outside
     document.addEventListener('click', function () {
-        document.querySelectorAll('.ogc-nav-dropdown-menu, .ogc-profile-menu').forEach(m => m.classList.add('hidden'));
+        document.querySelectorAll('.dropdown-panel, .ogc-profile-menu').forEach(m => m.classList.add('hidden'));
         if (notifPanel) notifPanel.classList.add('hidden');
     });
 

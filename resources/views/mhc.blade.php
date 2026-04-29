@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>Mental Health Corner - Office of Guidance and Counseling</title>
     <link rel="icon" type="image/png" href="{{ asset('images/msu-iit-logo.png') }}">
     <link rel="shortcut icon" type="image/png" href="{{ asset('images/msu-iit-logo.png') }}">
@@ -62,50 +63,64 @@
         left: 0;
         right: 0;
         z-index: 1000;
-        background: linear-gradient(90deg, #5f0f12 0%, #8f1d1d 45%, #b32028 100%);
+        background: linear-gradient(90deg, #5b0f0f, #8f1d1d, #a11f2f);
         border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-        box-shadow: 0 10px 28px rgba(91, 15, 15, 0.22);
-        backdrop-filter: blur(12px);
-        transition: box-shadow 0.25s ease, background 0.25s ease;
+        box-shadow: 0 8px 24px rgba(91, 15, 15, 0.18);
+        backdrop-filter: blur(10px);
+        transition: all 0.3s ease;
     }
 
     .mhc-navbar.scrolled {
-        box-shadow: 0 16px 34px rgba(91, 15, 15, 0.28);
+        box-shadow: 0 12px 28px rgba(91, 15, 15, 0.24);
     }
 
     .nav-link {
         color: white;
         font-weight: 600;
-        transition: all 0.25s ease;
-        position: relative;
+        transition: 0.25s ease;
     }
 
     .nav-link:hover {
-        color: rgba(255, 245, 235, 0.92);
-    }
-
-    .nav-link::after {
-        content: '';
-        position: absolute;
-        left: 0;
-        bottom: -0.35rem;
-        width: 0;
-        height: 2px;
-        border-radius: 999px;
-        background: linear-gradient(90deg, #f0cd63, #fff2c6);
-        transition: width 0.25s ease;
-    }
-
-    .nav-link:hover::after {
-        width: 100%;
+        color: rgba(255, 245, 235, 0.88);
     }
 
     .dropdown-panel {
-        background: rgba(255, 253, 250, 0.98);
-        border: 1px solid var(--border-soft);
-        border-radius: 18px;
-        box-shadow: var(--shadow-medium);
-        overflow: hidden;
+        position: absolute;
+        top: calc(100% + 10px);
+        left: 0;
+        background: #fffdfb;
+        box-shadow: 0 16px 40px rgba(91, 15, 15, 0.12);
+        border-radius: 16px;
+        padding: 0.5rem;
+        width: 220px;
+        z-index: 1001;
+        border: 1px solid #e8ddd2;
+    }
+
+    .dropdown-link {
+        display: block;
+        padding: 0.75rem 0.9rem;
+        border-radius: 12px;
+        color: #2f2522;
+        transition: all 0.2s ease;
+    }
+
+    .dropdown-link:hover {
+        color: #8f1d1d;
+        background: #f8f1e8;
+    }
+
+    .profile-dropdown-content {
+        position: absolute;
+        right: 0;
+        top: calc(100% + 10px);
+        background: #fffdfb;
+        box-shadow: 0 16px 40px rgba(91, 15, 15, 0.12);
+        border-radius: 16px;
+        padding: 1rem;
+        min-width: 220px;
+        z-index: 1001;
+        border: 1px solid #e8ddd2;
     }
 
     .mhc-page-header {
@@ -480,56 +495,107 @@
 
     <!-- Navbar -->
     <nav class="mhc-navbar py-4" id="mainNavbar">
-        <div class="container mx-auto px-6 flex justify-between items-center">
+        <div class="container mx-auto px-6 flex items-center" style="display:grid;grid-template-columns:1fr auto 1fr;align-items:center;">
+            <!-- Left: Logo -->
             <div class="flex items-center">
-                <div class="text-white font-bold text-2xl mr-10 tracking-wide">
-                    <span class="gold-text">my.OGC</span>
-                </div>
+                <a href="{{ route('dashboard') }}" class="flex items-center gap-3 no-underline" style="text-decoration:none;">
+                    <div style="width:2.6rem;height:2.6rem;border-radius:0.9rem;background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.10);display:flex;align-items:center;justify-content:center;box-shadow:inset 0 1px 0 rgba(255,255,255,0.12);flex-shrink:0;">
+                        <img src="{{ asset('images/msu-iit-logo.png') }}" alt="MSU-IIT" class="h-8 w-8 object-contain" onerror="this.style.display='none'">
+                    </div>
+                    <span class="text-white font-bold text-sm hidden md:block" style="line-height:1.1;letter-spacing:0.01em;">
+                        my.OGC<br>
+                        <span class="font-medium text-xs" style="color:#d4af37;">MSU-IIT Office of Guidance & Counseling</span>
+                    </span>
+                </a>
+            </div>
 
-                <div class="hidden md:flex space-x-8">
-                    <a href="{{ route('dashboard') }}" class="nav-link">Home</a>
+            <!-- Center: Nav Links -->
+            <div class="hidden md:flex items-center space-x-8">
+                <a href="{{ route('dashboard') }}" class="nav-link">Home</a>
 
-                    <div class="relative group">
-                        <button class="nav-link flex items-center">
+                @if(Auth::check() && Auth::user()->role === 'student')
+                    <a href="{{ route('student.show', Auth::user()->student->id) }}" class="nav-link">Profile</a>
+                    <div class="relative" id="services-dropdown">
+                        <button class="nav-link flex items-center" id="services-dropdown-btn">
                             Services <i class="fas fa-chevron-down ml-1 text-sm"></i>
                         </button>
+                        <div class="dropdown-panel hidden" id="services-dropdown-menu">
+                            <a href="{{ route('bap') }}" class="dropdown-link">Book an Appointment</a>
+                            <a href="{{ route('mhc') }}" class="dropdown-link" style="color:#8f1d1d;background:rgba(143,29,29,0.05);font-weight:600;">Mental Health Corner</a>
+                        </div>
+                    </div>
+                    <a href="{{ route('feedback') }}" class="nav-link">Feedback</a>
+                @endif
+            </div>
 
-                        <div class="absolute hidden group-hover:block rounded-2xl shadow-lg py-2 mt-3 w-52 z-10 dropdown-panel">
-                            <a href="{{ route('bap') }}" class="block px-4 py-2.5 text-[var(--text-dark)] hover:text-[var(--primary-red)] hover:bg-[rgba(143,29,29,0.04)]">
-                                Book an Appointment
-                            </a>
-                            <a href="{{ route('mhc') }}" class="block px-4 py-2.5 text-[var(--primary-red)] bg-[rgba(143,29,29,0.05)] font-semibold">
-                                Mental Health Corner
-                            </a>
+            <!-- Right: Icons -->
+            <div class="flex items-center space-x-4 justify-end">
+                <div class="relative" id="notif-dropdown-wrapper">
+                    <button id="notif-bell-btn" class="text-white p-2 rounded-full hover:bg-white/10 transition relative" aria-label="Notifications">
+                        <i class="fas fa-bell"></i>
+                        @if($unreadCount > 0)
+                            <span id="notif-badge" class="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold rounded-full min-w-[16px] h-4 flex items-center justify-center px-1 leading-none">
+                                {{ $unreadCount > 99 ? '99+' : $unreadCount }}
+                            </span>
+                        @endif
+                    </button>
+                    <div id="notif-panel" class="hidden absolute right-0 top-[calc(100%+10px)] w-80 bg-white rounded-2xl shadow-xl border border-[#e8ddd2] z-[1002] overflow-hidden">
+                        <div class="flex items-center justify-between px-4 py-3 border-b border-[#e8ddd2]">
+                            <span class="font-semibold text-sm text-[#2f2522]">Notifications</span>
+                            @if($unreadCount > 0)
+                                <button id="mark-all-read-btn" class="text-xs text-[#8f1d1d] hover:underline font-medium">Mark all as read</button>
+                            @endif
+                        </div>
+                        <div class="overflow-y-auto divide-y divide-[#e8ddd2]" id="notif-list">
+                            @forelse($unreadNotifications as $notif)
+                                <div class="notif-item flex items-start gap-3 px-4 py-3 hover:bg-[#f6f1ea] cursor-pointer bg-blue-50/40" data-id="{{ $notif->id }}">
+                                    @php
+                                        $nType = $notif->data['type'] ?? '';
+                                        [$nIcon, $nBg] = match($nType) {
+                                            'appointment_booked', 'appointment_booked_by_counselor' => ['fa-calendar-plus', '#2d7a4f'],
+                                            'appointment_cancelled' => ['fa-calendar-xmark', '#b91c1c'],
+                                            'appointment_rescheduled', 'reschedule_response' => ['fa-calendar-days', '#c2410c'],
+                                            'appointment_referred', 'appointment_referred_to_counselor', 'referral_response' => ['fa-arrow-right-arrow-left', '#7a2a2a'],
+                                            'appointment_status_changed' => ['fa-circle-check', '#2a5a7a'],
+                                            'event_counselor_assigned', 'event_schedule_conflict', 'student_event_schedule_conflict' => ['fa-calendar-exclamation', '#92400e'],
+                                            default => ['fa-bell', '#7a2a2a'],
+                                        };
+                                    @endphp
+                                    <div class="mt-0.5 flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center" style="background:{{ $nBg }}">
+                                        <i class="fas {{ $nIcon }} text-white text-xs"></i>
+                                    </div>
+                                    <div class="flex-1 min-w-0">
+                                        <p class="text-xs font-semibold text-[#2f2522] truncate">{{ $notif->data['title'] ?? 'Notification' }}</p>
+                                        <p class="text-xs text-[#766864] mt-0.5 line-clamp-2">{{ $notif->data['message'] ?? '' }}</p>
+                                        <p class="text-[10px] text-[#a09490] mt-1">{{ $notif->created_at->diffForHumans() }}</p>
+                                    </div>
+                                </div>
+                            @empty
+                                <div class="px-4 py-8 text-center text-sm text-[#a09490]">
+                                    <i class="fas fa-bell-slash text-2xl mb-2 block opacity-40"></i>
+                                    No new notifications
+                                </div>
+                            @endforelse
                         </div>
                     </div>
                 </div>
-            </div>
-
-            <div class="flex items-center space-x-4">
-                <button class="text-white p-2 rounded-full hover:bg-white/10 transition">
-                    <i class="fas fa-bell"></i>
-                </button>
 
                 <div class="relative">
                     <button class="text-white p-2 rounded-full hover:bg-white/10 transition focus:outline-none" id="profileBtn">
                         <i class="fas fa-user"></i>
                     </button>
-
                     <div class="profile-dropdown-content hidden" id="profileMenu">
-                        <div class="mb-3 border-b pb-2 border-[var(--border-soft)]">
-                            <div class="font-semibold text-[var(--text-dark)]">{{ Auth::user()->first_name }} {{ Auth::user()->last_name }}</div>
-                            <div class="text-sm text-[var(--text-secondary)]">{{ Auth::user()->email }}</div>
-                            <div class="text-xs text-[var(--primary-red)] capitalize font-semibold mt-1">Role: {{ Auth::user()->role }}</div>
+                        <div class="mb-3 border-b pb-2 border-[#e8ddd2]">
+                            <div class="font-semibold text-[#2f2522]">{{ Auth::user()->first_name }} {{ Auth::user()->last_name }}</div>
+                            <div class="text-sm text-[#766864]">{{ Auth::user()->email }}</div>
+                            <div class="text-xs text-[#8f1d1d] capitalize font-semibold mt-1">Role: {{ Auth::user()->role }}</div>
                         </div>
-
-                        <a href="" class="block py-2 text-[var(--text-dark)] hover:text-[var(--primary-red)] transition">
+                        <a href="{{ route('profile.edit') }}" class="block py-2 text-[#2f2522] hover:text-[#8f1d1d] transition">
                             <i class="fas fa-circle-user mr-2"></i> Profile
                         </a>
-
-                        <form method="POST" action="{{ route('logout') }}" class="border-t pt-2 mt-2 border-[var(--border-soft)]">
+                        <form method="POST" action="{{ route('logout') }}" class="border-t pt-2 mt-2 border-[#e8ddd2]">
                             @csrf
-                            <button type="submit" class="w-full text-left block py-2 text-[var(--text-dark)] hover:text-[var(--primary-red)] transition">
+                            <button type="submit" class="w-full text-left block py-2 text-[#2f2522] hover:text-[#8f1d1d] transition">
                                 <i class="fas fa-arrow-right-from-bracket mr-2"></i> Logout
                             </button>
                         </form>
@@ -586,6 +652,7 @@
                             ->active()
                             ->forCollege($student->college_id)
                             ->forYearLevel($student->year_level)
+                            ->orderBy('is_pinned', 'desc')
                             ->limit(3)
                             ->get();
                     } else {
@@ -627,7 +694,20 @@
                                 $isEventFull = !$hasAvailableSlots && !$isRegistered;
                             @endphp
 
-                            <div class="mhc-card h-full group">
+                            <div class="mhc-card h-full group cursor-pointer"
+                                onclick="openEventModal({
+                                    title: {{ json_encode($event->title) }},
+                                    type: {{ json_encode(ucfirst($event->type)) }},
+                                    description: {{ json_encode($event->description) }},
+                                    location: {{ json_encode($event->location) }},
+                                    timeRange: {{ json_encode($event->time_range) }},
+                                    dateRange: {{ json_encode($event->date_range) }},
+                                    maxAttendees: {{ json_encode($event->max_attendees) }},
+                                    registeredCount: {{ $event->registered_count }},
+                                    imageUrl: {{ json_encode($event->image_url) }},
+                                    isRequired: {{ json_encode($isRequiredEvent) }},
+                                    isRegistered: {{ json_encode($isRegistered) }}
+                                })">
                                 <div class="relative h-72 bg-gray-200 overflow-hidden">
                                     <img src="{{ $event->image_url }}"
                                          alt="{{ $event->title }}"
@@ -686,13 +766,13 @@
                                         </div>
 
                                         <div class="flex items-center">
-                                            <i class="far fa-location-dot mr-3 text-[var(--primary-red)] w-5 text-center"></i>
+                                            <i class="fas fa-location-dot mr-3 text-[var(--primary-red)] w-5 text-center"></i>
                                             <span class="truncate">{{ $event->location }}</span>
                                         </div>
 
                                         @if($event->max_attendees)
                                             <div class="flex items-center">
-                                                <i class="far fa-users mr-3 text-[var(--text-muted)] w-5 text-center"></i>
+                                                <i class="fas fa-users mr-3 text-[var(--text-muted)] w-5 text-center"></i>
                                                 <span>{{ $event->registered_count }}/{{ $event->max_attendees }} spots filled</span>
                                             </div>
                                         @endif
@@ -705,11 +785,11 @@
                                     <div class="grid grid-cols-2 gap-3 mt-auto">
                                         @if($isRegistered)
                                             @if($isRequiredEvent)
-                                                <button class="col-span-2 bg-[#f3eee8] text-[#8a7d77] text-sm px-3 py-3 rounded-[14px] cursor-not-allowed flex items-center justify-center font-medium" disabled>
+                                                <button class="col-span-2 bg-[#f3eee8] text-[#8a7d77] text-sm px-3 py-3 rounded-[14px] cursor-not-allowed flex items-center justify-center font-medium" disabled onclick="event.stopPropagation()">
                                                     <i class="fas fa-lock mr-2"></i> Auto Registered
                                                 </button>
                                             @else
-                                                <form action="{{ route('student.events.cancel', $event) }}" method="POST" class="col-span-2">
+                                                <form action="{{ route('student.events.cancel', $event) }}" method="POST" class="col-span-2" onclick="event.stopPropagation()">
                                                     @csrf
                                                     <button type="submit"
                                                             class="w-full bg-red-50 text-red-700 border border-red-100 text-sm px-3 py-3 rounded-[14px] hover:bg-red-100 transition flex items-center justify-center font-medium"
@@ -719,40 +799,22 @@
                                                 </form>
                                             @endif
                                         @elseif($isRequiredEvent)
-                                            <button class="col-span-2 btn-primary flex items-center justify-center font-medium rounded-[14px] py-3">
+                                            <button class="col-span-2 btn-primary flex items-center justify-center font-medium rounded-[14px] py-3" onclick="event.stopPropagation()">
                                                 <i class="fas fa-user-check mr-2"></i> Required Attendance
                                             </button>
                                         @elseif($hasAvailableSlots)
-                                            <form action="{{ route('student.events.register', $event) }}" method="POST" class="col-span-2">
+                                            <form action="{{ route('student.events.register', $event) }}" method="POST" class="col-span-2" onclick="event.stopPropagation()">
                                                 @csrf
                                                 <button type="submit" class="w-full btn-primary flex items-center justify-center font-medium rounded-[14px] py-3">
                                                     <i class="fas fa-calendar-plus mr-2"></i> Register Now
                                                 </button>
                                             </form>
                                         @else
-                                            <button class="col-span-2 bg-[#f3eee8] text-[#8a7d77] text-sm px-3 py-3 rounded-[14px] cursor-not-allowed flex items-center justify-center font-medium" disabled>
+                                            <button class="col-span-2 bg-[#f3eee8] text-[#8a7d77] text-sm px-3 py-3 rounded-[14px] cursor-not-allowed flex items-center justify-center font-medium" disabled onclick="event.stopPropagation()">
                                                 <i class="fas fa-calendar-xmark mr-2"></i> Event Full
                                             </button>
                                         @endif
                                     </div>
-
-                                    <button
-                                        onclick="openEventModal({
-                                            title: {{ json_encode($event->title) }},
-                                            type: {{ json_encode(ucfirst($event->type)) }},
-                                            description: {{ json_encode($event->description) }},
-                                            location: {{ json_encode($event->location) }},
-                                            timeRange: {{ json_encode($event->time_range) }},
-                                            dateRange: {{ json_encode($event->date_range) }},
-                                            maxAttendees: {{ json_encode($event->max_attendees) }},
-                                            registeredCount: {{ $event->registered_count }},
-                                            imageUrl: {{ json_encode($event->image_url) }},
-                                            isRequired: {{ json_encode($isRequiredEvent) }},
-                                            isRegistered: {{ json_encode($isRegistered) }}
-                                        })"
-                                        class="mt-5 text-xs font-bold text-[var(--accent-gold)] hover:text-[var(--primary-red)] transition flex items-center justify-center w-full uppercase tracking-wider">
-                                        <i class="fas fa-circle-info mr-2"></i> View Full Details
-                                    </button>
                                 </div>
                             </div>
                         @endforeach
@@ -872,9 +934,9 @@
              style="background:linear-gradient(180deg,#fffdfa,#faf4ed);border:1px solid var(--border-soft);">
 
             <!-- Modal image header -->
-            <div class="relative h-52 overflow-hidden rounded-t-[24px]">
-                <img id="modalImage" src="" alt="" class="w-full h-full object-cover">
-                <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent"></div>
+            <div class="relative overflow-hidden rounded-t-[24px] bg-black">
+                <img id="modalImage" src="" alt="" class="w-full h-auto max-h-[70vh] object-contain block">
+                <div class="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent pointer-events-none"></div>
 
                 <!-- Close button -->
                 <button onclick="closeEventModal()"
@@ -949,13 +1011,10 @@
     </div>
 
     <!-- Footer -->
-    <footer class="footer-shell py-12 mt-auto">
+    <footer style="background:linear-gradient(to right,#5b0f0f,#7b1717,#8f1d1d);color:white;" class="py-4 mt-auto">
         <div class="container mx-auto px-6 text-center">
-            <div class="mb-6">
-                <span class="text-3xl font-bold tracking-wide"><span class="text-[var(--accent-gold)]">OGC</span></span>
-            </div>
-            <p class="text-gray-300 text-sm">&copy; {{ date('Y') }} Office of Guidance and Counseling — MSU-IIT</p>
-            <p class="text-xs text-gray-400 mt-3 italic font-light">We're here whenever you need us.</p>
+            <p class="text-[#f3e8df]">&copy; {{ date('Y') }} Office of Guidance and Counseling. All rights reserved.</p>
+            <p class="text-sm text-[#e5caa9] mt-2">Committed to student support, wellness, and accessible guidance services</p>
         </div>
     </footer>
 
@@ -970,13 +1029,53 @@
         // Profile dropdown
         const profileBtn = document.getElementById('profileBtn');
         const profileMenu = document.getElementById('profileMenu');
-        if(profileBtn) {
+        const notifBellBtn = document.getElementById('notif-bell-btn');
+        const notifPanel = document.getElementById('notif-panel');
+
+        if (profileBtn && profileMenu) {
             profileBtn.addEventListener('click', (e) => {
                 e.stopPropagation();
                 profileMenu.classList.toggle('hidden');
+                notifPanel?.classList.add('hidden');
             });
             document.addEventListener('click', () => profileMenu.classList.add('hidden'));
             profileMenu.addEventListener('click', (e) => e.stopPropagation());
+        }
+
+        if (notifBellBtn && notifPanel) {
+            notifBellBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                notifPanel.classList.toggle('hidden');
+                profileMenu?.classList.add('hidden');
+            });
+            document.addEventListener('click', () => notifPanel.classList.add('hidden'));
+            notifPanel.addEventListener('click', (e) => e.stopPropagation());
+        }
+
+        // Mark all read
+        const markAllBtn = document.getElementById('mark-all-read-btn');
+        if (markAllBtn) {
+            markAllBtn.addEventListener('click', () => {
+                fetch('/notifications/mark-all-read', { method: 'POST', headers: { 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content } })
+                    .then(() => { document.getElementById('notif-badge')?.remove(); document.getElementById('notif-list').innerHTML = '<div class="px-4 py-8 text-center text-sm text-[#a09490]"><i class="fas fa-bell-slash text-2xl mb-2 block opacity-40"></i>No new notifications</div>'; markAllBtn.remove(); });
+            });
+        }
+
+        document.querySelectorAll('.notif-item').forEach(item => {
+            item.addEventListener('click', function() {
+                const id = this.dataset.id;
+                fetch(`/notifications/${id}/read`, { method: 'POST', headers: { 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content } })
+                    .then(() => { this.remove(); });
+            });
+        });
+
+        // Services dropdown
+        const servicesBtn = document.getElementById('services-dropdown-btn');
+        const servicesMenu = document.getElementById('services-dropdown-menu');
+        if (servicesBtn && servicesMenu) {
+            servicesBtn.addEventListener('click', (e) => { e.stopPropagation(); servicesMenu.classList.toggle('hidden'); });
+            document.addEventListener('click', () => servicesMenu.classList.add('hidden'));
+            servicesMenu.addEventListener('click', (e) => e.stopPropagation());
         }
 
         // FAQ Toggle

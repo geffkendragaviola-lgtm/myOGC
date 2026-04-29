@@ -142,7 +142,7 @@
                             <i class="fas fa-message text-base sm:text-lg"></i>
                         </div>
                         <div class="min-w-0">
-                            <div class="hero-badge"><span class="hero-badge-dot"></span>Counselor Portal</div>
+                            <div class="hero-badge"><span class="hero-badge-dot"></span>Student Insights</div>
                             <h1 class="text-lg sm:text-xl lg:text-2xl font-semibold tracking-tight text-[#2c2420] mt-2">Student Feedback</h1>
                             <p class="text-[#6b5e57] text-xs sm:text-sm mt-1.5">View and manage all student feedback submissions.</p>
                         </div>

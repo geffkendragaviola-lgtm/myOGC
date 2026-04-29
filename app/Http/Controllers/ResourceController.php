@@ -180,7 +180,10 @@ class ResourceController extends Controller
             ->ordered()
             ->get();
 
-        return view('student.resources.category', compact('resources', 'category', 'categories'));
+        $unreadNotifications = auth()->user()->unreadNotifications->take(5);
+        $unreadCount = auth()->user()->unreadNotifications->count();
+
+        return view('student.resources.category', compact('resources', 'category', 'categories', 'unreadNotifications', 'unreadCount'));
     }
 
     /**
@@ -206,7 +209,10 @@ class ResourceController extends Controller
             ->limit(3)
             ->get();
 
-        return view('student.resources.show', compact('resource', 'category', 'categories', 'related'));
+        $unreadNotifications = auth()->user()->unreadNotifications->take(5);
+        $unreadCount = auth()->user()->unreadNotifications->count();
+
+        return view('student.resources.show', compact('resource', 'category', 'categories', 'related', 'unreadNotifications', 'unreadCount'));
     }
 
     /**

@@ -265,7 +265,7 @@
                         <div class="min-w-0">
                             <div class="hero-badge">
                                 <span class="hero-badge-dot"></span>
-                                Counselor Portal
+                                Case Record
                             </div>
                             <h1 class="text-lg sm:text-xl lg:text-2xl font-semibold tracking-tight text-[#2c2420] mt-2">Appointment Session</h1>
                             <p class="text-[#6b5e57] text-xs sm:text-sm mt-1.5">

@@ -14,11 +14,11 @@
     <div style="border: 1px solid #e5e7eb; border-top: none; padding: 24px; border-radius: 0 0 8px 8px;">
         @if($respondedBy === 'student')
             @php
-                $recipientName = $appointment->originalCounselor
+                $greeting = $recipientName ?? ($appointment->originalCounselor
                     ? $appointment->originalCounselor->user->first_name . ' ' . $appointment->originalCounselor->user->last_name
-                    : $appointment->counselor->user->first_name . ' ' . $appointment->counselor->user->last_name;
+                    : $appointment->counselor->user->first_name . ' ' . $appointment->counselor->user->last_name);
             @endphp
-            <p>Hello, <strong>{{ $recipientName }}</strong>,</p>
+            <p>Hello, <strong>{{ $greeting }}</strong>,</p>
             <p>
                 The student <strong>{{ $appointment->student->user->first_name }} {{ $appointment->student->user->last_name }}</strong>
                 has <strong>{{ strtolower($label) }}</strong> the referral.

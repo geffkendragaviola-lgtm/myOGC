@@ -7,7 +7,7 @@
     </div>
     <div style="border: 1px solid #e5e7eb; border-top: none; padding: 24px; border-radius: 0 0 8px 8px;">
         <p>Hello, <strong>{{ $appointment->student->user->first_name }} {{ $appointment->student->user->last_name }}</strong>,</p>
-        <p>Your counselor has referred your appointment to another counselor. Please log in to accept or reject the referral.</p>
+        <p>Your counselor has referred your appointment to another counselor. Please log in to accept or reject the new schedule.</p>
 
         <table style="width: 100%; border-collapse: collapse; margin: 16px 0;">
             <tr style="background: #f9fafb;">
@@ -44,7 +44,7 @@
             @endif
         </table>
 
-        <p>Please log in to the system to accept or reject this referral.</p>
+        <p>Please log in to the system to accept or reject the proposed schedule.</p>
         <p style="color: #6b7280; font-size: 13px; margin-top: 24px;">MSU-IIT Guidance Counseling System</p>
     </div>
 </body>

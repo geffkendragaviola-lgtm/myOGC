@@ -17,11 +17,13 @@ class FAQ extends Model
         'answer',
         'category',
         'order',
-        'is_active'
+        'is_active',
+        'is_pinned',
     ];
 
     protected $casts = [
         'is_active' => 'boolean',
+        'is_pinned' => 'boolean',
     ];
 
     /**
@@ -45,7 +47,7 @@ class FAQ extends Model
      */
     public function scopeOrdered($query)
     {
-        return $query->orderBy('order')->orderBy('created_at');
+        return $query->orderBy('is_pinned', 'desc')->orderBy('created_at', 'desc');
     }
 
     /**

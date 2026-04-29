@@ -143,7 +143,7 @@
     <div class="edit-faq-glow one"></div>
     <div class="edit-faq-glow two"></div>
 
-    <div class="relative max-w-4xl mx-auto px-4 sm:px-6 py-5 md:py-8">
+    <div class="relative max-w-7xl mx-auto px-4 sm:px-6 py-5 md:py-8">
         <div class="mb-5 sm:mb-6">
             <div class="grid grid-cols-1 xl:grid-cols-[1fr_auto] gap-4 items-stretch">
                 <div class="hero-card">
@@ -244,12 +244,11 @@
                                 </div>
 
                                 <div>
-                                    <label for="order" class="field-label">Display Order</label>
-                                    <input type="number" name="order" id="order" value="{{ old('order', $faq->order ?? 0) }}" min="0"
-                                           class="input-field" placeholder="0">
-                                    @error('order')
-                                        <p class="error-text">{{ $message }}</p>
-                                    @enderror
+                                    <label class="field-label">Pin to Top</label>
+                                    <label class="inline-flex items-center gap-2 cursor-pointer">
+                                        <input type="checkbox" name="is_pinned" value="1" {{ old('is_pinned', $faq->is_pinned ?? false) ? 'checked' : '' }} class="w-4 h-4 accent-[#7a2a2a]">
+                                        <span class="text-sm text-[#6b5e57]">Pin this FAQ to appear first</span>
+                                    </label>
                                 </div>
                             </div>
 

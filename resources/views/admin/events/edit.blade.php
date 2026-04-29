@@ -157,11 +157,11 @@
     <div class="edit-event-glow one"></div>
     <div class="edit-event-glow two"></div>
 
-    <div class="relative max-w-5xl mx-auto px-4 sm:px-6 py-5 md:py-8">
+    <div class="relative max-w-7xl mx-auto px-4 sm:px-6 py-5 md:py-8">
         
         <!-- Header -->
         <div class="mb-5 sm:mb-6">
-            <div class="grid grid-cols-1 xl:grid-cols-[1fr_auto] gap-4 items-stretch">
+            <div class="grid grid-cols-1 lg:grid-cols-[1fr_auto] gap-4 items-stretch">
                 <div class="hero-card">
                     <div class="relative p-4 sm:p-5 flex items-start gap-3">
                         <div class="hero-icon">
@@ -182,11 +182,15 @@
                 </div>
 
                 <div class="summary-card">
-                    <div class="relative h-full flex flex-col sm:flex-row items-center justify-between gap-3 p-4">
-                        <div class="text-center sm:text-left min-w-0">
-                            <p class="summary-label">Navigation</p>
-                            <p class="summary-value">Back to Events</p>
-                            <p class="summary-subtext hidden sm:block">Return to the events directory whenever needed.</p>
+                    <div class="relative h-full flex items-center justify-between gap-3 p-4">
+                        <div class="flex items-center gap-3">
+                            <div class="summary-icon">
+                                <i class="fas fa-calendar-days text-sm"></i>
+                            </div>
+                            <div>
+                                <p class="summary-label">Event Management</p>
+                                <p class="summary-value">Edit Event</p>
+                            </div>
                         </div>
                         <a href="{{ route('admin.events') }}"
                            class="back-btn px-3 py-2 whitespace-nowrap text-xs sm:text-sm rounded-lg">
@@ -226,9 +230,62 @@
             </div>
 
             <div class="p-3 sm:p-4">
-                <form method="POST" action="{{ route('admin.events.update', $event) }}">
+                <form method="POST" action="{{ route('admin.events.update', $event) }}" enctype="multipart/form-data">
                     @csrf
                     @method('PUT')
+
+                    {{-- Event Image --}}
+                    <div class="section-card mb-4">
+                        <div class="section-topline"></div>
+                        <div class="section-header">
+                            <div class="section-icon">
+                                <i class="fas fa-image text-[9px] sm:text-xs"></i>
+                            </div>
+                            <div>
+                                <h3 class="section-title">Event Image</h3>
+                                <p class="section-subtitle hidden sm:block">Upload or replace the event cover photo.</p>
+                            </div>
+                        </div>
+
+                        <div class="p-3 sm:p-4">
+                            <div class="flex flex-col sm:flex-row gap-5 items-start">
+                                {{-- Current image preview --}}
+                                <div class="flex-shrink-0">
+                                    <div class="w-40 h-28 rounded-lg overflow-hidden border border-[#e5e0db] bg-[#f5f0eb] relative">
+                                        @if($event->image_url)
+                                            <img src="{{ $event->image_url }}"
+                                                 alt="Current event image"
+                                                 class="w-full h-full object-cover"
+                                                 id="event-img-preview">
+                                        @else
+                                            <div class="w-full h-full flex flex-col items-center justify-center text-[#8b7e76]" id="event-img-placeholder">
+                                                <i class="fas fa-image text-2xl mb-1 opacity-40"></i>
+                                                <span class="text-xs">No image</span>
+                                            </div>
+                                            <img src="" alt="" class="w-full h-full object-cover hidden" id="event-img-preview">
+                                        @endif
+                                    </div>
+                                </div>
+
+                                {{-- Upload controls --}}
+                                <div class="flex-1 min-w-0">
+                                    <label class="field-label">
+                                        {{ $event->image ? 'Replace Image' : 'Add Image' }}
+                                    </label>
+                                    <input type="file"
+                                           name="image"
+                                           id="event-image-input"
+                                           accept="image/jpeg,image/png,image/jpg,image/gif"
+                                           class="input-field mt-1"
+                                           onchange="previewEventImage(this)">
+                                    <p class="helper-text mt-1">JPG, PNG or GIF · Max 10MB. Leave empty to keep the current image.</p>
+                                    @error('image')
+                                        <p class="error-text mt-1">{{ $message }}</p>
+                                    @enderror
+                                </div>
+                            </div>
+                        </div>
+                    </div>
 
                     <div class="section-card mb-4">
                         <div class="section-topline"></div>
@@ -605,5 +662,21 @@
             }
         });
     });
+
+    function previewEventImage(input) {
+        if (input.files && input.files[0]) {
+            const reader = new FileReader();
+            reader.onload = e => {
+                const preview = document.getElementById('event-img-preview');
+                const placeholder = document.getElementById('event-img-placeholder');
+                if (preview) {
+                    preview.src = e.target.result;
+                    preview.classList.remove('hidden');
+                }
+                if (placeholder) placeholder.classList.add('hidden');
+            };
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
 </script>
 @endsection

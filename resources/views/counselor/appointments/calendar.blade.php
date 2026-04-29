@@ -266,7 +266,7 @@
         <!-- Header -->
         <div class="mb-5 sm:mb-6">
             <div class="hero-card">
-                <div class="relative p-4 sm:p-5 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                <div class="relative p-4 sm:p-5 flex flex-col md:flex-row md:items-start md:justify-between gap-4">
                     <div class="flex items-start gap-3">
                         <div class="hero-icon">
                             <i class="fas fa-calendar-days text-base sm:text-lg"></i>
@@ -274,7 +274,7 @@
                         <div class="min-w-0">
                             <div class="hero-badge">
                                 <span class="hero-badge-dot"></span>
-                                Counselor Portal
+                                My Schedule
                             </div>
                             <h1 class="text-lg sm:text-xl lg:text-2xl font-semibold tracking-tight text-[#2c2420] mt-2">Appointment Calendar</h1>
                             <p class="text-[#6b5e57] text-xs sm:text-sm mt-1.5 max-w-2xl">
@@ -282,25 +282,29 @@
                             </p>
                         </div>
                     </div>
-                    <div class="flex flex-col sm:flex-row gap-2 sm:gap-3 w-full md:w-auto">
+                    <div class="flex flex-col sm:flex-row gap-2 sm:gap-3">
                         <a href="{{ route('counselor.dashboard') }}"
                            class="secondary-btn px-4 py-2 text-xs sm:text-sm">
-                            <i class="fas fa-arrow-left mr-1.5 text-[9px] sm:text-xs"></i>Dashboard
+                            <i class="fas fa-arrow-left mr-1.5 text-[9px] sm:text-xs"></i>
+                            <span>Dashboard</span>
                         </a>
                         <a href="{{ route('counselor.appointments') }}"
                            class="primary-btn px-4 py-2 text-xs sm:text-sm">
-                            <i class="fas fa-list mr-1.5 text-[9px] sm:text-xs"></i>All Appointments
+                            <i class="fas fa-list mr-1.5 text-[9px] sm:text-xs"></i>
+                            <span>All Appointments</span>
                         </a>
                         @if($googleCalendarUrl)
                             <a href="{{ $googleCalendarUrl }}"
                                target="_blank" rel="noopener"
                                class="primary-btn px-4 py-2 text-xs sm:text-sm" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); border-color: rgba(16,185,129,0.3);">
-                                <i class="fab fa-google mr-1.5 text-[9px] sm:text-xs"></i>Google Calendar
+                                <i class="fab fa-google mr-1.5 text-[9px] sm:text-xs"></i>
+                                <span>Google Calendar</span>
                             </a>
                         @else
                             <a href="{{ route('profile.edit') }}"
                                class="secondary-btn px-4 py-2 text-xs sm:text-sm" style="border-color: rgba(212,175,55,0.4); color: #7a2a2a;">
-                                <i class="fas fa-link mr-1.5 text-[9px] sm:text-xs"></i>Add Calendar ID
+                                <i class="fas fa-link mr-1.5 text-[9px] sm:text-xs"></i>
+                                <span>Add Calendar ID</span>
                             </a>
                         @endif
                     </div>

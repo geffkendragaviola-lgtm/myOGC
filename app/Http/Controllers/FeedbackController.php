@@ -140,7 +140,10 @@ class FeedbackController extends Controller
             })
             ->values();
 
-        return view('feedback', compact('counselors'));
+        $unreadNotifications = Auth::user()->unreadNotifications->take(5);
+        $unreadCount = Auth::user()->unreadNotifications->count();
+
+        return view('feedback', compact('counselors', 'unreadNotifications', 'unreadCount'));
     }
 
     /**

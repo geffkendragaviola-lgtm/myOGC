@@ -42,7 +42,7 @@
     <div class="admin-glow one"></div>
     <div class="admin-glow two"></div>
 
-    <div class="relative max-w-5xl mx-auto px-4 sm:px-6 py-5 md:py-8">
+    <div class="relative max-w-7xl mx-auto px-4 sm:px-6 py-5 md:py-8">
 
         <!-- Header -->
         <div class="mb-5 sm:mb-6">

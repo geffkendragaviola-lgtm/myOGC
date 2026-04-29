@@ -8,10 +8,10 @@
         --bg-warm: #faf8f5; --border-soft: #e5e0db;
         --text-primary: #2c2420; --text-secondary: #6b5e57; --text-muted: #8b7e76;
     }
-    .student-shell { position:relative; overflow:hidden; background:var(--bg-warm); min-height:100vh; }
-    .student-glow { position:absolute; border-radius:50%; filter:blur(80px); pointer-events:none; opacity:0.2; }
-    .student-glow.one { top:-40px; left:-50px; width:240px; height:240px; background:var(--gold-400); }
-    .student-glow.two { bottom:-50px; right:-70px; width:280px; height:280px; background:var(--maroon-800); }
+    .ogc-shell { position:relative; overflow:hidden; background:var(--bg-warm); min-height:100vh; }
+    .ogc-glow { position:absolute; border-radius:50%; filter:blur(80px); pointer-events:none; opacity:0.2; }
+    .ogc-glow.one { top:-40px; left:-50px; width:240px; height:240px; background:var(--gold-400); }
+    .ogc-glow.two { bottom:-50px; right:-70px; width:280px; height:280px; background:var(--maroon-800); }
 
     .hero-card, .panel-card, .glass-card, .info-card {
         position:relative; overflow:hidden; border-radius:0.75rem;
@@ -37,6 +37,39 @@
         letter-spacing:0.16em; color:var(--maroon-700);
     }
     .hero-badge-dot { width:0.3rem; height:0.3rem; border-radius:999px; background:var(--gold-400); }
+
+    .summary-card {
+        position:relative; overflow:hidden; border-radius:0.75rem;
+        border:1px solid rgba(92,26,26,0.15);
+        background:linear-gradient(135deg, var(--maroon-800) 0%, var(--maroon-900) 100%); color:white;
+        box-shadow:0 4px 12px rgba(58,12,12,0.15);
+        min-width: 280px;
+    }
+    @media (min-width: 1024px) {
+        .summary-card {
+     width: 500px;
+            min-width: 500px;
+        }
+    }
+    .summary-card::before {
+        content:""; position:absolute; inset:0; opacity:0.15;
+        background:radial-gradient(circle at top right, var(--gold-400), transparent 40%); pointer-events:none;
+    }
+    .summary-icon {
+        width:2.5rem; height:2.5rem; border-radius:0.75rem;
+        background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.1);
+        display:flex; align-items:center; justify-content:center; color:#fef9e7; flex-shrink:0;
+    }
+    .summary-label { font-size:9px; font-weight:700; text-transform:uppercase; letter-spacing:0.2em; color:rgba(255,255,255,0.7); }
+    .summary-value { font-size:1.2rem; line-height:1.2; font-weight:800; margin-top:0.35rem; }
+    .btn-primary {
+        border-radius:0.6rem; font-weight:600; transition:all 0.2s ease;
+        display:inline-flex; align-items:center; justify-content:center; white-space:nowrap;
+        font-size:0.8rem; padding:0.55rem 1rem; gap:0.4rem;
+        color:#fef9e7; background:linear-gradient(135deg, var(--maroon-800) 0%, var(--maroon-700) 100%);
+        box-shadow:0 4px 10px rgba(92,26,26,0.15);
+    }
+    .btn-primary:hover { transform:translateY(-1px); box-shadow:0 6px 14px rgba(92,26,26,0.2); }
 
     /* Profile Card */
     .profile-avatar-wrap {
@@ -196,7 +229,7 @@
 
     @media print {
         @page { margin:1.5cm; size:A4; }
-        .ogc-navbar, #ogcSidebar, .sidebar-footer, .no-print, .tabs-nav, .student-glow { display:none !important; }
+        .ogc-navbar, #ogcSidebar, .sidebar-footer, .no-print, .tabs-nav, .ogc-glow { display:none !important; }
         #ogcMainContent { margin-left:0 !important; padding-top:0 !important; width:100% !important; }
         body { background:white !important; color:#000 !important; font-size:11pt; }
         .tab-pane { display:block !important; }
@@ -208,9 +241,9 @@
     .btn:focus, .tab-btn:focus { outline:2px solid var(--gold-500); outline-offset:2px; }
 </style>
 
-<div class="min-h-screen student-shell">
-    <div class="student-glow one"></div>
-    <div class="student-glow two"></div>
+<div class="min-h-screen ogc-shell">
+    <div class="ogc-glow one"></div>
+    <div class="ogc-glow two"></div>
 
     <div class="relative max-w-7xl mx-auto px-4 sm:px-6 py-5 md:py-8">
 
@@ -222,21 +255,41 @@
 
         <!-- Page Header -->
         <div class="mb-5 sm:mb-6">
-            <div class="hero-card">
-                <div class="relative p-4 sm:p-5 flex items-start gap-3">
-                    <div class="hero-icon"><i class="fas fa-user-graduate text-base sm:text-lg"></i></div>
-                    <div class="min-w-0 flex-1">
-                        <div class="hero-badge"><span class="hero-badge-dot"></span>Student Profile</div>
-                        <h1 class="text-lg sm:text-xl lg:text-2xl font-semibold tracking-tight text-[#2c2420] mt-2">{{ $student->full_name }}</h1>
-                        <p class="text-[#6b5e57] text-xs sm:text-sm mt-1">{{ $student->student_id }} &middot; {{ $student->course }} &middot; {{ $student->year_level }}</p>
+            <div class="grid grid-cols-1 lg:grid-cols-[1fr_auto] gap-4 items-stretch">
+                <div class="hero-card h-full">
+                    <div class="relative p-4 sm:p-5 flex items-start gap-3">
+                        <div class="hero-icon"><i class="fas fa-user-graduate text-base sm:text-lg"></i></div>
+                        <div class="min-w-0 flex-1">
+                            <div class="hero-badge"><span class="hero-badge-dot"></span>Student Profile</div>
+                            <h1 class="text-lg sm:text-xl lg:text-2xl font-semibold tracking-tight text-[#2c2420] mt-2">{{ $student->full_name }}</h1>
+                            <p class="text-[#6b5e57] text-xs sm:text-sm mt-1">{{ $student->student_id }} &middot; {{ $student->course }} &middot; {{ $student->year_level }}</p>
+                        </div>
                     </div>
-                    @if(Auth::check() && Auth::user()->role === 'counselor')
-                    <div class="ml-auto flex gap-2 no-print flex-shrink-0">
-                        <button onclick="window.print()" class="secondary-btn text-xs px-3 py-2">
-                            <i class="fas fa-print"></i><span class="hidden sm:inline">Print</span>
+                </div>
+
+                <div class="summary-card no-print h-full">
+                    <div class="relative h-full flex items-center justify-between gap-3 p-4">
+                        <div class="flex items-center gap-3">
+                            <div class="summary-icon">
+                                <i class="fas fa-calendar-check text-sm"></i>
+                            </div>
+                            <div>
+                                <p class="summary-label">Total Sessions</p>
+                                <p class="summary-value">{{ $student->appointments->count() }}</p>
+                            </div>
+                        </div>
+                        @if(Auth::check() && Auth::user()->role === 'counselor')
+                        <button onclick="window.print()" class="btn-primary no-print">
+                            <i class="fas fa-print"></i>
+                            <span>Print</span>
                         </button>
+                        @else
+                        <a href="{{ route('appointments.create') }}" class="btn-primary">
+                            <i class="fas fa-plus"></i>
+                            <span>Book Session</span>
+                        </a>
+                        @endif
                     </div>
-                    @endif
                 </div>
             </div>
         </div>
@@ -767,7 +820,7 @@
         <div class="print-footer">Student Profile Report • {{ $student->full_name }} • Generated: {{ date('F j, Y g:i A') }} • Office of Guidance and Counseling</div>
 
     </div><!-- /.max-w-7xl -->
-</div><!-- /.student-shell -->
+</div><!-- /.ogc-shell -->
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {

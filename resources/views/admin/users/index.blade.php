@@ -187,14 +187,6 @@
         <!-- Filters -->
         <div class="panel-card mb-5 sm:mb-6">
             <div class="panel-topline"></div>
-            <div class="panel-header">
-                <div class="panel-icon"><i class="fas fa-sliders text-[9px] sm:text-xs"></i></div>
-                <div>
-                    <h2 class="panel-title">Search and Filter</h2>
-                    <p class="panel-subtitle hidden sm:block">Find users by name, email, or role.</p>
-                </div>
-            </div>
-
             <div class="p-3 sm:p-4 md:p-5">
                 <form method="GET" class="flex flex-col md:flex-row gap-3 sm:gap-4">
                     <div class="flex-1 min-w-0">

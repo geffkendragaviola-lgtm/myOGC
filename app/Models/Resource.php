@@ -23,12 +23,14 @@ class Resource extends Model
         'image_path',
         'use_yt_thumbnail',
         'is_active',
+        'is_pinned',
         'show_disclaimer',
         'disclaimer_text'
     ];
 
     protected $casts = [
         'is_active' => 'boolean',
+        'is_pinned' => 'boolean',
         'use_yt_thumbnail' => 'boolean',
         'show_disclaimer' => 'boolean',
     ];
@@ -54,7 +56,7 @@ class Resource extends Model
      */
     public function scopeOrdered($query)
     {
-        return $query->orderBy('order')->orderBy('created_at', 'desc');
+        return $query->orderBy('is_pinned', 'desc')->orderBy('created_at', 'desc');
     }
 
     /**

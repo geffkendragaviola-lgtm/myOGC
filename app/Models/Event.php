@@ -25,6 +25,7 @@ class Event extends Model
         'location',
         'max_attendees',
         'is_active',
+        'is_pinned',
         'is_required',
         'for_all_colleges',
         'year_levels',
@@ -36,6 +37,7 @@ class Event extends Model
         'event_start_date' => 'date',
         'event_end_date' => 'date',
         'is_active' => 'boolean',
+        'is_pinned' => 'boolean',
         'is_required' => 'boolean',
         'for_all_colleges' => 'boolean',
         'year_levels' => 'array',
@@ -210,6 +212,11 @@ public function getCancellationCutoffTime(): string
                      ->where('is_active', true)
                      ->orderBy('event_start_date')
                      ->orderBy('start_time');
+    }
+
+    public function scopeOrdered($query)
+    {
+        return $query->orderBy('is_pinned', 'desc')->orderBy('event_start_date', 'desc')->orderBy('start_time', 'desc');
     }
 
     public function scopeActive($query)

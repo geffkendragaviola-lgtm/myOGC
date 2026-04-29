@@ -207,7 +207,7 @@
                         <div class="min-w-0">
                             <div class="hero-badge">
                                 <span class="hero-badge-dot"></span>
-                                Counselor Portal
+                                New Session
                             </div>
                             <h1 class="text-lg sm:text-xl lg:text-2xl font-semibold tracking-tight text-[#2c2420] mt-2">Book New Appointment</h1>
                         </div>

@@ -41,13 +41,24 @@
 }
 .section-title i { color: var(--maroon-soft); }
 .filter-bar {
+    position: relative;
     background: #fff;
     border: 1px solid var(--border-soft);
     border-radius: 1rem;
     padding: 1rem 1.25rem;
     box-shadow: 0 2px 10px rgba(44,36,32,0.05);
+    overflow: hidden;
+}
+.filter-bar::before {
+    content: "";
+    position: absolute;
+    inset-inline: 0;
+    top: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--maroon-medium) 0%, #d4af37 50%, var(--maroon-medium) 100%);
 }
 .filter-bar select, .filter-bar input[type=date] {
+    width: 100%;
     border: 1px solid var(--border-soft);
     border-radius: 0.5rem;
     padding: 0.45rem 0.75rem;
@@ -248,7 +259,7 @@
     <div class="admin-glow one"></div>
     <div class="admin-glow two"></div>
 
-    <div class="relative max-w-5xl mx-auto px-4 sm:px-6 py-5 md:py-8 space-y-6">
+    <div class="relative max-w-7xl mx-auto px-4 sm:px-6 py-5 md:py-8 space-y-6">
 
         <!-- Header -->
         <div class="hero-card no-print">
@@ -292,38 +303,46 @@
 
     {{-- Filter bar --}}
     <div class="filter-bar no-print">
-        <form method="GET" action="{{ route('admin.analytics') }}" class="flex flex-wrap gap-3 items-end">
-            <div>
-                <label class="block text-xs font-semibold mb-1" style="color:var(--text-secondary)">College</label>
-                <select name="college_id">
-                    <option value="">All Colleges</option>
-                    @foreach($colleges as $c)
-                        <option value="{{ $c->id }}" {{ $collegeId == $c->id ? 'selected' : '' }}>{{ $c->name }}</option>
-                    @endforeach
-                </select>
+        <form method="GET" action="{{ route('admin.analytics') }}">
+            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 items-end">
+                <div>
+                    <label class="block text-xs font-semibold mb-1" style="color:var(--text-secondary)">College</label>
+                    <select name="college_id">
+                        <option value="">All Colleges</option>
+                        @foreach($colleges as $c)
+                            <option value="{{ $c->id }}" {{ $collegeId == $c->id ? 'selected' : '' }}>{{ $c->name }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold mb-1" style="color:var(--text-secondary)">Year</label>
+                    <select name="year">
+                        @foreach($availableYears as $y)
+                            <option value="{{ $y }}" {{ $year == $y ? 'selected' : '' }}>{{ $y }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold mb-1" style="color:var(--text-secondary)">Date From</label>
+                    <input type="date" name="date_from" value="{{ $dateFrom }}">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold mb-1" style="color:var(--text-secondary)">Date To</label>
+                    <input type="date" name="date_to" value="{{ $dateTo }}">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold mb-1 opacity-0">Apply</label>
+                    <button type="submit" class="btn-maroon w-full">
+                        <i class="fas fa-magnifying-glass mr-1"></i> Apply
+                    </button>
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold mb-1 opacity-0">Reset</label>
+                    <a href="{{ route('admin.analytics') }}" class="btn-outline w-full flex items-center justify-center">
+                        <i class="fas fa-rotate-left mr-1"></i> Reset
+                    </a>
+                </div>
             </div>
-            <div>
-                <label class="block text-xs font-semibold mb-1" style="color:var(--text-secondary)">Year</label>
-                <select name="year">
-                    @foreach($availableYears as $y)
-                        <option value="{{ $y }}" {{ $year == $y ? 'selected' : '' }}>{{ $y }}</option>
-                    @endforeach
-                </select>
-            </div>
-            <div>
-                <label class="block text-xs font-semibold mb-1" style="color:var(--text-secondary)">Date From</label>
-                <input type="date" name="date_from" value="{{ $dateFrom }}">
-            </div>
-            <div>
-                <label class="block text-xs font-semibold mb-1" style="color:var(--text-secondary)">Date To</label>
-                <input type="date" name="date_to" value="{{ $dateTo }}">
-            </div>
-            <button type="submit" class="btn-maroon">
-                <i class="fas fa-magnifying-glass mr-1"></i> Apply
-            </button>
-            <a href="{{ route('admin.analytics') }}" class="btn-outline">
-                <i class="fas fa-rotate-left"></i> Reset
-            </a>
         </form>
     </div>
 

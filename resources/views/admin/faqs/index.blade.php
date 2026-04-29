@@ -89,10 +89,6 @@
     .primary-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 14px rgba(92,26,26,0.2); }
 
     .panel-topline { position: absolute; inset-inline: 0; top: 0; height: 3px; background: linear-gradient(90deg, var(--maroon-800) 0%, var(--gold-400) 50%, var(--maroon-800) 100%); }
-    .panel-header { display: flex; align-items: center; gap: 0.7rem; padding: 0.85rem 1.25rem; border-bottom: 1px solid var(--border-soft)/60; }
-    .panel-icon { width: 2rem; height: 2rem; border-radius: 0.6rem; background: rgba(254,249,231,0.7); color: var(--maroon-700); }
-    .panel-title { font-size: 0.8rem; font-weight: 600; color: var(--text-primary); }
-    .panel-subtitle { font-size: 0.68rem; color: var(--text-muted); margin-top: 0.1rem; }
 
     .field-label {
         display: block; font-size: 0.65rem; font-weight: 600; color: var(--text-secondary);
@@ -130,10 +126,6 @@
         display: inline-flex; align-items: center; padding: 0.2rem 0.5rem; border-radius: 999px;
         background: #fffbeb; color: #7a5a1a; font-size: 0.68rem; font-weight: 600; border: 1px solid rgba(212,175,55,0.3);
     }
-    .faq-order-badge {
-        display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.25rem 0.45rem;
-        border-radius: 0.55rem; background: rgba(245,240,235,0.7); border: 1px solid var(--border-soft)/60;
-    }
     .action-link { color: var(--text-secondary); transition: all 0.18s ease; }
     .action-link:hover { color: var(--maroon-700); transform: translateY(-1px); }
     .delete-link { color: #b91c1c; transition: all 0.18s ease; }
@@ -146,7 +138,6 @@
     }
 
     @media (max-width: 639px) {
-        .panel-header { padding: 0.75rem 1rem; }
         .input-field, .select-field { padding: 0.5rem 0.7rem; font-size: 0.85rem; }
         .primary-btn { width: 100%; justify-content: center; }
         .table-header-bar { padding: 0.65rem 1rem; }
@@ -158,8 +149,6 @@
     <div class="faqs-glow two"></div>
 
     <div class="relative max-w-7xl mx-auto px-4 sm:px-6 py-5 md:py-8">
-        
-        <!-- Header Card -->
         <div class="mb-5 sm:mb-6">
             <div class="grid grid-cols-1 xl:grid-cols-[1fr_auto] gap-4 items-stretch">
                 <div class="hero-card">
@@ -201,19 +190,8 @@
             </div>
         </div>
 
-        <!-- Search & Filter Card -->
         <div class="panel-card mb-5 sm:mb-6">
             <div class="panel-topline"></div>
-            <div class="panel-header">
-                <div class="panel-icon">
-                    <i class="fas fa-sliders text-[9px] sm:text-xs"></i>
-                </div>
-                <div>
-                    <h2 class="panel-title">Search and Filter</h2>
-                    <p class="panel-subtitle hidden sm:block">Find FAQs by question text, answer content, category, or status.</p>
-                </div>
-            </div>
-
             <div class="p-3 sm:p-4">
                 <form method="GET" action="{{ route('admin.faqs.index') }}">
                     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
@@ -247,9 +225,8 @@
             </div>
         </div>
 
-        <!-- FAQs Table Card -->
         <div class="panel-card overflow-hidden">
-            @if($faqs->isEmpty())
+            @if($faqs->count() === 0)
                 <div class="p-6 sm:p-8 text-center">
                     <div class="empty-state-icon mb-3">
                         <i class="fas fa-circle-question text-[#a89f97] text-xl sm:text-2xl"></i>
@@ -262,7 +239,6 @@
                     </a>
                 </div>
             @else
-                <!-- Table Header Stats -->
                 <div class="table-header-bar">
                     <div class="flex items-center gap-2.5">
                         <div class="table-header-icon">
@@ -287,7 +263,6 @@
                                 <th class="px-3 sm:px-4 py-2.5 sm:py-3 text-left text-[10px] sm:text-[11px] font-semibold text-[#8b7e76] uppercase tracking-[0.14em] whitespace-nowrap">Question</th>
                                 <th class="px-3 sm:px-4 py-2.5 sm:py-3 text-left text-[10px] sm:text-[11px] font-semibold text-[#8b7e76] uppercase tracking-[0.14em] whitespace-nowrap">Category</th>
                                 <th class="px-3 sm:px-4 py-2.5 sm:py-3 text-left text-[10px] sm:text-[11px] font-semibold text-[#8b7e76] uppercase tracking-[0.14em] whitespace-nowrap">Status</th>
-                                <th class="px-3 sm:px-4 py-2.5 sm:py-3 text-left text-[10px] sm:text-[11px] font-semibold text-[#8b7e76] uppercase tracking-[0.14em] whitespace-nowrap">Order</th>
                                 <th class="px-3 sm:px-4 py-2.5 sm:py-3 text-left text-[10px] sm:text-[11px] font-semibold text-[#8b7e76] uppercase tracking-[0.14em] whitespace-nowrap">Actions</th>
                             </tr>
                         </thead>
@@ -316,15 +291,12 @@
                                         </span>
                                     </td>
                                     <td class="px-3 sm:px-4 py-2.5 sm:py-3.5 whitespace-nowrap">
-                                        <div class="faq-order-badge">
-                                            <div class="h-4 w-4 rounded-md bg-[#f5f0eb] flex items-center justify-center flex-shrink-0">
-                                                <i class="fas fa-sort-numeric-down-alt text-[#a89f97] text-[9px] sm:text-[10px]"></i>
-                                            </div>
-                                            <span class="text-[10px] sm:text-xs font-mono text-[#4a3f3a]">{{ $faq->order }}</span>
-                                        </div>
-                                    </td>
-                                    <td class="px-3 sm:px-4 py-2.5 sm:py-3.5 whitespace-nowrap">
                                         <div class="flex items-center gap-1.5 sm:gap-2.5">
+                                            <button onclick="togglePin('faq', {{ $faq->id }}, this)"
+                                                    class="action-link {{ $faq->is_pinned ? 'text-yellow-500' : '' }}"
+                                                    title="{{ $faq->is_pinned ? 'Unpin' : 'Pin to top' }}">
+                                                <i class="fas fa-thumbtack text-[10px] sm:text-sm {{ $faq->is_pinned ? 'rotate-0' : 'opacity-40' }}"></i>
+                                            </button>
                                             <a href="{{ route('admin.faqs.edit', $faq) }}" 
                                                class="action-link" 
                                                title="Edit FAQ">
@@ -351,19 +323,8 @@
                 <!-- Enhanced Pagination Section -->
                 @if($faqs->hasPages())
                 <div class="px-4 sm:px-5 py-3 sm:py-3.5 border-t border-[#e5e0db]/60 bg-[#faf8f5]/40">
-                    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-                        <div class="flex items-center gap-2 text-[10px] sm:text-xs text-[#8b7e76]">
-                            <i class="fas fa-database text-[#a89f97]"></i>
-                            <span>Showing 
-                                <span class="font-semibold text-[#2c2420]">{{ $faqs->firstItem() ?? 0 }}</span> 
-                                to 
-                                <span class="font-semibold text-[#2c2420]">{{ $faqs->lastItem() ?? 0 }}</span> 
-                                of 
-                                <span class="font-semibold text-[#2c2420]">{{ $faqs->total() }}</span> 
-                                results
-                            </span>
-                        </div>
-                        <div class="pagination-wrap flex items-center gap-2 justify-center sm:justify-end">
+                    <div class="flex items-center justify-center">
+                        <div class="pagination-wrap flex items-center gap-2 justify-center">
                             {{ $faqs->appends(request()->query())->links() }}
                         </div>
                     </div>
@@ -378,23 +339,21 @@
                         font-size: 11px; font-weight: 600; transition: all 0.2s ease;
                     }
                     .pagination-wrap span[aria-current="page"] span {
-                        background: linear-gradient(135deg, #5c1a1a 0%, #7a2a2a 55%, #d4af37 100%);
-                        color: white; box-shadow: 0 4px 10px rgba(92, 26, 26, 0.2);
+                        background: #5c1a1a;
+                        color: white;
                     }
                     .pagination-wrap a {
                         background: white; color: #6b5e57; border: 1px solid #e5e0db;
-                        box-shadow: 0 1px 3px rgba(44, 36, 32, 0.04);
                     }
                     .pagination-wrap a:hover {
-                        background: #fdf2f2; color: #5c1a1a; border-color: rgba(212, 175, 55, 0.4); 
-                        transform: translateY(-1px); box-shadow: 0 4px 8px rgba(92, 26, 26, 0.08);
+                        background: #fdf2f2; color: #5c1a1a; border-color: rgba(212, 175, 55, 0.4);
                     }
                 </style>
                 @else
                 <div class="px-4 sm:px-5 py-3 sm:py-3.5 border-t border-[#e5e0db]/60 bg-[#faf8f5]/40">
                     <div class="flex items-center justify-center gap-2 text-[10px] sm:text-xs text-[#8b7e76]">
                         <i class="fas fa-circle-check text-[#059669]"></i>
-                        <span>Showing all <span class="font-semibold text-[#2c2420]">{{ $faqs->total() }}</span> FAQs</span>
+                        <span>Showing all <span class="font-semibold text-[#2c2420]">{{ $faqs->count() }}</span> FAQs</span>
                     </div>
                 </div>
                 @endif
@@ -402,4 +361,29 @@
         </div>
     </div>
 </div>
+
+<script>
+function togglePin(type, id, btn) {
+    fetch(`/admin/faqs/${id}/pin`, {
+        method: 'PATCH',
+        headers: {
+            'X-CSRF-TOKEN': document.querySelector('meta[name=csrf-token]').content,
+            'Accept': 'application/json',
+        }
+    })
+    .then(r => r.json())
+    .then(data => {
+        const icon = btn.querySelector('i');
+        if (data.is_pinned) {
+            btn.classList.add('text-yellow-500');
+            icon.classList.remove('opacity-40');
+            btn.title = 'Unpin';
+        } else {
+            btn.classList.remove('text-yellow-500');
+            icon.classList.add('opacity-40');
+            btn.title = 'Pin to top';
+        }
+    });
+}
+</script>
 @endsection

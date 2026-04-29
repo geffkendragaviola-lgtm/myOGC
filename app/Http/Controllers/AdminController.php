@@ -154,9 +154,10 @@ class AdminController extends Controller
             $query->where('user_id', $counselor);
         }
 
-        $events = $query->orderBy('event_start_date', 'desc')
+        $events = $query->orderBy('is_pinned', 'desc')
+                       ->orderBy('event_start_date', 'desc')
                        ->orderBy('start_time', 'desc')
-                       ->paginate(15);
+                       ->paginate(12);
 
         $counselors = Counselor::with('user')->get();
 
@@ -222,14 +223,46 @@ class AdminController extends Controller
             $stats[$s] = (clone $statsQuery)->where('status', $s)->count();
         }
 
+        $stats['rejected_by_student'] = (clone $statsQuery)
+            ->where('status', 'rejected')
+            ->where('notes', 'like', '%by student%')
+            ->count();
+
+        $stats['cancelled_by_student'] = (clone $statsQuery)
+            ->where('status', 'cancelled')
+            ->where('notes', 'like', '%Cancelled by student%')
+            ->count();
+
+        $stats['referred_total'] = (clone $statsQuery)
+            ->where(function ($q) {
+                $q->whereNotNull('referred_to_counselor_id')
+                  ->orWhereNotNull('original_counselor_id')
+                  ->orWhere('status', 'referred');
+            })
+            ->count();
+
         if ($status !== 'all') {
-            $query->where('status', $status);
+            if ($status === 'rejected_by_student') {
+                $query->where('status', 'rejected')
+                    ->where('notes', 'like', '%by student%');
+            } elseif ($status === 'cancelled_by_student') {
+                $query->where('status', 'cancelled')
+                    ->where('notes', 'like', '%Cancelled by student%');
+            } elseif ($status === 'referred_total') {
+                $query->where(function ($q) {
+                    $q->whereNotNull('referred_to_counselor_id')
+                      ->orWhereNotNull('original_counselor_id')
+                      ->orWhere('status', 'referred');
+                });
+            } else {
+                $query->where('status', $status);
+            }
         }
 
         $appointments = $query
             ->orderBy('appointment_date', 'desc')
             ->orderBy('start_time', 'desc')
-            ->paginate(15);
+            ->paginate(10);
 
         $monthStart = Carbon::now()->startOfMonth()->toDateString();
         $monthEnd = Carbon::now()->endOfMonth()->toDateString();
@@ -732,6 +765,16 @@ class AdminController extends Controller
             return redirect()->back()->with('error', 'Failed to update event status: ' . $e->getMessage());
         }
     }
+    public function toggleEventPin(Event $event)
+    {
+        $event->update(['is_pinned' => !$event->is_pinned]);
+
+        return response()->json([
+            'success' => true,
+            'is_pinned' => $event->is_pinned,
+            'message' => $event->is_pinned ? 'Event pinned.' : 'Event unpinned.',
+        ]);
+    }
 
     /**
      * Show event registrations as admin
@@ -1232,7 +1275,7 @@ class AdminController extends Controller
             $query->where('college_id', $college);
         }
 
-        $students = $query->orderBy('created_at', 'desc')->paginate(15);
+        $students = $query->orderBy('created_at', 'desc')->paginate(10);
         $colleges = College::orderBy('name')->get();
 
         $studentsPerCollege = College::query()
@@ -1663,7 +1706,7 @@ class AdminController extends Controller
             $query->where('college_id', $college);
         }
 
-        $counselors = $query->orderBy('created_at', 'desc')->paginate(15);
+        $counselors = $query->orderBy('created_at', 'desc')->paginate(10);
         $colleges = College::orderBy('name')->get();
 
         return view('admin.dashboards.counselor', compact('admin', 'counselors', 'colleges', 'search', 'college'));

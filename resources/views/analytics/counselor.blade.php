@@ -122,45 +122,84 @@
     .rate-bad { background:rgba(185,28,28,0.12); color:#991b1b; }
 
     @media print {
-        * { -webkit-print-color-adjust:exact !important; print-color-adjust:exact !important; box-sizing:border-box; }
-        @page { size:A4 landscape; margin:2cm 1.6cm 2.2cm 1.6cm; }
+        * { -webkit-print-color-adjust:exact !important; print-color-adjust:exact !important; color-adjust:exact !important; box-sizing:border-box; }
+        @page { size:A4 portrait; margin:1.8cm 1.5cm 2.2cm 1.5cm; }
         html, body { height:auto !important; min-height:0 !important; }
-        body { background:#fff !important; font-size:8.5pt; color:#1a1a1a; font-family:'Segoe UI',Arial,sans-serif; line-height:1.35; width:100%; margin:0 !important; padding:0 !important; }
+        body { background:#fff !important; font-size:9.5pt; color:#1a1a1a; font-family:'Segoe UI',Arial,sans-serif; line-height:1.4; width:100%; margin:0 !important; padding:0 !important; }
         .no-print { display:none !important; }
         .ogc-navbar, #ogcSidebar { display:none !important; }
         #ogcMainContent { margin-left:0 !important; padding-top:0 !important; width:100% !important; }
         .an-shell { padding:0 !important; min-height:auto !important; }
         .an-glow { display:none !important; }
-        .relative.max-w-7xl, .relative.max-w-4xl { max-width:none !important; width:100% !important; padding-left:0.6cm !important; padding-right:0.6cm !important; padding-top:0.5cm !important; padding-bottom:1cm !important; }
-        .print-header { display:block !important; margin-bottom:0.5rem; padding-bottom:0.35rem; border-bottom:1.25pt solid #7a2a2a; }
-        .print-header h1 { font-size:11pt; font-weight:800; color:#3a0c0c; margin:0; }
-        .print-header .ph-subtitle { font-size:7.5pt; color:#7a2a2a; font-weight:600; margin:0.05rem 0 0; text-transform:uppercase; }
-        .print-header .report-meta { display:flex; justify-content:space-between; margin-top:0.25rem; padding-top:0.2rem; border-top:0.5pt solid #d4c4bc; font-size:7.25pt; color:#6b5e57; }
-        .sec-title { font-size:8pt !important; font-weight:700 !important; color:#3a0c0c !important; text-transform:uppercase; border-bottom:1pt solid #c9a227 !important; padding-bottom:0.2rem !important; margin-bottom:0.5rem !important; display:block !important; }
+        .relative.max-w-7xl, .relative.max-w-4xl { max-width:none !important; width:100% !important; padding-left:0 !important; padding-right:0 !important; padding-top:0 !important; padding-bottom:0 !important; }
+        .p-6 { padding:0 !important; }
+        .space-y-5 > * + * { margin-top:0.5rem !important; }
+
+        /* ── Report header ── */
+        .print-header {
+            display:block !important;
+            margin-bottom:1.2rem;
+            padding-bottom:0.8rem;
+            border-bottom:2.5pt solid #7a2a2a;
+        }
+        .print-header-top {
+            display:flex;
+            align-items:flex-start;
+            justify-content:space-between;
+            gap:1rem;
+            margin-bottom:0.5rem;
+        }
+        .print-header h1 { font-size:15pt; font-weight:800; color:#3a0c0c; margin:0; letter-spacing:-0.02em; }
+        .print-header .subtitle { font-size:9pt; color:#7a2a2a; font-weight:600; margin:0.15rem 0 0; text-transform:uppercase; letter-spacing:0.06em; }
+        .print-header .meta-block { text-align:right; font-size:8pt; color:#6b5e57; line-height:1.6; }
+        .print-header .meta-row { display:flex; gap:1.5rem; flex-wrap:wrap; font-size:8pt; color:#6b5e57; margin-top:0.4rem; padding-top:0.4rem; border-top:0.5pt solid #d4c4bc; }
+        .print-header .meta-row span { display:inline-flex; gap:0.3rem; }
+        .print-header .meta-row strong { color:#3a0c0c; }
+
+        /* ── Section headings ── */
+        .print-only { display:block !important; }
+        .sec-title {
+            font-size:9pt !important; font-weight:700 !important; color:#3a0c0c !important;
+            text-transform:uppercase; letter-spacing:0.07em;
+            border-bottom:1pt solid #c9a227 !important; padding-bottom:0.25rem !important;
+            margin-bottom:0.6rem !important; display:block !important;
+        }
         .sec-title i { display:none; }
-        .an-card, .stat-card, .reach-card { box-shadow:none !important; border:0.5pt solid #d4c4bc !important; border-radius:0 !important; margin-bottom:0.4rem; background:#fff !important; }
-        .an-card, .reach-card { break-inside:avoid; page-break-inside:avoid; }
-        .stat-card { break-inside:auto; page-break-inside:auto; }
-        .an-card { padding:0.55rem 0.7rem !important; }
-        .stat-card { padding:0.35rem 0.5rem !important; gap:0.35rem !important; }
+
+        /* ── Cards ── */
+        .an-card, .stat-card, .reach-card {
+            box-shadow:none !important; border:0.5pt solid #d4c4bc !important;
+            border-radius:0 !important; break-inside:avoid; page-break-inside:avoid;
+            margin-bottom:0.5rem; background:#fff !important;
+        }
+        .an-card { padding:0.7rem 0.8rem !important; }
+        .stat-card { padding:0.5rem 0.7rem !important; gap:0.5rem !important; break-inside:auto; page-break-inside:auto; }
         .reach-card { padding:0.5rem 0.65rem !important; background:#faf8f5 !important; }
-        .stat-value { font-size:11pt !important; } .stat-label { font-size:6.5pt !important; }
-        .stat-icon { width:1.4rem !important; height:1.4rem !important; font-size:0.6rem !important; border-radius:0.2rem !important; }
-        .college-tabs { display:none !important; }
-        .college-tab-pane { display:block !important; break-inside:auto; page-break-inside:auto; }
-        .college-tab-pane + .college-tab-pane { page-break-before:always; break-before:page; }
-        .print-college-header { display:block !important; border-left:3pt solid #7a2a2a; padding-left:0.5rem; margin-bottom:0.6rem; }
-        .print-college-header h2 { font-size:11pt; font-weight:800; color:#3a0c0c; margin:0; }
+        .stat-value { font-size:13pt !important; font-weight:700; line-height:1; }
+        .stat-label { font-size:7pt !important; color:#6b5e57; margin-top:0.1rem; }
+        .stat-icon { width:1.8rem !important; height:1.8rem !important; font-size:0.75rem !important; border-radius:0.3rem !important; }
+
+        /* ── Grid ── */
         .grid { display:grid !important; }
         .xl\:grid-cols-6 { grid-template-columns:repeat(3,1fr) !important; gap:0.35rem !important; }
         .md\:grid-cols-3 { grid-template-columns:repeat(3,1fr) !important; gap:0.35rem !important; }
         .md\:grid-cols-2, .lg\:grid-cols-2 { grid-template-columns:repeat(2,1fr) !important; gap:0.35rem !important; }
         .md\:grid-cols-4 { grid-template-columns:repeat(4,1fr) !important; gap:0.3rem !important; }
+
+        /* ── College tabs ── */
+        .college-tabs { display:none !important; }
+        .college-tab-pane { display:block !important; break-inside:auto; page-break-inside:auto; }
+        .college-tab-pane + .college-tab-pane { page-break-before:always; break-before:page; }
+        .print-college-header { display:block !important; border-left:3pt solid #7a2a2a; padding-left:0.5rem; margin-bottom:0.6rem; }
+        .print-college-header h2 { font-size:11pt; font-weight:800; color:#3a0c0c; margin:0; }
+
+        /* ── Charts ── */
         canvas { max-width:100% !important; height:auto !important; page-break-inside:avoid; break-inside:avoid; }
-        canvas, canvas * { page-break-inside:avoid !important; break-inside:avoid !important; }
         div[style*="position:relative"][style*="height:"] { page-break-inside:avoid; break-inside:avoid; }
         [style*="height:240px"], [style*="height:260px"] { height:170px !important; }
         [style*="height:200px"] { height:150px !important; }
+
+        /* ── Tables ── */
         .print-stat-table { display:table !important; width:100%; border-collapse:collapse; font-size:7.5pt; }
         .print-stat-table th { background:#f5f0eb !important; color:#3a0c0c; font-weight:700; padding:0.25rem 0.45rem; border:0.5pt solid #d4c4bc; font-size:7pt; text-transform:uppercase; }
         .print-stat-table td { padding:0.22rem 0.45rem; border:0.5pt solid #e5e0db; }
@@ -170,14 +209,24 @@
         table th { background:#f5f0eb !important; font-weight:700; }
         table td, table th { padding:0.22rem 0.4rem !important; }
         th, td { vertical-align:top; }
-        .print-signature { display:block !important; margin-top:1.2rem !important; margin-bottom:0.8cm !important; padding-top:0.6rem; border-top:0.5pt solid #d4c4bc; page-break-inside:avoid; }
+
+        /* ── Signature block ── */
+        .print-signature {
+            display:block !important;
+            margin-top:2rem !important;
+            padding-top:1rem;
+            border-top:0.5pt solid #d4c4bc;
+            page-break-inside:avoid;
+        }
         .print-sig-grid { display:grid; grid-template-columns:1fr 1fr 1fr; gap:2rem; }
-        .print-sig-item { font-size:7.5pt; color:#6b5e57; }
-        .print-sig-line { border-top:0.75pt solid #3a0c0c; margin-top:1.4rem; padding-top:0.25rem; }
-        .print-sig-name { font-weight:700; color:#1a1a1a; font-size:8pt; }
-        .print-sig-role { color:#6b5e57; font-size:7pt; }
+        .print-sig-item { font-size:8pt; color:#6b5e57; }
+        .print-sig-line { border-top:0.75pt solid #3a0c0c; margin-top:1.8rem; padding-top:0.3rem; }
+        .print-sig-name { font-weight:700; color:#1a1a1a; font-size:8.5pt; }
+        .print-sig-role { color:#6b5e57; font-size:7.5pt; }
+
+        /* ── Misc ── */
         a { color:inherit !important; text-decoration:none !important; }
-        .mb-5 { margin-bottom:0.4rem !important; }
+        .mb-5 { margin-bottom:0.5rem !important; }
         .space-y-5 > * + * { margin-top:0.4rem !important; }
         .gap-3 { gap:0.3rem !important; } .gap-4, .gap-5 { gap:0.35rem !important; }
         .p-5 { padding:0.5rem !important; }
@@ -209,18 +258,23 @@
 
     <div class="relative max-w-7xl mx-auto px-4 sm:px-6 py-5 md:py-8 space-y-5">
 
-    <div class="print-header mb-4">
-        <h1>MSU-IIT Office of Guidance and Counseling</h1>
-        <p class="ph-subtitle">Counselor Analytics Report</p>
-        <div class="report-meta">
+    <div class="print-header">
+        <div class="print-header-top">
             <div>
-                <p><strong>Period:</strong> {{ $dateFrom && $dateTo ? \Carbon\Carbon::parse($dateFrom)->format('M j, Y').' – '.\Carbon\Carbon::parse($dateTo)->format('M j, Y') : 'Year '.$year }}</p>
-                <p><strong>Prepared by:</strong> {{ auth()->user()->first_name }} {{ auth()->user()->last_name }}</p>
+                <h1>MSU-IIT Office of Guidance and Counseling</h1>
+                <p class="subtitle">Counselor Analytics Report</p>
             </div>
-            <div style="text-align:right;">
-                <p><strong>Generated:</strong> {{ now()->format('F j, Y') }}</p>
-                <p><strong>Time:</strong> {{ now()->format('g:i A') }}</p>
+            <div class="meta-block">
+                <div>Generated: {{ now()->format('F j, Y') }}</div>
+                <div>{{ now()->format('g:i A') }}</div>
             </div>
+        </div>
+        <div class="meta-row">
+            <span><strong>Period:</strong>
+                @if($dateFrom && $dateTo) {{ \Carbon\Carbon::parse($dateFrom)->format('M j, Y') }} – {{ \Carbon\Carbon::parse($dateTo)->format('M j, Y') }}
+                @else Year {{ $year }} @endif
+            </span>
+            <span><strong>Prepared by:</strong> {{ auth()->user()->first_name }} {{ auth()->user()->last_name }}</span>
         </div>
     </div>
 
@@ -232,7 +286,7 @@
                     <i class="fas fa-chart-column text-base sm:text-lg"></i>
                 </div>
                 <div class="min-w-0">
-                    <div class="hero-badge"><span class="hero-badge-dot"></span>Counselor Portal</div>
+                    <div class="hero-badge"><span class="hero-badge-dot"></span>My Performance</div>
                     <h1 class="text-lg sm:text-xl lg:text-2xl font-semibold tracking-tight text-[#2c2420] mt-2">Analytics</h1>
                     <p class="text-[#6b5e57] text-xs sm:text-sm mt-1.5">Per-college counseling insights</p>
                 </div>

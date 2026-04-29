@@ -15,8 +15,9 @@ class ReferralResponse extends Mailable
 
     public function __construct(
         public Appointment $appointment,
-        public string $response, // 'accepted' or 'rejected'
-        public string $respondedBy // 'student' or 'counselor'
+        public string $response,      // 'accepted' or 'rejected'
+        public string $respondedBy,   // 'student' or 'counselor'
+        public ?string $recipientName = null  // override greeting name
     ) {}
 
     public function envelope(): Envelope

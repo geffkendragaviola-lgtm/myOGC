@@ -379,6 +379,16 @@ public function updateRegistrationStatus(Request $request, Event $event, EventRe
         return redirect()->route('counselor.events.index')
             ->with('success', "Event {$status} successfully!");
     }
+    public function togglePin(Event $event)
+    {
+        $event->update(['is_pinned' => !$event->is_pinned]);
+
+        return response()->json([
+            'success' => true,
+            'is_pinned' => $event->is_pinned,
+            'message' => $event->is_pinned ? 'Event pinned.' : 'Event unpinned.',
+        ]);
+    }
 
     public function edit(Event $event)
     {

@@ -21,7 +21,11 @@ class AppointmentReferredToCounselorNotification extends Notification
     {
         return [
             'title'          => 'New Referral Assignment',
-            'message'        => 'A student has been referred to you. Case #' . $this->appointment->case_number,
+            'message'        => 'A student has been referred to you by ' .
+                                ($this->appointment->originalCounselor?->user
+                                    ? $this->appointment->originalCounselor->user->first_name . ' ' . $this->appointment->originalCounselor->user->last_name
+                                    : 'another counselor') .
+                                '. Case #' . $this->appointment->case_number . '. Awaiting student confirmation.',
             'appointment_id' => $this->appointment->id,
             'case_number'    => $this->appointment->case_number,
             'type'           => 'appointment_referred_to_counselor',

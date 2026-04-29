@@ -30,7 +30,7 @@ class AdminFAQController extends Controller
             $query->where('is_active', $request->input('status') === 'active');
         }
 
-        $faqs = $query->paginate(15)->appends($request->query());
+        $faqs = $query->paginate(10)->appends($request->query());
 
         return view('admin.faqs.index', compact('faqs'));
     }
@@ -62,6 +62,7 @@ class AdminFAQController extends Controller
 
         $validated['user_id'] = Auth::id();
         $validated['is_active'] = $request->has('is_active');
+        $validated['is_pinned'] = $request->has('is_pinned');
 
         FAQ::create($validated);
 
@@ -94,6 +95,7 @@ class AdminFAQController extends Controller
         ]);
 
         $validated['is_active'] = $request->has('is_active');
+        $validated['is_pinned'] = $request->has('is_pinned');
 
         $faq->update($validated);
 
@@ -110,5 +112,17 @@ class AdminFAQController extends Controller
         $faq->delete();
 
         return redirect()->route('admin.faqs.index')->with('success', 'FAQ deleted successfully!');
+    }
+    public function togglePin(FAQ $faq)
+    {
+        $faq->update(['is_pinned' => !$faq->is_pinned]);
+
+        $state = $faq->is_pinned ? 'pinned' : 'unpinned';
+
+        return response()->json([
+            'success' => true,
+            'is_pinned' => $faq->is_pinned,
+            'message' => "FAQ {$state} successfully!",
+        ]);
     }
 }

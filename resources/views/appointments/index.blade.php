@@ -17,17 +17,17 @@
         --text-muted: #8b7e76;
     }
 
-    .appointments-shell {
+    .ogc-shell {
         position: relative;
         overflow: hidden;
         background: var(--bg-warm);
         min-height: 100vh;
     }
-    .appointments-glow {
+    .ogc-glow {
         position: absolute; border-radius: 50%; filter: blur(80px); pointer-events: none; opacity: 0.2;
     }
-    .appointments-glow.one { top: -40px; left: -50px; width: 240px; height: 240px; background: var(--gold-400); }
-    .appointments-glow.two { bottom: -50px; right: -70px; width: 280px; height: 280px; background: var(--maroon-800); }
+    .ogc-glow.one { top: -40px; left: -50px; width: 240px; height: 240px; background: var(--gold-400); }
+    .ogc-glow.two { bottom: -50px; right: -70px; width: 280px; height: 280px; background: var(--maroon-800); }
 
     /* Cards */
     .hero-card, .panel-card, .glass-card, .stat-card {
@@ -49,6 +49,7 @@
         box-shadow: 0 4px 12px rgba(92,26,26,0.15);
         display: flex; align-items: center; justify-content: center; flex-shrink: 0;
     }
+    .hero-card { min-height: 100px; }
     .hero-badge {
         display: inline-flex; align-items: center; gap: 0.4rem; border-radius: 999px;
         border: 1px solid rgba(212,175,55,0.3); background: rgba(254,249,231,0.9);
@@ -63,6 +64,13 @@
         border: 1px solid rgba(92,26,26,0.15);
         background: linear-gradient(135deg, var(--maroon-800) 0%, var(--maroon-900) 100%); color: white;
         box-shadow: 0 4px 12px rgba(58,12,12,0.15);
+        min-width: 280px;
+    }
+    @media (min-width: 1024px) {
+        .summary-card {
+     width: 500px;
+            min-width: 500px;
+        }
     }
     .summary-card::before {
         content: ""; position: absolute; inset: 0; opacity: 0.15;
@@ -124,7 +132,7 @@
     .form-input, .form-select {
         width: 100%; border: 1px solid var(--border-soft); border-radius: 0.5rem;
         background: white; color: var(--text-primary); outline: none;
-        transition: all 0.2s ease; font-size: 0.8rem; padding: 0.5rem 0.75rem;
+        transition: all 0.2s ease; font-size: 0.8rem; padding: 0.4rem 0.75rem;
     }
     .form-input:focus, .form-select:focus { border-color: var(--maroon-700); box-shadow: 0 0 0 3px rgba(92,26,26,0.08); }
 
@@ -144,6 +152,11 @@
         padding: 1rem 1.25rem;
         border-bottom: 1px solid var(--border-soft);
         background: rgba(250,248,245,0.4);
+    }
+    .quick-filter-bar .btn-filter {
+        flex: 1;
+        min-width: 0;
+        justify-content: center;
     }
 
     /* Alerts */
@@ -332,15 +345,15 @@
     }
 </style>
 
-<div class="min-h-screen appointments-shell">
-    <div class="appointments-glow one"></div>
-    <div class="appointments-glow two"></div>
+<div class="min-h-screen ogc-shell">
+    <div class="ogc-glow one"></div>
+    <div class="ogc-glow two"></div>
 
     <div class="relative max-w-7xl mx-auto px-4 sm:px-6 py-5 md:py-8">
         {{-- Header Section --}}
-        <div class="mb-6">
-            <div class="grid grid-cols-1 lg:grid-cols-[1fr_auto] gap-4">
-                <div class="hero-card">
+        <div class="mb-5 sm:mb-6">
+            <div class="grid grid-cols-1 lg:grid-cols-[1fr_auto] gap-4 items-stretch">
+                <div class="hero-card h-full">
                     <div class="relative p-4 sm:p-5 flex items-start gap-3">
                         <div class="hero-icon">
                             <i class="fas fa-calendar-check text-base sm:text-lg"></i>
@@ -358,7 +371,7 @@
                     </div>
                 </div>
 
-                <div class="summary-card">
+                <div class="summary-card h-full">
                     <div class="relative h-full flex items-center justify-between gap-3 p-4">
                         <div class="flex items-center gap-3">
                             <div class="summary-icon">
@@ -380,68 +393,44 @@
 
         {{-- Alert Messages --}}
 
-        {{-- Quick Filter Buttons (Moved to Top After Header) --}}
-        <div class="panel-card mb-5">
-            <div class="quick-filter-bar">
-                <a href="{{ route('appointments.index') }}"
-                   class="btn-filter {{ !request('status') && !request('search_date') ? 'active' : '' }}">
-                    <i class="fas fa-bars-staggered"></i> All
+        {{-- Quick Filter Buttons --}}
+        <div class="flex gap-2 mb-5">
+            @php
+                $filters = [
+                    ['label' => 'All',             'status' => '',                    'icon' => 'fa-bars-staggered',        'color' => 'var(--maroon-800)'],
+                    ['label' => 'Pending',         'status' => 'pending',             'icon' => 'fa-hourglass-half',        'color' => '#c9a227'],
+                    ['label' => 'Approved',        'status' => 'approved',            'icon' => 'fa-circle-check',          'color' => '#2d7a4f'],
+                    ['label' => 'Reschedule Req.', 'status' => 'reschedule_requested','icon' => 'fa-calendar-pen',          'color' => '#ea580c'],
+                    ['label' => 'Rescheduled',     'status' => 'rescheduled',         'icon' => 'fa-calendar-check',        'color' => '#2a5a7a'],
+                    ['label' => 'Rejected by Me',  'status' => 'reschedule_rejected', 'icon' => 'fa-circle-xmark',         'color' => '#b91c1c'],
+                    ['label' => 'Completed',       'status' => 'completed',           'icon' => 'fa-circle-dot',            'color' => '#2a5a7a'],
+                    ['label' => 'Referred',        'status' => 'referred',            'icon' => 'fa-arrow-right-arrow-left','color' => '#7c3aed'],
+                    ['label' => 'Cancelled',       'status' => 'cancelled',           'icon' => 'fa-ban',                   'color' => '#6b7280'],
+                ];
+            @endphp
+            @foreach($filters as $f)
+                @php $isActive = (!request('status') && !request('search_date') && $f['status'] === '') || request('status') === $f['status']; @endphp
+                <a href="{{ $f['status'] ? route('appointments.index', ['status' => $f['status']]) : route('appointments.index') }}"
+                   class="flex-1 inline-flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-full border text-xs font-semibold transition-all hover:shadow-sm whitespace-nowrap"
+                   style="{{ $isActive ? 'background:'.$f['color'].';color:#fff;border-color:'.$f['color'].';box-shadow:0 4px 10px rgba(0,0,0,0.15);' : 'background:#fff;color:var(--text-secondary);border-color:var(--border-soft);' }}">
+                    <i class="fas {{ $f['icon'] }} text-[10px]"></i>
+                    {{ $f['label'] }}
                 </a>
-                <a href="{{ route('appointments.index', ['status' => 'pending']) }}"
-                   class="btn-filter {{ request('status') == 'pending' ? 'active' : '' }}">
-                    <i class="fas fa-hourglass-half"></i> Pending
-                </a>
-                <a href="{{ route('appointments.index', ['status' => 'approved']) }}"
-                   class="btn-filter {{ request('status') == 'approved' ? 'active' : '' }}">
-                    <i class="fas fa-circle-check"></i> Approved
-                </a>
-                <a href="{{ route('appointments.index', ['status' => 'reschedule_requested']) }}"
-                   class="btn-filter {{ request('status') == 'reschedule_requested' ? 'active' : '' }}">
-                    <i class="fas fa-calendar-pen"></i> Reschedule Req.
-                </a>
-                <a href="{{ route('appointments.index', ['status' => 'rescheduled']) }}"
-                   class="btn-filter {{ request('status') == 'rescheduled' ? 'active' : '' }}">
-                    <i class="fas fa-calendar-check"></i> Rescheduled
-                </a>
-                <a href="{{ route('appointments.index', ['status' => 'reschedule_rejected']) }}"
-                   class="btn-filter {{ request('status') == 'reschedule_rejected' ? 'active' : '' }}">
-                    <i class="fas fa-circle-xmark"></i> Rejected by Me
-                </a>
-                <a href="{{ route('appointments.index', ['status' => 'completed']) }}"
-                   class="btn-filter {{ request('status') == 'completed' ? 'active' : '' }}">
-                    <i class="fas fa-circle-dot"></i> Completed
-                </a>
-                <a href="{{ route('appointments.index', ['status' => 'referred']) }}"
-                   class="btn-filter {{ request('status') == 'referred' ? 'active' : '' }}">
-                    <i class="fas fa-arrow-right-arrow-left"></i> Referred
-                </a>
-                <a href="{{ route('appointments.index', ['status' => 'cancelled']) }}"
-                   class="btn-filter {{ request('status') == 'cancelled' ? 'active' : '' }}">
-                    <i class="fas fa-ban"></i> Cancelled
-                </a>
-            </div>
+            @endforeach
         </div>
 
         {{-- Search and Filters Section --}}
         <div class="panel-card mb-6">
-            <div class="panel-header">
-                <div class="panel-icon"><i class="fas fa-sliders"></i></div>
-                <div>
-                    <h3 class="panel-title">Search & Filter</h3>
-                    <p class="panel-subtitle">Find appointments by date or status</p>
-                </div>
-            </div>
-
-            <div class="p-5">
-                <form method="GET" action="{{ route('appointments.index') }}" class="flex flex-col md:flex-row gap-4">
-                    <div class="flex flex-wrap gap-4 flex-1">
-                        <div class="min-w-[160px]">
+            <div class="p-4">
+                <form method="GET" action="{{ route('appointments.index') }}" class="flex flex-col lg:flex-row gap-3 items-end">
+                    <div class="flex flex-col sm:flex-row gap-3 flex-1">
+                        <div class="flex-1 min-w-[160px]">
                             <label class="form-label">Date</label>
                             <input type="date" name="search_date" id="search_date"
                                    value="{{ request('search_date') }}"
                                    class="form-input">
                         </div>
-                        <div class="min-w-[180px]">
+                        <div class="flex-1 min-w-[180px]">
                             <label class="form-label">Status</label>
                             <select name="status" id="status" class="form-select">
                                 <option value="">All Statuses</option>
@@ -457,12 +446,12 @@
                         </div>
                     </div>
 
-                    <div class="flex items-end gap-2">
-                        <button type="submit" class="btn-primary">
+                    <div class="flex gap-2 w-full sm:w-auto">
+                        <button type="submit" class="btn-primary flex-1 sm:flex-initial">
                             <i class="fas fa-search"></i>
                             <span>Search</span>
                         </button>
-                        <a href="{{ route('appointments.index') }}" class="btn-secondary">
+                        <a href="{{ route('appointments.index') }}" class="btn-secondary flex-1 sm:flex-initial">
                             <i class="fas fa-rotate-left"></i>
                             <span>Reset</span>
                         </a>

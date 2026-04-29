@@ -49,7 +49,7 @@
             </div>
 
             <!-- Stats Cards -->
-            <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4 mb-6 sm:mb-8">
+            <div class="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 mb-6 sm:mb-8">
                 <a href="{{ route('admin.appointments') }}?{{ http_build_query(request()->except('page', 'status')) }}&status=all"
                    class="stat-card group">
                     <div class="stat-card-pattern"></div>
@@ -106,16 +106,58 @@
                     </div>
                 </a>
 
-                <a href="{{ route('admin.appointments') }}?{{ http_build_query(request()->except('page', 'status')) }}&status=rejected"
+                <a href="{{ route('admin.appointments') }}?{{ http_build_query(request()->except('page', 'status')) }}&status=rejected_by_student"
                    class="stat-card group">
                     <div class="stat-card-pattern"></div>
                     <div class="relative flex items-center gap-2.5 sm:gap-3">
-                        <div class="stat-icon bg-[#fdf2f2] text-[#b91c1c] group-hover:bg-[#fce4e4]">
-                            <i class="fas fa-circle-xmark text-sm sm:text-base"></i>
+                        <div class="stat-icon bg-[#fff1f2] text-[#be123c] group-hover:bg-[#ffe4e6]">
+                            <i class="fas fa-user-xmark text-sm sm:text-base"></i>
                         </div>
                         <div>
-                            <p class="stat-label">Rejected</p>
-                            <p class="stat-value">{{ $stats['rejected'] ?? 0 }}</p>
+                            <p class="stat-label">Rejected by Student</p>
+                            <p class="stat-value">{{ $stats['rejected_by_student'] ?? 0 }}</p>
+                        </div>
+                    </div>
+                </a>
+
+                <a href="{{ route('admin.appointments') }}?{{ http_build_query(request()->except('page', 'status')) }}&status=cancelled_by_student"
+                   class="stat-card group">
+                    <div class="stat-card-pattern"></div>
+                    <div class="relative flex items-center gap-2.5 sm:gap-3">
+                        <div class="stat-icon bg-[#fffbeb] text-[#b45309] group-hover:bg-[#fef3d1]">
+                            <i class="fas fa-user-clock text-sm sm:text-base"></i>
+                        </div>
+                        <div>
+                            <p class="stat-label">Cancelled by Student</p>
+                            <p class="stat-value">{{ $stats['cancelled_by_student'] ?? 0 }}</p>
+                        </div>
+                    </div>
+                </a>
+
+                <a href="{{ route('admin.appointments') }}?{{ http_build_query(request()->except('page', 'status')) }}&status=referred_total"
+                   class="stat-card group">
+                    <div class="stat-card-pattern"></div>
+                    <div class="relative flex items-center gap-2.5 sm:gap-3">
+                        <div class="stat-icon bg-[#fef9e7] text-[#7a2a2a] group-hover:bg-[#fef3d1]">
+                            <i class="fas fa-right-left text-sm sm:text-base"></i>
+                        </div>
+                        <div>
+                            <p class="stat-label">Referred</p>
+                            <p class="stat-value">{{ $stats['referred_total'] ?? 0 }}</p>
+                        </div>
+                    </div>
+                </a>
+
+                <a href="{{ route('admin.appointments') }}?{{ http_build_query(request()->except('page', 'status')) }}&status=no_show"
+                   class="stat-card group">
+                    <div class="stat-card-pattern"></div>
+                    <div class="relative flex items-center gap-2.5 sm:gap-3">
+                        <div class="stat-icon bg-[#f5f0eb] text-[#6b5e57] group-hover:bg-[#e5e0db]">
+                            <i class="fas fa-user-slash text-sm sm:text-base"></i>
+                        </div>
+                        <div>
+                            <p class="stat-label">No Show</p>
+                            <p class="stat-value">{{ $stats['no_show'] ?? 0 }}</p>
                         </div>
                     </div>
                 </a>
@@ -154,7 +196,11 @@
                             <label class="filter-label">Status</label>
                             <select name="status" class="filter-input bg-white">
                                 <option value="all" {{ $status === 'all' ? 'selected' : '' }}>All Statuses</option>
+                                <option value="rejected_by_student" {{ $status === 'rejected_by_student' ? 'selected' : '' }}>Rejected by Student</option>
+                                <option value="cancelled_by_student" {{ $status === 'cancelled_by_student' ? 'selected' : '' }}>Cancelled by Student</option>
+                                <option value="referred_total" {{ $status === 'referred_total' ? 'selected' : '' }}>Referred</option>
                                 @foreach($statuses as $s)
+                                    @if($s === 'rejected') @continue @endif
                                     <option value="{{ $s }}" {{ $status === $s ? 'selected' : '' }}>{{ ucfirst(str_replace('_', ' ', $s)) }}</option>
                                 @endforeach
                             </select>
@@ -362,9 +408,43 @@
                     </table>
                 </div>
 
-                <div class="px-4 sm:px-5 py-3 border-t border-[#e5e0db]/60 bg-[#faf8f5]/50">
-                    {{ $appointments->appends(request()->query())->links() }}
+                <!-- Enhanced Pagination Section -->
+                @if($appointments->hasPages())
+                <div class="px-4 sm:px-5 py-3 sm:py-3.5 border-t border-[#e5e0db]/60 bg-[#faf8f5]/40">
+                    <div class="flex items-center justify-center">
+                        <div class="pagination-wrap flex items-center gap-2 justify-center">
+                            {{ $appointments->appends(request()->query())->links() }}
+                        </div>
+                    </div>
                 </div>
+
+                <style>
+                    .pagination-wrap nav { display: inline-flex; }
+                    .pagination-wrap .relative { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
+                    .pagination-wrap span, .pagination-wrap a {
+                        display: inline-flex; align-items: center; justify-content: center;
+                        min-width: 28px; height: 28px; padding: 0 8px; border-radius: 8px;
+                        font-size: 11px; font-weight: 600; transition: all 0.2s ease;
+                    }
+                    .pagination-wrap span[aria-current="page"] span {
+                        background: #5c1a1a;
+                        color: white;
+                    }
+                    .pagination-wrap a {
+                        background: white; color: #6b5e57; border: 1px solid #e5e0db;
+                    }
+                    .pagination-wrap a:hover {
+                        background: #fdf2f2; color: #5c1a1a; border-color: rgba(212, 175, 55, 0.4);
+                    }
+                </style>
+                @else
+                <div class="px-4 sm:px-5 py-3 sm:py-3.5 border-t border-[#e5e0db]/60 bg-[#faf8f5]/40">
+                    <div class="flex items-center justify-center gap-2 text-[10px] sm:text-xs text-[#8b7e76]">
+                        <i class="fas fa-circle-check text-[#059669]"></i>
+                        <span>Showing all <span class="font-semibold text-[#2c2420]">{{ $appointments->count() }}</span> appointments</span>
+                    </div>
+                </div>
+                @endif
             </div>
 
             <!-- Modal -->

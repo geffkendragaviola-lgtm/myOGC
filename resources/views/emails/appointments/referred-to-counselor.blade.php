@@ -10,7 +10,7 @@
         <p>
             A student has been referred to you by
             <strong>{{ $appointment->originalCounselor->user->first_name }} {{ $appointment->originalCounselor->user->last_name }}</strong>.
-            Please log in to accept or reject this referral.
+            The appointment has been assigned to you automatically. The student will confirm the schedule.
         </p>
 
         <table style="width: 100%; border-collapse: collapse; margin: 16px 0;">
@@ -53,7 +53,7 @@
             @endif
         </table>
 
-        <p>Please log in to the system to accept or reject this referral.</p>
+        <p>No further action is required from you at this time. The student will be notified to confirm the schedule.</p>
         <p style="color: #6b7280; font-size: 13px; margin-top: 24px;">MSU-IIT Guidance Counseling System</p>
     </div>
 </body>

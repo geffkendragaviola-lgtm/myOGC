@@ -386,40 +386,62 @@ class ProfileController extends Controller
     }
 
     /**
-     * Update admin-specific profile information.
+     * Update admin email.
      */
     public function updateAdmin(Request $request)
     {
         try {
-            $request->validate([
-                'position' => ['required', 'string', 'max:255'],
-                'department' => ['required', 'string', 'max:255'],
-                'employee_id' => ['required', 'string', 'max:50'],
-                'office_location' => ['nullable', 'string', 'max:255'],
-                'extension' => ['nullable', 'string', 'max:20'],
-            ]);
-
             $user = $request->user();
 
             if ($user->role !== 'admin') {
                 return back()->withErrors(['error' => 'Unauthorized action.']);
             }
 
-            $adminProfile = Admin::where('user_id', $user->id)->first();
+            $request->validate([
+                'email' => ['required', 'string', 'email', 'max:255', 'unique:users,email,' . $user->id],
+            ]);
 
-            if ($adminProfile) {
-                $adminProfile->update($request->all());
-            } else {
-                Admin::create(array_merge(
-                    ['user_id' => $user->id],
-                    $request->all()
-                ));
+            $user->email = $request->email;
+            if ($user->isDirty('email')) {
+                $user->email_verified_at = null;
             }
+            $user->save();
 
             return Redirect::route('profile.edit')->with('status', 'admin-profile-updated');
         } catch (\Exception $e) {
             Log::error('Admin profile update error: ' . $e->getMessage());
-            return back()->withErrors(['error' => 'Failed to update admin profile.']);
+            return back()->withErrors(['error' => 'Failed to update email.']);
+        }
+    }
+
+    /**
+     * Update admin profile picture.
+     */
+    public function updateAdminPicture(Request $request)
+    {
+        try {
+            $user = $request->user();
+
+            if ($user->role !== 'admin') {
+                return back()->withErrors(['error' => 'Unauthorized action.']);
+            }
+
+            $request->validate([
+                'profile_picture' => ['required', 'image', 'mimes:jpeg,png,jpg,gif,webp', 'max:4096'],
+            ]);
+
+            if ($user->profile_picture) {
+                \Illuminate\Support\Facades\Storage::disk('public')->delete($user->profile_picture);
+            }
+
+            $path = $request->file('profile_picture')->store('profile-pictures', 'public');
+            $user->profile_picture = $path;
+            $user->save();
+
+            return Redirect::route('profile.edit')->with('status', 'admin-picture-updated');
+        } catch (\Exception $e) {
+            Log::error('Admin picture update error: ' . $e->getMessage());
+            return back()->withErrors(['error' => 'Failed to update profile picture.']);
         }
     }
 

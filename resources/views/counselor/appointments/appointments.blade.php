@@ -369,7 +369,7 @@
                         <div class="min-w-0">
                             <div class="hero-badge">
                                 <span class="hero-badge-dot"></span>
-                                Counselor Portal
+                                Case Management
                             </div>
                             <h1 class="text-lg sm:text-xl lg:text-2xl font-semibold tracking-tight text-[#2c2420] mt-2">Appointment Management</h1>
                             <p class="text-[#6b5e57] text-xs sm:text-sm mt-1.5 max-w-2xl">
@@ -406,38 +406,37 @@
         </div>
 
         <!-- Status Filter Chips -->
-<div class="flex flex-wrap gap-2 mb-6">
-    @php
-        $currentStatus = request('status', 'all');
-        $currentDir    = request('referral_direction', '');
-        $baseParams    = request()->except('page', 'status', 'referral_direction');
-        $chips = [
-            ['label' => 'All',        'status' => 'all',       'dir' => '',    'count' => $stats['total'] ?? 0,        'color' => 'var(--maroon-soft)'],
-            ['label' => 'Pending',    'status' => 'pending',   'dir' => '',    'count' => $stats['pending'] ?? 0,      'color' => '#c9a227'],
-            ['label' => 'Approved',   'status' => 'approved',  'dir' => '',    'count' => $stats['approved'] ?? 0,     'color' => '#2d7a4f'],
-            ['label' => 'Completed',  'status' => 'completed', 'dir' => '',    'count' => $stats['completed'] ?? 0,    'color' => '#2a5a7a'],
-            ['label' => 'Cancelled',  'status' => 'cancelled', 'dir' => '',    'count' => $stats['cancelled'] ?? 0,    'color' => '#b91c1c'],
-            ['label' => 'Inbound Referral','status' => 'all',       'dir' => 'in',  'count' => $stats['referred_in'] ?? 0,  'color' => '#c9a227'],
-            ['label' => 'Outbound Referral','status'=> 'all',       'dir' => 'out', 'count' => $stats['referred_out'] ?? 0, 'color' => '#7c3aed'],
-        ];
-    @endphp
-    @foreach($chips as $chip)
-        @php
-            $isActive = ($currentStatus === $chip['status'] && $currentDir === $chip['dir']);
-            $url = route('counselor.appointments') . '?' . http_build_query(array_merge($baseParams, ['status' => $chip['status'], 'referral_direction' => $chip['dir']]));
-        @endphp
-        <a href="{{ $url }}"
-           style="{{ $isActive ? 'background:'.($chip['color']).';color:#fff;border-color:'.($chip['color']).';' : 'background:#fff;color:var(--text-secondary);border-color:var(--border-soft);' }}"
-           class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-xs font-semibold transition-all hover:shadow-sm"
-           style="{{ $isActive ? '' : '' }}">
-            {{ $chip['label'] }}
-            <span class="inline-flex items-center justify-center min-w-[1.2rem] h-5 px-1 rounded-full text-[10px] font-bold"
-                  style="{{ $isActive ? 'background:rgba(255,255,255,0.25);color:#fff;' : 'background:var(--bg-warm);color:var(--text-primary);' }}">
-                {{ $chip['count'] }}
-            </span>
-        </a>
-    @endforeach
-</div>
+        <div class="flex gap-2 mb-6">
+                    @php
+                        $currentStatus = request('status', 'all');
+                        $currentDir    = request('referral_direction', '');
+                        $baseParams    = request()->except('page', 'status', 'referral_direction');
+                        $chips = [
+                            ['label' => 'All',               'status' => 'all',       'dir' => '',    'count' => $stats['total'] ?? 0,        'color' => 'var(--maroon-800)'],
+                            ['label' => 'Pending',           'status' => 'pending',   'dir' => '',    'count' => $stats['pending'] ?? 0,      'color' => '#c9a227'],
+                            ['label' => 'Approved',          'status' => 'approved',  'dir' => '',    'count' => $stats['approved'] ?? 0,     'color' => '#2d7a4f'],
+                            ['label' => 'Completed',         'status' => 'completed', 'dir' => '',    'count' => $stats['completed'] ?? 0,    'color' => '#2a5a7a'],
+                            ['label' => 'Cancelled',         'status' => 'cancelled', 'dir' => '',    'count' => $stats['cancelled'] ?? 0,    'color' => '#b91c1c'],
+                            ['label' => 'Inbound Referral',  'status' => 'all',       'dir' => 'in',  'count' => $stats['referred_in'] ?? 0,  'color' => '#c9a227'],
+                            ['label' => 'Outbound Referral', 'status' => 'all',       'dir' => 'out', 'count' => $stats['referred_out'] ?? 0, 'color' => '#7c3aed'],
+                        ];
+                    @endphp
+                    @foreach($chips as $chip)
+                        @php
+                            $isActive = ($currentStatus === $chip['status'] && $currentDir === $chip['dir']);
+                            $url = route('counselor.appointments') . '?' . http_build_query(array_merge($baseParams, ['status' => $chip['status'], 'referral_direction' => $chip['dir']]));
+                        @endphp
+                        <a href="{{ $url }}"
+                           class="flex-1 inline-flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-full border text-xs font-semibold transition-all hover:shadow-sm whitespace-nowrap"
+                           style="{{ $isActive ? 'background:'.$chip['color'].';color:#fff;border-color:'.$chip['color'].';box-shadow:0 4px 10px rgba(0,0,0,0.15);' : 'background:#fff;color:var(--text-secondary);border-color:var(--border-soft);' }}">
+                            {{ $chip['label'] }}
+                            <span class="inline-flex items-center justify-center min-w-[1.2rem] h-5 px-1 rounded-full text-[10px] font-bold"
+                                  style="{{ $isActive ? 'background:rgba(255,255,255,0.25);color:#fff;' : 'background:var(--bg-warm);color:var(--text-primary);' }}">
+                                {{ $chip['count'] }}
+                            </span>
+                        </a>
+                    @endforeach
+        </div>
 
         <!-- Filters -->
         <div class="panel-card mb-6">
@@ -619,7 +618,9 @@
                                             </div>
                                             <div class="text-[9px] font-semibold text-[#a89f97] uppercase tracking-wide mt-1">Old</div>
                                             <div class="text-[10px] text-[#a89f97]">
-                                                {{ \Carbon\Carbon::parse($appointment->appointment_date)->format('M j') }}
+                                                {{ \Carbon\Carbon::parse($appointment->appointment_date)->format('M j, Y') }}
+                                                {{ \Carbon\Carbon::parse($appointment->start_time)->format('g:i A') }} -
+                                                {{ \Carbon\Carbon::parse($appointment->end_time)->format('g:i A') }}
                                             </div>
                                         @elseif($appointment->status === 'referred' && $appointment->proposed_date)
                                             <div class="text-[10px] font-semibold text-[#7a2a2a] uppercase tracking-wide">New</div>
@@ -632,7 +633,9 @@
                                             </div>
                                             <div class="text-[9px] font-semibold text-[#a89f97] uppercase tracking-wide mt-1">Old</div>
                                             <div class="text-[10px] text-[#a89f97]">
-                                                {{ \Carbon\Carbon::parse($appointment->appointment_date)->format('M j') }}
+                                                {{ \Carbon\Carbon::parse($appointment->appointment_date)->format('M j, Y') }}
+                                                {{ \Carbon\Carbon::parse($appointment->start_time)->format('g:i A') }} -
+                                                {{ \Carbon\Carbon::parse($appointment->end_time)->format('g:i A') }}
                                             </div>
                                         @else
                                             <div class="text-xs sm:text-sm text-[#2c2420]">
@@ -673,7 +676,12 @@
                                             <span class="status-chip {{ $statusColor }}">
                                                 {{ $statusText }}
                                             </span>
-                                            @if($appointment->status === 'referred')
+                                            @if($appointment->status === 'rejected' && $appointment->original_counselor_id && $appointment->notes && str_contains($appointment->notes, 'REFERRAL CANCELLED by student'))
+                                                <span class="text-[10px] font-semibold mt-0.5" style="color:#b91c1c;">
+                                                    <i class="fas fa-user-xmark text-[9px] mr-0.5"></i>
+                                                    Student rejected referral
+                                                </span>
+                                            @elseif($appointment->status === 'referred')
                                                 @if($appointment->referredCounselor?->user)
                                                     <span class="text-[10px] text-[#7a2a2a] font-medium mt-0.5">
                                                         <i class="fas fa-arrow-right-arrow-left text-[9px] mr-0.5"></i>
@@ -745,17 +753,10 @@
                                                             </button>
                                                         </form>
                                                     @elseif($appointment->status === 'referred' && in_array($appointment->referred_to_counselor_id, $counselorIdList, true))
-                                                        <!-- Special actions for referred appointments where this counselor is the receiver -->
-                                                        <form action="{{ route('counselor.appointments.referral.accept', $appointment) }}" method="POST" class="inline">
-                                                            @csrf
-                                                            @method('PATCH')
-                                                            <button type="submit"
-                                                                    class="action-icon success"
-                                                                    onclick="return confirm('Accept this referred appointment and schedule it?')"
-                                                                    title="Accept Referred Appointment">
-                                                                <i class="fas fa-circle-check"></i>
-                                                            </button>
-                                                        </form>
+                                                        <!-- Referral is auto-approved for the receiving counselor — student accepts/rejects -->
+                                                        <span class="text-xs text-[#6b5e57]" title="Awaiting student acceptance">
+                                                            <i class="fas fa-hourglass-half"></i> Awaiting student
+                                                        </span>
                                                     @endif
                                                 @endif
 

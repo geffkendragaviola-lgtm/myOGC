@@ -176,96 +176,6 @@
             @endforeach
         </div>
 
-        {{-- Counseling analytics cards --}}
-        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4">
-            {{-- Total Appointments --}}
-            <div class="stat-card p-4">
-                <div class="flex items-start justify-between gap-2">
-                    <div class="min-w-0">
-                        <p class="stat-label">Appointments</p>
-                        <p class="stat-value mt-1" style="font-weight:600;">{{ number_format($stats['total_appointments']) }}</p>
-                    </div>
-                    <div class="stat-icon" style="background:#7a2a2a;color:#fff;">
-                        <i class="fas fa-calendar-check text-sm"></i>
-                    </div>
-                </div>
-                <div class="stat-bar"><div class="stat-bar-fill" style="width:100%;background:#7a2a2a;"></div></div>
-            </div>
-
-            {{-- Completion Rate --}}
-            <div class="stat-card p-4">
-                <div class="flex items-start justify-between gap-2">
-                    <div class="min-w-0">
-                        <p class="stat-label">Completion Rate</p>
-                        <p class="stat-value mt-1" style="font-weight:600;color:#2d7a4f;">{{ $stats['completion_rate'] }}%</p>
-                    </div>
-                    <div class="stat-icon" style="background:#ecfdf5;color:#2d7a4f;border:1px solid #d1fae5;">
-                        <i class="fas fa-circle-check text-sm"></i>
-                    </div>
-                </div>
-                <div class="stat-bar"><div class="stat-bar-fill" style="width:{{ $stats['completion_rate'] }}%;background:#2d7a4f;"></div></div>
-            </div>
-
-            {{-- Pending / Awaiting --}}
-            <div class="stat-card p-4">
-                <div class="flex items-start justify-between gap-2">
-                    <div class="min-w-0">
-                        <p class="stat-label">Pending</p>
-                        <p class="stat-value mt-1" style="font-weight:600;color:#b45309;">{{ number_format($stats['pending_count']) }}</p>
-                    </div>
-                    <div class="stat-icon" style="background:#fef3c7;color:#b45309;border:1px solid #fde68a;">
-                        <i class="fas fa-hourglass-half text-sm"></i>
-                    </div>
-                </div>
-                <div class="stat-bar"><div class="stat-bar-fill" style="width:{{ $stats['total_appointments'] > 0 ? round(($stats['pending_count']/$stats['total_appointments'])*100) : 0 }}%;background:#d97706;"></div></div>
-            </div>
-
-            {{-- No-Show Rate --}}
-            <div class="stat-card p-4">
-                <div class="flex items-start justify-between gap-2">
-                    <div class="min-w-0">
-                        <p class="stat-label">No-Show Rate</p>
-                        <p class="stat-value mt-1" style="font-weight:600;color:#b91c1c;">{{ $stats['no_show_rate'] }}%</p>
-                    </div>
-                    <div class="stat-icon" style="background:#fee2e2;color:#b91c1c;border:1px solid #fecaca;">
-                        <i class="fas fa-user-xmark text-sm"></i>
-                    </div>
-                </div>
-                <div class="stat-bar"><div class="stat-bar-fill" style="width:{{ $stats['no_show_rate'] }}%;background:#dc2626;"></div></div>
-            </div>
-
-            {{-- Avg Satisfaction --}}
-            <div class="stat-card p-4">
-                <div class="flex items-start justify-between gap-2">
-                    <div class="min-w-0">
-                        <p class="stat-label">Avg Satisfaction</p>
-                        <p class="stat-value mt-1" style="font-weight:600;color:#c9a227;">
-                            {{ $stats['avg_satisfaction'] !== null ? $stats['avg_satisfaction'].'/5' : 'N/A' }}
-                        </p>
-                    </div>
-                    <div class="stat-icon" style="background:#fef9e7;color:#c9a227;border:1px solid #f5e6b8;">
-                        <i class="fas fa-star text-sm"></i>
-                    </div>
-                </div>
-                @php $satPct = $stats['avg_satisfaction'] !== null ? ($stats['avg_satisfaction']/5)*100 : 0; @endphp
-                <div class="stat-bar"><div class="stat-bar-fill" style="width:{{ $satPct }}%;background:#c9a227;"></div></div>
-            </div>
-
-            {{-- Follow-up Required --}}
-            <div class="stat-card p-4">
-                <div class="flex items-start justify-between gap-2">
-                    <div class="min-w-0">
-                        <p class="stat-label">Follow-ups Due</p>
-                        <p class="stat-value mt-1" style="font-weight:600;color:#5c1a1a;">{{ number_format($stats['follow_up_count']) }}</p>
-                    </div>
-                    <div class="stat-icon" style="background:#f5e6e8;color:#5c1a1a;border:1px solid #e5d0d3;">
-                        <i class="fas fa-rotate-right text-sm"></i>
-                    </div>
-                </div>
-                <div class="stat-bar"><div class="stat-bar-fill" style="width:60%;background:#5c1a1a;"></div></div>
-            </div>
-        </div>
-
         {{-- Appointments by College mini-panel --}}
         @if($appointmentsByCollege->count())
         <div class="panel-card overflow-hidden">
@@ -297,13 +207,44 @@
         </div>
         @endif
 
+        {{-- Recent events row --}}
+        @if(isset($recentEvents) && $recentEvents->count())
+        <div class="panel-card overflow-hidden">
+            <div class="panel-topline"></div>
+            <div class="panel-header">
+                <div class="panel-icon"><i class="fas fa-calendar-days text-xs"></i></div>
+                <div>
+                    <p class="panel-title">Recent Events</p>
+                    <p class="panel-subtitle hidden sm:block">Latest events added to the system</p>
+                </div>
+                <a href="{{ route('admin.events') }}" class="ml-auto text-[10px] font-semibold text-[#7a2a2a] hover:text-[#5c1a1a] transition flex items-center gap-1">
+                    View all <i class="fas fa-arrow-right text-[9px]" ></i>
+                </a>
+            </div>
+            <div class="p-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-3">
+                @foreach($recentEvents as $event)
+                <div class="rounded-lg border border-[#e5e0db] bg-[#faf8f5]/60 p-3 hover:border-[rgba(212,175,55,0.4)] hover:bg-[rgba(254,249,231,0.4)] transition">
+                    <p class="text-xs font-semibold text-[#2c2420] truncate">{{ $event->title }}</p>
+                    <p class="text-[10px] text-[#8b7e76] mt-1 flex items-center gap-1">
+                        <i class="fas fa-calendar-days text-[9px] text-[#c4b8b1]"></i>
+                        {{ \Carbon\Carbon::parse($event->event_start_date)->format('M j, Y') }}
+                    </p>
+                    <span class="inline-flex items-center mt-2 px-2 py-0.5 rounded-full text-[9px] font-semibold
+                        {{ $event->is_active ? 'bg-[#ecfdf5] text-[#059669] border border-[#10b981]/25' : 'bg-[#f5f0eb] text-[#8b7e76] border border-[#e5e0db]' }}">
+                        {{ $event->is_active ? 'Active' : 'Inactive' }}
+                    </span>
+                </div>
+                @endforeach
+            </div>
+        </div>
+        @endif
+
         {{-- Two-column layout --}}
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-5 sm:gap-6">
 
             {{-- Quick access --}}
-            <div class="lg:col-span-1 space-y-3">
-                <div class="panel-card">
-                    <div class="panel-topline"></div>
+            <div class="lg:col-span-1 h-full">
+                <div class="panel-card h-full flex flex-col">
                     <div class="panel-header">
                         <div class="panel-icon"><i class="fas fa-bolt text-xs"></i></div>
                         <div>
@@ -311,7 +252,7 @@
                             <p class="panel-subtitle hidden sm:block">Common admin actions</p>
                         </div>
                     </div>
-                    <div class="p-3 space-y-2">
+                    <div class="p-3 space-y-2 flex-1">
                         @php
                             $quickLinks = [
                                 ['href'=>route('admin.students'),      'icon'=>'fa-user-graduate', 'label'=>'Student Records',   'sub'=>'Browse all students',           'ic_bg'=>'background:rgba(254,249,231,0.8);color:#7a5a1a;', 'ic_hover'=>'background:#c9a227;color:#3a0c0c;'],
@@ -340,8 +281,7 @@
 
             {{-- Recent registrations --}}
             <div class="lg:col-span-2">
-                <div class="panel-card overflow-hidden h-full flex flex-col">
-                    <div class="panel-topline"></div>
+                <div class="panel-card overflow-hidden">
                     <div class="panel-header">
                         <div class="panel-icon"><i class="fas fa-users text-xs"></i></div>
                         <div>
@@ -350,7 +290,7 @@
                         </div>
                     </div>
 
-                    <div class="overflow-x-auto flex-1">
+                    <div class="overflow-x-auto">
                         <table class="w-full min-w-[520px]">
                             <thead>
                                 <tr style="background:rgba(250,248,245,0.8);">
@@ -360,13 +300,26 @@
                                 </tr>
                             </thead>
                             <tbody class="divide-y divide-[#e5e0db]/50">
-                                @forelse($recentUsers as $user)
+                                @forelse($recentUsers->take(4) as $user)
                                 <tr class="table-row">
                                     <td class="px-4 py-3">
                                         <div class="flex items-center gap-2.5">
-                                            <div class="avatar-badge">
-                                                {{ strtoupper(substr($user->first_name,0,1)) }}{{ strtoupper(substr($user->last_name,0,1)) }}
-                                            </div>
+                                            @php
+                                                $profilePicturePath = $user->profile_picture
+                                                    ?: optional($user->student)->profile_picture;
+                                            @endphp
+                                            @if(!empty($profilePicturePath))
+                                                <img
+                                                    src="{{ Storage::url(ltrim($profilePicturePath, '/')) }}"
+                                                    alt="{{ $user->first_name }} {{ $user->last_name }}"
+                                                    class="w-9 h-9 rounded-[0.65rem] object-cover border border-[rgba(212,175,55,0.35)] bg-[#faf8f5] flex-shrink-0"
+                                                    loading="lazy"
+                                                />
+                                            @else
+                                                <div class="avatar-badge">
+                                                    {{ strtoupper(substr($user->first_name,0,1)) }}{{ strtoupper(substr($user->last_name,0,1)) }}
+                                                </div>
+                                            @endif
                                             <div class="min-w-0">
                                                 <p class="text-xs font-semibold text-[#2c2420] truncate">{{ $user->first_name }} {{ $user->last_name }}</p>
                                                 <p class="text-[10px] text-[#8b7e76] truncate max-w-[160px]">{{ $user->email }}</p>
@@ -411,44 +364,12 @@
 
                     <div class="table-footer flex items-center justify-between">
                         <span class="text-[10px] text-[#8b7e76]">
-                            Showing <span class="font-semibold text-[#2c2420]">{{ $recentUsers->count() }}</span> recent users
+                            Showing <span class="font-semibold text-[#2c2420]">{{ $recentUsers->take(4)->count() }}</span> recent users
                         </span>
                     </div>
                 </div>
             </div>
         </div>
-
-        {{-- Recent events row --}}
-        @if(isset($recentEvents) && $recentEvents->count())
-        <div class="panel-card overflow-hidden">
-            <div class="panel-topline"></div>
-            <div class="panel-header">
-                <div class="panel-icon"><i class="fas fa-calendar-days text-xs"></i></div>
-                <div>
-                    <p class="panel-title">Recent Events</p>
-                    <p class="panel-subtitle hidden sm:block">Latest events added to the system</p>
-                </div>
-                <a href="{{ route('admin.events') }}" class="ml-auto text-[10px] font-semibold text-[#7a2a2a] hover:text-[#5c1a1a] transition flex items-center gap-1">
-                    View all <i class="fas fa-arrow-right text-[9px]"></i>
-                </a>
-            </div>
-            <div class="p-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-3">
-                @foreach($recentEvents as $event)
-                <div class="rounded-lg border border-[#e5e0db] bg-[#faf8f5]/60 p-3 hover:border-[rgba(212,175,55,0.4)] hover:bg-[rgba(254,249,231,0.4)] transition">
-                    <p class="text-xs font-semibold text-[#2c2420] truncate">{{ $event->title }}</p>
-                    <p class="text-[10px] text-[#8b7e76] mt-1 flex items-center gap-1">
-                        <i class="fas fa-calendar-days text-[9px] text-[#c4b8b1]"></i>
-                        {{ \Carbon\Carbon::parse($event->event_start_date)->format('M j, Y') }}
-                    </p>
-                    <span class="inline-flex items-center mt-2 px-2 py-0.5 rounded-full text-[9px] font-semibold
-                        {{ $event->is_active ? 'bg-[#ecfdf5] text-[#059669] border border-[#10b981]/25' : 'bg-[#f5f0eb] text-[#8b7e76] border border-[#e5e0db]' }}">
-                        {{ $event->is_active ? 'Active' : 'Inactive' }}
-                    </span>
-                </div>
-                @endforeach
-            </div>
-        </div>
-        @endif
 
     </div>
 </div>

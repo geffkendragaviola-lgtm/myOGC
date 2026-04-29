@@ -72,7 +72,9 @@ Route::middleware('auth')->group(function () {
 
     // Mental Health Corner route
     Route::get('/mental-health-corner', function () {
-        return view('mhc'); // Your MHC blade file
+        $unreadNotifications = Auth::user()->unreadNotifications->take(5);
+        $unreadCount = Auth::user()->unreadNotifications->count();
+        return view('mhc', compact('unreadNotifications', 'unreadCount'));
     })->name('mhc');
 
     Route::get('/book-appointment', function () {
@@ -153,6 +155,7 @@ Route::middleware('auth')->group(function () {
         Route::put('/events/{event}', [EventController::class, 'update'])->name('counselor.events.update');
         Route::delete('/events/{event}', [EventController::class, 'destroy'])->name('counselor.events.destroy');
         Route::patch('/events/{event}/toggle-status', [EventController::class, 'toggleStatus'])->name('counselor.events.toggle-status');
+        Route::patch('/events/{event}/toggle-pin', [EventController::class, 'togglePin'])->name('counselor.events.toggle-pin');
 
         Route::get('/events/{event}/registrations', [EventController::class, 'showRegistrations'])->name('counselor.events.registrations');
         Route::patch('/events/{event}/registrations/{registration}/status', [EventController::class, 'updateRegistrationStatus'])->name('counselor.events.update-registration-status');
@@ -202,6 +205,8 @@ Route::middleware(['auth'])->prefix('counselor')->name('counselor.')->group(func
     Route::resource('announcements', \App\Http\Controllers\CounselorAnnouncementController::class);
     Route::patch('announcements/{announcement}/toggle-status', [\App\Http\Controllers\CounselorAnnouncementController::class, 'toggleStatus'])
          ->name('announcements.toggle-status');
+    Route::patch('announcements/{announcement}/toggle-pin', [\App\Http\Controllers\CounselorAnnouncementController::class, 'togglePin'])
+         ->name('announcements.toggle-pin');
     Route::patch('announcements/{announcement}/complete', [\App\Http\Controllers\CounselorAnnouncementController::class, 'complete'])
          ->name('announcements.complete');
 });
@@ -212,6 +217,7 @@ Route::middleware(['auth'])->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::patch('/profile/password', [ProfileController::class, 'updatePassword'])->name('profile.password.update');
     Route::patch('/profile/admin', [ProfileController::class, 'updateAdmin'])->name('profile.admin.update');
+    Route::post('/profile/admin/picture', [ProfileController::class, 'updateAdminPicture'])->name('profile.admin.picture');
 
     // Student-specific profile routes
     Route::patch('/profile/student', [ProfileController::class, 'updateStudent'])->name('profile.student.update');
@@ -262,6 +268,7 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
     Route::patch('/resources/{resource}', [AdminResourceController::class, 'update'])->name('resources.update');
     Route::delete('/resources/{resource}', [AdminResourceController::class, 'destroy'])->name('resources.destroy');
     Route::patch('/resources/{resource}/status', [AdminResourceController::class, 'updateStatus'])->name('resources.update-status');
+    Route::patch('/resources/{resource}/pin', [AdminResourceController::class, 'togglePin'])->name('resources.toggle-pin');
 
     Route::get('/faqs', [AdminFAQController::class, 'index'])->name('faqs.index');
     Route::get('/faqs/create', [AdminFAQController::class, 'create'])->name('faqs.create');
@@ -269,6 +276,7 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
     Route::get('/faqs/{faq}/edit', [AdminFAQController::class, 'edit'])->name('faqs.edit');
     Route::patch('/faqs/{faq}', [AdminFAQController::class, 'update'])->name('faqs.update');
     Route::delete('/faqs/{faq}', [AdminFAQController::class, 'destroy'])->name('faqs.destroy');
+    Route::patch('/faqs/{faq}/pin', [AdminFAQController::class, 'togglePin'])->name('faqs.toggle-pin');
 
     // Admin Event Management Routes
     Route::get('/events', [AdminController::class, 'events'])->name('events');
@@ -278,6 +286,7 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
     Route::put('/events/{event}', [AdminController::class, 'updateEvent'])->name('events.update');
     Route::delete('/events/{event}', [AdminController::class, 'deleteEvent'])->name('events.destroy');
     Route::patch('/events/{event}/toggle-status', [AdminController::class, 'toggleEventStatus'])->name('events.toggle-status');
+    Route::patch('/events/{event}/toggle-pin', [AdminController::class, 'toggleEventPin'])->name('events.toggle-pin');
 
     // Event Registrations
     Route::get('/events/{event}/registrations', [AdminController::class, 'showEventRegistrations'])->name('events.registrations');

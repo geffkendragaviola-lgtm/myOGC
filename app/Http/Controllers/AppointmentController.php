@@ -257,41 +257,12 @@ public function create()
         return redirect()->back()->with('error', 'Student profile not found.');
     }
 
-    $allowAllCounselors = Appointment::where('student_id', $student->id)
-        ->where('status', 'completed')
-        ->whereNotNull('original_counselor_id')
-        ->exists();
-
-    if ($allowAllCounselors) {
-        $counselors = Counselor::with('user', 'college')
-            ->whereHas('user', function($query) {
-                $query->where('role', 'counselor');
-            })
-            ->get()
-            ->unique(function ($counselor) {
-                // Ensure each counselor appears only once by their user ID
-                // This prevents duplicates if a counselor handles multiple colleges
-                return $counselor->user_id;
-            });
-    } else {
-        // Get counselors from the same college OR counselors who have received referrals from this student
-        $counselors = Counselor::with('user', 'college')
-            ->where(function($query) use ($student) {
-                // Primary college assignment
-                $query->where('college_id', $student->college_id);
-            })
-            ->orWhereHas('receivedReferrals', function($query) use ($student) {
-                // Counselors who have received referrals for this student
-                $query->where('student_id', $student->id)
-                      ->where('status', 'referred');
-            })
-            ->get()
-            ->unique(function ($counselor) {
-                // Ensure each counselor appears only once by their user ID
-                // This prevents duplicates if a counselor handles multiple colleges
-                return $counselor->user_id;
-            });
-    }
+    // "My College" tab: only counselors assigned to the student's own college
+    $allowAllCounselors = false;
+    $counselors = Counselor::with('user', 'college')
+        ->where('college_id', $student->college_id)
+        ->get()
+        ->unique(fn($counselor) => $counselor->user_id);
 
     $hasInitialInterviewAppointment = Appointment::where('student_id', $student->id)
         ->where('booking_type', 'Initial Interview')
@@ -550,10 +521,12 @@ public function getReferredCounselors(Request $request)
     }
 
     // Get counselors who have been referred to in past appointments for this student
+    // Only show counselors where the referred appointment has been completed.
     $referredCounselors = Counselor::with('user', 'college')
         ->whereHas('receivedReferrals', function($query) use ($student) {
             $query->where('student_id', $student->id)
-                  ->where('status', 'referred');
+                  ->whereNotNull('referred_to_counselor_id')
+                  ->where('status', 'completed');
         })
         ->get()
         ->unique(function ($counselor) {
@@ -1608,8 +1581,9 @@ public function refer(Request $request, Appointment $appointment)
         }
     }
 
-    $referralNote = "REFERRAL REQUESTED by {$counselor->user->first_name} {$counselor->user->last_name} on " .
-        now()->toDateTimeString() . "\nProposed schedule: " . $date->format('Y-m-d') . " {$request->start_time} - {$endTime}";
+    $referralNote = "REFERRED by {$counselor->user->first_name} {$counselor->user->last_name} on " .
+        now()->toDateTimeString() . "\nSchedule: " . $date->format('Y-m-d') . " {$request->start_time} - {$endTime}" .
+        "\nAuto-approved — awaiting student acceptance.";
 
     if ($request->filled('referral_reason')) {
         $referralNote .= "\nReason: " . $request->input('referral_reason');
@@ -1629,7 +1603,7 @@ public function refer(Request $request, Appointment $appointment)
             'endDateTime' => $slotEndDateTime,
         ];
 
-        // Try to create calendar event — non-fatal if calendar not configured
+        // Create calendar event on referred counselor's calendar
         if ($referredCounselor->google_calendar_id) {
             try {
                 $newEvent = $calendarService->createAppointmentEvent($eventData, $referredCounselor->google_calendar_id);
@@ -1642,6 +1616,7 @@ public function refer(Request $request, Appointment $appointment)
             }
         }
 
+        // Remove old calendar event from the referring counselor's calendar
         if ($oldEventId && $appointment->counselor && $appointment->counselor->google_calendar_id) {
             try {
                 $calendarService->deleteEvent($oldEventId, $appointment->counselor->google_calendar_id);
@@ -1650,8 +1625,10 @@ public function refer(Request $request, Appointment $appointment)
             }
         }
 
+        // Transfer ownership to referred counselor immediately — student still accepts/rejects the schedule.
         $appointment->update([
             'status' => 'referred',
+            'counselor_id' => $referredCounselor->id,
             'referred_to_counselor_id' => $referredCounselor->id,
             'referral_reason' => $request->input('referral_reason'),
             'referral_previous_status' => $appointment->status,
@@ -1659,7 +1636,7 @@ public function refer(Request $request, Appointment $appointment)
             'referral_outcome' => null,
             'referral_resolved_at' => null,
             'referral_resolved_by_counselor_id' => null,
-            'original_counselor_id' => $appointment->counselor_id,
+            'original_counselor_id' => $appointment->original_counselor_id ?? $appointment->counselor_id,
             'proposed_date' => $date->toDateString(),
             'proposed_start_time' => $request->start_time,
             'proposed_end_time' => $endTime,
@@ -1671,7 +1648,7 @@ public function refer(Request $request, Appointment $appointment)
     } catch (\Throwable $exception) {
         DB::rollBack();
 
-        Log::error('Failed to process referral request', [
+        Log::error('Failed to process referral', [
             'counselor_id' => $counselor->id,
             'appointment_id' => $appointment->id,
             'error' => $exception->getMessage(),
@@ -1680,7 +1657,7 @@ public function refer(Request $request, Appointment $appointment)
         return redirect()->back()->with('error', 'Failed to process referral. Please try again.');
     }
 
-    // Notify student of referral
+    // Notify student — they need to accept or reject the new schedule
     try {
         $appointment->load(['student.user', 'counselor.user', 'referredCounselor.user', 'originalCounselor.user']);
         Mail::to($appointment->student->user->email)->send(new AppointmentReferred($appointment));
@@ -1689,7 +1666,7 @@ public function refer(Request $request, Appointment $appointment)
         Log::warning('Failed to send referral notification email', ['error' => $e->getMessage()]);
     }
 
-    // Notify referred-to counselor of the new assignment
+    // Notify referred-to counselor — informational only, no action needed from them
     try {
         $appointment->loadMissing(['student.user', 'referredCounselor.user', 'originalCounselor.user']);
         Mail::to($appointment->referredCounselor->user->email)->send(new AppointmentReferredToCounselor($appointment));
@@ -1698,7 +1675,7 @@ public function refer(Request $request, Appointment $appointment)
         Log::warning('Failed to send referral-to-counselor notification email', ['error' => $e->getMessage()]);
     }
 
-    return redirect()->back()->with('success', 'Referral request sent successfully.')->withErrors([]);
+    return redirect()->back()->with('success', 'Referral sent. The student will be notified to accept or reject.')->withErrors([]);
 }
 
 public function acceptReschedule(Request $request, Appointment $appointment)
@@ -1994,8 +1971,8 @@ public function acceptReferral(Request $request, Appointment $appointment)
     }
 
     $referredCounselor = Counselor::find($appointment->referred_to_counselor_id);
-    if (!$referredCounselor || !$referredCounselor->google_calendar_id) {
-        return redirect()->back()->with('error', 'Referred counselor calendar is not configured.');
+    if (!$referredCounselor) {
+        return redirect()->back()->with('error', 'Referred counselor not found.');
     }
 
     $date = Carbon::parse($appointment->proposed_date);
@@ -2003,6 +1980,7 @@ public function acceptReferral(Request $request, Appointment $appointment)
     $endTime = $appointment->proposed_end_time;
 
     $referredCounselorIds = $this->getCounselorAssignmentIds($referredCounselor);
+
     if ($this->isDateClosed($referredCounselor, $date)) {
         return redirect()->back()->with('error', 'The referred counselor is not available on the selected date.');
     }
@@ -2042,7 +2020,7 @@ public function acceptReferral(Request $request, Appointment $appointment)
                 return redirect()->back()->with('error', 'The proposed time is no longer available.');
             }
         } catch (\Throwable $exception) {
-            Log::warning('Google Calendar check skipped for referral accept � falling back to DB-only', [
+            Log::warning('Google Calendar check skipped for referral accept — falling back to DB-only', [
                 'counselor_id' => $referredCounselor->id,
                 'appointment_id' => $appointment->id,
                 'error' => $exception->getMessage(),
@@ -2051,21 +2029,47 @@ public function acceptReferral(Request $request, Appointment $appointment)
     }
 
     $acceptNote = "REFERRAL ACCEPTED by student on " . now()->toDateTimeString() .
-        "\nNew schedule: " . $date->format('Y-m-d') . " {$startTime} - {$endTime}";
+        "\nNew schedule: " . $date->format('Y-m-d') . " {$startTime} - {$endTime}" .
+        "\nAuto-approved — no further counselor acceptance required.";
 
-    $appointment->update([
-        'counselor_id' => $referredCounselor->id,
-        'appointment_date' => $date->toDateString(),
-        'start_time' => $startTime,
-        'end_time' => $endTime,
-        'status' => 'pending',
-        'notes' => ($appointment->notes ? $appointment->notes . "\n\n" : '') . $acceptNote,
-        'proposed_date' => null,
-        'proposed_start_time' => null,
-        'proposed_end_time' => null,
-        'referral_previous_status' => null,
-        'referral_requested_at' => null,
-    ]);
+    DB::beginTransaction();
+    $newEvent = null;
+
+    try {
+        $oldEventId = $appointment->google_calendar_event_id;
+        $originalCounselor = $appointment->originalCounselor ?? $appointment->counselor;
+
+        // Calendar event was already created on the referred counselor's calendar when the referral was made.
+        // Just confirm the appointment — no new event needed, nothing to delete.
+        $newEvent = null;
+
+        // Student acceptance is the final step — appointment is now approved.
+        $appointment->update([
+            'counselor_id' => $referredCounselor->id,
+            'appointment_date' => $date->toDateString(),
+            'start_time' => $startTime,
+            'end_time' => $endTime,
+            'status' => 'approved',
+            'notes' => ($appointment->notes ? $appointment->notes . "\n\n" : '') . $acceptNote,
+            'proposed_date' => null,
+            'proposed_start_time' => null,
+            'proposed_end_time' => null,
+            'referral_previous_status' => null,
+            'referral_requested_at' => null,
+            'referral_outcome' => 'accepted',
+            'referral_resolved_at' => now(),
+            'referral_resolved_by_counselor_id' => null,
+        ]);
+
+        DB::commit();
+    } catch (\Throwable $exception) {
+        DB::rollBack();
+        Log::error('Failed to accept referral by student', [
+            'appointment_id' => $appointment->id,
+            'error' => $exception->getMessage(),
+        ]);
+        return redirect()->back()->with('error', 'Failed to accept referral. Please try again.');
+    }
 
     // Notify original counselor that student accepted referral
     try {
@@ -2079,10 +2083,19 @@ public function acceptReferral(Request $request, Appointment $appointment)
         Mail::to($notifyEmail)->send(new ReferralResponse($appointment, 'accepted', 'student'));
         $notifyUser->notify(new ReferralResponseNotification($appointment, 'accepted', 'student'));
     } catch (\Throwable $e) {
-        Log::warning('Failed to send referral-accepted email', ['error' => $e->getMessage()]);
+        Log::warning('Failed to send referral-accepted email to original counselor', ['error' => $e->getMessage()]);
     }
 
-    return redirect()->back()->with('success', 'Referral accepted. Your appointment has been updated.');
+    // Notify the referred counselor that they have a new approved appointment
+    try {
+        $appointment->loadMissing(['student.user', 'counselor.user']);
+        Mail::to($appointment->counselor->user->email)->send(new AppointmentStatusChanged($appointment));
+        $appointment->counselor->user->notify(new AppointmentStatusChangedNotification($appointment));
+    } catch (\Throwable $e) {
+        Log::warning('Failed to notify referred counselor of accepted referral', ['error' => $e->getMessage()]);
+    }
+
+    return redirect()->back()->with('success', 'Referral accepted. Your appointment is now approved with the new counselor.');
 }
 
 public function rejectReferral(Request $request, Appointment $appointment)
@@ -2130,27 +2143,33 @@ public function rejectReferral(Request $request, Appointment $appointment)
         'notes' => ($appointment->notes ? $appointment->notes . "\n\n" : '') . $rejectNote,
         'cancellation_reason' => $request->cancellation_reason,
         'google_calendar_event_id' => null,
-        'referred_to_counselor_id' => null,
-        'referral_reason' => null,
-        'referral_previous_status' => null,
-        'referral_requested_at' => null,
-        'original_counselor_id' => null,
+        // Preserve referral fields so both counselors retain history visibility
+        'referral_outcome' => 'rejected',
+        'referral_resolved_at' => now(),
         'proposed_date' => null,
         'proposed_start_time' => null,
         'proposed_end_time' => null,
     ]);
 
-    // Notify original counselor that student rejected referral
+    // Notify both the original counselor and the referred counselor that the student rejected
     try {
         $appointment->load(['student.user', 'counselor.user', 'originalCounselor.user']);
-        $notifyEmail = $appointment->originalCounselor
-            ? $appointment->originalCounselor->user->email
-            : $appointment->counselor->user->email;
-        $notifyUser = $appointment->originalCounselor
-            ? $appointment->originalCounselor->user
-            : $appointment->counselor->user;
-        Mail::to($notifyEmail)->send(new ReferralResponse($appointment, 'rejected', 'student'));
-        $notifyUser->notify(new ReferralResponseNotification($appointment, 'rejected', 'student'));
+
+        // Notify original counselor
+        $originalCounselor = $appointment->originalCounselor;
+        if ($originalCounselor?->user) {
+            $originalName = $originalCounselor->user->first_name . ' ' . $originalCounselor->user->last_name;
+            Mail::to($originalCounselor->user->email)->send(new ReferralResponse($appointment, 'rejected', 'student', $originalName));
+            $originalCounselor->user->notify(new ReferralResponseNotification($appointment, 'rejected', 'student'));
+        }
+
+        // Notify referred counselor (current counselor_id after referral transfer)
+        $referredCounselor = $appointment->counselor;
+        if ($referredCounselor?->user && $referredCounselor->id !== $originalCounselor?->id) {
+            $referredName = $referredCounselor->user->first_name . ' ' . $referredCounselor->user->last_name;
+            Mail::to($referredCounselor->user->email)->send(new ReferralResponse($appointment, 'rejected', 'student', $referredName));
+            $referredCounselor->user->notify(new ReferralResponseNotification($appointment, 'rejected', 'student'));
+        }
     } catch (\Throwable $e) {
         Log::warning('Failed to send referral-rejected email', ['error' => $e->getMessage()]);
     }

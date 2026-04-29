@@ -10,16 +10,56 @@ use Illuminate\Support\Facades\Storage;
 
 class AdminResourceController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
         $user = Auth::user();
         if (!$user || $user->role !== 'admin') {
             return redirect()->route('login');
         }
 
-        $resources = Resource::with('user')->ordered()->get();
+        $search = $request->string('search')->trim()->toString();
+        $category = $request->string('category')->trim()->toString();
+        $status = $request->string('status')->trim()->toString();
+        $pinned = $request->string('pinned')->trim()->toString();
 
-        return view('admin.resources.index', compact('resources'));
+        $query = Resource::query()->with('user');
+
+        if ($search !== '') {
+            $query->where(function ($q) use ($search) {
+                $q->where('title', 'like', "%{$search}%")
+                  ->orWhere('description', 'like', "%{$search}%")
+                  ->orWhere('button_text', 'like', "%{$search}%");
+            });
+        }
+
+        if ($category !== '' && $category !== 'all') {
+            $query->where('category', $category);
+        }
+
+        if ($status === 'active') {
+            $query->where('is_active', true);
+        } elseif ($status === 'inactive') {
+            $query->where('is_active', false);
+        }
+
+        if ($pinned === 'pinned') {
+            $query->where('is_pinned', true);
+        } elseif ($pinned === 'unpinned') {
+            $query->where('is_pinned', false);
+        }
+
+        $resources = $query->ordered()->paginate(10)->appends($request->query());
+
+        $categories = Resource::getCategories();
+
+        return view('admin.resources.index', compact(
+            'resources',
+            'search',
+            'category',
+            'status',
+            'pinned',
+            'categories'
+        ));
     }
 
     public function create()
@@ -74,6 +114,7 @@ class AdminResourceController extends Controller
         $validated['is_active'] = $request->has('is_active');
         $validated['use_yt_thumbnail'] = $request->has('use_yt_thumbnail');
         $validated['show_disclaimer'] = $request->has('show_disclaimer');
+        $validated['is_pinned'] = $request->has('is_pinned');
 
         if ($request->hasFile('image')) {
             $validated['image_path'] = $request->file('image')->store('resources', 'public');
@@ -135,6 +176,7 @@ class AdminResourceController extends Controller
         $validated['is_active'] = $request->has('is_active');
         $validated['use_yt_thumbnail'] = $request->has('use_yt_thumbnail');
         $validated['show_disclaimer'] = $request->has('show_disclaimer');
+        $validated['is_pinned'] = $request->has('is_pinned');
 
         if ($request->hasFile('image')) {
             if ($resource->image_path) {
@@ -190,6 +232,18 @@ class AdminResourceController extends Controller
             'success' => true,
             'message' => "Resource {$status} successfully!",
             'resource' => $resource
+        ]);
+    }
+    public function togglePin(Resource $resource)
+    {
+        $resource->update(['is_pinned' => !$resource->is_pinned]);
+
+        $state = $resource->is_pinned ? 'pinned' : 'unpinned';
+
+        return response()->json([
+            'success' => true,
+            'is_pinned' => $resource->is_pinned,
+            'message' => "Resource {$state} successfully!",
         ]);
     }
 }

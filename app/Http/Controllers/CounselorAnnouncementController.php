@@ -181,6 +181,16 @@ if ($request->hasFile('image')) {
         return redirect()->route('counselor.announcements.index')
             ->with('success', "Announcement {$status} successfully.");
     }
+    public function togglePin(Announcement $announcement)
+    {
+        $announcement->update(['is_pinned' => !$announcement->is_pinned]);
+
+        return response()->json([
+            'success' => true,
+            'is_pinned' => $announcement->is_pinned,
+            'message' => $announcement->is_pinned ? 'Announcement pinned.' : 'Announcement unpinned.',
+        ]);
+    }
 
     public function complete(Announcement $announcement)
     {

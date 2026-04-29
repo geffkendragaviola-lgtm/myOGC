@@ -51,16 +51,6 @@
         <!-- Search & Filter Card -->
         <div class="panel-card mb-5 sm:mb-6">
             <div class="panel-topline"></div>
-            <div class="panel-header">
-                <div class="panel-header-icon">
-                    <i class="fas fa-sliders text-[10px] sm:text-xs"></i>
-                </div>
-                <div>
-                    <h2 class="panel-title">Search and Filter</h2>
-                    <p class="panel-subtitle hidden sm:block">Find counselors by name, email, position, credentials, or college.</p>
-                </div>
-            </div>
-
             <div class="p-3 sm:p-4">
                 <form method="GET" class="flex flex-col md:flex-row gap-3">
                     <div class="flex-1 min-w-0">
@@ -214,19 +204,7 @@
             <!-- Enhanced Pagination Section -->
             @if($counselors->hasPages())
             <div class="px-4 sm:px-5 py-3 sm:py-3.5 border-t border-[#e5e0db]/60 bg-[#faf8f5]/40">
-                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-                    <div class="flex items-center gap-2 text-[10px] sm:text-xs text-[#8b7e76]">
-                        <i class="fas fa-database text-[#a89f97]"></i>
-                        <span>
-                            Showing 
-                            <span class="font-semibold text-[#2c2420]">{{ $counselors->firstItem() ?? 0 }}</span>
-                            to
-                            <span class="font-semibold text-[#2c2420]">{{ $counselors->lastItem() ?? 0 }}</span>
-                            of
-                            <span class="font-semibold text-[#2c2420]">{{ $counselors->total() }}</span>
-                            results
-                        </span>
-                    </div>
+                <div class="flex items-center justify-center">
                     <div class="pagination-wrap flex items-center gap-2 justify-center">
                         {{ $counselors->appends(request()->query())->links() }}
                     </div>
@@ -234,50 +212,22 @@
             </div>
 
             <style>
-                .pagination-wrap nav {
-                    display: inline-flex;
+                .pagination-wrap nav { display: inline-flex; }
+                .pagination-wrap .relative { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
+                .pagination-wrap span, .pagination-wrap a {
+                    display: inline-flex; align-items: center; justify-content: center;
+                    min-width: 28px; height: 28px; padding: 0 8px; border-radius: 8px;
+                    font-size: 11px; font-weight: 600; transition: all 0.2s ease;
                 }
-
-                .pagination-wrap .relative {
-                    display: flex;
-                    gap: 6px;
-                    align-items: center;
-                    flex-wrap: wrap;
-                }
-
-                .pagination-wrap span,
-                .pagination-wrap a {
-                    display: inline-flex;
-                    align-items: center;
-                    justify-content: center;
-                    min-width: 28px;
-                    height: 28px;
-                    padding: 0 8px;
-                    border-radius: 8px;
-                    font-size: 11px;
-                    font-weight: 600;
-                    transition: all 0.2s ease;
-                }
-
                 .pagination-wrap span[aria-current="page"] span {
-                    background: linear-gradient(135deg, #5c1a1a 0%, #7a2a2a 55%, #d4af37 100%);
+                    background: #5c1a1a;
                     color: white;
-                    box-shadow: 0 4px 10px rgba(92, 26, 26, 0.2);
                 }
-
                 .pagination-wrap a {
-                    background: white;
-                    color: #6b5e57;
-                    border: 1px solid #e5e0db;
-                    box-shadow: 0 1px 3px rgba(44, 36, 32, 0.04);
+                    background: white; color: #6b5e57; border: 1px solid #e5e0db;
                 }
-
                 .pagination-wrap a:hover {
-                    background: #fdf2f2;
-                    color: #5c1a1a;
-                    border-color: #d4af37/40;
-                    transform: translateY(-1px);
-                    box-shadow: 0 4px 8px rgba(92, 26, 26, 0.08);
+                    background: #fdf2f2; color: #5c1a1a; border-color: rgba(212, 175, 55, 0.4);
                 }
             </style>
             @else

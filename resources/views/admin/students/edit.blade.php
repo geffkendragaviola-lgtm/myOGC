@@ -132,7 +132,7 @@
     <div class="edit-student-glow one"></div>
     <div class="edit-student-glow two"></div>
 
-    <div class="relative max-w-5xl mx-auto px-4 sm:px-6 py-5 md:py-8">
+    <div class="relative max-w-7xl mx-auto px-4 sm:px-6 py-5 md:py-8">
         <!-- Header -->
         <div class="mb-5 sm:mb-6">
             <div class="grid grid-cols-1 xl:grid-cols-[1fr_auto] gap-4 items-stretch">
