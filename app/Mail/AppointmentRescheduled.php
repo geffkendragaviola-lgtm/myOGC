@@ -17,7 +17,7 @@ class AppointmentRescheduled extends Mailable
 
     public function envelope(): Envelope
     {
-        return new Envelope(subject: 'Reschedule Request - ' . $this->appointment->case_number);
+        return new Envelope(subject: 'Reschedule Request');
     }
 
     public function content(): Content

@@ -27,7 +27,7 @@ class AppointmentStatusChanged extends Mailable
             'completed' => 'Appointment Completed',
         ];
 
-        $subject = ($labels[$this->newStatus] ?? 'Appointment Update') . ' - ' . $this->appointment->case_number;
+        $subject = ($labels[$this->newStatus] ?? 'Appointment Update');
 
         return new Envelope(subject: $subject);
     }

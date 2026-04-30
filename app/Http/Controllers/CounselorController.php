@@ -168,7 +168,7 @@ public function students(Request $request)
 
     $students = $query
         ->orderBy('student_id')
-        ->paginate(15)
+        ->paginate(10)
         ->appends($request->query());
 
     $assignedColleges = College::query()
@@ -425,7 +425,7 @@ public function appointments(Request $request)
 
     $appointments = $baseQuery->orderBy('appointment_date', 'desc')
         ->orderBy('start_time', 'desc')
-        ->paginate(15);
+        ->paginate(10);
 
     $stats = [
         'total' => (clone $statsQuery)->count(),

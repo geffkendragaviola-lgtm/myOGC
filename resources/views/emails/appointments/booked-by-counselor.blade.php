@@ -7,14 +7,10 @@
     </div>
     <div style="border: 1px solid #e5e7eb; border-top: none; padding: 24px; border-radius: 0 0 8px 8px;">
         <p>Hello, <strong>{{ $appointment->student->user->first_name }} {{ $appointment->student->user->last_name }}</strong>,</p>
-        <p>Your counselor has scheduled an appointment for you. The appointment is already approved.</p>
+        <p>Your appointment has been approved on <strong>{{ \Carbon\Carbon::parse($appointment->appointment_date)->format('F d, Y') }}</strong> at <strong>{{ \Carbon\Carbon::parse($appointment->start_time)->format('h:i A') }} – {{ \Carbon\Carbon::parse($appointment->end_time)->format('h:i A') }}</strong>. Please log in to the system to view your appointment details.</p>
 
         <table style="width: 100%; border-collapse: collapse; margin: 16px 0;">
             <tr style="background: #f9fafb;">
-                <td style="padding: 10px; border: 1px solid #e5e7eb; font-weight: bold; width: 40%;">Case Number</td>
-                <td style="padding: 10px; border: 1px solid #e5e7eb;">{{ $appointment->case_number }}</td>
-            </tr>
-            <tr>
                 <td style="padding: 10px; border: 1px solid #e5e7eb; font-weight: bold;">Counselor</td>
                 <td style="padding: 10px; border: 1px solid #e5e7eb;">
                     {{ $appointment->counselor->user->first_name }} {{ $appointment->counselor->user->last_name }}

@@ -421,24 +421,8 @@
 
             <!-- Pagination -->
             @if($announcements->hasPages())
-            <div class="pagination-shell">
-                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-                    <div class="flex items-center gap-2 text-[10px] sm:text-xs text-[#8b7e76]">
-                        <i class="fas fa-database text-[#a89f97]"></i>
-                        <span>Showing
-                            <span class="font-semibold text-[#2c2420]">{{ $announcements->firstItem() ?? 0 }}</span>
-                            to
-                            <span class="font-semibold text-[#2c2420]">{{ $announcements->lastItem() ?? 0 }}</span>
-                            of
-                            <span class="font-semibold text-[#2c2420]">{{ $announcements->total() }}</span>
-                            results
-                        </span>
-                    </div>
-
-                    <div class="flex flex-wrap items-center justify-center gap-2">
-                        {{ $announcements->links('vendor.pagination.tailwind') }}
-                    </div>
-                </div>
+            <div class="px-4 sm:px-5 py-3 border-t border-[#e5e0db]/60 bg-[#faf8f5]/40">
+                {{ $announcements->appends(request()->query())->links('vendor.pagination.counselor-resources') }}
             </div>
             @endif
         </div>

@@ -128,7 +128,30 @@
     .calendar-card {
         border: 1px solid var(--border-soft); border-radius: 0.75rem;
         background: white; padding: 1rem;
+        position: relative;
     }
+
+    .calendar-loading-overlay {
+        position: absolute; inset: 0; border-radius: 0.75rem;
+        background: rgba(255,255,255,0.85); backdrop-filter: blur(3px);
+        display: flex; flex-direction: column; align-items: center; justify-content: center;
+        gap: 0.6rem; z-index: 10; opacity: 0; pointer-events: none;
+        transition: opacity 0.2s ease;
+    }
+    .calendar-loading-overlay.visible {
+        opacity: 1; pointer-events: all;
+    }
+    .calendar-loading-spinner {
+        width: 2rem; height: 2rem; border-radius: 50%;
+        border: 3px solid rgba(92,26,26,0.15);
+        border-top-color: var(--maroon-700);
+        animation: spin 0.7s linear infinite;
+    }
+    .calendar-loading-text {
+        font-size: 0.75rem; font-weight: 600; color: var(--maroon-700);
+        letter-spacing: 0.02em;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
     .calendar-header {
         display: flex; align-items: center; justify-content: space-between;
         margin-bottom: 0.75rem;
@@ -172,7 +195,7 @@
     .calendar-status {
         margin-top: 0.5rem; font-size: 0.7rem; color: var(--text-muted);
     }
-    .calendar-status.success { color: #065f46; }
+    .calendar-status.success { color: var(--maroon-700); }
     .calendar-status.error { color: #b91c1c; }
 
     .time-slots-grid {
@@ -205,7 +228,7 @@
     .modal-card {
         background: white; border-radius: 0.75rem; border: 1px solid var(--border-soft);
         box-shadow: 0 8px 32px rgba(44,36,32,0.12); max-width: 42rem; width: 100%;
-        overflow: hidden; display: flex; flex-direction: column; max-height: 90vh;
+        overflow: hidden; display: flex; flex-direction: column; max-height: 70vh;
     }
     .modal-header {
         display: flex; align-items: center; justify-content: space-between;
@@ -242,7 +265,7 @@
     .modal-hint {
         font-size: 0.7rem; color: var(--text-muted); text-align: center;
     }
-    .modal-hint.success { color: #065f46; }
+    .modal-hint.success { color: var(--text-muted); }
 
     .field-help {
         font-size: 0.7rem; color: var(--text-muted); margin-top: 0.35rem;
@@ -484,7 +507,7 @@
     .field-label { display:flex; align-items:center; gap:0.4rem; font-size:0.72rem; font-weight:600; color:var(--text-secondary); margin-bottom:0.4rem; text-transform:uppercase; letter-spacing:0.06em; }
     .field-icon { font-size:0.7rem; color:var(--maroon-700); }
     .field-help { font-size:0.7rem; color:var(--text-muted); margin-top:0.35rem; }
-    .success-help { color:#065f46; font-weight:500; }
+    .success-help { color: var(--maroon-700); font-weight: 700; font-size: 0.95rem; }
 
     /* Type radio cards */
     .type-radio-card { cursor:pointer; }
@@ -635,10 +658,12 @@
                                     <input type="radio" name="counselor_type" value="college" checked class="counselor-type-radio sr-only">
                                     <div class="type-radio-inner"><i class="fas fa-building-columns"></i><span>{{ ($allowAllCounselors ?? false) ? 'All Colleges' : 'My College' }}</span></div>
                                 </label>
+                                @if($hasReferredCounselors ?? false)
                                 <label class="type-radio-card" id="referredCounselorOption">
                                     <input type="radio" name="counselor_type" value="referred" class="counselor-type-radio sr-only">
                                     <div class="type-radio-inner"><i class="fas fa-user-check"></i><span>Previously Referred</span></div>
                                 </label>
+                                @endif
                             </div>
                         </div>
                         <div class="field-wrap">
@@ -785,6 +810,10 @@
                             <div>
                                 <label class="field-label mb-2"><i class="fas fa-calendar field-icon"></i> Select Date</label>
                                 <div id="appointmentCalendar" class="calendar-card">
+                                    <div id="calendarLoadingOverlay" class="calendar-loading-overlay">
+                                        <div class="calendar-loading-spinner"></div>
+                                        <span class="calendar-loading-text">Checking available dates…</span>
+                                    </div>
                                     <div class="calendar-header">
                                         <button type="button" id="calendarPrev" class="calendar-nav-btn" aria-label="Previous month">‹</button>
                                         <h3 id="calendarMonthLabel" class="calendar-month"></h3>
@@ -977,6 +1006,15 @@ document.addEventListener('DOMContentLoaded', function() {
     const studentInitialInterviewCompleted = {!! json_encode(optional($student)->initial_interview_completed) !!};
     const hasInitialInterviewAppointment = {!! json_encode($hasInitialInterviewAppointment ?? false) !!};
     const allowAllCounselors = {!! json_encode($allowAllCounselors ?? false) !!};
+    const referredCounselorsData = {!! json_encode(($referredCounselors ?? collect())->map(fn($c) => [
+        'id' => $c->id,
+        'name' => $c->user->first_name . ' ' . $c->user->last_name,
+        'position' => $c->position,
+        'college' => $c->college->name ?? 'N/A',
+        'college_id' => $c->college_id,
+        'is_referred' => true,
+        'display_text' => $c->user->first_name . ' ' . $c->user->last_name . ' - ' . $c->position . ' (' . ($c->college->name ?? 'N/A') . ') - Previously Referred',
+    ])->values()) !!};
 
     let currentSelectedSlot = null;
     const minDate = new Date();
@@ -1289,7 +1327,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 dateSelect.value = formatDateValue(date);
                 selectedTime.value = '';
                 currentSelectedSlot = null;
-                setCalendarStatus(`Selected date: ${date.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}`, 'success');
+                setCalendarStatus('', 'success');
                 renderCalendar();
                 loadAvailableSlots();
             });
@@ -1303,13 +1341,18 @@ document.addEventListener('DOMContentLoaded', function() {
         availabilityByDate = new Map();
         renderCalendar();
 
+        const overlay = document.getElementById('calendarLoadingOverlay');
+
         if (!counselorId) {
             setCalendarStatus('Select a counselor to load available dates.');
+            overlay?.classList.remove('visible');
             return;
         }
 
         const requestId = ++availabilityRequestId;
-        setCalendarStatus('Checking available dates...');
+        setCalendarStatus('');
+        overlay?.classList.add('visible');
+
         const monthValue = `${currentMonth.getFullYear()}-${String(currentMonth.getMonth() + 1).padStart(2, '0')}`;
 
         try {
@@ -1323,6 +1366,8 @@ document.addEventListener('DOMContentLoaded', function() {
         } catch (error) {
             if (requestId !== availabilityRequestId) return;
         }
+
+        overlay?.classList.remove('visible');
 
         if (requestId !== availabilityRequestId) return;
 
@@ -1348,21 +1393,11 @@ document.addEventListener('DOMContentLoaded', function() {
 
         if (type === 'college') {
             populateCounselorSelect(collegeCounselors);
-            counselorLoading.classList.add('hidden');
         } else {
-            fetch('/appointments/referred-counselors')
-                .then(response => response.json())
-                .then(data => {
-                    populateCounselorSelect(data);
-                    counselorLoading.classList.add('hidden');
-                })
-                .catch(error => {
-                    console.error('Error loading referred counselors:', error);
-                    counselorLoading.classList.add('hidden');
-                    counselorSelect.innerHTML = '<option value="">Error loading counselors</option>';
-                    showSystemAlert('Unable to load referred counselors right now. Please try again.', 'error', 'Loading failed');
-                });
+            // Use pre-loaded server-side data — no AJAX needed
+            populateCounselorSelect(referredCounselorsData);
         }
+        counselorLoading.classList.add('hidden');
     }
 
     function populateCounselorSelect(counselors) {
@@ -1388,7 +1423,7 @@ document.addEventListener('DOMContentLoaded', function() {
             counselorSelect.value = onlyCounselor.id;
             counselorSelect.disabled = true;
             counselorSelect.classList.add('hidden');
-            counselorAutoAssigned.textContent = `Assigned counselor: ${onlyCounselor.display_text || onlyCounselor.name}`;
+            counselorAutoAssigned.textContent = `${onlyCounselor.display_text || onlyCounselor.name}`;
             counselorAutoAssigned.classList.remove('hidden');
             counselorAutoAssignedInput.value = onlyCounselor.id;
             loadMonthAvailability();
@@ -1430,25 +1465,8 @@ document.addEventListener('DOMContentLoaded', function() {
     function checkReferredCounselorsAvailability() {
         if (allowAllCounselors) {
             counselorTypeWrapper?.classList.add('hidden');
-            return;
         }
-        fetch('/appointments/referred-counselors')
-            .then(response => response.json())
-            .then(data => {
-                if (!Array.isArray(data) || data.length === 0) {
-                    const referredRadio = referredCounselorOption?.querySelector('input[type="radio"]');
-                    if (referredRadio) {
-                        referredRadio.disabled = true;
-                        referredRadio.checked = false;
-                    }
-                    referredCounselorOption?.classList.add('opacity-50', 'cursor-not-allowed');
-                    referredCounselorOption?.setAttribute('title', 'No referred counselors available');
-                    counselorTypeWrapper?.classList.add('hidden');
-                } else {
-                    counselorTypeWrapper?.classList.remove('hidden');
-                }
-            })
-            .catch(() => {});
+        // Button visibility is already handled server-side — nothing to do here
     }
 
     function loadAvailableSlots() {

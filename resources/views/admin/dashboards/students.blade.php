@@ -63,27 +63,18 @@
             </div>
 
             <div class="p-3 sm:p-4">
-                <div class="college-linear-wrap">
+                <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-2 sm:gap-3">
                     @foreach(($studentsPerCollege ?? []) as $collegeStat)
+                        @php
+                            $abbr = collect(explode(' ', $collegeStat->name))->map(fn($w) => strtoupper($w[0] ?? ''))->filter()->implode('');
+                            $isActive = (string)($college ?? '') === (string)$collegeStat->id;
+                        @endphp
                         <a href="{{ route('admin.students', array_filter(['search' => $search, 'college' => $collegeStat->id])) }}"
-                           class="college-linear-card group">
-                            <div class="min-w-0 flex-1">
-                                <div class="text-xs sm:text-sm font-semibold text-[#2c2420] group-hover:text-[#7a2a2a] transition leading-snug truncate">
-                                    {{ $collegeStat->name }}
-                                </div>
-                                <div class="text-[10px] sm:text-xs text-[#8b7e76] mt-0.5">
-                                    {{ $collegeStat->students_count }} student{{ $collegeStat->students_count == 1 ? '' : 's' }}
-                                </div>
-                            </div>
-
-                            <div class="college-linear-right">
-                                <span class="college-count-pill">
-                                    {{ $collegeStat->students_count }}
-                                </span>
-                                <span class="college-arrow">
-                                    <i class="fas fa-chevron-right text-[9px] sm:text-[10px] transition-transform group-hover:translate-x-0.5"></i>
-                                </span>
-                            </div>
+                           class="college-stat-card group {{ $isActive ? 'college-stat-active' : '' }}">
+                            <div class="college-stat-abbr">{{ $abbr }}</div>
+                            <div class="college-stat-count">{{ $collegeStat->students_count }}</div>
+                            <div class="college-stat-name">{{ $collegeStat->name }}</div>
+                            <div class="college-stat-label">student{{ $collegeStat->students_count == 1 ? '' : 's' }}</div>
                         </a>
                     @endforeach
                 </div>
@@ -100,7 +91,7 @@
                         <div class="relative">
                             <i class="fas fa-search absolute left-3 sm:left-3.5 top-1/2 -translate-y-1/2 text-[#a89f97] text-[10px] sm:text-xs"></i>
                             <input type="text" name="search" value="{{ $search }}"
-                                   placeholder="Search student ID, name, email, course..."
+                                   placeholder="    Search student ID, name, email, course..."
                                    class="input-field w-full pl-8 sm:pl-9 pr-3 py-2 sm:py-2.5 text-xs sm:text-sm">
                         </div>
                     </div>
@@ -497,65 +488,64 @@
         margin-top: 0.1rem;
     }
 
-    .college-linear-wrap {
+    .college-stat-card {
         display: flex;
-        flex-wrap: wrap;
-        gap: 0.6rem;
-    }
-
-    .college-linear-card {
-        display: flex;
+        flex-direction: column;
         align-items: center;
-        justify-content: space-between;
-        gap: 0.85rem;
-        min-width: 0;
-        flex: 1 1 220px;
-        padding: 0.7rem 0.85rem;
-        border-radius: 0.75rem;
+        justify-content: center;
+        text-align: center;
+        padding: 1rem 0.75rem;
+        border-radius: 0.85rem;
         border: 1px solid var(--border-soft);
         background: rgba(255,255,255,0.98);
         transition: all 0.2s ease;
         box-shadow: 0 2px 6px rgba(44,36,32,0.03);
+        text-decoration: none;
+        gap: 0.2rem;
     }
-
-    .college-linear-card:hover {
-        border-color: rgba(212,175,55,0.4);
+    .college-stat-card:hover {
+        border-color: rgba(122,42,42,0.25);
         background: rgba(254,249,231,0.6);
-        transform: translateY(-2px);
-        box-shadow: 0 6px 14px rgba(92,26,26,0.05);
+        transform: translateY(-3px);
+        box-shadow: 0 8px 20px rgba(92,26,26,0.08);
     }
-
-    .college-linear-right {
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-        flex-shrink: 0;
+    .college-stat-active {
+        border-color: rgba(122,42,42,0.5) !important;
+        background: linear-gradient(135deg, rgba(92,26,26,0.06), rgba(212,175,55,0.06)) !important;
+        box-shadow: 0 4px 14px rgba(92,26,26,0.1) !important;
     }
-
-    .college-count-pill {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        min-width: 1.75rem;
-        height: 1.75rem;
-        padding: 0 0.45rem;
-        border-radius: 999px;
-        background: #fef9e7;
+    .college-stat-abbr {
+        font-size: 0.65rem;
+        font-weight: 800;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: #7a2a2a;
+        background: rgba(254,249,231,0.8);
         border: 1px solid rgba(212,175,55,0.3);
-        color: #7a5a1a;
-        font-size: 0.7rem;
-        font-weight: 700;
+        border-radius: 999px;
+        padding: 0.15rem 0.55rem;
+        margin-bottom: 0.4rem;
     }
-
-    .college-arrow {
-        width: 1.65rem;
-        height: 1.65rem;
-        border-radius: 0.55rem;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: #c4b8b1;
-        background: #f8fafc;
+    .college-stat-count {
+        font-size: 1.6rem;
+        font-weight: 800;
+        color: #2c2420;
+        line-height: 1;
+    }
+    .college-stat-name {
+        font-size: 0.65rem;
+        font-weight: 600;
+        color: #6b5e57;
+        margin-top: 0.35rem;
+        line-height: 1.3;
+        max-width: 120px;
+    }
+    .college-stat-label {
+        font-size: 0.6rem;
+        color: #8b7e76;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        font-weight: 600;
     }
 
     .input-field {

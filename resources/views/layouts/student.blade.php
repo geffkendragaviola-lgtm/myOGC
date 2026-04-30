@@ -943,8 +943,8 @@
                         Services <i class="fas fa-chevron-down ml-1 text-sm"></i>
                     </button>
                     <div class="dropdown-panel hidden" id="services-dropdown-menu">
-                        <a href="{{ route('bap') }}" class="dropdown-link"><i class="fas fa-calendar-plus mr-2 text-[#8f1d1d]"></i> Book Appointment</a>
-                        <a href="{{ route('mhc') }}" class="dropdown-link"><i class="fas fa-heart-pulse mr-2 text-[#8f1d1d]"></i> Mental Health Corner</a>
+                        <a href="{{ route('bap') }}" class="dropdown-link" style="color: #8f1d1d;">Book Appointment</a>
+                        <a href="{{ route('mhc') }}" class="dropdown-link" style="color: #8f1d1d;">Mental Health Corner</a>
                     </div>
                 </div>
                 <a href="{{ route('feedback') }}" class="nav-link">Feedback</a>
@@ -1291,7 +1291,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
 {{-- Global System Alert Toast --}}
 <div id="layoutAlertStack" style="
-    position:fixed; top:1rem; right:1rem; z-index:9999;
+    position:fixed; top:calc(var(--navbar-h) + 0.75rem); right:1rem; z-index:9999;
     display:flex; flex-direction:column; gap:0.75rem;
     width:min(24rem, calc(100vw - 2rem)); pointer-events:none;
 "></div>
@@ -1449,7 +1449,7 @@ document.addEventListener('DOMContentLoaded', function () {
         to   { transform:scaleX(0); }
     }
     @media (max-width:639px) {
-        #layoutAlertStack { top:0.75rem; left:0.75rem; right:0.75rem; width:auto; }
+        #layoutAlertStack { top:calc(var(--navbar-h) + 0.5rem); left:0.75rem; right:0.75rem; width:auto; }
         .system-alert { padding:0.85rem 0.9rem; }
     }
 </style>

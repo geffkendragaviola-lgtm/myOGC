@@ -132,7 +132,7 @@ public function updateRegistrationStatus(Request $request, Event $event, EventRe
             $query->where('type', $request->type);
         }
 
-        $events = $query->get();
+        $events = $query->paginate(12)->withQueryString();
 
         return view('counselor.events.index', compact('events'));
     }

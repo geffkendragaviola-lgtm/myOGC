@@ -12,13 +12,30 @@ class ResourceController extends Controller
     /**
      * Display a listing of the resources.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $resources = Resource::with('user')
-            ->ordered()
-            ->get();
+        $query = Resource::with('user')->ordered();
 
-        return view('counselor.resources.index', compact('resources'));
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function ($q) use ($search) {
+                $q->where('title', 'like', "%{$search}%")
+                  ->orWhere('description', 'like', "%{$search}%");
+            });
+        }
+
+        if ($request->filled('category')) {
+            $query->where('category', $request->category);
+        }
+
+        if ($request->filled('status') && $request->status !== 'all') {
+            $query->where('is_active', $request->status === 'active');
+        }
+
+        $resources = $query->paginate(10)->appends($request->query());
+        $categories = Resource::getCategories();
+
+        return view('counselor.resources.index', compact('resources', 'categories'));
     }
 
     /**

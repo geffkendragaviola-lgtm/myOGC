@@ -38,35 +38,45 @@
     }
     .hero-badge-dot { width:0.3rem; height:0.3rem; border-radius:999px; background:var(--gold-400); }
     .panel-topline { position:absolute; inset-inline:0; top:0; height:3px; background:linear-gradient(90deg, var(--maroon-800) 0%, var(--gold-400) 50%, var(--maroon-800) 100%); }
-    .an-card { padding:1.25rem; }
+    .an-card { padding:1.5rem; border-radius:1rem; box-shadow:0 4px 18px rgba(44,36,32,0.07); }
+
+    /* Admin analytics compatibility aliases */
+    .analytics-card { padding:1.5rem; }
+    .section-title {
+        font-size:1rem; font-weight:700; color:var(--text-primary);
+        margin-bottom:1rem; display:flex; align-items:center; gap:0.5rem;
+    }
+    .section-title i { color:var(--maroon-700); }
 
     .stat-card {
-        position:relative; overflow:hidden; border-radius:0.75rem;
-        border:1px solid var(--border-soft); background:rgba(255,255,255,0.95);
-        backdrop-filter:blur(8px); box-shadow:0 2px 8px rgba(44,36,32,0.04);
-        padding:1rem 1.1rem; display:flex; align-items:center; gap:0.85rem; transition:box-shadow 0.2s ease;
+        position:relative; overflow:hidden;
+        background:#fff;
+        border:1px solid var(--border-soft);
+        border-radius:1rem;
+        box-shadow:0 4px 18px rgba(44,36,32,0.07);
+        padding:1.25rem 1.5rem;
+        display:flex;
+        align-items:center;
+        gap:1rem;
+        flex-wrap:wrap;
+        transition:box-shadow 0.2s ease;
     }
-    .stat-card:hover { box-shadow:0 4px 14px rgba(44,36,32,0.06); }
+    .stat-card:hover { box-shadow:0 6px 20px rgba(44,36,32,0.09); }
     .stat-card::before { content:""; position:absolute; inset:0; pointer-events:none; background:radial-gradient(circle at top right, rgba(212,175,55,0.06), transparent 30%); }
-    .stat-icon { width:2.5rem; height:2.5rem; border-radius:0.65rem; display:flex; align-items:center; justify-content:center; font-size:1rem; flex-shrink:0; }
+    .stat-icon { width:3rem; height:3rem; border-radius:0.75rem; display:flex; align-items:center; justify-content:center; font-size:1.2rem; flex-shrink:0; }
     .si-maroon { background:linear-gradient(135deg,var(--maroon-700),var(--maroon-800)); color:#fff; }
     .si-gold { background:linear-gradient(135deg,var(--gold-400),var(--gold-500)); color:var(--maroon-900); }
     .si-green { background:linear-gradient(135deg,#2d7a4f,#1e5c38); color:#fff; }
     .si-blue { background:linear-gradient(135deg,#2a5a7a,#1a3c5c); color:#fff; }
     .si-purple { background:linear-gradient(135deg,#6d28d9,#4c1d95); color:#fff; }
     .si-red { background:linear-gradient(135deg,#b91c1c,#991b1b); color:#fff; }
-    .stat-value { font-size:1.4rem; font-weight:800; color:var(--text-primary); line-height:1; }
-    .stat-label { font-size:0.72rem; color:var(--text-secondary); margin-top:0.2rem; }
+    .stat-value { font-size:1.75rem; font-weight:600; color:var(--text-primary); line-height:1; }
+    .stat-label { font-size:0.8rem; color:var(--text-secondary); margin-top:0.2rem; font-weight:500; }
 
-    .sec-title {
-        font-size:0.8rem; font-weight:700; color:var(--text-primary);
-        margin-bottom:1rem; display:flex; align-items:center; gap:0.5rem;
-        text-transform:uppercase; letter-spacing:0.06em;
-        padding-bottom:0.5rem; border-bottom:2px solid rgba(212,175,55,0.3);
-    }
-    .sec-title i { color:var(--maroon-700); font-size:0.75rem; }
+    .sec-title { font-size:1rem; font-weight:700; color:var(--text-primary); margin-bottom:1rem; display:flex; align-items:center; gap:0.5rem; }
+    .sec-title i { color:var(--maroon-700); }
 
-    .filter-bar { padding:1rem 1.25rem; }
+    .filter-bar { padding:1rem 1.25rem; border-radius:1rem; box-shadow:0 2px 10px rgba(44,36,32,0.05); }
     .filter-bar select, .filter-bar input[type=date] {
         border:1px solid var(--border-soft); border-radius:0.6rem;
         padding:0.5rem 0.75rem; font-size:0.8rem; color:var(--text-primary);
@@ -124,6 +134,7 @@
     @media print {
         * { -webkit-print-color-adjust:exact !important; print-color-adjust:exact !important; color-adjust:exact !important; box-sizing:border-box; }
         @page { size:A4 portrait; margin:1.8cm 1.5cm 2.2cm 1.5cm; }
+        @page { @bottom-left { content: "MSU-IIT Office of Guidance and Counseling — Confidential"; font-size:7.5pt; color:#8b7e76; font-family:'Segoe UI', sans-serif; } @bottom-right { content: "Page " counter(page) " of " counter(pages); font-size:7.5pt; color:#8b7e76; font-family:'Segoe UI', sans-serif; } }
         html, body { height:auto !important; min-height:0 !important; }
         body { background:#fff !important; font-size:9.5pt; color:#1a1a1a; font-family:'Segoe UI',Arial,sans-serif; line-height:1.4; width:100%; margin:0 !important; padding:0 !important; }
         .no-print { display:none !important; }

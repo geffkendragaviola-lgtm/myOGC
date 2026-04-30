@@ -17,7 +17,7 @@ class AppointmentReferredToCounselor extends Mailable
 
     public function envelope(): Envelope
     {
-        return new Envelope(subject: 'New Referral Assignment - ' . $this->appointment->case_number);
+        return new Envelope(subject: 'New Referral Assignment');
     }
 
     public function content(): Content

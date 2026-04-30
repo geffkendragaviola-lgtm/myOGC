@@ -21,13 +21,13 @@ class AppointmentReferredNotification extends Notification
     {
         $date      = \Carbon\Carbon::parse($this->appointment->appointment_date)->format('F d, Y');
         $time      = \Carbon\Carbon::parse($this->appointment->start_time)->format('h:i A');
+        $timeEnd   = \Carbon\Carbon::parse($this->appointment->end_time)->format('h:i A');
         $firstName = $this->appointment->student->user->first_name;
 
         return [
             'title'          => 'Appointment Referral',
-            'message'        => "Hi {$firstName}, your appointment on {$date} at {$time} has been referred to another counselor.",
+            'message'        => "Hello {$firstName}, your appointment has been referred on {$date} at {$time} – {$timeEnd}. Please log in to the system to view your appointment details.",
             'appointment_id' => $this->appointment->id,
-            'case_number'    => $this->appointment->case_number,
             'type'           => 'appointment_referred',
         ];
     }

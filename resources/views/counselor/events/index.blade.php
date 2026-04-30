@@ -471,10 +471,14 @@
             </div>
 
             <div class="p-4 sm:p-5 border-t border-[#e5e0db]/60 bg-[#faf8f5]/40">
+                @if($events->hasPages())
+                    {{ $events->appends(request()->query())->links('vendor.pagination.counselor-resources') }}
+                @else
                 <div class="flex items-center justify-center gap-2 text-[10px] sm:text-xs text-[#8b7e76]">
                     <i class="fas fa-circle-check text-[#059669]"></i>
                     <span>Showing all <span class="font-semibold text-[#2c2420]">{{ $events->count() }}</span> events</span>
                 </div>
+                @endif
             </div>
         </div>
 

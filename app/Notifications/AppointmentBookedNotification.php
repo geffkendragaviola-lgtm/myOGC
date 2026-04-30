@@ -25,9 +25,8 @@ class AppointmentBookedNotification extends Notification
 
         return [
             'title'          => 'New Appointment Booking',
-            'message'        => 'A student has booked an appointment. Case #' . $this->appointment->case_number . $suffix,
+            'message'        => 'A student has booked an appointment.' . $suffix,
             'appointment_id' => $this->appointment->id,
-            'case_number'    => $this->appointment->case_number,
             'type'           => 'appointment_booked',
         ];
     }

@@ -147,26 +147,19 @@
 
         <!-- Table -->
         <div class="panel-card overflow-hidden">
-            @if($students->isEmpty())
-                <div class="empty-state">
-                    <div class="empty-state-icon"><i class="fas fa-user-slash"></i></div>
-                    <p class="text-sm font-medium text-[#2c2420]">No students found.</p>
-                    <p class="text-xs text-[#8b7e76] mt-1">Try adjusting your search or college filter.</p>
-                </div>
-            @else
-                <div class="overflow-x-auto">
-                    <table class="w-full min-w-[700px]">
-                        <thead class="bg-[#faf8f5]/80">
-                            <tr>
-                                <th class="px-4 sm:px-5 py-3 text-left text-[10px] sm:text-xs font-semibold text-[#8b7e76] uppercase tracking-wider whitespace-nowrap">Student</th>
-                                <th class="px-4 sm:px-5 py-3 text-left text-[10px] sm:text-xs font-semibold text-[#8b7e76] uppercase tracking-wider whitespace-nowrap">Student ID</th>
-                                <th class="px-4 sm:px-5 py-3 text-left text-[10px] sm:text-xs font-semibold text-[#8b7e76] uppercase tracking-wider whitespace-nowrap">College</th>
-                                <th class="px-4 sm:px-5 py-3 text-left text-[10px] sm:text-xs font-semibold text-[#8b7e76] uppercase tracking-wider whitespace-nowrap">Course / Year</th>
-                                <th class="px-4 sm:px-5 py-3 text-left text-[10px] sm:text-xs font-semibold text-[#8b7e76] uppercase tracking-wider whitespace-nowrap">Last Session</th>
-                            </tr>
-                        </thead>
-                        <tbody class="bg-white divide-y divide-[#e5e0db]/50">
-                            @foreach($students as $student)
+            <div class="overflow-x-auto">
+                <table class="w-full min-w-[700px]">
+                    <thead class="bg-[#faf8f5]/80">
+                        <tr>
+                            <th class="px-4 sm:px-5 py-3 text-left text-[10px] sm:text-xs font-semibold text-[#8b7e76] uppercase tracking-wider whitespace-nowrap">Student</th>
+                            <th class="px-4 sm:px-5 py-3 text-left text-[10px] sm:text-xs font-semibold text-[#8b7e76] uppercase tracking-wider whitespace-nowrap">Student ID</th>
+                            <th class="px-4 sm:px-5 py-3 text-left text-[10px] sm:text-xs font-semibold text-[#8b7e76] uppercase tracking-wider whitespace-nowrap">College</th>
+                            <th class="px-4 sm:px-5 py-3 text-left text-[10px] sm:text-xs font-semibold text-[#8b7e76] uppercase tracking-wider whitespace-nowrap">Course / Year</th>
+                            <th class="px-4 sm:px-5 py-3 text-left text-[10px] sm:text-xs font-semibold text-[#8b7e76] uppercase tracking-wider whitespace-nowrap">Last Session</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-[#e5e0db]/50">
+                        @forelse($students as $student)
                             @php
                                 $stressResponses = $student->needsAssessment?->stress_responses ?? [];
                                 $stressResponses = is_array($stressResponses) ? $stressResponses : [];
@@ -224,16 +217,25 @@
                                     </span>
                                 </td>
                             </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
-                </div>
+                        @empty
+                            <tr>
+                                <td colspan="5">
+                                    <div class="empty-state">
+                                        <div class="empty-state-icon"><i class="fas fa-user-slash"></i></div>
+                                        <p class="text-sm font-medium text-[#2c2420]">No students found.</p>
+                                        <p class="text-xs text-[#8b7e76] mt-1">Try adjusting your search or college filter.</p>
+                                    </div>
+                                </td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
 
-                @if($students->hasPages())
-                <div class="px-4 sm:px-5 py-3 border-t border-[#e5e0db]/60 bg-[#faf8f5]/40">
-                    {{ $students->links() }}
-                </div>
-                @endif
+            @if($students->hasPages())
+            <div class="px-4 sm:px-5 py-3 border-t border-[#e5e0db]/60 bg-[#faf8f5]/40">
+                {{ $students->appends(request()->query())->links('vendor.pagination.counselor-resources') }}
+            </div>
             @endif
         </div>
 

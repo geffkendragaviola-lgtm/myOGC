@@ -26,9 +26,8 @@ class RescheduleResponseNotification extends Notification
 
         return [
             'title'          => $label,
-            'message'        => 'The student has ' . $this->response . ' your reschedule request. Case #' . $this->appointment->case_number,
+            'message'        => 'The student has ' . $this->response . ' your reschedule request.',
             'appointment_id' => $this->appointment->id,
-            'case_number'    => $this->appointment->case_number,
             'response'       => $this->response,
             'type'           => 'reschedule_response',
         ];

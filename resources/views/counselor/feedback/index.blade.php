@@ -326,7 +326,7 @@
 
             @if($feedbacks->hasPages())
             <div class="px-4 sm:px-5 py-3 border-t border-[#e5e0db]/60 bg-[#faf8f5]/40">
-                {{ $feedbacks->links() }}
+                {{ $feedbacks->appends(request()->query())->links('vendor.pagination.counselor-resources') }}
             </div>
             @endif
         </div>

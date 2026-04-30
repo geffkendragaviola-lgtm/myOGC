@@ -197,6 +197,46 @@
             </div>
         </div>
 
+        <!-- Search & Filter -->
+        <div class="panel-card mb-5">
+            <div class="panel-topline"></div>
+            <div class="p-4">
+                <form method="GET" action="{{ route('counselor.resources.index') }}" class="flex flex-col sm:flex-row gap-3 items-end">
+                    <div class="flex-1 min-w-0">
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-[var(--text-muted)] mb-1">Search</label>
+                        <input type="text" name="search" value="{{ request('search') }}"
+                               placeholder="Search by title or description…"
+                               class="w-full border border-[var(--border-soft)] rounded-lg px-3 py-2 text-sm bg-white text-[var(--text-primary)] focus:outline-none focus:border-[var(--maroon-700)] focus:ring-2 focus:ring-[var(--maroon-700)]/10 transition">
+                    </div>
+                    <div class="min-w-[150px]">
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-[var(--text-muted)] mb-1">Category</label>
+                        <select name="category" class="w-full border border-[var(--border-soft)] rounded-lg px-3 py-2 text-sm bg-white text-[var(--text-primary)] focus:outline-none focus:border-[var(--maroon-700)] transition">
+                            <option value="">All Categories</option>
+                            @foreach($categories as $key => $label)
+                                <option value="{{ $key }}" {{ request('category') === $key ? 'selected' : '' }}>{{ $label }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="min-w-[130px]">
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-[var(--text-muted)] mb-1">Status</label>
+                        <select name="status" class="w-full border border-[var(--border-soft)] rounded-lg px-3 py-2 text-sm bg-white text-[var(--text-primary)] focus:outline-none focus:border-[var(--maroon-700)] transition">
+                            <option value="all" {{ request('status', 'all') === 'all' ? 'selected' : '' }}>All</option>
+                            <option value="active" {{ request('status') === 'active' ? 'selected' : '' }}>Active</option>
+                            <option value="inactive" {{ request('status') === 'inactive' ? 'selected' : '' }}>Inactive</option>
+                        </select>
+                    </div>
+                    <div class="flex gap-2">
+                        <button type="submit" class="btn-primary text-xs px-4 py-2">
+                            <i class="fas fa-search mr-1.5 text-[9px]"></i>Search
+                        </button>
+                        <a href="{{ route('counselor.resources.index') }}" class="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg border border-[var(--border-soft)] bg-white text-[var(--text-secondary)] text-xs font-semibold hover:bg-[rgba(254,249,231,0.7)] hover:border-[var(--maroon-700)] transition">
+                            <i class="fas fa-rotate-left text-[9px]"></i>Reset
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+
         <!-- Resources Table -->
         <div class="panel-card overflow-hidden">
             <div class="panel-topline"></div>
@@ -297,6 +337,20 @@
                         </tbody>
                     </table>
                 </div>
+            @endif
+
+            <!-- Pagination -->
+            @if($resources->hasPages())
+            <div class="px-4 sm:px-5 py-3 sm:py-3.5 border-t border-[#e5e0db]/60 bg-[#faf8f5]/40">
+                {{ $resources->appends(request()->query())->links('vendor.pagination.counselor-resources') }}
+            </div>
+            @else
+            <div class="px-4 sm:px-5 py-3 sm:py-3.5 border-t border-[#e5e0db]/60 bg-[#faf8f5]/40">
+                <div class="flex items-center justify-center gap-2 text-[10px] sm:text-xs text-[#8b7e76]">
+                    <i class="fas fa-circle-check text-[#059669]"></i>
+                    <span>Showing all <span class="font-semibold text-[#2c2420]">{{ $resources->count() }}</span> resources</span>
+                </div>
+            </div>
             @endif
         </div>
     </div>

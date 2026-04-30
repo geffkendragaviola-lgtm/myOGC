@@ -24,10 +24,6 @@
                 has <strong>{{ strtolower($label) }}</strong> the referral.
             </p>
             <table style="width: 100%; border-collapse: collapse; margin: 16px 0;">
-                <tr style="background: #f9fafb;">
-                    <td style="padding: 10px; border: 1px solid #e5e7eb; font-weight: bold; width: 40%;">Case Number</td>
-                    <td style="padding: 10px; border: 1px solid #e5e7eb;">{{ $appointment->case_number }}</td>
-                </tr>
                 <tr>
                     <td style="padding: 10px; border: 1px solid #e5e7eb; font-weight: bold;">Student</td>
                     <td style="padding: 10px; border: 1px solid #e5e7eb;">

@@ -23,7 +23,7 @@ class ReferralResponse extends Mailable
     public function envelope(): Envelope
     {
         $label = $this->response === 'accepted' ? 'Referral Accepted' : 'Referral Rejected';
-        return new Envelope(subject: $label . ' - ' . $this->appointment->case_number);
+        return new Envelope(subject: $label);
     }
 
     public function content(): Content

@@ -17,7 +17,7 @@ class AppointmentBooked extends Mailable
 
     public function envelope(): Envelope
     {
-        return new Envelope(subject: 'New Appointment Booking - ' . $this->appointment->case_number);
+        return new Envelope(subject: 'New Appointment Booking');
     }
 
     public function content(): Content

@@ -17,7 +17,7 @@ class AppointmentCancelled extends Mailable
 
     public function envelope(): Envelope
     {
-        return new Envelope(subject: 'Appointment Cancelled - ' . $this->appointment->case_number);
+        return new Envelope(subject: 'Appointment Cancelled');
     }
 
     public function content(): Content

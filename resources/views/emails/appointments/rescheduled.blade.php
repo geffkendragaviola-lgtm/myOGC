@@ -7,22 +7,9 @@
     </div>
     <div style="border: 1px solid #e5e7eb; border-top: none; padding: 24px; border-radius: 0 0 8px 8px;">
         <p>Hello, <strong>{{ $appointment->student->user->first_name }}</strong>,</p>
-        <p>Your counselor has requested to reschedule your appointment. Please log in to accept or reject the new schedule.</p>
+        <p>Your appointment has been requested to be rescheduled to <strong>{{ \Carbon\Carbon::parse($appointment->proposed_date)->format('F d, Y') }}</strong> at <strong>{{ \Carbon\Carbon::parse($appointment->proposed_start_time)->format('h:i A') }} – {{ \Carbon\Carbon::parse($appointment->proposed_end_time)->format('h:i A') }}</strong>.</p>
 
-        <table style="width: 100%; border-collapse: collapse; margin: 16px 0;">
-            <tr style="background: #f9fafb;">
-                <td style="padding: 10px; border: 1px solid #e5e7eb; font-weight: bold; width: 40%;">Proposed New Date</td>
-                <td style="padding: 10px; border: 1px solid #e5e7eb;">{{ \Carbon\Carbon::parse($appointment->proposed_date)->format('F d, Y') }}</td>
-            </tr>
-            <tr>
-                <td style="padding: 10px; border: 1px solid #e5e7eb; font-weight: bold;">Proposed New Time</td>
-                <td style="padding: 10px; border: 1px solid #e5e7eb;">
-                    {{ \Carbon\Carbon::parse($appointment->proposed_start_time)->format('h:i A') }} – {{ \Carbon\Carbon::parse($appointment->proposed_end_time)->format('h:i A') }}
-                </td>
-            </tr>
-        </table>
-
-        <p>Please log in to the system to accept or reject this reschedule request.</p>
+        <p>Please log in to the system to view your appointment details.</p>
         <p style="color: #6b7280; font-size: 13px; margin-top: 24px;">MSU-IIT Guidance Counseling System</p>
     </div>
 </body>

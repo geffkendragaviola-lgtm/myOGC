@@ -28,9 +28,8 @@ class ReferralResponseNotification extends Notification
 
         return [
             'title'          => $label,
-            'message'        => 'The referral has been ' . $this->response . ' by ' . $by . '. Case #' . $this->appointment->case_number,
+            'message'        => 'The referral has been ' . $this->response . ' by ' . $by . '.',
             'appointment_id' => $this->appointment->id,
-            'case_number'    => $this->appointment->case_number,
             'response'       => $this->response,
             'responded_by'   => $this->respondedBy,
             'type'           => 'referral_response',

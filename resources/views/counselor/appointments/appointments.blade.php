@@ -1,4 +1,4 @@
-@extends('layouts.app')
+﻿@extends('layouts.app')
 
 @section('title', 'Counselor Dashboard - OGC')
 
@@ -504,29 +504,20 @@
 
         <!-- Appointments Table -->
         <div class="panel-card overflow-hidden">
-            @if($appointments->isEmpty())
-                <div class="empty-state">
-                    <div class="empty-state-icon">
-                        <i class="fas fa-calendar-xmark"></i>
-                    </div>
-                    <p class="text-sm sm:text-base font-medium text-[#2c2420]">No appointments found.</p>
-                    <p class="text-xs sm:text-sm text-[#8b7e76] mt-1">When students book appointments, they will appear here.</p>
-                </div>
-            @else
-                <div class="table-scroll">
-                    <table class="w-full min-w-[900px]" id="appointmentsTable">
-                        <thead class="bg-[#faf8f5]/80">
-                            <tr>
-                                <th class="px-4 sm:px-6 py-3 text-left text-[10px] sm:text-xs font-semibold text-[#8b7e76] uppercase tracking-wider whitespace-nowrap">Student</th>
-                                <th class="px-4 sm:px-6 py-3 text-left text-[10px] sm:text-xs font-semibold text-[#8b7e76] uppercase tracking-wider whitespace-nowrap">Date & Time</th>
-                                <th class="px-4 sm:px-6 py-3 text-left text-[10px] sm:text-xs font-semibold text-[#8b7e76] uppercase tracking-wider whitespace-nowrap">College</th>
-                                <th class="px-4 sm:px-6 py-3 text-left text-[10px] sm:text-xs font-semibold text-[#8b7e76] uppercase tracking-wider whitespace-nowrap">Booking Type</th>
-                                <th class="px-4 sm:px-6 py-3 text-left text-[10px] sm:text-xs font-semibold text-[#8b7e76] uppercase tracking-wider whitespace-nowrap">Status</th>
-                                <th class="px-4 sm:px-6 py-3 text-left text-[10px] sm:text-xs font-semibold text-[#8b7e76] uppercase tracking-wider whitespace-nowrap">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody class="bg-white divide-y divide-[#e5e0db]/50">
-                            @foreach($appointments as $appointment)
+            <div class="table-scroll">
+                <table class="w-full min-w-[900px]" id="appointmentsTable">
+                    <thead class="bg-[#faf8f5]/80">
+                        <tr>
+                            <th class="px-4 sm:px-6 py-3 text-left text-[10px] sm:text-xs font-semibold text-[#8b7e76] uppercase tracking-wider whitespace-nowrap">Student</th>
+                            <th class="px-4 sm:px-6 py-3 text-left text-[10px] sm:text-xs font-semibold text-[#8b7e76] uppercase tracking-wider whitespace-nowrap">Date & Time</th>
+                            <th class="px-4 sm:px-6 py-3 text-left text-[10px] sm:text-xs font-semibold text-[#8b7e76] uppercase tracking-wider whitespace-nowrap">College</th>
+                            <th class="px-4 sm:px-6 py-3 text-left text-[10px] sm:text-xs font-semibold text-[#8b7e76] uppercase tracking-wider whitespace-nowrap">Booking Type</th>
+                            <th class="px-4 sm:px-6 py-3 text-left text-[10px] sm:text-xs font-semibold text-[#8b7e76] uppercase tracking-wider whitespace-nowrap">Status</th>
+                            <th class="px-4 sm:px-6 py-3 text-left text-[10px] sm:text-xs font-semibold text-[#8b7e76] uppercase tracking-wider whitespace-nowrap">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-[#e5e0db]/50">
+                        @forelse($appointments as $appointment)
                                 @php
                                     // Define status colors with ALL possible statuses
                                     $statusColors = [
@@ -761,7 +752,7 @@
                                                 @endif
 
                                                 <!-- Reschedule option for effective counselor -->
-                                                @if(in_array($appointment->getEffectiveCounselorId(), $counselorIdList, true) && in_array($appointment->status, ['pending', 'approved', 'referred', 'rescheduled', 'reschedule_rejected'], true))
+                                                @if(in_array($appointment->getEffectiveCounselorId(), $counselorIdList, true) && in_array($appointment->status, ['pending', 'approved', 'referred', 'rescheduled', 'reschedule_rejected'], true) && !($appointment->status === 'referred' && in_array($appointment->referred_to_counselor_id, $counselorIdList, true)))
                                                     <button onclick="showRescheduleModal({{ $appointment->id }}, {{ $appointment->getEffectiveCounselorId() }}, '{{ $appointment->appointment_date->format('Y-m-d') }}')"
                                                             class="action-icon warning"
                                                             title="Reschedule Appointment">
@@ -780,15 +771,28 @@
                                         @endif
                                     </td>
                                 </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
-                </div>
+                        @empty
+                            <tr>
+                                <td colspan="6">
+                                    <div class="empty-state">
+                                        <div class="empty-state-icon">
+                                            <i class="fas fa-calendar-xmark"></i>
+                                        </div>
+                                        <p class="text-sm sm:text-base font-medium text-[#2c2420]">No appointments found.</p>
+                                        <p class="text-xs sm:text-sm text-[#8b7e76] mt-1">When students book appointments, they will appear here.</p>
+                                    </div>
+                                </td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
 
-                <!-- Pagination -->
-                <div class="pagination-shell" style="padding: 0.75rem 1.25rem; border-top: 1px solid var(--border-soft)/60; background: rgba(250,248,245,0.4);">
-                    {{ $appointments->appends(request()->query())->links('vendor.pagination.tailwind') }}
-                </div>
+            <!-- Pagination -->
+            @if($appointments->hasPages())
+            <div class="px-4 sm:px-5 py-3 border-t border-[#e5e0db]/60 bg-[#faf8f5]/40">
+                {{ $appointments->appends(request()->query())->links('vendor.pagination.counselor-resources') }}
+            </div>
             @endif
         </div>
 
@@ -2007,14 +2011,40 @@
         </script>
 
         <script>
-            // Scroll to and highlight a specific appointment when ?highlight=ID is in the URL
+            (function() {
+                const params = new URLSearchParams(window.location.search);
+                if (params.get('highlight')) return;
+                if ('scrollRestoration' in history) {
+                    history.scrollRestoration = 'manual';
+                }
+                window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+            })();
+        </script>
+
+        <script>
             (function() {
                 const params = new URLSearchParams(window.location.search);
                 const id = params.get('highlight');
                 if (!id) return;
+
                 const row = document.getElementById('appointment-' + id);
                 if (!row) return;
-                row.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+                const rect = row.getBoundingClientRect();
+                const viewportHeight = window.innerHeight || document.documentElement.clientHeight;
+                const isFullyInView = rect.top >= 0 && rect.bottom <= viewportHeight;
+
+                row.style.scrollMarginTop = '5rem';
+
+                if (!isFullyInView) {
+                    row.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                }
+
+                params.delete('highlight');
+                const nextQuery = params.toString();
+                const nextUrl = window.location.pathname + (nextQuery ? ('?' + nextQuery) : '') + window.location.hash;
+                window.history.replaceState({}, '', nextUrl);
+
                 row.style.transition = 'outline 0.3s ease, box-shadow 0.3s ease';
                 row.style.outline = '2px solid #c9a227';
                 row.style.boxShadow = '0 0 0 4px rgba(201,162,39,0.2)';

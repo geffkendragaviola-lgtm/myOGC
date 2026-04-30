@@ -57,7 +57,7 @@
                         <div class="relative">
                             <i class="fas fa-search absolute left-3 sm:left-3.5 top-1/2 -translate-y-1/2 text-[#a89f97] text-[10px] sm:text-xs"></i>
                             <input type="text" name="search" value="{{ $search }}"
-                                   placeholder="Search counselor name, email, position, credentials..."
+                                   placeholder="    Search counselor name, email, position, credentials..."
                                    class="input-field w-full pl-8 sm:pl-9 pr-3 py-2 sm:py-2.5 text-xs sm:text-sm">
                         </div>
                     </div>
@@ -85,25 +85,6 @@
 
         <!-- Counselors Table Card -->
         <div class="panel-card overflow-hidden">
-            <!-- Table Header Stats -->
-            <div class="table-header-bar">
-                <div class="flex items-center gap-2.5">
-                    <div class="table-header-icon">
-                        <i class="fas fa-user-doctor text-[#9a7b0a] text-[10px] sm:text-xs"></i>
-                    </div>
-                    <div>
-                        <h2 class="text-sm font-medium text-[#2c2420]">Counselor Directory</h2>
-                        <p class="text-[10px] sm:text-[11px] text-[#8b7e76]">Total records: {{ $counselors->total() }}</p>
-                    </div>
-                </div>
-
-                <div class="flex items-center gap-2">
-                    <span class="table-live-pill">
-                        <i class="fas fa-clock mr-1 text-[9px]"></i> Live data
-                    </span>
-                </div>
-            </div>
-
             <div class="overflow-x-auto">
                 <table class="min-w-[700px] md:min-w-full divide-y divide-[#e5e0db]/60 w-full">
                     <thead class="bg-[#faf8f5]/85">
@@ -112,14 +93,13 @@
                             <th class="px-4 py-3 text-left text-[10px] sm:text-[11px] font-semibold text-[#8b7e76] uppercase tracking-[0.14em] whitespace-nowrap">College</th>
                             <th class="px-4 py-3 text-left text-[10px] sm:text-[11px] font-semibold text-[#8b7e76] uppercase tracking-[0.14em] whitespace-nowrap">Position</th>
                             <th class="px-4 py-3 text-left text-[10px] sm:text-[11px] font-semibold text-[#8b7e76] uppercase tracking-[0.14em] whitespace-nowrap">Credentials</th>
-                            <th class="px-4 py-3 text-left text-[10px] sm:text-[11px] font-semibold text-[#8b7e76] uppercase tracking-[0.14em] whitespace-nowrap">Created</th>
                             <th class="px-4 py-3 text-left text-[10px] sm:text-[11px] font-semibold text-[#8b7e76] uppercase tracking-[0.14em] whitespace-nowrap">Actions</th>
                         </tr>
                     </thead>
 
                     <tbody class="bg-white divide-y divide-[#e5e0db]/50">
                         @forelse($counselors as $counselor)
-                            <tr class="table-row group">
+                            <tr class="table-row group cursor-pointer" onclick="openCounselorModal({{ $counselor->id }})">
                                 <td class="px-4 py-3 sm:py-3.5">
                                     <div class="flex items-center gap-2.5">
                                         <div class="avatar-badge overflow-hidden" style="{{ $counselor->user->profile_picture ? 'background:none;padding:0;' : '' }}">
@@ -145,7 +125,7 @@
                                         <span class="mini-icon bg-[#f5f0eb] text-[#8b7e76]">
                                             <i class="fas fa-school text-[10px]"></i>
                                         </span>
-                                        <span class="truncate max-w-[100px] sm:max-w-[140px]">{{ $counselor->college->name ?? 'N/A' }}</span>
+                                        <span class="truncate max-w-[100px] sm:max-w-[140px]">{{ collect(explode(' ', $counselor->college->name ?? ''))->map(fn($w) => strtoupper($w[0] ?? ''))->filter()->implode('') ?: 'N/A' }}</span>
                                     </div>
                                 </td>
 
@@ -169,15 +149,7 @@
                                     </div>
                                 </td>
 
-                                <td class="px-4 py-3 sm:py-3.5 whitespace-nowrap">
-                                    <div class="inline-flex items-center gap-1.5 text-xs sm:text-sm text-[#8b7e76]">
-                                        <span class="mini-icon bg-[#fdf2f2] text-[#7a2a2a]/60">
-                                            <i class="fas fa-calendar-days-days text-[10px]"></i>
-                                        </span>
-                                        {{ $counselor->created_at?->format('M j, Y') ?? 'N/A' }}
-                                    </div>
-                                </td>
-                                <td class="px-4 py-3 sm:py-3.5 whitespace-nowrap">
+                                <td class="px-4 py-3 sm:py-3.5 whitespace-nowrap" onclick="event.stopPropagation()">
                                     <a href="{{ route('admin.counselors.edit', $counselor) }}"
                                        class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[10px] sm:text-xs font-semibold text-[#7a2a2a] bg-[rgba(122,42,42,0.07)] hover:bg-[rgba(122,42,42,0.14)] transition-colors">
                                         <i class="fas fa-pen-to-square"></i> Edit
@@ -186,7 +158,7 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="6" class="px-4 py-10 sm:py-12 text-center">
+                                <td colspan="5" class="px-4 py-10 sm:py-12 text-center">
                                     <div class="flex flex-col items-center justify-center">
                                         <div class="empty-state-icon mb-3">
                                             <i class="fas fa-user-doctor-slash text-[#a89f97] text-lg"></i>
@@ -204,38 +176,7 @@
             <!-- Enhanced Pagination Section -->
             @if($counselors->hasPages())
             <div class="px-4 sm:px-5 py-3 sm:py-3.5 border-t border-[#e5e0db]/60 bg-[#faf8f5]/40">
-                <div class="flex items-center justify-center">
-                    <div class="pagination-wrap flex items-center gap-2 justify-center">
-                        {{ $counselors->appends(request()->query())->links() }}
-                    </div>
-                </div>
-            </div>
-
-            <style>
-                .pagination-wrap nav { display: inline-flex; }
-                .pagination-wrap .relative { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
-                .pagination-wrap span, .pagination-wrap a {
-                    display: inline-flex; align-items: center; justify-content: center;
-                    min-width: 28px; height: 28px; padding: 0 8px; border-radius: 8px;
-                    font-size: 11px; font-weight: 600; transition: all 0.2s ease;
-                }
-                .pagination-wrap span[aria-current="page"] span {
-                    background: #5c1a1a;
-                    color: white;
-                }
-                .pagination-wrap a {
-                    background: white; color: #6b5e57; border: 1px solid #e5e0db;
-                }
-                .pagination-wrap a:hover {
-                    background: #fdf2f2; color: #5c1a1a; border-color: rgba(212, 175, 55, 0.4);
-                }
-            </style>
-            @else
-            <div class="px-4 sm:px-5 py-3 sm:py-3.5 border-t border-[#e5e0db]/60 bg-[#faf8f5]/40">
-                <div class="flex items-center justify-center gap-2 text-[10px] sm:text-xs text-[#8b7e76]">
-                    <i class="fas fa-circle-check text-[#059669]"></i>
-                    <span>Showing all <span class="font-semibold text-[#2c2420]">{{ $counselors->total() }}</span> counselors</span>
-                </div>
+                {{ $counselors->appends(request()->query())->links('vendor.pagination.counselor-resources') }}
             </div>
             @endif
         </div>
@@ -560,5 +501,119 @@
         .avatar-badge { width: 2rem; height: 2rem; font-size: 0.65rem; }
     }
 </style>
+
+{{-- Counselor data for modal --}}
+<script>
+const counselorData = {
+    @foreach($counselors as $c)
+    {{ $c->id }}: {
+        name: "{{ $c->user->first_name }} {{ $c->user->last_name }}",
+        email: "{{ $c->user->email }}",
+        phone: "{{ $c->user->phone_number ?? '' }}",
+        college: "{{ $c->college->name ?? 'N/A' }}",
+        position: "{{ $c->position ?? 'N/A' }}",
+        credentials: "{{ $c->credentials ?? '' }}",
+        isHead: {{ $c->is_head ? 'true' : 'false' }},
+        avatar: "{{ $c->user->profile_picture ? asset('storage/' . $c->user->profile_picture) : '' }}",
+        initials: "{{ strtoupper(substr($c->user->first_name,0,1)) }}{{ strtoupper(substr($c->user->last_name,0,1)) }}",
+        editUrl: "{{ route('admin.counselors.edit', $c) }}",
+        joined: "{{ $c->created_at?->format('F j, Y') ?? 'N/A' }}",
+    },
+    @endforeach
+};
+
+function openCounselorModal(id) {
+    const d = counselorData[id];
+    if (!d) return;
+
+    const abbr = d.college.split(' ').map(w => w[0]?.toUpperCase() ?? '').join('');
+
+    document.getElementById('cm-avatar-wrap').innerHTML = d.avatar
+        ? `<img src="${d.avatar}" class="w-full h-full object-cover" />`
+        : `<span class="text-xl font-bold text-[#7a2a2a]">${d.initials}</span>`;
+
+    document.getElementById('cm-name').textContent = d.name;
+    document.getElementById('cm-email').textContent = d.email;
+    document.getElementById('cm-phone').textContent = d.phone || '—';
+    document.getElementById('cm-college').textContent = d.college;
+    document.getElementById('cm-college-abbr').textContent = abbr;
+    document.getElementById('cm-position').textContent = d.position;
+    document.getElementById('cm-credentials').textContent = d.credentials || '—';
+    document.getElementById('cm-joined').textContent = d.joined;
+    document.getElementById('cm-head').textContent = d.isHead ? 'Head Counselor' : 'Counselor';
+    document.getElementById('cm-edit-btn').href = d.editUrl;
+
+    document.getElementById('counselorModal').classList.remove('hidden');
+    document.body.style.overflow = 'hidden';
+}
+
+function closeCounselorModal() {
+    document.getElementById('counselorModal').classList.add('hidden');
+    document.body.style.overflow = '';
+}
+</script>
+
+<!-- Counselor Detail Modal -->
+<div id="counselorModal" class="hidden fixed inset-0 z-[2000] flex items-center justify-center p-4" style="background:rgba(44,36,32,0.5);backdrop-filter:blur(4px);" onclick="if(event.target===this)closeCounselorModal()">
+    <div class="relative w-full max-w-lg bg-white rounded-2xl shadow-2xl overflow-hidden" style="border:1px solid #e5e0db;">
+        <!-- Top gradient bar -->
+        <div style="height:4px;background:linear-gradient(90deg,#5c1a1a 0%,#d4af37 50%,#5c1a1a 100%);"></div>
+
+        <!-- Header -->
+        <div style="background:linear-gradient(135deg,#5c1a1a 0%,#3a0c0c 100%);padding:1.25rem 1.5rem;" class="flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div id="cm-avatar-wrap" class="w-12 h-12 rounded-xl overflow-hidden flex items-center justify-center flex-shrink-0" style="background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.2);"></div>
+                <div>
+                    <div id="cm-name" class="text-white font-bold text-base"></div>
+                    <div id="cm-head" class="text-[10px] font-semibold uppercase tracking-widest mt-0.5" style="color:rgba(212,175,55,0.9);"></div>
+                </div>
+            </div>
+            <button onclick="closeCounselorModal()" class="text-white/70 hover:text-white transition text-lg leading-none">&times;</button>
+        </div>
+
+        <!-- Body -->
+        <div class="p-5 space-y-4">
+            <!-- College badge -->
+            <div class="flex items-center gap-2">
+                <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold" style="background:rgba(254,249,231,0.8);color:#7a2a2a;border:1px solid rgba(212,175,55,0.3);">
+                    <i class="fas fa-school text-[10px]"></i>
+                    <span id="cm-college-abbr"></span>
+                </span>
+                <span id="cm-college" class="text-xs text-[#6b5e57]"></span>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div class="rounded-xl p-3" style="background:#faf8f5;border:1px solid #e5e0db;">
+                    <div class="text-[10px] font-semibold uppercase tracking-wider text-[#8b7e76] mb-1">Email</div>
+                    <div id="cm-email" class="text-xs font-medium text-[#2c2420] break-all"></div>
+                </div>
+                <div class="rounded-xl p-3" style="background:#faf8f5;border:1px solid #e5e0db;">
+                    <div class="text-[10px] font-semibold uppercase tracking-wider text-[#8b7e76] mb-1">Phone</div>
+                    <div id="cm-phone" class="text-xs font-medium text-[#2c2420]"></div>
+                </div>
+                <div class="rounded-xl p-3" style="background:#faf8f5;border:1px solid #e5e0db;">
+                    <div class="text-[10px] font-semibold uppercase tracking-wider text-[#8b7e76] mb-1">Position</div>
+                    <div id="cm-position" class="text-xs font-medium text-[#2c2420]"></div>
+                </div>
+                <div class="rounded-xl p-3" style="background:#faf8f5;border:1px solid #e5e0db;">
+                    <div class="text-[10px] font-semibold uppercase tracking-wider text-[#8b7e76] mb-1">Joined</div>
+                    <div id="cm-joined" class="text-xs font-medium text-[#2c2420]"></div>
+                </div>
+                <div class="rounded-xl p-3 sm:col-span-2" style="background:#faf8f5;border:1px solid #e5e0db;">
+                    <div class="text-[10px] font-semibold uppercase tracking-wider text-[#8b7e76] mb-1">Credentials</div>
+                    <div id="cm-credentials" class="text-xs font-medium text-[#2c2420]"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="px-5 pb-5 flex justify-end gap-2">
+            <button onclick="closeCounselorModal()" class="px-4 py-2 rounded-lg text-xs font-semibold text-[#6b5e57] bg-white border border-[#e5e0db] hover:bg-[#f5f0eb] transition">Close</button>
+            <a id="cm-edit-btn" href="#" class="px-4 py-2 rounded-lg text-xs font-semibold text-[#fef9e7] transition" style="background:linear-gradient(135deg,#5c1a1a,#7a2a2a);box-shadow:0 4px 10px rgba(92,26,26,0.2);">
+                <i class="fas fa-pen-to-square mr-1.5"></i> Edit
+            </a>
+        </div>
+    </div>
+</div>
 
 @endsection

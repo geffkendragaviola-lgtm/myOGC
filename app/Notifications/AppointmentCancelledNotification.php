@@ -21,9 +21,8 @@ class AppointmentCancelledNotification extends Notification
     {
         return [
             'title'          => 'Appointment Cancelled',
-            'message'        => 'An appointment has been cancelled. Case #' . $this->appointment->case_number,
+            'message'        => 'An appointment has been cancelled.',
             'appointment_id' => $this->appointment->id,
-            'case_number'    => $this->appointment->case_number,
             'type'           => 'appointment_cancelled',
         ];
     }

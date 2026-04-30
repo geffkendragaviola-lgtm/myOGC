@@ -21,7 +21,7 @@ class RescheduleResponse extends Mailable
     public function envelope(): Envelope
     {
         $label = $this->response === 'accepted' ? 'Reschedule Accepted' : 'Reschedule Rejected';
-        return new Envelope(subject: $label . ' - ' . $this->appointment->case_number);
+        return new Envelope(subject: $label);
     }
 
     public function content(): Content

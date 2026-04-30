@@ -269,7 +269,23 @@ public function create()
         ->whereNotIn('status', ['cancelled', 'rejected', 'no_show'])
         ->exists();
 
-    return view('appointments.create', compact('counselors', 'student', 'allowAllCounselors', 'hasInitialInterviewAppointment'));
+    // Pre-load referred counselors server-side so the button renders instantly
+    $referredCounselors = Counselor::with('user', 'college')
+        ->whereHas('receivedReferrals', function ($q) use ($student) {
+            $q->where('student_id', $student->id)
+              ->whereNotNull('referred_to_counselor_id')
+              ->where('status', 'completed');
+        })
+        ->get()
+        ->unique(fn($c) => $c->user_id)
+        ->values();
+
+    $hasReferredCounselors = $referredCounselors->isNotEmpty();
+
+    return view('appointments.create', compact(
+        'counselors', 'student', 'allowAllCounselors',
+        'hasInitialInterviewAppointment', 'referredCounselors', 'hasReferredCounselors'
+    ));
 }
 
 public function createByCounselor(Request $request)
@@ -702,6 +718,25 @@ public function getAvailableSlots(Request $request)
         'date' => $isCounselorRequest ? 'required|date|after_or_equal:today' : 'required|date|after:yesterday',
     ]);
 
+    // For students: block the entire day if they already have an active appointment on it
+    if (!$isCounselorRequest && $requestUser && $requestUser->role === 'student') {
+        $student = Student::where('user_id', $requestUser->id)->first();
+        if ($student) {
+            $sameDayActive = Appointment::where('student_id', $student->id)
+                ->where('appointment_date', $request->date)
+                ->whereIn('status', ['pending', 'approved', 'rescheduled', 'reschedule_requested', 'reschedule_rejected'])
+                ->exists();
+
+            if ($sameDayActive) {
+                return response()->json([
+                    'available_slots' => [],
+                    'booked_slots' => [],
+                    'message' => 'You already have an appointment on this date that has not been completed yet.',
+                ]);
+            }
+        }
+    }
+
     $counselor = Counselor::findOrFail($request->counselor_id);
     $counselorIds = $this->getCounselorAssignmentIds($counselor);
     $date = Carbon::parse($request->date);
@@ -1043,8 +1078,15 @@ public function store(Request $request)
         return redirect()->back()->with('error', 'Student profile not found.');
     }
 
-    $studentNeedsInitialInterview = false; // Initial Interview is optional — students can book Counseling/Consultation freely
-    if (false) {
+    // Prevent double-booking: student cannot book on a day where they already have
+    // a pending or approved appointment that hasn't been completed yet.
+    $sameDayActiveAppointment = Appointment::where('student_id', $student->id)
+        ->where('appointment_date', $request->appointment_date)
+        ->whereIn('status', ['pending', 'approved', 'rescheduled', 'reschedule_requested', 'reschedule_rejected'])
+        ->exists();
+
+    if ($sameDayActiveAppointment) {
+        return redirect()->back()->with('error', 'You already have an appointment on this date that has not been completed yet. Please choose a different date.');
     }
 
     if ($request->booking_type === 'Initial Interview') {

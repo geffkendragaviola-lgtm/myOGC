@@ -32,13 +32,21 @@ class AppointmentStatusChangedNotification extends Notification
         $title = $labels[$this->newStatus] ?? 'Appointment Update';
         $date  = \Carbon\Carbon::parse($this->appointment->appointment_date)->format('F d, Y');
         $time  = \Carbon\Carbon::parse($this->appointment->start_time)->format('h:i A');
+        $timeEnd = \Carbon\Carbon::parse($this->appointment->end_time)->format('h:i A');
         $firstName = $this->appointment->student->user->first_name;
+
+        $statusVerb = match ($this->newStatus) {
+            'approved'  => 'approved',
+            'cancelled' => 'cancelled',
+            'no_show'   => 'marked as no show',
+            'completed' => 'completed',
+            default     => str_replace('_', ' ', $this->newStatus),
+        };
 
         return [
             'title'          => $title,
-            'message'        => "Hi {$firstName}, your appointment on {$date} at {$time} has been " . strtolower($labels[$this->newStatus] ?? $this->newStatus) . '.',
+            'message'        => "Hello {$firstName}, your appointment has been {$statusVerb} on {$date} at {$time} – {$timeEnd}. Please log in to the system to view your appointment details.",
             'appointment_id' => $this->appointment->id,
-            'case_number'    => $this->appointment->case_number,
             'status'         => $this->newStatus,
             'type'           => 'appointment_status_changed',
         ];
