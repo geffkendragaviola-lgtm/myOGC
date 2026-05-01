@@ -128,7 +128,7 @@
     <div class="feedback-detail-glow one"></div>
     <div class="feedback-detail-glow two"></div>
 
-    <div class="relative max-w-6xl mx-auto px-4 sm:px-6 py-5 md:py-8">
+    <div class="relative max-w-7xl mx-auto px-4 sm:px-6 py-5 md:py-8 space-y-6">
         <!-- Header -->
         <div class="mb-5 sm:mb-6">
             <div class="grid grid-cols-1 xl:grid-cols-[1fr_auto] gap-4 items-stretch">
@@ -151,7 +151,7 @@
                 </div>
 
                 <div class="summary-card">
-                    <div class="relative h-full flex flex-col sm:flex-row xl:flex-col justify-center gap-3 p-4">
+                    <div class="relative h-full flex flex-col sm:flex-row items-center justify-between gap-3 p-4">
                         <div class="flex items-center gap-3 text-center sm:text-left">
                             <div class="summary-icon flex-shrink-0">
                                 <i class="fas fa-bolt text-sm"></i>
@@ -163,7 +163,7 @@
                             </div>
                         </div>
 
-                        <div class="flex flex-wrap gap-2 sm:gap-3 mt-2 sm:mt-3 justify-center sm:justify-start xl:justify-center">
+                        <div class="flex flex-wrap items-center justify-center sm:justify-end gap-2 sm:gap-3 mt-2 sm:mt-0">
                             <a href="{{ route('admin.feedback.index') }}"
                                class="secondary-btn px-4 py-2.5 text-xs sm:text-sm rounded-lg">
                                 <i class="fas fa-arrow-left mr-1.5 text-[9px] sm:text-xs"></i> Back
@@ -180,7 +180,6 @@
 
         <!-- Main Feedback Card -->
         <div class="panel-card overflow-hidden">
-            <div class="section-topline"></div>
 
             <!-- Header Section -->
             <div class="px-4 sm:px-6 py-5 sm:py-6 border-b border-[#e5e0db]/60 bg-gradient-to-r from-[#5c1a1a] via-[#7a2a2a] to-[#d4af37]">

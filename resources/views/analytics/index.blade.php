@@ -55,7 +55,7 @@
     inset-inline: 0;
     top: 0;
     height: 3px;
-    background: linear-gradient(90deg, var(--maroon-medium) 0%, #d4af37 50%, var(--maroon-medium) 100%);
+    background: linear-gradient(90deg, #5c1a1a 0%, #d4af37 50%, #5c1a1a 100%);
 }
 .filter-bar select, .filter-bar input[type=date] {
     width: 100%;
@@ -253,6 +253,34 @@
     letter-spacing: 0.16em; color: #7a2a2a;
 }
 .hero-badge-dot { width: 0.3rem; height: 0.3rem; border-radius: 999px; background: #d4af37; }
+
+.summary-card {
+    position: relative; overflow: hidden; border-radius: 0.75rem;
+    border: 1px solid rgba(92,26,26,0.15);
+    background: linear-gradient(135deg, #5c1a1a 0%, #3a0c0c 100%); color: white;
+    box-shadow: 0 4px 12px rgba(58,12,12,0.15);
+}
+.summary-card::before {
+    content: ""; position: absolute; inset: 0; opacity: 0.15;
+    background: radial-gradient(circle at top right, #d4af37, transparent 40%);
+    pointer-events: none;
+}
+.summary-icon {
+    width: 2.5rem; height: 2.5rem; border-radius: 0.75rem; display: flex;
+    align-items: center; justify-content: center; background: rgba(255,255,255,0.1);
+    border: 1px solid rgba(255,255,255,0.1); color: #fef9e7; flex-shrink: 0;
+}
+.summary-label { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.2em; color: rgba(255,255,255,0.7); }
+.summary-value { font-size: 1.2rem; line-height: 1.2; font-weight: 800; margin-top: 0.35rem; }
+.summary-subtext { font-size: 0.7rem; color: rgba(255,255,255,0.8); margin-top: 0.2rem; }
+
+.primary-btn {
+    border-radius: 0.6rem; font-weight: 600; transition: all 0.2s ease;
+    display: inline-flex; align-items: center; justify-content: center; white-space: nowrap;
+    color: #fef9e7; background: linear-gradient(135deg, #5c1a1a 0%, #7a2a2a 100%);
+    box-shadow: 0 4px 10px rgba(92,26,26,0.15);
+}
+.primary-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 14px rgba(92,26,26,0.2); }
 </style>
 
 <div class="min-h-screen admin-shell">
@@ -262,19 +290,36 @@
     <div class="relative max-w-7xl mx-auto px-4 sm:px-6 py-5 md:py-8 space-y-6">
 
         <!-- Header -->
-        <div class="hero-card no-print">
-            <div class="relative p-4 sm:p-5 flex items-start justify-between gap-3">
-                <div class="flex items-start gap-3">
-                    <div class="hero-icon"><i class="fas fa-chart-column text-base sm:text-lg"></i></div>
-                    <div class="min-w-0">
-                        <div class="hero-badge"><span class="hero-badge-dot"></span>Admin Panel</div>
-                        <h1 class="text-lg sm:text-xl lg:text-2xl font-semibold tracking-tight text-[#2c2420] mt-2">Analytics</h1>
-                        <p class="text-[#6b5e57] text-xs sm:text-sm mt-1.5">Appointment and counseling insights</p>
+        <div class="mb-5 sm:mb-6">
+            <div class="grid grid-cols-1 xl:grid-cols-[1fr_auto] gap-4 items-stretch">
+                <div class="hero-card no-print">
+                    <div class="relative p-4 sm:p-5 flex items-start gap-3">
+                        <div class="hero-icon"><i class="fas fa-chart-column text-base sm:text-lg"></i></div>
+                        <div class="min-w-0">
+                            <div class="hero-badge"><span class="hero-badge-dot"></span>Admin Panel</div>
+                            <h1 class="text-lg sm:text-xl lg:text-2xl font-semibold tracking-tight text-[#2c2420] mt-2">Analytics</h1>
+                            <p class="text-[#6b5e57] text-xs sm:text-sm mt-1.5">Appointment and counseling insights</p>
+                        </div>
                     </div>
                 </div>
-                <button onclick="window.print()" class="btn-outline no-print flex-shrink-0">
-                    <i class="fas fa-print"></i> Print Report
-                </button>
+
+                <div class="summary-card no-print">
+                    <div class="relative h-full flex flex-col sm:flex-row items-center justify-between gap-3 p-4">
+                        <div class="flex items-center gap-3 text-center sm:text-left">
+                            <div class="summary-icon flex-shrink-0">
+                                <i class="fas fa-print text-sm"></i>
+                            </div>
+                            <div class="min-w-0">
+                                <p class="summary-label">Quick Action</p>
+                                <p class="summary-value">Print Report</p>
+                                <p class="summary-subtext hidden sm:block">Generate a printable version of this analytics data.</p>
+                            </div>
+                        </div>
+                        <button onclick="exportWord()" class="primary-btn px-5 py-2.5 whitespace-nowrap text-xs sm:text-sm rounded-lg">
+                            <i class="fas fa-file-word mr-1.5 text-[9px] sm:text-xs"></i> Export Word
+                        </button>
+                    </div>
+                </div>
             </div>
         </div>
     <div class="print-header">
@@ -808,5 +853,219 @@ document.addEventListener('DOMContentLoaded', function () {
     @endif
 
 });
+
+function exportWord() {
+    let charts = [];
+    document.querySelectorAll('canvas').forEach(canvas => {
+        let tempCanvas = document.createElement('canvas');
+        tempCanvas.width = canvas.width;
+        tempCanvas.height = canvas.height;
+        let ctx = tempCanvas.getContext('2d');
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(0, 0, tempCanvas.width, tempCanvas.height);
+        ctx.drawImage(canvas, 0, 0);
+        
+        let clientWidth = canvas.clientWidth || 500;
+        let clientHeight = canvas.clientHeight || 300;
+        
+        let base64 = tempCanvas.toDataURL("image/jpeg", 1.0).split(',')[1];
+        
+        charts.push({
+            id: canvas.id, 
+            base64: base64,
+            width: clientWidth,
+            height: clientHeight
+        });
+    });
+
+    let htmlContent = `
+        <style>
+            @page { mso-page-orientation: portrait; margin: 1in; }
+            body { font-family: 'Calibri', sans-serif; background: #ffffff; color: #000000; }
+            table { width: 100%; border-collapse: collapse; margin-bottom: 20px; font-size: 10pt; }
+            th, td { border: 1px solid #d4c4bc; padding: 6px; text-align: left; }
+            th { background-color: #f5f0eb; font-weight: bold; color: #3a0c0c; }
+            h1 { font-size: 16pt; color: #3a0c0c; margin-bottom: 5px; }
+            h2 { font-size: 13pt; color: #7a2a2a; border-bottom: 1px solid #c9a227; padding-bottom: 4px; margin-top: 25px; margin-bottom: 15px; }
+            .meta { font-size: 10pt; margin-bottom: 25px; color: #444444; line-height: 1.5; }
+            .chart-img { text-align: center; margin: 20px 0; }
+            .sig-table { width: 100%; border: none; margin-top: 50px; }
+            .sig-table td { border: none; padding: 10px; text-align: center; vertical-align: bottom; height: 80px; }
+            .sig-line { border-top: 1px solid #000000; width: 85%; margin: 0 auto; padding-top: 5px; font-weight: bold; font-size: 10pt; color: #000; }
+            .sig-role { font-weight: normal; font-size: 8pt; color: #555; }
+        </style>
+        <h1>MSU-IIT Office of Guidance and Counseling</h1>
+        <div class="meta">
+            <strong>Counseling Analytics Report</strong><br>
+            Generated: {{ now()->format('F j, Y g:i A') }}<br>
+            Prepared by: {{ auth()->user()->first_name }} {{ auth()->user()->last_name }}<br>
+            Scope: @if($collegeId) {{ addslashes($colleges->firstWhere('id',$collegeId)?->name ?? 'All Colleges') }} @else All Colleges @endif<br>
+            Period: @if($dateFrom && $dateTo) {{ \Carbon\Carbon::parse($dateFrom)->format('M j, Y') }} – {{ \Carbon\Carbon::parse($dateTo)->format('M j, Y') }} @else Year {{ $year }} @endif
+        </div>
+        
+        <h2>Summary Statistics</h2>
+        <table>
+            <tr>
+                <th>Total Appointments</th><td>{{ number_format($totalAppointments) }}</td>
+                <th>Completion Rate</th><td>{{ $completionRate }}%</td>
+            </tr>
+            <tr>
+                <th>Students Served</th><td>{{ number_format($totalStudents) }}</td>
+                <th>No-Show Rate</th><td>{{ $noShowRate }}%</td>
+            </tr>
+            <tr>
+                <th>Completed Sessions</th><td>{{ number_format($completedCount) }}</td>
+                <th>Avg Satisfaction</th><td>{{ $avgSatisfaction !== null ? $avgSatisfaction.'/5' : 'N/A' }}</td>
+            </tr>
+            <tr>
+                <th>Pending / Approved</th><td>{{ number_format($pendingCount) }}</td>
+                <th>Follow-ups Due</th><td>{{ number_format($followUpCount) }}</td>
+            </tr>
+            <tr>
+                <th>Total Referrals</th><td>{{ number_format($referralCount) }}</td>
+                <th>Avg Counselor Load</th><td>{{ $avgCounselorLoad }}</td>
+            </tr>
+        </table>
+        
+        <h2>Referral Overview</h2>
+        <table>
+            <tr><th>Category</th><th>Students</th><th>% of Served</th></tr>
+            <tr><td>Inbound Referral (received)</td><td>{{ number_format($referredInStudents) }}</td><td>{{ $referredInRate }}%</td></tr>
+            <tr><td>Outbound Referral (sent)</td><td>{{ number_format($referredOutStudents) }}</td><td>{{ $referredOutRate }}%</td></tr>
+        </table>
+        
+        <h2>Feedback Details</h2>
+        <p style="margin-top: 15px; font-size: 10pt; line-height: 1.5; color: #444444;">
+            <strong>Average Satisfaction Rating:</strong> {{ $avgSatisfaction !== null ? $avgSatisfaction.'/5' : 'No ratings yet.' }}
+        </p>
+    `;
+
+    let chartDataTables = {
+        'statusChart': `
+            <p style="margin-top: 15px; font-size: 10pt; line-height: 1.5; color: #444444;">
+                <strong>Data Summary:</strong> The Appointment Status Breakdown shows 
+                @php
+                    $statusStrings = [];
+                    foreach($statusData as $s) {
+                        if($s['count'] > 0) {
+                            $statusStrings[] = $s['count'] . " " . strtolower($s['label']);
+                        }
+                    }
+                    echo empty($statusStrings) ? "no appointments." : implode(', ', $statusStrings) . ".";
+                @endphp
+            </p>
+        `,
+        'bookingChart': `
+            <p style="margin-top: 15px; font-size: 10pt; line-height: 1.5; color: #444444;">
+                <strong>Data Summary:</strong> The Booking Type Distribution consists of 
+                @php
+                    $bookingStrings = [];
+                    foreach($bookingTypeData as $type => $count) {
+                        if($count > 0) {
+                            $bookingStrings[] = $count . " " . strtolower($type) . " bookings";
+                        }
+                    }
+                    echo empty($bookingStrings) ? "no bookings." : implode(' and ', $bookingStrings) . ".";
+                @endphp
+            </p>
+        `,
+        'monthlyChart': `
+            <p style="margin-top: 15px; font-size: 10pt; line-height: 1.5; color: #444444;">
+                <strong>Data Summary:</strong> Monthly Counseling Availed records 
+                @php
+                    $monthlyStrings = [];
+                    foreach($monthlyData as $m) {
+                        if(data_get($m, 'count') > 0) {
+                            $monthlyStrings[] = data_get($m, 'count') . " sessions in " . data_get($m, 'month');
+                        }
+                    }
+                    echo empty($monthlyStrings) ? "no sessions." : implode(', ', $monthlyStrings) . ".";
+                @endphp
+            </p>
+        `,
+        'collegeChart': `
+            <p style="margin-top: 15px; font-size: 10pt; line-height: 1.5; color: #444444;">
+                <strong>Data Summary:</strong> Appointments per College are distributed as follows: 
+                @php
+                    $collegeStrings = [];
+                    foreach($collegeAppointmentCounts as $college => $count) {
+                        if($count > 0) {
+                            $collegeStrings[] = $count . " from " . $college;
+                        }
+                    }
+                    echo empty($collegeStrings) ? "none." : implode(', ', $collegeStrings) . ".";
+                @endphp
+            </p>
+        `
+    };
+
+    charts.forEach(c => {
+        let title = '';
+        if (c.id === 'statusChart') title = 'Appointment Status Breakdown';
+        else if (c.id === 'bookingChart') title = 'Booking Type Distribution';
+        else if (c.id === 'monthlyChart') title = 'Monthly Counseling Availed';
+        else if (c.id === 'collegeChart') title = 'Appointments per College';
+        
+        htmlContent += "<h2>" + title + "</h2>";
+        htmlContent += '<div class="chart-img"><img src="file:///C:/fake/' + c.id + '.jpg" width="' + c.width + '" height="' + c.height + '"></div>';
+        
+        if (chartDataTables[c.id]) {
+            htmlContent += chartDataTables[c.id];
+        }
+    });
+
+    htmlContent += `
+        <table class="sig-table">
+            <tr>
+                <td><div class="sig-line">{{ addslashes(auth()->user()->first_name) }} {{ addslashes(auth()->user()->last_name) }}<br><span class="sig-role">Guidance Counselor / Admin</span></div></td>
+                <td><div class="sig-line">&nbsp;<br><span class="sig-role">Head, Guidance Office</span></div></td>
+                <td><div class="sig-line">&nbsp;<br><span class="sig-role">Director / Dean of Student Affairs</span></div></td>
+            </tr>
+        </table>
+        <p style="font-size:8pt;color:#666666;text-align:center;margin-top:20px;">This report is generated from the MSU-IIT Office of Guidance and Counseling Information System. All data is confidential and for official use only.</p>
+    `;
+
+    let boundary = "mht_boundary_123456789";
+    
+    let mhtml = "MIME-Version: 1.0\r\n";
+    mhtml += 'Content-Type: multipart/related; boundary="' + boundary + '"\r\n\r\n';
+    
+    // HTML Part
+    mhtml += "--" + boundary + "\r\n";
+    mhtml += "Content-Location: file:///C:/fake/document.html\r\n";
+    mhtml += "Content-Transfer-Encoding: utf-8\r\n";
+    mhtml += "Content-Type: text/html; charset=\"utf-8\"\r\n\r\n";
+    
+    mhtml += "<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word'>\n";
+    mhtml += "<head>\n<meta charset='utf-8'>\n<title>Analytics Report</title>\n</head>\n<body>\n";
+    mhtml += htmlContent;
+    mhtml += "\n</body>\n</html>\r\n\r\n";
+
+    // Image Parts
+    charts.forEach(c => {
+        mhtml += "--" + boundary + "\r\n";
+        mhtml += "Content-Location: file:///C:/fake/" + c.id + ".jpg\r\n";
+        mhtml += "Content-Transfer-Encoding: base64\r\n";
+        mhtml += "Content-Type: image/jpeg\r\n\r\n";
+        mhtml += c.base64 + "\r\n\r\n";
+    });
+
+    mhtml += "--" + boundary + "--";
+
+    let blob = new Blob([mhtml], { type: 'application/msword' });
+    let url = URL.createObjectURL(blob);
+    let downloadLink = document.createElement("a");
+
+    document.body.appendChild(downloadLink);
+    if (navigator.msSaveOrOpenBlob) {
+        navigator.msSaveOrOpenBlob(blob, 'Analytics_Report.doc');
+    } else {
+        downloadLink.href = url;
+        downloadLink.download = 'Analytics_Report.doc';
+        downloadLink.click();
+    }
+    document.body.removeChild(downloadLink);
+    URL.revokeObjectURL(url);
+}
 </script>
 @endpush

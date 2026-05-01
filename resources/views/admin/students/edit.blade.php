@@ -29,14 +29,20 @@
     .edit-student-glow.one { top: -30px; left: -40px; width: 200px; height: 200px; background: var(--gold-400); }
     .edit-student-glow.two { bottom: -30px; right: -60px; width: 220px; height: 220px; background: var(--maroon-800); }
 
-    .hero-card, .section-card, .summary-card, .glass-alert {
+    .hero-card, .summary-card, .glass-alert {
         position: relative; overflow: hidden; border-radius: 0.75rem;
         border: 1px solid var(--border-soft); background: rgba(255,255,255,0.95);
         backdrop-filter: blur(8px); box-shadow: 0 2px 8px rgba(44,36,32,0.04);
         transition: box-shadow 0.2s ease;
     }
-    .hero-card:hover, .section-card:hover { box-shadow: 0 4px 14px rgba(44,36,32,0.06); }
-    .hero-card::before, .section-card::before, .glass-alert::before {
+    .section-card {
+        position: relative; overflow: hidden; border-radius: 0.85rem;
+        border: 1px solid var(--border-soft); background: rgba(255,255,255,0.98);
+        box-shadow: 0 4px 16px rgba(44,36,32,0.04);
+        transition: box-shadow 0.2s ease;
+    }
+    .hero-card:hover { box-shadow: 0 4px 14px rgba(44,36,32,0.06); }
+    .hero-card::before, .glass-alert::before {
         content: ""; position: absolute; inset: 0; pointer-events: none;
         background: radial-gradient(circle at top right, rgba(212,175,55,0.06), transparent 30%);
     }
@@ -157,15 +163,17 @@
                     </div>
                 </div>
 
-                <div class="summary-card relative p-4 sm:p-5">
-                    <div class="flex items-start gap-3 sm:gap-4">
-                        <div class="summary-avatar flex-shrink-0">
-                            {{ strtoupper(substr($student->user->first_name, 0, 1)) }}{{ strtoupper(substr($student->user->last_name, 0, 1)) }}
-                        </div>
-                        <div class="min-w-0">
-                            <div class="summary-label">Student Summary</div>
-                            <div class="summary-value truncate">{{ $student->user->first_name }} {{ $student->user->last_name }}</div>
-                            <div class="summary-subtext">{{ $student->student_id }}</div>
+                <div class="summary-card min-w-[240px] sm:min-w-[280px]">
+                    <div class="relative h-full flex flex-col justify-center p-4 sm:p-5">
+                        <div class="flex items-center gap-3 sm:gap-4">
+                            <div class="summary-avatar flex-shrink-0">
+                                {{ strtoupper(substr($student->user->first_name, 0, 1)) }}{{ strtoupper(substr($student->user->last_name, 0, 1)) }}
+                            </div>
+                            <div class="min-w-0">
+                                <div class="summary-label">Student Profile</div>
+                                <div class="summary-value truncate" title="{{ $student->user->first_name }} {{ $student->user->last_name }}">{{ $student->user->first_name }} {{ $student->user->last_name }}</div>
+                                <div class="summary-subtext">{{ $student->student_id }}</div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -183,9 +191,14 @@
             </div>
         @endif
 
-        <form method="POST" action="{{ route('admin.students.update', $student) }}" class="space-y-4 sm:space-y-6">
+        <form method="POST" action="{{ route('admin.students.update', $student) }}">
             @csrf
             @method('patch')
+
+            <div class="grid grid-cols-1 xl:grid-cols-2 gap-5 sm:gap-6 items-start">
+                
+                <!-- Left Column -->
+                <div class="space-y-5 sm:space-y-6">
 
             <!-- User Information -->
             <div class="section-card">
@@ -504,6 +517,11 @@
                     </div>
                 </div>
             </div>
+            
+                </div> <!-- End Left Column -->
+
+                <!-- Right Column -->
+                <div class="space-y-5 sm:space-y-6">
 
             <!-- Academic Data -->
             <div class="section-card">
@@ -735,10 +753,10 @@
                 </div>
             </div>
 
-            <div class="flex flex-col sm:flex-row justify-between items-center gap-3 sm:gap-4 pt-2 sm:pt-4">
-                <a href="{{ route('admin.students') }}" class="secondary-btn w-full sm:w-auto text-center rounded-lg">
-                    <i class="fas fa-arrow-left mr-1.5 text-[9px] sm:text-xs"></i>Back to Students
-                </a>
+                </div> <!-- End Right Column -->
+            </div> <!-- End Grid -->
+
+            <div class="mt-6 flex justify-end">
                 <button type="submit" class="primary-btn w-full sm:w-auto rounded-lg">
                     <i class="fas fa-save mr-1.5 text-[9px] sm:text-xs"></i>Save Changes
                 </button>

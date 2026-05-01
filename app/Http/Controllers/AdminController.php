@@ -182,6 +182,9 @@ class AdminController extends Controller
 
         $search = $request->get('search');
         $status = $request->get('status', 'all');
+        $collegeId = $request->get('college');
+        $counselorId = $request->get('counselor');
+        $date = $request->get('date');
 
         $query = Appointment::with([
             'student.user',
@@ -211,6 +214,20 @@ class AdminController extends Controller
                         });
                     });
             });
+        }
+
+        if ($collegeId) {
+            $query->whereHas('counselor', function($q) use ($collegeId) {
+                $q->where('college_id', $collegeId);
+            });
+        }
+
+        if ($counselorId) {
+            $query->where('counselor_id', $counselorId);
+        }
+
+        if ($date) {
+            $query->whereDate('appointment_date', $date);
         }
 
         $statsQuery = (clone $query);
@@ -269,13 +286,22 @@ class AdminController extends Controller
         $totalAppointmentsThisMonth = Appointment::whereBetween('appointment_date', [$monthStart, $monthEnd])->count();
 
         $statuses = Appointment::getStatuses();
+        $colleges = College::orderBy('name')->get();
+        $counselorsList = Counselor::with('user', 'college')->get()->sortBy(function($c) {
+            return $c->user->last_name ?? '';
+        });
 
         return view('admin.appointments.index', compact(
             'admin',
             'appointments',
             'search',
             'status',
+            'collegeId',
+            'counselorId',
+            'date',
             'statuses',
+            'colleges',
+            'counselorsList',
             'totalAppointmentsThisMonth',
             'stats'
         ));

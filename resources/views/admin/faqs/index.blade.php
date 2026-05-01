@@ -81,10 +81,9 @@
 
     .primary-btn {
         border-radius: 0.6rem; font-weight: 600; transition: all 0.2s ease;
-        display: inline-flex; align-items: center; justify-content: center; font-size: 0.8rem;
+        display: inline-flex; align-items: center; justify-content: center; white-space: nowrap;
         color: #fef9e7; background: linear-gradient(135deg, var(--maroon-800) 0%, var(--maroon-700) 100%);
         box-shadow: 0 4px 10px rgba(92,26,26,0.15);
-        padding: 0.5rem 0.75rem;
     }
     .primary-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 14px rgba(92,26,26,0.2); }
 
@@ -182,7 +181,7 @@
                             </div>
                         </div>
                         <a href="{{ route('admin.faqs.create') }}"
-                           class="primary-btn px-3 py-2 whitespace-nowrap text-xs sm:text-sm rounded-lg">
+                           class="primary-btn px-5 py-2.5 whitespace-nowrap text-xs sm:text-sm rounded-lg">
                             <i class="fas fa-plus mr-1.5 text-[9px] sm:text-xs"></i> Add FAQ
                         </a>
                     </div>
@@ -320,43 +319,10 @@
                     </table>
                 </div>
 
-                <!-- Enhanced Pagination Section -->
-                @if($faqs->hasPages())
+                <!-- Pagination -->
                 <div class="px-4 sm:px-5 py-3 sm:py-3.5 border-t border-[#e5e0db]/60 bg-[#faf8f5]/40">
-                    <div class="flex items-center justify-center">
-                        <div class="pagination-wrap flex items-center gap-2 justify-center">
-                            {{ $faqs->appends(request()->query())->links() }}
-                        </div>
-                    </div>
+                    {{ $faqs->appends(request()->query())->links('vendor.pagination.counselor-resources') }}
                 </div>
-
-                <style>
-                    .pagination-wrap nav { display: inline-flex; }
-                    .pagination-wrap .relative { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
-                    .pagination-wrap span, .pagination-wrap a {
-                        display: inline-flex; align-items: center; justify-content: center;
-                        min-width: 28px; height: 28px; padding: 0 8px; border-radius: 8px;
-                        font-size: 11px; font-weight: 600; transition: all 0.2s ease;
-                    }
-                    .pagination-wrap span[aria-current="page"] span {
-                        background: #5c1a1a;
-                        color: white;
-                    }
-                    .pagination-wrap a {
-                        background: white; color: #6b5e57; border: 1px solid #e5e0db;
-                    }
-                    .pagination-wrap a:hover {
-                        background: #fdf2f2; color: #5c1a1a; border-color: rgba(212, 175, 55, 0.4);
-                    }
-                </style>
-                @else
-                <div class="px-4 sm:px-5 py-3 sm:py-3.5 border-t border-[#e5e0db]/60 bg-[#faf8f5]/40">
-                    <div class="flex items-center justify-center gap-2 text-[10px] sm:text-xs text-[#8b7e76]">
-                        <i class="fas fa-circle-check text-[#059669]"></i>
-                        <span>Showing all <span class="font-semibold text-[#2c2420]">{{ $faqs->count() }}</span> FAQs</span>
-                    </div>
-                </div>
-                @endif
             @endif
         </div>
     </div>

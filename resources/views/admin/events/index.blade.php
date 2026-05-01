@@ -91,13 +91,23 @@
         border: 1px solid rgba(255,255,255,0.1); color: #fef9e7; flex-shrink: 0;
     }
     .summary-label { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.2em; color: rgba(255,255,255,0.7); }
+    .summary-value { font-size: 1.2rem; line-height: 1.2; font-weight: 800; margin-top: 0.35rem; }
+    .summary-subtext { font-size: 0.7rem; color: rgba(255,255,255,0.8); margin-top: 0.2rem; }
 
-    .filter-btn, .primary-btn {
+    .primary-btn {
+        border-radius: 0.6rem; font-weight: 600; transition: all 0.2s ease;
+        display: inline-flex; align-items: center; justify-content: center; white-space: nowrap;
+        color: #fef9e7; background: linear-gradient(135deg, var(--maroon-800) 0%, var(--maroon-700) 100%);
+        box-shadow: 0 4px 10px rgba(92,26,26,0.15);
+    }
+    .primary-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 14px rgba(92,26,26,0.2); }
+
+    .filter-btn {
         border-radius: 0.6rem; color: #fef9e7;
         background: linear-gradient(135deg, var(--maroon-800) 0%, var(--maroon-700) 100%);
         box-shadow: 0 4px 10px rgba(92,26,26,0.15); transition: all 0.2s ease;
     }
-    .filter-btn:hover, .primary-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 14px rgba(92,26,26,0.2); }
+    .filter-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 14px rgba(92,26,26,0.2); }
 
     .panel-topline { position: absolute; inset-inline: 0; top: 0; height: 3px; background: linear-gradient(90deg, var(--maroon-800) 0%, var(--gold-400) 50%, var(--maroon-800) 100%); }
     .panel-header { display: flex; align-items: center; gap: 0.7rem; padding: 0.85rem 1.25rem; border-bottom: 1px solid var(--border-soft)/60; }
@@ -210,14 +220,19 @@
 
                 <div class="summary-card">
                     <div class="relative h-full flex flex-col sm:flex-row items-center justify-between gap-3 p-4">
-                        <div class="min-w-0 text-center sm:text-left">
-                            <p class="summary-label">Quick Action</p>
-                            <p class="text-base sm:text-lg font-semibold mt-1 sm:mt-1.5">Create New Event</p>
-                            <p class="text-[10px] sm:text-xs text-white/80 mt-0.5">Add workshops, webinars, seminars, and conferences.</p>
+                        <div class="flex items-center gap-3 text-center sm:text-left">
+                            <div class="summary-icon flex-shrink-0">
+                                <i class="fas fa-plus text-sm"></i>
+                            </div>
+                            <div class="min-w-0">
+                                <p class="summary-label">Quick Action</p>
+                                <p class="summary-value">Create New Event</p>
+                                <p class="summary-subtext hidden sm:block">Add workshops, webinars, seminars, and conferences.</p>
+                            </div>
                         </div>
                         <a href="{{ route('admin.events.create') }}"
-                           class="inline-flex items-center justify-center w-full sm:w-auto px-3 py-2 bg-[#fef9e7] text-[#7a2a2a] rounded-lg hover:bg-[#f5e6b8] transition font-semibold shadow-sm whitespace-nowrap text-xs sm:text-sm">
-                            <i class="fas fa-plus mr-1.5 text-[9px] sm:text-xs"></i> Create
+                           class="primary-btn px-5 py-2.5 whitespace-nowrap text-xs sm:text-sm rounded-lg">
+                            <i class="fas fa-plus mr-1.5 text-[9px] sm:text-xs"></i> Create New Event
                         </a>
                     </div>
                 </div>
@@ -483,45 +498,12 @@
                 @endforeach
             </div>
 
-            <!-- Enhanced Pagination -->
-            @if($events->hasPages())
+            <!-- Pagination -->
             <div class="mt-5 sm:mt-6 glass-card overflow-hidden">
                 <div class="px-4 sm:px-5 py-3 sm:py-3.5 border-t border-[#e5e0db]/60 bg-[#faf8f5]/40">
-                    <div class="flex items-center justify-center">
-                        <div class="pagination-wrap flex items-center gap-2 justify-center">
-                            {{ $events->appends(request()->query())->links() }}
-                        </div>
-                    </div>
-                </div>
-
-                <style>
-                    .pagination-wrap nav { display: inline-flex; }
-                    .pagination-wrap .relative { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
-                    .pagination-wrap span, .pagination-wrap a {
-                        display: inline-flex; align-items: center; justify-content: center;
-                        min-width: 28px; height: 28px; padding: 0 8px; border-radius: 8px;
-                        font-size: 11px; font-weight: 600; transition: all 0.2s ease;
-                    }
-                    .pagination-wrap span[aria-current="page"] span {
-                        background: #5c1a1a;
-                        color: white;
-                    }
-                    .pagination-wrap a {
-                        background: white; color: #6b5e57; border: 1px solid #e5e0db;
-                    }
-                    .pagination-wrap a:hover {
-                        background: #fdf2f2; color: #5c1a1a; border-color: rgba(212, 175, 55, 0.4);
-                    }
-                </style>
-            </div>
-            @else
-            <div class="mt-5 sm:mt-6 glass-card p-4">
-                <div class="flex items-center justify-center gap-2 text-[10px] sm:text-xs text-[#8b7e76]">
-                    <i class="fas fa-circle-check text-[#059669]"></i>
-                    <span>Showing all <span class="font-semibold text-[#2c2420]">{{ $events->total() }}</span> events</span>
+                    {{ $events->appends(request()->query())->links('vendor.pagination.counselor-resources') }}
                 </div>
             </div>
-            @endif
         @endif
     </div>
 </div>

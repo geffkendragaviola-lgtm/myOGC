@@ -87,6 +87,8 @@
     }
     .primary-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 14px rgba(92,26,26,0.2); }
 
+    .panel-topline { position: absolute; inset-inline: 0; top: 0; height: 3px; background: linear-gradient(90deg, var(--maroon-800) 0%, var(--gold-400) 50%, var(--maroon-800) 100%); z-index: 10; }
+
     .table-header-bar {
         display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.6rem;
         padding: 0.75rem 1.25rem; border-bottom: 1px solid var(--border-soft)/60;
@@ -211,30 +213,19 @@
             </div>
         </div>
 
-        <div class="panel-card mb-5 sm:mb-6 overflow-hidden">
-            <div class="table-header-bar">
-                <div class="flex items-center gap-3">
-                    <div class="table-header-icon">
-                        <i class="fas fa-sliders text-[#7a2a2a] text-[10px] sm:text-xs"></i>
-                    </div>
-                    <div>
-                        <h2 class="text-sm font-medium text-[#2c2420]">Filters</h2>
-                        <p class="text-[10px] sm:text-xs text-[#8b7e76]">Search and filter resources</p>
-                    </div>
-                </div>
-            </div>
-
+        <div class="panel-card mb-5 sm:mb-6 overflow-hidden relative">
+            <div class="panel-topline z-10"></div>
             <div class="p-4 sm:p-5">
-                <form method="GET" action="{{ route('admin.resources.index') }}" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 items-end">
-                    <div class="lg:col-span-2">
+                <form method="GET" action="{{ route('admin.resources.index') }}" class="flex flex-wrap items-end gap-3">
+                    <div class="flex-1 min-w-[140px]">
                         <label class="filter-label">Search</label>
                         <div class="relative">
                             <i class="fas fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-[#a89f97] text-xs"></i>
-                            <input type="text" name="search" value="{{ $search ?? '' }}" placeholder="Title, description, button text..." class="filter-input pl-9" />
+                            <input type="text" name="search" value="{{ $search ?? '' }}" placeholder="   Title, description..." class="filter-input pl-9" />
                         </div>
                     </div>
 
-                    <div>
+                    <div class="min-w-[120px]">
                         <label class="filter-label">Category</label>
                         <select name="category" class="filter-input bg-white">
                             <option value="all" {{ ($category ?? 'all') === 'all' ? 'selected' : '' }}>All</option>
@@ -244,7 +235,7 @@
                         </select>
                     </div>
 
-                    <div>
+                    <div class="min-w-[110px]">
                         <label class="filter-label">Status</label>
                         <select name="status" class="filter-input bg-white">
                             <option value="all" {{ ($status ?? 'all') === 'all' ? 'selected' : '' }}>All</option>
@@ -253,7 +244,7 @@
                         </select>
                     </div>
 
-                    <div>
+                    <div class="min-w-[110px]">
                         <label class="filter-label">Pinned</label>
                         <select name="pinned" class="filter-input bg-white">
                             <option value="all" {{ ($pinned ?? 'all') === 'all' ? 'selected' : '' }}>All</option>
@@ -262,7 +253,7 @@
                         </select>
                     </div>
 
-                    <div class="sm:col-span-2 lg:col-span-4 flex flex-col sm:flex-row justify-end gap-2 sm:gap-3 pt-1">
+                    <div class="flex gap-2">
                         <button type="submit" class="primary-btn px-4 py-2 text-xs sm:text-sm rounded-lg">
                             <i class="fas fa-filter mr-1.5 text-[9px] sm:text-xs"></i> Apply
                         </button>
@@ -275,7 +266,7 @@
         </div>
 
         <!-- Main Content Card -->
-        <div class="panel-card overflow-hidden">
+        <div class="panel-card overflow-hidden relative">
             @if($resources->count() === 0)
                 <div class="p-6 sm:p-10 md:p-12 text-center">
                     <div class="empty-state-icon mb-4">
@@ -297,13 +288,8 @@
                         </div>
                         <div>
                             <h2 class="text-sm font-medium text-[#2c2420]">Resource Library</h2>
-                            <p class="text-[10px] sm:text-xs text-[#8b7e76]">Total resources: {{ $resources->total() }}</p>
+                            <p class="text-[10px] sm:text-xs text-[#8b7e76]">Total resources: <span class="font-bold text-[#2c2420]">{{ $resources->total() }}</span></p>
                         </div>
-                    </div>
-                    <div class="flex items-center gap-2">
-                        <span class="table-live-pill">
-                            <i class="fas fa-clock mr-1 text-[9px]"></i> Live data
-                        </span>
                     </div>
                 </div>
 
@@ -408,43 +394,10 @@
                     </table>
                 </div>
 
-                <!-- Enhanced Pagination Section -->
-                @if($resources->hasPages())
+                <!-- Pagination -->
                 <div class="px-4 sm:px-5 py-3 sm:py-3.5 border-t border-[#e5e0db]/60 bg-[#faf8f5]/40">
-                    <div class="flex items-center justify-center">
-                        <div class="pagination-wrap flex items-center gap-2 justify-center">
-                            {{ $resources->appends(request()->query())->links() }}
-                        </div>
-                    </div>
+                    {{ $resources->appends(request()->query())->links('vendor.pagination.counselor-resources') }}
                 </div>
-
-                <style>
-                    .pagination-wrap nav { display: inline-flex; }
-                    .pagination-wrap .relative { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
-                    .pagination-wrap span, .pagination-wrap a {
-                        display: inline-flex; align-items: center; justify-content: center;
-                        min-width: 28px; height: 28px; padding: 0 8px; border-radius: 8px;
-                        font-size: 11px; font-weight: 600; transition: all 0.2s ease;
-                    }
-                    .pagination-wrap span[aria-current="page"] span {
-                        background: #5c1a1a;
-                        color: white;
-                    }
-                    .pagination-wrap a {
-                        background: white; color: #6b5e57; border: 1px solid #e5e0db;
-                    }
-                    .pagination-wrap a:hover {
-                        background: #fdf2f2; color: #5c1a1a; border-color: rgba(212, 175, 55, 0.4);
-                    }
-                </style>
-                @else
-                <div class="px-4 sm:px-5 py-3 sm:py-3.5 border-t border-[#e5e0db]/60 bg-[#faf8f5]/40">
-                    <div class="flex items-center justify-center gap-2 text-[10px] sm:text-xs text-[#8b7e76]">
-                        <i class="fas fa-circle-check text-[#059669]"></i>
-                        <span>Showing all <span class="font-semibold text-[#2c2420]">{{ $resources->count() }}</span> resources</span>
-                    </div>
-                </div>
-                @endif
             @endif
         </div>
     </div>

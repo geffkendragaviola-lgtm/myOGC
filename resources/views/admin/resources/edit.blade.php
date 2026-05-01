@@ -5,23 +5,14 @@
 @section('content')
 <style>
     :root {
-        --maroon-900: #3a0c0c;
-        --maroon-800: #5c1a1a;
-        --maroon-700: #7a2a2a;
-        --gold-500: #c9a227;
-        --gold-400: #d4af37;
-        --bg-warm: #faf8f5;
-        --border-soft: #e5e0db;
-        --text-primary: #2c2420;
-        --text-secondary: #6b5e57;
-        --text-muted: #8b7e76;
+        --maroon-900: #3a0c0c; --maroon-800: #5c1a1a; --maroon-700: #7a2a2a;
+        --gold-500: #c9a227; --gold-400: #d4af37;
+        --bg-warm: #faf8f5; --border-soft: #e5e0db;
+        --text-primary: #2c2420; --text-secondary: #6b5e57; --text-muted: #8b7e76;
     }
 
     .edit-resource-shell {
-        position: relative;
-        overflow: hidden;
-        background: var(--bg-warm);
-        min-height: 100vh;
+        position: relative; overflow: hidden; background: var(--bg-warm); min-height: 100vh;
     }
     .edit-resource-glow {
         position: absolute; border-radius: 50%; filter: blur(80px); pointer-events: none; opacity: 0.25;
@@ -29,21 +20,27 @@
     .edit-resource-glow.one { top: -30px; left: -40px; width: 200px; height: 200px; background: var(--gold-400); }
     .edit-resource-glow.two { bottom: -30px; right: -60px; width: 220px; height: 220px; background: var(--maroon-800); }
 
-    .hero-card, .panel-card, .section-card {
+    .hero-card, .summary-card, .glass-alert {
         position: relative; overflow: hidden; border-radius: 0.75rem;
         border: 1px solid var(--border-soft); background: rgba(255,255,255,0.95);
         backdrop-filter: blur(8px); box-shadow: 0 2px 8px rgba(44,36,32,0.04);
         transition: box-shadow 0.2s ease;
     }
-    .hero-card:hover, .panel-card:hover, .section-card:hover {
+    .section-card {
+        position: relative; overflow: hidden; border-radius: 0.85rem;
+        border: 1px solid var(--border-soft); background: rgba(255,255,255,0.98);
+        box-shadow: 0 4px 16px rgba(44,36,32,0.04);
+        transition: box-shadow 0.2s ease;
+    }
+    .hero-card:hover {
         box-shadow: 0 4px 14px rgba(44,36,32,0.06);
     }
-    .hero-card::before, .panel-card::before, .section-card::before {
+    .hero-card::before, .glass-alert::before {
         content: ""; position: absolute; inset: 0; pointer-events: none;
         background: radial-gradient(circle at top right, rgba(212,175,55,0.06), transparent 30%);
     }
 
-    .hero-icon, .panel-icon, .section-icon {
+    .hero-icon, .section-icon {
         display: flex; align-items: center; justify-content: center; flex-shrink: 0;
     }
     .hero-icon {
@@ -60,23 +57,17 @@
     .hero-badge-dot { width: 0.3rem; height: 0.3rem; border-radius: 999px; background: var(--gold-400); }
 
     .summary-card {
-        position: relative; overflow: hidden; border-radius: 0.75rem;
-        border: 1px solid rgba(92,26,26,0.15);
-        background: linear-gradient(135deg, var(--maroon-800) 0%, var(--maroon-900) 100%); color: white;
-        box-shadow: 0 4px 12px rgba(58,12,12,0.15);
+        border: 1px solid rgba(92,26,26,0.15); background: linear-gradient(135deg, var(--maroon-800) 0%, var(--maroon-900) 100%); color: white; box-shadow: 0 4px 12px rgba(58,12,12,0.15);
     }
     .summary-card::before {
         content: ""; position: absolute; inset: 0; opacity: 0.15;
-        background: radial-gradient(circle at top right, var(--gold-400), transparent 40%);
-        pointer-events: none;
+        background: radial-gradient(circle at top right, var(--gold-400), transparent 40%); pointer-events: none;
     }
-    .summary-icon {
-        width: 2.5rem; height: 2.5rem; border-radius: 0.75rem; display: flex;
-        align-items: center; justify-content: center; background: rgba(255,255,255,0.1);
-        border: 1px solid rgba(255,255,255,0.1); color: #fef9e7; flex-shrink: 0;
+    .summary-avatar {
+        width: 2.75rem; height: 2.75rem; border-radius: 0.75rem; display: flex; align-items: center; justify-content: center; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.1); color: #fef9e7; flex-shrink: 0; font-weight: 700;
     }
     .summary-label { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.2em; color: rgba(255,255,255,0.7); }
-    .summary-value { font-size: 1.15rem; line-height: 1.2; font-weight: 800; margin-top: 0.35rem; }
+    .summary-value { font-size: 1.15rem; line-height: 1.25; font-weight: 800; margin-top: 0.35rem; }
     .summary-subtext { font-size: 0.7rem; color: rgba(255,255,255,0.8); margin-top: 0.2rem; }
 
     .primary-btn, .secondary-btn {
@@ -95,16 +86,16 @@
     }
     .secondary-btn:hover { background: #f5f0eb; }
 
-    .panel-topline, .section-topline { position: absolute; inset-inline: 0; top: 0; height: 3px; background: linear-gradient(90deg, var(--maroon-800) 0%, var(--gold-400) 50%, var(--maroon-800) 100%); }
-    .panel-header, .section-header {
+    .section-topline { position: absolute; inset-inline: 0; top: 0; height: 3px; background: linear-gradient(90deg, var(--maroon-800) 0%, var(--gold-400) 50%, var(--maroon-800) 100%); }
+    .section-header {
         display: flex; align-items: center; gap: 0.7rem; padding: 0.85rem 1.25rem;
-        border-bottom: 1px solid var(--border-soft)/60;
+        border-bottom: 1px solid var(--border-soft); background: rgba(250,248,245,0.5);
     }
-    .panel-icon, .section-icon {
+    .section-icon {
         width: 2rem; height: 2rem; border-radius: 0.6rem; background: rgba(254,249,231,0.7); color: var(--maroon-700);
     }
-    .panel-title, .section-title { font-size: 0.8rem; font-weight: 600; color: var(--text-primary); }
-    .panel-subtitle, .section-subtitle { font-size: 0.68rem; color: var(--text-muted); margin-top: 0.1rem; }
+    .section-title { font-size: 0.8rem; font-weight: 600; color: var(--text-primary); }
+    .section-subtitle { font-size: 0.68rem; color: var(--text-muted); margin-top: 0.1rem; }
 
     .field-label {
         display: block; font-size: 0.65rem; font-weight: 600; color: var(--text-secondary);
@@ -133,7 +124,7 @@
     .option-card:hover { border-color: rgba(212,175,55,0.4); background: rgba(254,249,231,0.5); }
 
     @media (max-width: 639px) {
-        .panel-header, .section-header { padding: 0.75rem 1rem; }
+        .section-header { padding: 0.75rem 1rem; }
         .input-field, .textarea-field, .select-field { padding: 0.6rem 0.75rem; font-size: 0.85rem; }
         .primary-btn, .secondary-btn { width: 100%; justify-content: center; padding: 0.6rem 1rem; }
         .space-x-3 > * + * { margin-left: 0; margin-top: 0.5rem; }
@@ -149,61 +140,50 @@
         <div class="mb-5 sm:mb-6">
             <div class="grid grid-cols-1 xl:grid-cols-[1fr_auto] gap-4 items-stretch">
                 <div class="hero-card">
-                    <div class="relative p-4 sm:p-5 flex items-start gap-3">
+                    <div class="relative p-4 sm:p-5 flex flex-col sm:flex-row items-start gap-3 sm:gap-4">
                         <div class="hero-icon">
                             <i class="fas fa-pen-to-square text-base sm:text-lg"></i>
                         </div>
                         <div class="min-w-0">
+                            <a href="{{ route('admin.resources.index') }}" class="inline-flex items-center text-[#7a2a2a] hover:text-[#5c1a1a] mb-3 sm:mb-4 font-medium text-xs sm:text-sm">
+                                <i class="fas fa-arrow-left mr-1.5"></i> Back to Resources
+                            </a>
                             <div class="hero-badge">
                                 <span class="hero-badge-dot"></span>
-                                Resource Editing
+                                Resource Editor
                             </div>
                             <h1 class="text-lg sm:text-xl lg:text-2xl font-semibold tracking-tight text-[#2c2420] mt-2">Edit Resource</h1>
                             <p class="text-[#6b5e57] text-xs sm:text-sm mt-1.5 max-w-2xl">
-                                Update the resource details.
+                                Update the resource details, metadata, link behavior, and visibility settings.
                             </p>
                         </div>
                     </div>
                 </div>
 
-                <div class="summary-card">
-                    <div class="relative h-full flex flex-col sm:flex-row items-center justify-between gap-3 p-4">
-                        <div class="flex items-center gap-3 text-center sm:text-left">
-                            <div class="summary-icon flex-shrink-0">
-                                <i class="fas fa-arrow-left text-sm"></i>
+                <div class="summary-card min-w-[240px] sm:min-w-[280px]">
+                    <div class="relative h-full flex flex-col justify-center p-4 sm:p-5">
+                        <div class="flex items-center gap-3 sm:gap-4">
+                            <div class="summary-avatar flex-shrink-0">
+                                <i class="{{ $resource->icon }} text-lg"></i>
                             </div>
                             <div class="min-w-0">
-                                <p class="summary-label">Navigation</p>
-                                <p class="summary-value">Back to Resources</p>
-                                <p class="summary-subtext hidden sm:block">Return to the resource library anytime.</p>
+                                <div class="summary-label">Resource Profile</div>
+                                <div class="summary-value truncate" title="{{ $resource->title }}">{{ $resource->title }}</div>
+                                <div class="summary-subtext">{{ Str::title(str_replace('_', ' ', $resource->category)) }}</div>
                             </div>
                         </div>
-                        <a href="{{ route('admin.resources.index') }}"
-                           class="secondary-btn px-3 py-2 text-xs sm:text-sm rounded-lg">
-                            <i class="fas fa-arrow-left mr-1.5 text-[9px] sm:text-xs"></i> Back
-                        </a>
                     </div>
                 </div>
             </div>
         </div>
 
-        <div class="panel-card">
-            <div class="panel-topline"></div>
-            <div class="panel-header">
-                <div class="panel-icon">
-                    <i class="fas fa-book-open text-[9px] sm:text-xs"></i>
-                </div>
-                <div>
-                    <h2 class="panel-title">Resource Form</h2>
-                    <p class="panel-subtitle hidden sm:block">Update content, metadata, link behavior, and visibility settings for this resource.</p>
-                </div>
-            </div>
+        <form action="{{ route('admin.resources.update', $resource) }}" method="POST" enctype="multipart/form-data">
+            @csrf
+            @method('PATCH')
 
-            <div class="p-3 sm:p-4 md:p-6">
-                <form action="{{ route('admin.resources.update', $resource) }}" method="POST" enctype="multipart/form-data">
-                    @csrf
-                    @method('PATCH')
-
+            <div class="grid grid-cols-1 xl:grid-cols-2 gap-5 sm:gap-6 items-start">
+                <!-- Left Column -->
+                <div class="space-y-5 sm:space-y-6">
                     <div class="section-card">
                         <div class="section-topline"></div>
                         <div class="section-header">
@@ -212,12 +192,12 @@
                             </div>
                             <div>
                                 <h3 class="section-title">Resource Details</h3>
-                                <p class="section-subtitle hidden sm:block">Edit the title, description, category, icon, link, and other display settings.</p>
+                                <p class="section-subtitle hidden sm:block">Edit the title, description, category, and main link.</p>
                             </div>
                         </div>
 
-                        <div class="p-3 sm:p-4 md:p-6 grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4 md:gap-6">
-                            <div class="md:col-span-2">
+                        <div class="p-3 sm:p-4 md:p-6 grid grid-cols-1 gap-3 sm:gap-4 md:gap-6">
+                            <div>
                                 <label for="title" class="field-label">Title *</label>
                                 <input type="text" name="title" id="title" value="{{ old('title', $resource->title) }}"
                                        class="input-field" required>
@@ -226,9 +206,32 @@
                                 @enderror
                             </div>
 
-                            <div class="md:col-span-2">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
+                                <div>
+                                    <label for="category" class="field-label">Category *</label>
+                                    <select name="category" id="category" class="select-field" required>
+                                        <option value="">Select a category</option>
+                                        @foreach($categories as $value => $label)
+                                            <option value="{{ $value }}" {{ old('category', $resource->category) == $value ? 'selected' : '' }}>{{ $label }}</option>
+                                        @endforeach
+                                    </select>
+                                    @error('category')
+                                        <p class="error-text">{{ $message }}</p>
+                                    @enderror
+                                </div>
+                                <div>
+                                    <label for="button_text" class="field-label">Button Text *</label>
+                                    <input type="text" name="button_text" id="button_text" value="{{ old('button_text', $resource->button_text) }}"
+                                           class="input-field" required>
+                                    @error('button_text')
+                                        <p class="error-text">{{ $message }}</p>
+                                    @enderror
+                                </div>
+                            </div>
+
+                            <div>
                                 <label for="description" class="field-label">Description *</label>
-                                <textarea name="description" id="description" rows="3"
+                                <textarea name="description" id="description" rows="4"
                                           class="textarea-field" required>{{ old('description', $resource->description) }}</textarea>
                                 @error('description')
                                     <p class="error-text">{{ $message }}</p>
@@ -236,10 +239,37 @@
                             </div>
 
                             <div>
+                                <label for="link" class="field-label">Resource Link *</label>
+                                <input type="url" name="link" id="link" value="{{ old('link', $resource->link) }}"
+                                       class="input-field" required>
+                                @error('link')
+                                    <p class="error-text">{{ $message }}</p>
+                                @enderror
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Column -->
+                <div class="space-y-5 sm:space-y-6">
+                    <div class="section-card">
+                        <div class="section-topline"></div>
+                        <div class="section-header">
+                            <div class="section-icon">
+                                <i class="fas fa-sliders text-[9px] sm:text-xs"></i>
+                            </div>
+                            <div>
+                                <h3 class="section-title">Media & Settings</h3>
+                                <p class="section-subtitle hidden sm:block">Icon selection, thumbnail, and display preferences.</p>
+                            </div>
+                        </div>
+
+                        <div class="p-3 sm:p-4 md:p-6 grid grid-cols-1 gap-3 sm:gap-4 md:gap-6">
+                            <div>
                                 <label for="icon" class="field-label">Icon *</label>
                                 <div class="grid grid-cols-5 sm:grid-cols-6 md:grid-cols-7 gap-2">
                                     @foreach($icons as $icon)
-                                        <label class="option-card cursor-pointer flex items-center justify-center gap-2 p-2 sm:p-2.5">
+                                        <label class="option-card cursor-pointer flex items-center justify-center gap-2 p-2 sm:p-2.5 !m-0">
                                             <input type="radio"
                                                    name="icon"
                                                    value="{{ $icon }}"
@@ -258,46 +288,6 @@
                             </div>
 
                             <div>
-                                <label for="category" class="field-label">Category *</label>
-                                <select name="category" id="category"
-                                        class="select-field" required>
-                                    <option value="">Select a category</option>
-                                    @foreach($categories as $value => $label)
-                                        <option value="{{ $value }}" {{ old('category', $resource->category) == $value ? 'selected' : '' }}>{{ $label }}</option>
-                                    @endforeach
-                                </select>
-                                @error('category')
-                                    <p class="error-text">{{ $message }}</p>
-                                @enderror
-                            </div>
-
-                            <div>
-                                <label for="button_text" class="field-label">Button Text *</label>
-                                <input type="text" name="button_text" id="button_text" value="{{ old('button_text', $resource->button_text) }}"
-                                       class="input-field" required>
-                                @error('button_text')
-                                    <p class="error-text">{{ $message }}</p>
-                                @enderror
-                            </div>
-
-                            <div>
-                                <label class="field-label">Pin to Top</label>
-                                <label class="inline-flex items-center gap-2 cursor-pointer">
-                                    <input type="checkbox" name="is_pinned" value="1" {{ old('is_pinned', $resource->is_pinned ?? false) ? 'checked' : '' }} class="w-4 h-4 accent-[#7a2a2a]">
-                                    <span class="text-sm text-[#6b5e57]">Pin this resource to appear first</span>
-                                </label>
-                            </div>
-
-                            <div class="md:col-span-2">
-                                <label for="link" class="field-label">Resource Link *</label>
-                                <input type="url" name="link" id="link" value="{{ old('link', $resource->link) }}"
-                                       class="input-field" required>
-                                @error('link')
-                                    <p class="error-text">{{ $message }}</p>
-                                @enderror
-                            </div>
-
-                            <div class="md:col-span-2">
                                 <label for="image" class="field-label">Replace Image (optional)</label>
                                 <input type="file" name="image" id="image" accept="image/*" class="file-field">
                                 @error('image')
@@ -305,11 +295,17 @@
                                 @enderror
                             </div>
 
-                            <div class="md:col-span-2 space-y-3 sm:space-y-4">
+                            <div class="space-y-3 sm:space-y-4">
                                 <div class="option-card">
                                     <input type="checkbox" name="use_yt_thumbnail" id="use_yt_thumbnail" value="1" {{ old('use_yt_thumbnail', $resource->use_yt_thumbnail) ? 'checked' : '' }}
                                            class="h-4 w-4 text-[#7a2a2a] focus:ring-[#7a2a2a] border-[#e5e0db] rounded mt-0.5 flex-shrink-0">
                                     <label for="use_yt_thumbnail" class="ml-3 text-xs sm:text-sm font-medium text-[#4a3f3a] cursor-pointer">Use YouTube thumbnail (for YouTube links)</label>
+                                </div>
+
+                                <div class="option-card">
+                                    <input type="checkbox" name="is_pinned" id="is_pinned" value="1" {{ old('is_pinned', $resource->is_pinned ?? false) ? 'checked' : '' }}
+                                           class="h-4 w-4 text-[#7a2a2a] focus:ring-[#7a2a2a] border-[#e5e0db] rounded mt-0.5 flex-shrink-0">
+                                    <label for="is_pinned" class="ml-3 text-xs sm:text-sm font-medium text-[#4a3f3a] cursor-pointer">Pin this resource to appear first</label>
                                 </div>
 
                                 <div class="option-card">
@@ -335,16 +331,16 @@
                             </div>
                         </div>
                     </div>
+                </div>
 
-                    <div class="mt-6 sm:mt-8 flex flex-col sm:flex-row justify-end gap-2 sm:gap-3">
-                        <a href="{{ route('admin.resources.index') }}" class="secondary-btn text-center rounded-lg">Cancel</a>
-                        <button type="submit" class="primary-btn rounded-lg">
-                            <i class="fas fa-save mr-1.5 text-[9px] sm:text-xs"></i> Update Resource
-                        </button>
-                    </div>
-                </form>
+            </div> <!-- End Grid -->
+
+            <div class="mt-6 flex justify-end">
+                <button type="submit" class="primary-btn w-full sm:w-auto rounded-lg">
+                    <i class="fas fa-save mr-1.5 text-[9px] sm:text-xs"></i>Update Resource
+                </button>
             </div>
-        </div>
+        </form>
     </div>
 </div>
 @endsection

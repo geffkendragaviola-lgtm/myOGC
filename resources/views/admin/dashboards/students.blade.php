@@ -12,7 +12,7 @@
         
         <!-- Header Section -->
         <div class="mb-5 sm:mb-6">
-            <div class="grid grid-cols-1 lg:grid-cols-[1fr_auto] gap-4 items-stretch">
+            <div class="grid grid-cols-1 xl:grid-cols-[1fr_auto] gap-4 items-stretch">
                 <div class="hero-card group">
                     <div class="hero-card-pattern"></div>
                     <div class="relative flex items-start gap-3 p-4 sm:p-5">
@@ -34,15 +34,21 @@
 
                 <div class="summary-card">
                     <div class="summary-card-pattern"></div>
-                    <div class="relative h-full flex items-center gap-3 p-4">
-                        <div class="summary-icon">
-                            <i class="fas fa-users text-sm"></i>
+                    <div class="relative h-full flex flex-col sm:flex-row items-center justify-between gap-3 p-4">
+                        <div class="flex items-center gap-3 text-center sm:text-left">
+                            <div class="summary-icon flex-shrink-0">
+                                <i class="fas fa-users text-sm"></i>
+                            </div>
+                            <div class="min-w-0">
+                                <p class="summary-label">Total Students</p>
+                                <p class="summary-value">{{ $totalStudents ?? $students->total() }}</p>
+                                <p class="summary-subtext hidden sm:block">Live student directory count</p>
+                            </div>
                         </div>
-                        <div>
-                            <p class="summary-label">Total Students</p>
-                            <p class="summary-value">{{ $totalStudents ?? $students->total() }}</p>
-                            <p class="summary-subtext">Live student directory count</p>
-                        </div>
+                        <a href="#"
+                           class="primary-btn px-5 py-2.5 whitespace-nowrap text-xs sm:text-sm rounded-lg">
+                            <i class="fas fa-plus mr-1.5 text-[9px] sm:text-xs"></i> Add Student
+                        </a>
                     </div>
                 </div>
             </div>
@@ -63,18 +69,22 @@
             </div>
 
             <div class="p-3 sm:p-4">
-                <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-2 sm:gap-3">
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
                     @foreach(($studentsPerCollege ?? []) as $collegeStat)
                         @php
-                            $abbr = collect(explode(' ', $collegeStat->name))->map(fn($w) => strtoupper($w[0] ?? ''))->filter()->implode('');
                             $isActive = (string)($college ?? '') === (string)$collegeStat->id;
                         @endphp
                         <a href="{{ route('admin.students', array_filter(['search' => $search, 'college' => $collegeStat->id])) }}"
                            class="college-stat-card group {{ $isActive ? 'college-stat-active' : '' }}">
-                            <div class="college-stat-abbr">{{ $abbr }}</div>
-                            <div class="college-stat-count">{{ $collegeStat->students_count }}</div>
-                            <div class="college-stat-name">{{ $collegeStat->name }}</div>
-                            <div class="college-stat-label">student{{ $collegeStat->students_count == 1 ? '' : 's' }}</div>
+                            <div class="flex items-center justify-between">
+                                <div class="text-left min-w-0 pr-2">
+                                    <div class="college-stat-name" title="{{ $collegeStat->name }}">{{ $collegeStat->name }}</div>
+                                    <div class="college-stat-count mt-1.5">{{ $collegeStat->students_count }}</div>
+                                </div>
+                                <div class="stats-icon {{ $isActive ? 'bg-[#fef9e7] text-[#c9a227]' : 'bg-[#eff6ff] text-sky-600 group-hover:bg-[#e0f2fe]' }} transition-colors">
+                                    <i class="fas fa-school text-sm sm:text-base"></i>
+                                </div>
+                            </div>
                         </a>
                     @endforeach
                 </div>
@@ -83,8 +93,6 @@
 
         <!-- Search & Filter Card -->
         <div class="panel-card mb-5 sm:mb-6">
-            <div class="panel-topline"></div>
-
             <div class="p-3 sm:p-4">
                 <form method="GET" class="flex flex-col md:flex-row gap-3">
                     <div class="flex-1 min-w-0">
@@ -119,25 +127,6 @@
 
         <!-- Students Table Card -->
         <div class="panel-card overflow-hidden">
-            <!-- Table Header Stats -->
-            <div class="table-header-bar">
-                <div class="flex items-center gap-2.5">
-                    <div class="table-header-icon">
-                        <i class="fas fa-user-graduate text-[#7a2a2a] text-[10px] sm:text-xs"></i>
-                    </div>
-                    <div>
-                        <h2 class="text-sm font-medium text-[#2c2420]">Student Directory</h2>
-                        <p class="text-[10px] sm:text-[11px] text-[#8b7e76]">Total records: {{ $students->total() }}</p>
-                    </div>
-                </div>
-
-                <div class="flex items-center gap-2">
-                    <span class="table-live-pill">
-                        <i class="fas fa-clock mr-1 text-[9px]"></i> Live data
-                    </span>
-                </div>
-            </div>
-
             <div class="overflow-x-auto">
                 <table class="min-w-[850px] md:min-w-full divide-y divide-[#e5e0db]/60 w-full">
                     <thead class="bg-[#faf8f5]/85">
@@ -250,43 +239,10 @@
                 </table>
             </div>
 
-            <!-- Enhanced Pagination Section -->
-            @if($students->hasPages())
+            <!-- Pagination -->
             <div class="px-4 sm:px-5 py-3 sm:py-3.5 border-t border-[#e5e0db]/60 bg-[#faf8f5]/40">
-                <div class="flex items-center justify-center">
-                    <div class="pagination-wrap flex items-center gap-2 justify-center">
-                        {{ $students->appends(request()->query())->links() }}
-                    </div>
-                </div>
+                {{ $students->appends(request()->query())->links('vendor.pagination.counselor-resources') }}
             </div>
-
-            <style>
-                .pagination-wrap nav { display: inline-flex; }
-                .pagination-wrap .relative { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
-                .pagination-wrap span, .pagination-wrap a {
-                    display: inline-flex; align-items: center; justify-content: center;
-                    min-width: 28px; height: 28px; padding: 0 8px; border-radius: 8px;
-                    font-size: 11px; font-weight: 600; transition: all 0.2s ease;
-                }
-                .pagination-wrap span[aria-current="page"] span {
-                    background: #5c1a1a;
-                    color: white;
-                }
-                .pagination-wrap a {
-                    background: white; color: #6b5e57; border: 1px solid #e5e0db;
-                }
-                .pagination-wrap a:hover {
-                    background: #fdf2f2; color: #5c1a1a; border-color: rgba(212, 175, 55, 0.4); 
-                }
-            </style>
-            @else
-            <div class="px-4 sm:px-5 py-3 sm:py-3.5 border-t border-[#e5e0db]/60 bg-[#faf8f5]/40">
-                <div class="flex items-center justify-center gap-2 text-[10px] sm:text-xs text-[#8b7e76]">
-                    <i class="fas fa-circle-check text-[#059669]"></i>
-                    <span>Showing all <span class="font-semibold text-[#2c2420]">{{ $students->count() }}</span> students</span>
-                </div>
-            </div>
-            @endif
         </div>
     </div>
 </div>
@@ -489,19 +445,16 @@
     }
 
     .college-stat-card {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        text-align: center;
-        padding: 1rem 0.75rem;
+        display: block;
+        padding: 1rem;
         border-radius: 0.85rem;
         border: 1px solid var(--border-soft);
         background: rgba(255,255,255,0.98);
         transition: all 0.2s ease;
         box-shadow: 0 2px 6px rgba(44,36,32,0.03);
         text-decoration: none;
-        gap: 0.2rem;
+        position: relative;
+        overflow: hidden;
     }
     .college-stat-card:hover {
         border-color: rgba(122,42,42,0.25);
@@ -511,20 +464,16 @@
     }
     .college-stat-active {
         border-color: rgba(122,42,42,0.5) !important;
-        background: linear-gradient(135deg, rgba(92,26,26,0.06), rgba(212,175,55,0.06)) !important;
+        background: linear-gradient(135deg, rgba(254,249,231,0.8), rgba(255,255,255,1)) !important;
         box-shadow: 0 4px 14px rgba(92,26,26,0.1) !important;
     }
-    .college-stat-abbr {
-        font-size: 0.65rem;
-        font-weight: 800;
-        letter-spacing: 0.12em;
-        text-transform: uppercase;
-        color: #7a2a2a;
-        background: rgba(254,249,231,0.8);
-        border: 1px solid rgba(212,175,55,0.3);
-        border-radius: 999px;
-        padding: 0.15rem 0.55rem;
-        margin-bottom: 0.4rem;
+    .college-stat-active::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        border-radius: 0.85rem;
+        border: 2px solid var(--maroon-700);
+        pointer-events: none;
     }
     .college-stat-count {
         font-size: 1.6rem;
@@ -534,19 +483,30 @@
     }
     .college-stat-name {
         font-size: 0.65rem;
-        font-weight: 600;
-        color: #6b5e57;
-        margin-top: 0.35rem;
-        line-height: 1.3;
-        max-width: 120px;
-    }
-    .college-stat-label {
-        font-size: 0.6rem;
+        font-weight: 700;
         color: #8b7e76;
         text-transform: uppercase;
-        letter-spacing: 0.08em;
-        font-weight: 600;
+        letter-spacing: 0.05em;
+        line-height: 1.3;
+        max-width: 100%;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
     }
+    .stats-icon { 
+        width: 2.25rem; height: 2.25rem; border-radius: 0.6rem; 
+        display: flex; align-items: center; justify-content: center;
+        flex-shrink: 0;
+    }
+
+    .primary-btn {
+        border-radius: 0.6rem; font-weight: 600; transition: all 0.2s ease;
+        display: inline-flex; align-items: center; justify-content: center; white-space: nowrap;
+        color: #fef9e7; background: linear-gradient(135deg, var(--maroon-800) 0%, var(--maroon-700) 100%);
+        box-shadow: 0 4px 10px rgba(92,26,26,0.15);
+        text-decoration: none;
+    }
+    .primary-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 14px rgba(92,26,26,0.2); color: #fef9e7; }
 
     .input-field {
         border: 1px solid var(--border-soft);

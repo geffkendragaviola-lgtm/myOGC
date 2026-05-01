@@ -1,4 +1,3 @@
-@if ($paginator->hasPages())
 <nav role="navigation" aria-label="Pagination" class="flex items-center justify-center gap-1.5 flex-wrap">
 
     {{-- Prev arrow --}}
@@ -55,4 +54,3 @@
     .pag-disabled { background: #f5f3f0; color: #c4b8b0; border: 1px solid #e5e0db; cursor: default; }
     .pag-dots   { background: transparent; color: #8b7e76; border: none; cursor: default; }
 </style>
-@endif

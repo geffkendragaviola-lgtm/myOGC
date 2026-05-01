@@ -3,45 +3,44 @@
 @section('title', 'Appointments - Admin Panel')
 
 @section('content')
-    <div class="appointments-shell relative min-h-screen bg-[#faf8f5]">
+    <div class="appointments-shell relative overflow-hidden min-h-screen bg-[#faf8f5]">
         <div class="appointments-glow appointments-glow-1"></div>
         <div class="appointments-glow appointments-glow-2"></div>
 
-        <div class="relative max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
+        <div class="relative max-w-7xl mx-auto px-4 sm:px-6 py-5 md:py-8">
             <!-- Header Section -->
-            <div class="mb-6 sm:mb-8">
-                <div class="grid grid-cols-1 xl:grid-cols-[1fr_auto] gap-4 items-stretch">
-                    <div class="relative overflow-hidden rounded-xl border border-[#d4af37]/20 bg-white/95 backdrop-blur-sm shadow-sm">
-                        <div class="absolute inset-0 bg-gradient-to-br from-[#fdf2f2] via-white to-[#fef9e7]/40"></div>
-                        <div class="relative px-4 sm:px-5 py-4 sm:py-5">
-                            <div class="flex items-start gap-3 sm:gap-4">
-                                <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-lg bg-gradient-to-br from-[#5c1a1a] to-[#7a2a2a] text-[#d4af37] shadow-sm flex items-center justify-center shrink-0">
-                                    <i class="fas fa-calendar-check text-base sm:text-lg"></i>
+            <div class="mb-5 sm:mb-6">
+                <div class="grid grid-cols-1 lg:grid-cols-[1fr_auto] gap-4 items-stretch">
+                    <div class="hero-card group">
+                        <div class="hero-card-pattern"></div>
+                        <div class="relative flex items-start gap-3 p-4 sm:p-5">
+                            <div class="hero-icon">
+                                <i class="fas fa-calendar-check text-base sm:text-lg"></i>
+                            </div>
+                            <div class="min-w-0">
+                                <div class="hero-badge">
+                                    <span class="hero-badge-dot"></span>
+                                    Appointments Overview
                                 </div>
-                                <div class="min-w-0">
-                                    <div class="inline-flex items-center gap-1.5 sm:gap-2 rounded-full border border-[#d4af37]/20 bg-[#fef9e7]/70 px-2 sm:px-2.5 py-0.5 text-[9px] sm:text-[10px] font-semibold uppercase tracking-[0.2em] text-[#7a2a2a] mb-1.5 sm:mb-2">
-                                        <span class="w-1 h-1 sm:w-1.5 sm:h-1.5 rounded-full bg-[#d4af37]"></span>
-                                        Appointments Overview
-                                    </div>
-                                    <h1 class="text-lg sm:text-xl lg:text-2xl font-semibold tracking-tight text-[#2c2420]">Appointments</h1>
-                                    <p class="mt-1 text-xs sm:text-sm text-[#6b5e57] max-w-xl">
-                                        Manage, review, and monitor all counseling appointments with a cleaner and more polished admin experience.
-                                    </p>
-                                </div>
+                                <h1 class="text-lg sm:text-xl lg:text-2xl font-semibold tracking-tight text-[#2c2420] mt-2">Appointments</h1>
+                                <p class="text-[#6b5e57] text-xs sm:text-sm mt-1.5 max-w-2xl">
+                                    Manage, review, and monitor all counseling appointments with a cleaner and more polished admin experience.
+                                </p>
                             </div>
                         </div>
                     </div>
 
-                    <div class="relative overflow-hidden rounded-xl border border-[#5c1a1a]/10 bg-gradient-to-br from-[#5c1a1a] to-[#3a0c0c] text-white shadow-sm min-w-[200px] sm:min-w-[240px]">
-                        <div class="absolute inset-0 opacity-15 bg-[radial-gradient(circle_at_top_right,#d4af37,transparent_40%)]"></div>
-                        <div class="relative h-full px-4 sm:px-5 py-3.5 sm:py-4 flex items-center gap-3 sm:gap-4">
-                            <div class="w-10 h-10 sm:w-11 sm:h-11 rounded-lg bg-white/10 border border-white/10 backdrop-blur-sm flex items-center justify-center shrink-0">
-                                <i class="fas fa-calendar-week text-base sm:text-[15px] text-[#d4af37]"></i>
-                            </div>
-                            <div>
-                                <p class="text-[9px] sm:text-[10px] font-semibold uppercase tracking-[0.22em] text-white/70">This Month</p>
-                                <p class="text-xl sm:text-2xl font-bold leading-none mt-1">{{ $totalAppointmentsThisMonth }}</p>
-                                <p class="text-[11px] text-white/80 mt-1">Appointments logged</p>
+                    <div class="summary-card">
+                        <div class="relative h-full flex flex-col sm:flex-row items-center justify-between gap-3 p-4">
+                            <div class="flex items-center gap-3 text-center sm:text-left">
+                                <div class="summary-icon flex-shrink-0">
+                                    <i class="fas fa-calendar-week text-sm"></i>
+                                </div>
+                                <div class="min-w-0">
+                                    <p class="summary-label">This Month</p>
+                                    <p class="summary-value">{{ $totalAppointmentsThisMonth }}</p>
+                                    <p class="summary-subtext hidden sm:block">Appointments logged</p>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -166,20 +165,9 @@
             <!-- Filter Bar -->
             <div class="relative overflow-hidden rounded-xl border border-[#e5e0db]/80 bg-white/95 backdrop-blur-sm shadow-sm mb-5 sm:mb-6">
                 <div class="absolute inset-x-0 top-0 h-0.5 bg-gradient-to-r from-[#5c1a1a] via-[#d4af37] to-[#5c1a1a]"></div>
-                <div class="px-4 sm:px-5 py-3 border-b border-[#e5e0db]/60">
-                    <div class="flex items-center gap-2.5">
-                        <div class="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-[#fef9e7] flex items-center justify-center text-[#9a7b0a]">
-                            <i class="fas fa-sliders text-[10px] sm:text-xs"></i>
-                        </div>
-                        <div>
-                            <p class="text-sm font-medium text-[#2c2420]">Filter Appointments</p>
-                            <p class="text-[11px] text-[#6b5e57] hidden sm:block">Refine results without altering stored data.</p>
-                        </div>
-                    </div>
-                </div>
 
                 <div class="p-3 sm:p-4">
-                    <form method="GET" class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3 sm:gap-4">
+                    <form method="GET" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-3 sm:gap-4">
                         <div>
                             <label class="filter-label">Search</label>
                             <div class="relative">
@@ -187,9 +175,36 @@
                                 <input type="text"
                                        name="search"
                                        value="{{ $search }}"
-                                       placeholder="Case #, student, counselor..."
+                                       placeholder="Case #, student..."
                                        class="filter-input pl-9 sm:pl-10" />
                             </div>
+                        </div>
+
+                        <div>
+                            <label class="filter-label">College</label>
+                            <select name="college" class="filter-input bg-white">
+                                <option value="">All Colleges</option>
+                                @foreach($colleges as $c)
+                                    <option value="{{ $c->id }}" {{ $collegeId == $c->id ? 'selected' : '' }}>{{ $c->name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="filter-label">Counselor</label>
+                            <select name="counselor" class="filter-input bg-white">
+                                <option value="">All Counselors</option>
+                                @foreach($counselorsList as $c)
+                                    <option value="{{ $c->id }}" {{ $counselorId == $c->id ? 'selected' : '' }}>
+                                        {{ $c->user->first_name ?? '' }} {{ $c->user->last_name ?? '' }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="filter-label">Date</label>
+                            <input type="date" name="date" value="{{ $date }}" class="filter-input bg-white text-[#2c2420]" />
                         </div>
 
                         <div>
@@ -260,9 +275,6 @@
                                 <th class="px-3 sm:px-4 py-2.5 sm:py-3 text-left whitespace-nowrap">
                                     <span class="text-[10px] sm:text-[11px] font-semibold text-[#8b7e76] uppercase tracking-[0.15em]">Notes</span>
                                 </th>
-                                <th class="px-3 sm:px-4 py-2.5 sm:py-3 text-center whitespace-nowrap">
-                                    <span class="text-[10px] sm:text-[11px] font-semibold text-[#8b7e76] uppercase tracking-[0.15em]">Action</span>
-                                </th>
                             </tr>
                         </thead>
 
@@ -272,7 +284,7 @@
                                     $hasNotes = $appointment->sessionNotes->count() > 0;
                                     $notesCount = $appointment->sessionNotes->count();
                                 @endphp
-                                <tr class="group hover:bg-[#fdf9f6] transition-colors duration-150">
+                                <tr class="group hover:bg-[#fdf9f6] transition-colors duration-150 cursor-pointer" onclick="showAppointmentDetails({{ $appointment->id }})">
                                     <td class="px-3 sm:px-4 py-2.5 sm:py-3">
                                         <span class="inline-flex rounded-md border border-[#e5e0db]/70 bg-[#faf8f5] px-2 py-0.5 text-[11px] font-mono font-medium text-[#5c4d47]">
                                             {{ $appointment->case_number ?? ('#' . $appointment->id) }}
@@ -380,18 +392,10 @@
                                             </div>
                                         @endif
                                     </td>
-
-                                    <td class="px-3 sm:px-4 py-2.5 sm:py-3 text-center">
-                                        <button onclick="showAppointmentDetails({{ $appointment->id }})"
-                                                class="inline-flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-lg border border-[#7a2a2a]/20 bg-[#fdf2f2] text-[#7a2a2a] font-medium hover:bg-[#5c1a1a] hover:text-[#d4af37] hover:border-[#5c1a1a] shadow-sm transition-all duration-200 text-[10px] sm:text-xs">
-                                            <i class="fas fa-eye text-[9px] sm:text-[10px]"></i>
-                                            <span>View</span>
-                                        </button>
-                                    </td>
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="8" class="px-4 py-12 text-center">
+                                    <td colspan="7" class="px-4 py-12 text-center">
                                         <div class="flex flex-col items-center gap-3">
                                             <div class="w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-[#f5f0eb] flex items-center justify-center shadow-inner">
                                                 <i class="fas fa-calendar-xmark text-[#a89f97] text-xl sm:text-2xl"></i>
@@ -408,70 +412,43 @@
                     </table>
                 </div>
 
-                <!-- Enhanced Pagination Section -->
-                @if($appointments->hasPages())
+                <!-- Pagination -->
                 <div class="px-4 sm:px-5 py-3 sm:py-3.5 border-t border-[#e5e0db]/60 bg-[#faf8f5]/40">
-                    <div class="flex items-center justify-center">
-                        <div class="pagination-wrap flex items-center gap-2 justify-center">
-                            {{ $appointments->appends(request()->query())->links() }}
-                        </div>
-                    </div>
+                    {{ $appointments->appends(request()->query())->links('vendor.pagination.counselor-resources') }}
                 </div>
-
-                <style>
-                    .pagination-wrap nav { display: inline-flex; }
-                    .pagination-wrap .relative { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
-                    .pagination-wrap span, .pagination-wrap a {
-                        display: inline-flex; align-items: center; justify-content: center;
-                        min-width: 28px; height: 28px; padding: 0 8px; border-radius: 8px;
-                        font-size: 11px; font-weight: 600; transition: all 0.2s ease;
-                    }
-                    .pagination-wrap span[aria-current="page"] span {
-                        background: #5c1a1a;
-                        color: white;
-                    }
-                    .pagination-wrap a {
-                        background: white; color: #6b5e57; border: 1px solid #e5e0db;
-                    }
-                    .pagination-wrap a:hover {
-                        background: #fdf2f2; color: #5c1a1a; border-color: rgba(212, 175, 55, 0.4);
-                    }
-                </style>
-                @else
-                <div class="px-4 sm:px-5 py-3 sm:py-3.5 border-t border-[#e5e0db]/60 bg-[#faf8f5]/40">
-                    <div class="flex items-center justify-center gap-2 text-[10px] sm:text-xs text-[#8b7e76]">
-                        <i class="fas fa-circle-check text-[#059669]"></i>
-                        <span>Showing all <span class="font-semibold text-[#2c2420]">{{ $appointments->count() }}</span> appointments</span>
-                    </div>
-                </div>
-                @endif
             </div>
 
             <!-- Modal -->
-            <div id="appointmentModal" class="fixed inset-0 bg-[#2c2420]/40 backdrop-blur-sm flex items-center justify-center hidden z-50 transition-all duration-200 p-3 sm:p-4">
-                <div class="bg-white rounded-xl shadow-xl shadow-[#2c2420]/10 w-full max-w-3xl max-h-[90vh] overflow-y-auto animate-fade-in-up border border-[#e5e0db]/60">
-                    <div class="sticky top-0 bg-white/95 backdrop-blur-sm rounded-t-xl px-4 sm:px-5 py-3.5 sm:py-4 border-b border-[#e5e0db]/60 z-10">
-                        <div class="flex justify-between items-center gap-3 sm:gap-4">
-                            <div class="flex items-center gap-2.5 sm:gap-3">
-                                <div class="w-8 h-8 sm:w-9 sm:h-9 bg-[#fdf2f2] rounded-lg flex items-center justify-center">
-                                    <i class="fas fa-calendar-check text-[#7a2a2a] text-sm"></i>
-                                </div>
-                                <div>
-                                    <h3 class="text-base sm:text-lg font-semibold text-[#2c2420]">Appointment Details</h3>
-                                    <p class="text-[10px] sm:text-[11px] text-[#8b7e76] mt-0.5 hidden sm:block">Review detailed information for this record.</p>
-                                </div>
+            <div id="appointmentModal" class="hidden fixed inset-0 z-[2000] flex items-center justify-center p-4" style="background:rgba(44,36,32,0.5);backdrop-filter:blur(4px);" onclick="if(event.target===this)closeAppointmentModal()">
+                <div class="relative w-full max-w-2xl bg-white rounded-2xl shadow-2xl overflow-hidden" style="border:1px solid #e5e0db;max-height:90vh;display:flex;flex-direction:column;">
+                    <!-- Top gradient bar -->
+                    <div style="height:4px;background:linear-gradient(90deg,#5c1a1a 0%,#d4af37 50%,#5c1a1a 100%);flex-shrink:0;"></div>
+
+                    <!-- Header -->
+                    <div style="background:linear-gradient(135deg,#5c1a1a 0%,#3a0c0c 100%);padding:1.25rem 1.5rem;flex-shrink:0;" class="flex items-center justify-between">
+                        <div class="flex items-center gap-3">
+                            <div id="am-avatar" class="w-12 h-12 rounded-xl overflow-hidden flex items-center justify-center flex-shrink-0" style="background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.2);">
+                                <i class="fas fa-calendar-check text-white text-lg"></i>
                             </div>
-                            <button onclick="closeAppointmentModal()" class="w-7 h-7 sm:w-8 sm:h-8 bg-[#f5f0eb] rounded-lg flex items-center justify-center text-[#6b5e57] hover:bg-[#e5e0db] transition">
-                                <i class="fas fa-xmark text-xs"></i>
-                            </button>
+                            <div>
+                                <div id="am-title" class="text-white font-bold text-base">Appointment Details</div>
+                                <div id="am-subtitle" class="text-[10px] font-semibold uppercase tracking-widest mt-0.5" style="color:rgba(212,175,55,0.9);">Loading...</div>
+                            </div>
+                        </div>
+                        <button onclick="closeAppointmentModal()" class="text-white/70 hover:text-white transition text-xl leading-none">&times;</button>
+                    </div>
+
+                    <!-- Body -->
+                    <div id="appointmentDetails" class="p-5 overflow-y-auto flex-1">
+                        <div class="flex flex-col items-center justify-center py-12">
+                            <div class="w-10 h-10 border-4 border-[#e5e0db] border-t-[#7a2a2a] rounded-full animate-spin"></div>
+                            <p class="mt-4 text-sm text-[#8b7e76]">Loading...</p>
                         </div>
                     </div>
 
-                    <div id="appointmentDetails" class="p-4 sm:p-5">
-                        <div class="flex flex-col items-center justify-center py-8 sm:py-10">
-                            <div class="w-8 h-8 sm:w-10 sm:h-10 border-3 sm:border-4 border-[#e5e0db] border-t-[#7a2a2a] rounded-full animate-spin"></div>
-                            <p class="mt-3 text-xs sm:text-sm text-[#8b7e76]">Loading appointment details...</p>
-                        </div>
+                    <!-- Footer -->
+                    <div id="am-footer" class="px-5 pb-5 pt-3 flex justify-end gap-2 border-t border-[#e5e0db]/60 flex-shrink-0">
+                        <button onclick="closeAppointmentModal()" class="px-4 py-2 rounded-lg text-xs font-semibold text-[#6b5e57] bg-white border border-[#e5e0db] hover:bg-[#f5f0eb] transition">Close</button>
                     </div>
                 </div>
             </div>
@@ -514,6 +491,126 @@
             height: 200px;
             background: var(--maroon-800);
         }
+
+        .hero-card {
+            position: relative;
+            overflow: hidden;
+            border-radius: 0.75rem;
+            border: 1px solid rgba(229, 224, 219, 0.8);
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 2px 8px rgba(44, 36, 32, 0.04);
+            transition: box-shadow 0.2s ease;
+        }
+
+        .hero-card:hover {
+            box-shadow: 0 4px 12px rgba(44, 36, 32, 0.06);
+        }
+
+        .hero-card-pattern {
+            position: absolute;
+            inset: 0;
+            background:
+                radial-gradient(circle at top left, rgba(212,175,55,0.08), transparent 35%),
+                radial-gradient(circle at bottom right, rgba(92,26,26,0.06), transparent 40%);
+            pointer-events: none;
+        }
+
+        .hero-icon {
+            width: 2.75rem;
+            height: 2.75rem;
+            border-radius: 0.75rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fef9e7;
+            background: linear-gradient(135deg, var(--maroon-800) 0%, var(--maroon-700) 100%);
+            box-shadow: 0 4px 12px rgba(92,26,26,0.15);
+            flex-shrink: 0;
+        }
+
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            border-radius: 999px;
+            border: 1px solid rgba(212,175,55,0.3);
+            background: rgba(254,249,231,0.8);
+            padding: 0.2rem 0.55rem;
+            font-size: 9px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.16em;
+            color: var(--maroon-700);
+        }
+
+        .hero-badge-dot {
+            width: 0.3rem;
+            height: 0.3rem;
+            border-radius: 999px;
+            background: var(--gold-400);
+        }
+
+        .summary-card {
+            position: relative;
+            overflow: hidden;
+            border-radius: 0.75rem;
+            border: 1px solid rgba(92,26,26,0.15);
+            background: linear-gradient(135deg, var(--maroon-800) 0%, var(--maroon-900) 100%);
+            color: white;
+            box-shadow: 0 4px 12px rgba(58,12,12,0.15);
+            min-width: 200px;
+        }
+        .summary-card::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            opacity: 0.15;
+            background: radial-gradient(circle at top right, var(--gold-400), transparent 40%);
+            pointer-events: none;
+        }
+
+        .summary-icon {
+            width: 2.5rem;
+            height: 2.5rem;
+            border-radius: 0.75rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.1);
+            color: #fef9e7;
+            flex-shrink: 0;
+        }
+
+        .summary-label {
+            font-size: 9px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.2em;
+            color: rgba(255,255,255,0.7);
+        }
+
+        .summary-value {
+            font-size: 1.5rem;
+            line-height: 1;
+            font-weight: 800;
+            margin-top: 0.35rem;
+        }
+
+        .summary-subtext {
+            font-size: 0.7rem;
+            color: rgba(255,255,255,0.8);
+            margin-top: 0.25rem;
+        }
+
+        .primary-btn {
+            border-radius: 0.6rem; font-weight: 600; transition: all 0.2s ease;
+            display: inline-flex; align-items: center; justify-content: center; white-space: nowrap;
+            color: #fef9e7; background: linear-gradient(135deg, var(--maroon-800) 0%, var(--maroon-700) 100%);
+            box-shadow: 0 4px 10px rgba(92,26,26,0.15);
+        }
+        .primary-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 14px rgba(92,26,26,0.2); }
 
         .stat-card {
             position: relative;
@@ -620,152 +717,123 @@
         function showAppointmentDetails(appointmentId) {
             const modal = document.getElementById('appointmentModal');
             const details = document.getElementById('appointmentDetails');
-            
+            const footer = document.getElementById('am-footer');
+
+            document.getElementById('am-subtitle').textContent = 'Loading...';
             details.innerHTML = `
                 <div class="flex flex-col items-center justify-center py-12">
-                    <div class="w-12 h-12 border-4 border-[#e5e0db] border-t-[#7a2a2a] rounded-full animate-spin"></div>
-                    <p class="mt-4 text-[#8b7e76]">Loading appointment details...</p>
-                </div>
-            `;
+                    <div class="w-10 h-10 border-4 border-[#e5e0db] border-t-[#7a2a2a] rounded-full animate-spin"></div>
+                    <p class="mt-4 text-sm text-[#8b7e76]">Loading...</p>
+                </div>`;
+            footer.innerHTML = `<button onclick="closeAppointmentModal()" class="px-4 py-2 rounded-lg text-xs font-semibold text-[#6b5e57] bg-white border border-[#e5e0db] hover:bg-[#f5f0eb] transition">Close</button>`;
+
             modal.classList.remove('hidden');
             document.body.style.overflow = 'hidden';
 
             fetch(`/admin/appointments/${appointmentId}/details`)
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error('Network response was not ok');
-                    }
-                    return response.json();
-                })
+                .then(r => { if (!r.ok) throw new Error(); return r.json(); })
                 .then(data => {
-                    let sessionNotesHtml = '';
+                    const a = data.appointment ?? {};
+                    const student = data.student ?? {};
+                    const counselor = data.counselor ?? {};
+
+                    document.getElementById('am-title').textContent = a.case_number ? `Case #${a.case_number}` : `Appointment #${appointmentId}`;
+                    document.getElementById('am-subtitle').textContent = data.formatted_date ?? '';
+
+                    const statusColors = {
+                        pending:   'background:#fef9e7;color:#9a7b0a;border:1px solid rgba(212,175,55,0.3)',
+                        approved:  'background:#ecfdf5;color:#059669;border:1px solid rgba(16,185,129,0.3)',
+                        completed: 'background:#f5f0eb;color:#475569;border:1px solid #e5e0db',
+                        rejected:  'background:#fdf2f2;color:#b91c1c;border:1px solid rgba(185,28,28,0.3)',
+                        cancelled: 'background:#f5f0eb;color:#6b5e57;border:1px solid #e5e0db',
+                        referred:  'background:#fef9e7;color:#9a7b0a;border:1px solid rgba(212,175,55,0.3)',
+                    };
+                    const sc = statusColors[a.status] ?? 'background:#f5f0eb;color:#6b5e57;border:1px solid #e5e0db';
+                    const statusLabel = a.status_display ?? (a.status ?? 'N/A');
 
                     details.innerHTML = `
-                        <div class="space-y-4 sm:space-y-5">
-                            <!-- Student & Counselor Cards -->
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
-                                <div class="bg-gradient-to-br from-[#fdf2f2]/60 to-transparent rounded-lg p-3.5 sm:p-4 border border-[#e5e0db]/60">
-                                    <div class="flex items-center gap-2 mb-2.5 sm:mb-3">
-                                        <div class="w-7 h-7 sm:w-8 sm:h-8 bg-[#fdf2f2] rounded-md flex items-center justify-center">
-                                            <i class="fas fa-user-graduate text-[#7a2a2a] text-xs sm:text-sm"></i>
-                                        </div>
-                                        <h4 class="text-sm font-medium text-[#4a3f3a]">Student Information</h4>
-                                    </div>
-                                    <div class="space-y-1.5 sm:space-y-2">
-                                        <p class="text-sm"><span class="font-medium text-[#8b7e76]">Name:</span> <span class="text-[#2c2420]">${data.student?.user?.first_name || 'N/A'} ${data.student?.user?.last_name || ''}</span></p>
-                                        <p class="text-sm"><span class="font-medium text-[#8b7e76]">Student ID:</span> <span class="text-[#2c2420]">${data.student?.student_id || 'N/A'}</span></p>
-                                        <p class="text-sm"><span class="font-medium text-[#8b7e76]">College:</span> <span class="text-[#2c2420]">${data.student?.college?.name || 'N/A'}</span></p>
-                                        <p class="text-sm"><span class="font-medium text-[#8b7e76]">Year Level:</span> <span class="text-[#2c2420]">${data.student?.year_level || 'N/A'}</span></p>
-                                        <p class="text-sm"><span class="font-medium text-[#8b7e76]">Course:</span> <span class="text-[#2c2420]">${data.student?.course || 'N/A'}</span></p>
-                                    </div>
-                                </div>
-                                <div class="bg-gradient-to-br from-[#f5f0eb]/60 to-transparent rounded-lg p-3.5 sm:p-4 border border-[#e5e0db]/60">
-                                    <div class="flex items-center gap-2 mb-2.5 sm:mb-3">
-                                        <div class="w-7 h-7 sm:w-8 sm:h-8 bg-[#f5f0eb] rounded-md flex items-center justify-center">
-                                            <i class="fas fa-user-doctor text-[#6b5e57] text-xs sm:text-sm"></i>
-                                        </div>
-                                        <h4 class="text-sm font-medium text-[#4a3f3a]">Counselor Information</h4>
-                                    </div>
-                                    <div class="space-y-1.5 sm:space-y-2">
-                                        <p class="text-sm"><span class="font-medium text-[#8b7e76]">Name:</span> <span class="text-[#2c2420]">${data.counselor?.name || 'N/A'}</span></p>
-                                        <p class="text-sm"><span class="font-medium text-[#8b7e76]">College:</span> <span class="text-[#2c2420]">${data.counselor?.college?.name || 'N/A'}</span></p>
-                                    </div>
-                                </div>
+                        <div class="space-y-3">
+                            <!-- Status badge -->
+                            <div class="flex items-center gap-2 flex-wrap">
+                                <span style="${sc};padding:0.25rem 0.75rem;border-radius:999px;font-size:0.7rem;font-weight:700;">${statusLabel}</span>
+                                ${a.booking_type ? `<span style="background:#f5f0eb;color:#6b5e57;border:1px solid #e5e0db;padding:0.25rem 0.75rem;border-radius:999px;font-size:0.7rem;font-weight:600;">${a.booking_type}</span>` : ''}
                             </div>
 
-                            <!-- Appointment Details Card -->
-                            <div class="bg-[#faf8f5] rounded-lg p-3.5 sm:p-4 border border-[#e5e0db]/60">
-                                <div class="flex items-center gap-2 mb-2.5 sm:mb-3">
-                                    <div class="w-7 h-7 sm:w-8 sm:h-8 bg-[#fdf2f2] rounded-md flex items-center justify-center">
-                                        <i class="fas fa-calendar-days text-[#7a2a2a] text-xs sm:text-sm"></i>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                <!-- Student -->
+                                <div class="rounded-xl p-3" style="background:#faf8f5;border:1px solid #e5e0db;">
+                                    <div class="text-[10px] font-semibold uppercase tracking-wider text-[#8b7e76] mb-2 flex items-center gap-1.5">
+                                        <i class="fas fa-user-graduate text-[#7a2a2a]"></i> Student
                                     </div>
-                                    <h4 class="text-sm font-medium text-[#4a3f3a]">Appointment Details</h4>
+                                    <div class="text-sm font-bold text-[#2c2420]">${(student.user?.first_name ?? '') + ' ' + (student.user?.last_name ?? '') || 'N/A'}</div>
+                                    <div class="text-xs text-[#6b5e57] mt-0.5 font-mono">${student.student_id ?? ''}</div>
+                                    <div class="text-xs text-[#8b7e76] mt-0.5">${student.college?.name ?? ''}</div>
+                                    <div class="text-xs text-[#8b7e76]">${student.course ?? ''} ${student.year_level ? '· Yr ' + student.year_level : ''}</div>
                                 </div>
-                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 sm:gap-3">
-                                    <div>
-                                        <p class="text-sm"><span class="font-medium text-[#8b7e76]">Date:</span> <span class="text-[#2c2420]">${data.formatted_date || 'N/A'}</span></p>
-                                        <p class="text-sm"><span class="font-medium text-[#8b7e76]">Time:</span> <span class="text-[#2c2420]">${data.formatted_time || 'N/A'}</span></p>
-                                        <p class="text-sm"><span class="font-medium text-[#8b7e76]">Type:</span> <span class="text-[#2c2420]">${data.appointment?.booking_type || 'N/A'}</span></p>
-                                        <p class="text-sm"><span class="font-medium text-[#8b7e76]">Category:</span> <span class="text-[#2c2420]">${data.appointment?.booking_category ? data.appointment.booking_category.charAt(0).toUpperCase() + data.appointment.booking_category.slice(1).replace('-', ' ') : 'N/A'}</span></p>
+
+                                <!-- Counselor -->
+                                <div class="rounded-xl p-3" style="background:#faf8f5;border:1px solid #e5e0db;">
+                                    <div class="text-[10px] font-semibold uppercase tracking-wider text-[#8b7e76] mb-2 flex items-center gap-1.5">
+                                        <i class="fas fa-user-doctor text-[#7a2a2a]"></i> Counselor
                                     </div>
-                                    <div>
-                                        <p class="text-sm"><span class="font-medium text-[#8b7e76]">Status:</span> 
-                                            <span class="inline-flex ml-2 px-1.5 py-0.5 text-xs font-medium rounded-full
-                                                ${data.appointment?.status === 'pending' ? 'bg-[#fef9e7] text-[#9a7b0a]' :
-                                                data.appointment?.status === 'approved' ? 'bg-[#ecfdf5] text-[#059669]' :
-                                                data.appointment?.status === 'completed' ? 'bg-[#f5f0eb] text-[#475569]' :
-                                                'bg-[#f5f0eb] text-[#6b5e57]'}">
-                                                ${data.appointment?.status_display || 'N/A'}
-                                            </span>
-                                        </p>
-                                        ${data.appointment?.case_number ? `<p class="text-sm mt-1"><span class="font-medium text-[#8b7e76]">Case #:</span> <span class="text-[#2c2420] font-mono">${data.appointment.case_number}</span></p>` : ''}
-                                    </div>
+                                    <div class="text-sm font-bold text-[#2c2420]">${counselor.name ?? 'N/A'}</div>
+                                    <div class="text-xs text-[#8b7e76] mt-0.5">${counselor.college?.name ?? ''}</div>
                                 </div>
+
+                                <!-- Schedule -->
+                                <div class="rounded-xl p-3" style="background:#faf8f5;border:1px solid #e5e0db;">
+                                    <div class="text-[10px] font-semibold uppercase tracking-wider text-[#8b7e76] mb-2 flex items-center gap-1.5">
+                                        <i class="fas fa-calendar-days text-[#7a2a2a]"></i> Schedule
+                                    </div>
+                                    <div class="text-sm font-bold text-[#2c2420]">${data.formatted_date ?? 'N/A'}</div>
+                                    <div class="text-xs text-[#6b5e57] mt-0.5">${data.formatted_time ?? ''}</div>
+                                </div>
+
+                                <!-- Concern -->
+                                ${a.concern ? `
+                                <div class="rounded-xl p-3" style="background:#faf8f5;border:1px solid #e5e0db;">
+                                    <div class="text-[10px] font-semibold uppercase tracking-wider text-[#8b7e76] mb-2 flex items-center gap-1.5">
+                                        <i class="fas fa-comment-dots text-[#7a2a2a]"></i> Concern
+                                    </div>
+                                    <div class="text-xs text-[#2c2420] leading-relaxed">${a.concern}</div>
+                                </div>` : ''}
                             </div>
 
-
-
-                            <!-- Counselor Notes Section -->
-                            ${data.appointment?.notes ? `
-                            <div class="bg-[#faf8f5] rounded-lg p-3.5 sm:p-4 border border-[#e5e0db]/60">
-                                <div class="flex items-center gap-2 mb-2.5 sm:mb-3">
-                                    <div class="w-7 h-7 sm:w-8 sm:h-8 bg-[#f5f0eb] rounded-md flex items-center justify-center">
-                                        <i class="fas fa-sticky-note text-[#6b5e57] text-xs sm:text-sm"></i>
-                                    </div>
-                                    <h4 class="text-sm font-medium text-[#4a3f3a]">Counselor's Notes</h4>
+                            <!-- Notes -->
+                            ${a.notes ? `
+                            <div class="rounded-xl p-3" style="background:#faf8f5;border:1px solid #e5e0db;">
+                                <div class="text-[10px] font-semibold uppercase tracking-wider text-[#8b7e76] mb-2 flex items-center gap-1.5">
+                                    <i class="fas fa-sticky-note text-[#7a2a2a]"></i> Notes
                                 </div>
-                                <p class="text-sm text-[#4a3f3a] whitespace-pre-line leading-relaxed">${data.appointment.notes}</p>
-                            </div>
-                            ` : ''}
+                                <div class="text-xs text-[#2c2420] leading-relaxed whitespace-pre-line">${a.notes}</div>
+                            </div>` : ''}
 
-                            <!-- Referral Details -->
-                            ${(data.appointment?.is_referred || data.appointment?.referral_reason || data.referral?.referred_to_name || data.referral?.referred_from_name) ? `
-                            <div class="bg-[#fef9e7] rounded-lg p-3.5 sm:p-4 border border-[#d4af37]/30">
-                                <div class="flex items-center gap-2 mb-2.5 sm:mb-3">
-                                    <div class="w-7 h-7 sm:w-8 sm:h-8 bg-[#d4af37]/20 rounded-md flex items-center justify-center">
-                                        <i class="fas fa-arrow-right-arrow-left text-[#9a7b0a] text-xs sm:text-sm"></i>
-                                    </div>
-                                    <h4 class="text-sm font-medium text-[#9a7b0a]">Referral Details</h4>
+                            <!-- Referral -->
+                            ${(data.referral?.referred_from_name || data.referral?.referred_to_name) ? `
+                            <div class="rounded-xl p-3" style="background:#fef9e7;border:1px solid rgba(212,175,55,0.3);">
+                                <div class="text-[10px] font-semibold uppercase tracking-wider mb-2 flex items-center gap-1.5" style="color:#9a7b0a;">
+                                    <i class="fas fa-arrow-right-arrow-left"></i> Referral
                                 </div>
-                                <div class="space-y-1.5 sm:space-y-2 text-sm">
-                                    ${data.referral?.referred_from_name ? `<p><span class="font-medium text-[#9a7b0a]">Referred from:</span> <span class="text-[#4a3f3a]">${data.referral.referred_from_name}</span></p>` : ''}
-                                    ${data.referral?.referred_to_name ? `<p><span class="font-medium text-[#9a7b0a]">Referred to:</span> <span class="text-[#4a3f3a]">${data.referral.referred_to_name}</span></p>` : ''}
-                                    ${data.formatted_referral_date ? `<p><span class="font-medium text-[#9a7b0a]">Referral date:</span> <span class="text-[#4a3f3a]">${data.formatted_referral_date}</span></p>` : ''}
-                                    ${data.appointment?.referral_reason ? `<p class="mt-2"><span class="font-medium text-[#9a7b0a]">Reason:</span><br><span class="text-[#4a3f3a]">${data.appointment.referral_reason}</span></p>` : ''}
-                                </div>
-                            </div>
-                            ` : ''}
+                                ${data.referral.referred_from_name ? `<div class="text-xs text-[#4a3f3a]"><span class="font-semibold">From:</span> ${data.referral.referred_from_name}</div>` : ''}
+                                ${data.referral.referred_to_name ? `<div class="text-xs text-[#4a3f3a] mt-0.5"><span class="font-semibold">To:</span> ${data.referral.referred_to_name}</div>` : ''}
+                                ${a.referral_reason ? `<div class="text-xs text-[#4a3f3a] mt-1">${a.referral_reason}</div>` : ''}
+                            </div>` : ''}
+                        </div>`;
 
-                            <!-- Action Buttons -->
-                            <div class="flex flex-wrap justify-end gap-2.5 sm:gap-3 pt-3 sm:pt-4 border-t border-[#e5e0db]/60">
-                                ${data.student?.profile_url ? `
-                                <a href="${data.student.profile_url}"
-                                   class="inline-flex items-center gap-2 px-3 sm:px-4 py-2 bg-[#5c1a1a] text-[#d4af37] rounded-lg hover:bg-[#7a2a2a] transition text-xs sm:text-sm font-medium">
-                                    <i class="fas fa-user-graduate text-xs sm:text-sm"></i>
-                                    View Student Profile
-                                </a>
-                                ` : ''}
-                                <button onclick="closeAppointmentModal()"
-                                        class="inline-flex items-center gap-2 px-3 sm:px-4 py-2 bg-[#f5f0eb] text-[#6b5e57] rounded-lg hover:bg-[#e5e0db] transition text-xs sm:text-sm font-medium">
-                                    <i class="fas fa-xmark text-xs sm:text-sm"></i>
-                                    Close
-                                </button>
-                            </div>
-                        </div>
-                    `;
+                    // Update footer with student profile link if available
+                    footer.innerHTML = `
+                        ${data.student?.profile_url ? `<a href="${data.student.profile_url}" class="px-4 py-2 rounded-lg text-xs font-semibold text-[#fef9e7] transition" style="background:linear-gradient(135deg,#5c1a1a,#7a2a2a);box-shadow:0 4px 10px rgba(92,26,26,0.2);">
+                            <i class="fas fa-user-graduate mr-1.5"></i> View Student
+                        </a>` : ''}
+                        <button onclick="closeAppointmentModal()" class="px-4 py-2 rounded-lg text-xs font-semibold text-[#6b5e57] bg-white border border-[#e5e0db] hover:bg-[#f5f0eb] transition">Close</button>`;
                 })
-                .catch(error => {
-                    console.error('Error fetching appointment details:', error);
+                .catch(() => {
                     details.innerHTML = `
-                        <div class="text-center py-12">
-                            <div class="w-14 h-14 sm:w-16 sm:h-16 bg-[#fdf2f2] rounded-full flex items-center justify-center mx-auto mb-4">
-                                <i class="fas fa-exclamation-triangle text-[#b91c1c] text-xl sm:text-2xl"></i>
-                            </div>
-                            <p class="text-[#b91c1c] font-medium">Error loading appointment details</p>
-                            <p class="text-xs sm:text-sm text-[#8b7e76] mt-1">Please try again</p>
-                            <button onclick="closeAppointmentModal()" class="mt-4 px-4 py-2 bg-[#f5f0eb] text-[#6b5e57] rounded-lg hover:bg-[#e5e0db] transition text-sm">Close</button>
-                        </div>
-                    `;
+                        <div class="text-center py-10">
+                            <i class="fas fa-exclamation-triangle text-[#b91c1c] text-2xl mb-3"></i>
+                            <p class="text-sm font-medium text-[#b91c1c]">Error loading details</p>
+                            <p class="text-xs text-[#8b7e76] mt-1">Please try again</p>
+                        </div>`;
                 });
         }
 
@@ -775,9 +843,7 @@
         }
 
         document.addEventListener('keydown', function (e) {
-            if (e.key === 'Escape') {
-                closeAppointmentModal();
-            }
+            if (e.key === 'Escape') closeAppointmentModal();
         });
     </script>
 @endsection

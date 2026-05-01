@@ -192,10 +192,20 @@
                                 <p class="summary-value">Edit Event</p>
                             </div>
                         </div>
-                        <a href="{{ route('admin.events') }}"
-                           class="back-btn px-3 py-2 whitespace-nowrap text-xs sm:text-sm rounded-lg">
-                            <i class="fas fa-arrow-left mr-1.5 text-[9px] sm:text-xs"></i> Back
-                        </a>
+                        <div class="flex items-center gap-2">
+                            <button type="button"
+                                    id="pin-btn"
+                                    onclick="togglePin({{ $event->id }}, this)"
+                                    title="{{ $event->is_pinned ? 'Unpin event' : 'Pin event' }}"
+                                    class="px-3 py-2 rounded-lg text-xs font-semibold transition-all duration-200 flex items-center gap-1.5 {{ $event->is_pinned ? 'bg-[#d4af37] text-[#3a0c0c]' : 'bg-white/10 text-white/80 hover:bg-white/20' }}">
+                                <i class="fas fa-thumbtack text-[10px] {{ $event->is_pinned ? '' : 'opacity-60' }}"></i>
+                                <span id="pin-label">{{ $event->is_pinned ? 'Pinned' : 'Pin' }}</span>
+                            </button>
+                            <a href="{{ route('admin.events') }}"
+                               class="back-btn px-3 py-2 whitespace-nowrap text-xs sm:text-sm rounded-lg">
+                                <i class="fas fa-arrow-left mr-1.5 text-[9px] sm:text-xs"></i> Back
+                            </a>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -678,5 +688,36 @@
             reader.readAsDataURL(input.files[0]);
         }
     }
+</script>
+
+<script>
+function togglePin(id, btn) {
+    fetch(`/admin/events/${id}/toggle-pin`, {
+        method: 'PATCH',
+        headers: {
+            'X-CSRF-TOKEN': document.querySelector('meta[name=csrf-token]').content,
+            'Accept': 'application/json',
+        }
+    })
+    .then(r => r.json())
+    .then(data => {
+        const label = document.getElementById('pin-label');
+        const icon = btn.querySelector('i');
+        if (data.is_pinned) {
+            btn.classList.remove('bg-white/10', 'text-white/80', 'hover:bg-white/20');
+            btn.classList.add('bg-[#d4af37]', 'text-[#3a0c0c]');
+            icon.classList.remove('opacity-60');
+            label.textContent = 'Pinned';
+            btn.title = 'Unpin event';
+        } else {
+            btn.classList.remove('bg-[#d4af37]', 'text-[#3a0c0c]');
+            btn.classList.add('bg-white/10', 'text-white/80', 'hover:bg-white/20');
+            icon.classList.add('opacity-60');
+            label.textContent = 'Pin';
+            btn.title = 'Pin event';
+        }
+    })
+    .catch(() => alert('Failed to update pin status.'));
+}
 </script>
 @endsection

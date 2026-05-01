@@ -1120,9 +1120,9 @@
                     <i class="fas fa-gauge-high"></i>
                     <span>Dashboard</span>
                 </a>
-                <a href="{{ route('admin.services.index') }}" class="sidebar-link {{ request()->routeIs('admin.services.*') ? 'active' : '' }}">
-                    <i class="fas fa-layer-group"></i>
-                    <span>Services</span>
+                    <a href="{{ route('admin.analytics') }}" class="sidebar-link {{ request()->routeIs('admin.analytics') ? 'active' : '' }}">
+                    <i class="fas fa-chart-column"></i>
+                    <span>Analytics</span>
                 </a>
                 <a href="{{ route('admin.students') }}" class="sidebar-link {{ request()->routeIs('admin.students', 'admin.students.*') ? 'active' : '' }}">
                     <i class="fas fa-user-graduate"></i>
@@ -1152,10 +1152,11 @@
                     <i class="fas fa-message"></i>
                     <span>Feedback</span>
                 </a>
-                <a href="{{ route('admin.analytics') }}" class="sidebar-link {{ request()->routeIs('admin.analytics') ? 'active' : '' }}">
-                    <i class="fas fa-chart-column"></i>
-                    <span>Analytics</span>
+                <a href="{{ route('admin.services.index') }}" class="sidebar-link {{ request()->routeIs('admin.services.*') ? 'active' : '' }}">
+                    <i class="fas fa-layer-group"></i>
+                    <span>Services</span>
                 </a>
+            
 
                 <div class="sidebar-divider"></div>
 

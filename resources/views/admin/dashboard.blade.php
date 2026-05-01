@@ -66,9 +66,9 @@
         display:flex; align-items:center; justify-content:center;
         background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.1); color:#fef9e7;
     }
-    .summary-label { font-size:9px; font-weight:700; text-transform:uppercase; letter-spacing:0.2em; color:rgba(255,255,255,0.7); }
-    .summary-value { font-size:1.5rem; line-height:1; font-weight:800; margin-top:0.3rem; }
-    .summary-sub { font-size:0.7rem; color:rgba(255,255,255,0.75); margin-top:0.2rem; }
+    .summary-label { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.2em; color: rgba(255,255,255,0.7); }
+    .summary-value { font-size: 1.2rem; line-height: 1.2; font-weight: 800; margin-top: 0.35rem; }
+    .summary-subtext { font-size: 0.7rem; color: rgba(255,255,255,0.8); margin-top: 0.2rem; }
 
     /* Stat cards */
     .stat-icon {
@@ -136,12 +136,16 @@
             </div>
 
             <div class="summary-card">
-                <div class="relative h-full flex items-center gap-3 px-5 py-4">
-                    <div class="summary-icon"><i class="fas fa-calendar-days text-sm"></i></div>
-                    <div>
-                        <p class="summary-label">This Month</p>
-                        <p class="summary-value">{{ $stats['total_events'] ?? 0 }}</p>
-                        <p class="summary-sub">Total events in system</p>
+                <div class="relative h-full flex flex-col sm:flex-row items-center justify-between gap-3 p-4">
+                    <div class="flex items-center gap-3 text-center sm:text-left">
+                        <div class="summary-icon flex-shrink-0">
+                            <i class="fas fa-calendar-days text-sm"></i>
+                        </div>
+                        <div class="min-w-0">
+                            <p class="summary-label">This Month</p>
+                            <p class="summary-value">{{ $stats['total_events'] ?? 0 }}</p>
+                            <p class="summary-subtext hidden sm:block">Total events in system</p>
+                        </div>
                     </div>
                 </div>
             </div>

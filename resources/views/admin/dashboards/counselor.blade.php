@@ -33,15 +33,16 @@
                 </div>
 
                 <div class="summary-card">
-                    <div class="summary-card-pattern"></div>
-                    <div class="relative h-full flex items-center gap-3 p-4">
-                        <div class="summary-icon">
-                            <i class="fas fa-address-book text-sm"></i>
-                        </div>
-                        <div>
-                            <p class="summary-label">Total Records</p>
-                            <p class="summary-value">{{ $counselors->total() }}</p>
-                            <p class="summary-subtext">Live counselor directory count</p>
+                    <div class="relative h-full flex flex-col sm:flex-row items-center justify-between gap-3 p-4">
+                        <div class="flex items-center gap-3 text-center sm:text-left">
+                            <div class="summary-icon flex-shrink-0">
+                                <i class="fas fa-address-book text-sm"></i>
+                            </div>
+                            <div class="min-w-0">
+                                <p class="summary-label">Total Records</p>
+                                <p class="summary-value">{{ $counselors->total() }}</p>
+                                <p class="summary-subtext hidden sm:block">Live counselor directory count.</p>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -297,12 +298,13 @@
         box-shadow: 0 4px 12px rgba(58,12,12,0.15);
         min-width: 200px;
     }
-
-    .summary-card-pattern {
+    .summary-card::before {
+        content: "";
         position: absolute;
         inset: 0;
         opacity: 0.15;
         background: radial-gradient(circle at top right, var(--gold-400), transparent 40%);
+        pointer-events: none;
     }
 
     .summary-icon {
@@ -338,6 +340,14 @@
         color: rgba(255,255,255,0.8);
         margin-top: 0.25rem;
     }
+
+    .primary-btn {
+        border-radius: 0.6rem; font-weight: 600; transition: all 0.2s ease;
+        display: inline-flex; align-items: center; justify-content: center; white-space: nowrap;
+        color: #fef9e7; background: linear-gradient(135deg, var(--maroon-800) 0%, var(--maroon-700) 100%);
+        box-shadow: 0 4px 10px rgba(92,26,26,0.15);
+    }
+    .primary-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 14px rgba(92,26,26,0.2); }
 
     .panel-topline {
         position: absolute;
