@@ -805,24 +805,38 @@ class AdminController extends Controller
     /**
      * Show event registrations as admin
      */
-    public function showEventRegistrations(Event $event)
+    public function showEventRegistrations(Request $request, Event $event)
     {
         $userId = Auth::id();
         $admin = Admin::with('user')->where('user_id', $userId)->first();
 
-        $registrations = EventRegistration::with(['student.user', 'student.college'])
-            ->where('event_id', $event->id)
-            ->orderBy('registered_at', 'desc')
-            ->get();
+        $query = EventRegistration::with(['student.user', 'student.college'])
+            ->where('event_id', $event->id);
+            
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->whereHas('student.user', function($q) use ($search) {
+                $q->where('first_name', 'like', "%{$search}%")
+                  ->orWhere('last_name', 'like', "%{$search}%")
+                  ->orWhere('email', 'like', "%{$search}%");
+            })->orWhereHas('student', function($q) use ($search) {
+                $q->where('student_id', 'like', "%{$search}%");
+            });
+        }
 
+        $registrations = $query->orderBy('registered_at', 'desc')->paginate(15)->withQueryString();
+
+        $allRegistrations = EventRegistration::where('event_id', $event->id)->get();
         $registrationStats = [
-            'total' => $registrations->count(),
-            'registered' => $registrations->where('status', 'registered')->count(),
-            'attended' => $registrations->where('status', 'attended')->count(),
-            'cancelled' => $registrations->where('status', 'cancelled')->count(),
+            'total' => $allRegistrations->count(),
+            'registered' => $allRegistrations->where('status', 'registered')->count(),
+            'attended' => $allRegistrations->where('status', 'attended')->count(),
+            'cancelled' => $allRegistrations->where('status', 'cancelled')->count(),
         ];
 
-        return view('admin.events.registrations', compact('admin', 'event', 'registrations', 'registrationStats'));
+        $search = $request->search ?? '';
+
+        return view('admin.events.registrations', compact('admin', 'event', 'registrations', 'registrationStats', 'search'));
     }
 
     /**

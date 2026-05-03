@@ -778,29 +778,6 @@
                                                 <div class="text-[var(--text-secondary)] whitespace-pre-line leading-relaxed mb-6 text-lg">
                                                     {{ $announcement->content }}
                                                 </div>
-
-                                                <div class="flex flex-wrap gap-4 text-sm text-[var(--text-muted)] mt-6 pt-4 border-t border-[var(--border-soft)]">
-                                                    <div class="flex items-center">
-                                                        <i class="fas fa-user mr-2 text-[var(--primary-red)]"></i>
-                                                        Posted by: {{ $announcement->user->first_name }} {{ $announcement->user->last_name }}
-                                                    </div>
-                                                    <div class="flex items-center">
-                                                        <i class="fas fa-calendar mr-2 text-[var(--primary-red)]"></i>
-                                                        Posted: {{ $announcement->created_at->format('M j, Y') }}
-                                                    </div>
-                                                    @if($announcement->start_date || $announcement->end_date)
-                                                        <div class="flex items-center">
-                                                            <i class="fas fa-clock mr-2 text-[var(--primary-red)]"></i>
-                                                            @if($announcement->start_date && $announcement->end_date)
-                                                                Valid: {{ $announcement->start_date->format('M j') }} - {{ $announcement->end_date->format('M j, Y') }}
-                                                            @elseif($announcement->start_date)
-                                                                Starts: {{ $announcement->start_date->format('M j, Y') }}
-                                                            @elseif($announcement->end_date)
-                                                                Until: {{ $announcement->end_date->format('M j, Y') }}
-                                                            @endif
-                                                        </div>
-                                                    @endif
-                                                </div>
                                             </div>
                                         </div>
                                     </div>
@@ -926,6 +903,9 @@
                             </h3>
                             <p class="text-[var(--primary-red)] font-semibold text-lg">Head of the Office of Guidance and Counseling</p>
                             <p class="text-[var(--text-secondary)]">{{ $headCounselor->position }} • {{ $headCounselor->credentials }}</p>
+                            @if($headCounselor->specialization)
+                            <p class="text-[var(--text-secondary)] text-sm mt-1">{{ $headCounselor->specialization }}</p>
+                            @endif
                             <p class="text-[var(--text-secondary)]">
                                 <i class="fas fa-building-columns mr-2 text-[var(--accent-gold)]"></i>{{ $headCounselor->college->name ?? 'N/A' }}
                             </p>
@@ -985,6 +965,9 @@
                                 <p class="text-[var(--primary-red)] font-medium">{{ $counselor->position }}</p>
                                 <p class="text-[var(--text-secondary)] text-sm mt-1">{{ $colleges }}</p>
                                 <p class="text-[var(--text-muted)] text-sm mt-1">{{ $counselor->credentials }}</p>
+                                @if($counselor->specialization)
+                                <p class="text-[var(--text-secondary)] text-sm mt-1">{{ $counselor->specialization }}</p>
+                                @endif
                                 <div class="mt-3 space-y-1 text-sm text-center">
                                     <p class="text-[var(--text-secondary)]">
                                         <i class="fas fa-envelope mr-2 text-[var(--accent-gold)]"></i>{{ $counselor->user->email }}

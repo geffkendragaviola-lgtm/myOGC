@@ -34,12 +34,13 @@ class ProfileController extends Controller
                     ->first();
             } elseif ($user->role === 'admin') {
                 $adminProfile = Admin::where('user_id', $user->id)->first();
+                return view('admin.profile.edit', compact('user', 'adminProfile'));
             }
 
             // Get colleges for dropdown
             $colleges = College::all();
 
-            return view('profile.edit', compact('user', 'studentProfile', 'counselorProfile', 'adminProfile', 'colleges'));
+            return view('profile.edit', compact('user', 'studentProfile', 'counselorProfile', 'colleges'));
         } catch (\Exception $e) {
             // Log the error and return a simple view
             Log::error('Profile edit error: ' . $e->getMessage());

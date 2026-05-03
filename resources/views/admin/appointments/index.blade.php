@@ -176,7 +176,8 @@
                                        name="search"
                                        value="{{ $search }}"
                                        placeholder="Case #, student..."
-                                       class="filter-input pl-9 sm:pl-10" />
+                                       class="filter-input"
+                                       style="padding-left: 2.25rem !important;" />
                             </div>
                         </div>
 
@@ -215,7 +216,7 @@
                                 <option value="cancelled_by_student" {{ $status === 'cancelled_by_student' ? 'selected' : '' }}>Cancelled by Student</option>
                                 <option value="referred_total" {{ $status === 'referred_total' ? 'selected' : '' }}>Referred</option>
                                 @foreach($statuses as $s)
-                                    @if($s === 'rejected') @continue @endif
+                                    @if($s === 'rejected' || $s === 'referred') @continue @endif
                                     <option value="{{ $s }}" {{ $status === $s ? 'selected' : '' }}>{{ ucfirst(str_replace('_', ' ', $s)) }}</option>
                                 @endforeach
                             </select>

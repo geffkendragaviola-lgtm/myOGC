@@ -99,8 +99,9 @@
                         <div class="relative">
                             <i class="fas fa-search absolute left-3 sm:left-3.5 top-1/2 -translate-y-1/2 text-[#a89f97] text-[10px] sm:text-xs"></i>
                             <input type="text" name="search" value="{{ $search }}"
-                                   placeholder="    Search student ID, name, email, course..."
-                                   class="input-field w-full pl-8 sm:pl-9 pr-3 py-2 sm:py-2.5 text-xs sm:text-sm">
+                                   placeholder="Search student ID, name, email, course..."
+                                   class="input-field w-full pr-3 py-2 sm:py-2.5 text-xs sm:text-sm"
+                                   style="padding-left: 2.25rem !important;">
                         </div>
                     </div>
 

@@ -63,8 +63,9 @@
                         <div class="relative">
                             <i class="fas fa-search absolute left-3 sm:left-3.5 top-1/2 -translate-y-1/2 text-[#a89f97] text-[10px] sm:text-xs"></i>
                             <input type="text" name="search" value="{{ $search }}"
-                                   placeholder="    Search counselor name, email, position, credentials..."
-                                   class="input-field w-full pl-8 sm:pl-9 pr-3 py-2 sm:py-2.5 text-xs sm:text-sm">
+                                   placeholder="Search counselor name, email, position, credentials..."
+                                   class="input-field w-full pr-3 py-2 sm:py-2.5 text-xs sm:text-sm"
+                                   style="padding-left: 2.25rem !important;">
                         </div>
                     </div>
 
@@ -111,6 +112,7 @@
                             <th class="px-4 py-3 text-left text-[10px] sm:text-[11px] font-semibold text-[#8b7e76] uppercase tracking-[0.14em] whitespace-nowrap">College</th>
                             <th class="px-4 py-3 text-left text-[10px] sm:text-[11px] font-semibold text-[#8b7e76] uppercase tracking-[0.14em] whitespace-nowrap">Position</th>
                             <th class="px-4 py-3 text-left text-[10px] sm:text-[11px] font-semibold text-[#8b7e76] uppercase tracking-[0.14em] whitespace-nowrap">Credentials</th>
+                            <th class="px-4 py-3 text-left text-[10px] sm:text-[11px] font-semibold text-[#8b7e76] uppercase tracking-[0.14em] whitespace-nowrap">Specialization</th>
                             <th class="px-4 py-3 text-left text-[10px] sm:text-[11px] font-semibold text-[#8b7e76] uppercase tracking-[0.14em] whitespace-nowrap">Actions</th>
                         </tr>
                     </thead>
@@ -181,6 +183,19 @@
                                     </div>
                                 </td>
 
+                                <td class="px-4 py-3 sm:py-3.5">
+                                    <div class="text-xs sm:text-sm text-[#4a3f3a]">
+                                        @if($counselor->specialization)
+                                            <span class="inline-flex items-center gap-1.5 max-w-[180px] truncate">
+                                                <i class="fas fa-star text-[#7a2a2a] text-[10px] sm:text-xs shrink-0"></i>
+                                                <span class="truncate">{{ $counselor->specialization }}</span>
+                                            </span>
+                                        @else
+                                            <span class="text-[#c4b8b1] text-[10px] sm:text-xs">—</span>
+                                        @endif
+                                    </div>
+                                </td>
+
                                 <td class="px-4 py-3 sm:py-3.5 whitespace-nowrap" onclick="event.stopPropagation()">
                                     <a href="{{ route('admin.counselors.edit', $counselor) }}"
                                        class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[10px] sm:text-xs font-semibold text-[#7a2a2a] bg-[rgba(122,42,42,0.07)] hover:bg-[rgba(122,42,42,0.14)] transition-colors">
@@ -190,7 +205,7 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="5" class="px-4 py-10 sm:py-12 text-center">
+                                <td colspan="6" class="px-4 py-10 sm:py-12 text-center">
                                     <div class="flex flex-col items-center justify-center">
                                         <div class="empty-state-icon mb-3">
                                             <i class="fas fa-user-doctor-slash text-[#a89f97] text-lg"></i>
@@ -548,9 +563,15 @@ const counselorData = {
         name: "{{ $c->user->first_name }} {{ $c->user->last_name }}",
         email: "{{ $c->user->email }}",
         phone: "{{ $c->user->phone_number ?? '' }}",
+        address: "{{ $c->user->address ?? '' }}",
+        birthday: "{{ $c->user->birthday?->format('F j, Y') ?? '' }}",
         college: "{{ $c->college->name ?? 'N/A' }}",
         position: "{{ $c->position ?? 'N/A' }}",
         credentials: "{{ $c->credentials ?? '' }}",
+        specialization: "{{ $c->specialization ?? '' }}",
+        facebookLink: "{{ $c->facebook_link ?? '' }}",
+        googleCalendarId: "{{ $c->google_calendar_id ?? '' }}",
+        bookingLimit: "{{ $c->daily_booking_limit ?? '' }}",
         isHead: {{ $c->is_head ? 'true' : 'false' }},
         avatar: "{{ $c->user->profile_picture ? asset('storage/' . $c->user->profile_picture) : '' }}",
         initials: "{{ strtoupper(substr($c->user->first_name,0,1)) }}{{ strtoupper(substr($c->user->last_name,0,1)) }}",
@@ -578,87 +599,208 @@ function openCounselorModal(id) {
 
     document.getElementById('cm-avatar-wrap').innerHTML = d.avatar
         ? `<img src="${d.avatar}" class="w-full h-full object-cover" />`
-        : `<span class="text-xl font-bold text-[#7a2a2a]">${d.initials}</span>`;
+        : `<span class="text-2xl sm:text-3xl font-bold text-white drop-shadow-md">${d.initials}</span>`;
 
     document.getElementById('cm-name').textContent = d.name;
     document.getElementById('cm-email').textContent = d.email;
     document.getElementById('cm-phone').textContent = d.phone || '—';
     document.getElementById('cm-college').textContent = d.college;
-    document.getElementById('cm-college-abbr').textContent = abbr;
     document.getElementById('cm-position').textContent = d.position;
     document.getElementById('cm-credentials').textContent = d.credentials || '—';
+    document.getElementById('cm-specialization').textContent = d.specialization || '—';
     document.getElementById('cm-joined').textContent = d.joined;
+    document.getElementById('cm-address').textContent = d.address || '—';
+    document.getElementById('cm-birthday').textContent = d.birthday || '—';
+    document.getElementById('cm-booking-limit').textContent = (d.bookingLimit !== '' && d.bookingLimit !== null && d.bookingLimit !== undefined) ? d.bookingLimit : '—';
+    document.getElementById('cm-google-id').textContent = d.googleCalendarId || '—';
+    const fbWrap = document.getElementById('cm-facebook-wrap');
+    if (fbWrap) {
+        fbWrap.innerHTML = d.facebookLink
+            ? `<a href="${d.facebookLink}" target="_blank" rel="noopener noreferrer" class="text-sm font-semibold text-[#1877f2] hover:underline">${d.facebookLink}</a>`
+            : `<span class="text-sm font-medium text-[#2c2420]">—</span>`;
+    }
     document.getElementById('cm-head').textContent = d.isHead ? 'Head Counselor' : 'Counselor';
     document.getElementById('cm-edit-btn').href = d.editUrl;
 
-    document.getElementById('counselorModal').classList.remove('hidden');
+    const modal = document.getElementById('counselorModal');
+    const modalContent = document.getElementById('counselorModalContent');
+    
+    modal.classList.remove('hidden');
+    // slight delay to allow display:block to apply before animating opacity
+    setTimeout(() => {
+        modal.classList.remove('opacity-0', 'pointer-events-none');
+        modalContent.classList.remove('scale-95');
+        modalContent.classList.add('scale-100');
+    }, 10);
+    
     document.body.style.overflow = 'hidden';
 }
 
 function closeCounselorModal() {
-    document.getElementById('counselorModal').classList.add('hidden');
-    document.body.style.overflow = '';
+    const modal = document.getElementById('counselorModal');
+    const modalContent = document.getElementById('counselorModalContent');
+    
+    modal.classList.add('opacity-0', 'pointer-events-none');
+    modalContent.classList.remove('scale-100');
+    modalContent.classList.add('scale-95');
+    
+    setTimeout(() => {
+        modal.classList.add('hidden');
+        document.body.style.overflow = '';
+    }, 300);
 }
 </script>
 
+<style>
+    /* Custom Scrollbar for Modal */
+    .custom-scrollbar::-webkit-scrollbar {
+        width: 6px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-track {
+        background: transparent;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+        background-color: rgba(139, 126, 118, 0.3);
+        border-radius: 20px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+        background-color: rgba(139, 126, 118, 0.5);
+    }
+</style>
+
 <!-- Counselor Detail Modal -->
-<div id="counselorModal" class="hidden fixed inset-0 z-[2000] flex items-center justify-center p-4" style="background:rgba(44,36,32,0.5);backdrop-filter:blur(4px);" onclick="if(event.target===this)closeCounselorModal()">
-    <div class="relative w-full max-w-lg bg-white rounded-2xl shadow-2xl overflow-hidden" style="border:1px solid #e5e0db;">
+<div id="counselorModal" class="hidden fixed inset-0 z-[2000] flex items-center justify-center p-4 sm:p-6 transition-all duration-300 opacity-0 pointer-events-none" style="background: rgba(44,36,32,0.6); backdrop-filter: blur(8px);" onclick="if(event.target===this)closeCounselorModal()">
+    <div class="relative w-full max-w-2xl bg-white/95 backdrop-blur-xl rounded-2xl shadow-2xl overflow-hidden border border-white/40 transform scale-95 transition-transform duration-300 flex flex-col max-h-full" id="counselorModalContent">
         <!-- Top gradient bar -->
-        <div style="height:4px;background:linear-gradient(90deg,#5c1a1a 0%,#d4af37 50%,#5c1a1a 100%);"></div>
+        <div class="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-[#5c1a1a] via-[#d4af37] to-[#5c1a1a] z-10"></div>
 
         <!-- Header -->
-        <div style="background:linear-gradient(135deg,#5c1a1a 0%,#3a0c0c 100%);padding:1.25rem 1.5rem;" class="flex items-center justify-between">
-            <div class="flex items-center gap-3">
-                <div id="cm-avatar-wrap" class="w-12 h-12 rounded-xl overflow-hidden flex items-center justify-center flex-shrink-0" style="background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.2);"></div>
-                <div>
-                    <div id="cm-name" class="text-white font-bold text-base"></div>
-                    <div id="cm-head" class="text-[10px] font-semibold uppercase tracking-widest mt-0.5" style="color:rgba(212,175,55,0.9);"></div>
+        <div class="relative pt-8 pb-6 px-6 sm:px-8 text-center bg-gradient-to-b from-[#faf8f5] to-white border-b border-[#e5e0db]/60 flex-shrink-0">
+            <button onclick="closeCounselorModal()" class="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full bg-[#f5f0eb] text-[#8b7e76] hover:bg-[#e5e0db] hover:text-[#5c1a1a] transition-colors focus:outline-none focus:ring-2 focus:ring-[#d4af37]/50">
+                <i class="fas fa-times text-sm"></i>
+            </button>
+            
+            <div class="flex flex-col items-center">
+                <div class="relative">
+                    <div class="absolute inset-0 bg-[#d4af37]/20 rounded-2xl blur-lg transform scale-110"></div>
+                    <div id="cm-avatar-wrap" class="relative w-20 h-20 sm:w-24 sm:h-24 rounded-2xl overflow-hidden flex items-center justify-center flex-shrink-0 shadow-lg border-2 border-white bg-gradient-to-br from-[#5c1a1a] to-[#7a2a2a]"></div>
+                </div>
+                
+                <h3 id="cm-name" class="mt-4 text-lg sm:text-xl lg:text-2xl font-bold text-[#2c2420] tracking-tight"></h3>
+                <div class="mt-1.5 flex items-center justify-center gap-2">
+                    <span id="cm-head" class="inline-flex items-center px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest bg-[#fef9e7] text-[#9a7b0a] border border-[#d4af37]/30 shadow-sm"></span>
                 </div>
             </div>
-            <button onclick="closeCounselorModal()" class="text-white/70 hover:text-white transition text-lg leading-none">&times;</button>
         </div>
 
         <!-- Body -->
-        <div class="p-5 space-y-4">
+        <div class="p-6 sm:p-8 overflow-y-auto custom-scrollbar flex-1">
             <!-- College badge -->
-            <div class="flex items-center gap-2">
-                <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold" style="background:rgba(254,249,231,0.8);color:#7a2a2a;border:1px solid rgba(212,175,55,0.3);">
-                    <i class="fas fa-school text-[10px]"></i>
-                    <span id="cm-college-abbr"></span>
+            <div class="flex flex-col items-center justify-center gap-2 mb-6 pb-6 border-b border-[#e5e0db]/60 text-center">
+                <span class="inline-flex items-center justify-center w-10 h-10 rounded-xl bg-[#fdf2f2] text-[#7a2a2a] shadow-inner mb-1">
+                    <i class="fas fa-school text-lg"></i>
                 </span>
-                <span id="cm-college" class="text-xs text-[#6b5e57]"></span>
+                <span id="cm-college" class="text-sm sm:text-base font-semibold text-[#4a3f3a]"></span>
             </div>
 
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <div class="rounded-xl p-3" style="background:#faf8f5;border:1px solid #e5e0db;">
-                    <div class="text-[10px] font-semibold uppercase tracking-wider text-[#8b7e76] mb-1">Email</div>
-                    <div id="cm-email" class="text-xs font-medium text-[#2c2420] break-all"></div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5">
+                <div class="group relative p-3.5 rounded-xl bg-[#faf8f5] border border-[#e5e0db]/80 hover:border-[#d4af37]/50 hover:bg-white transition-colors hover:shadow-sm">
+                    <div class="flex items-center gap-2 mb-1.5">
+                        <i class="fas fa-envelope text-[#a89f97] text-[10px] group-hover:text-[#d4af37] transition-colors"></i>
+                        <div class="text-[10px] font-bold uppercase tracking-wider text-[#8b7e76]">Email</div>
+                    </div>
+                    <div id="cm-email" class="text-sm font-semibold text-[#2c2420] break-all"></div>
                 </div>
-                <div class="rounded-xl p-3" style="background:#faf8f5;border:1px solid #e5e0db;">
-                    <div class="text-[10px] font-semibold uppercase tracking-wider text-[#8b7e76] mb-1">Phone</div>
-                    <div id="cm-phone" class="text-xs font-medium text-[#2c2420]"></div>
+
+                <div class="group relative p-3.5 rounded-xl bg-[#faf8f5] border border-[#e5e0db]/80 hover:border-[#d4af37]/50 hover:bg-white transition-colors hover:shadow-sm">
+                    <div class="flex items-center gap-2 mb-1.5">
+                        <i class="fas fa-phone text-[#a89f97] text-[10px] group-hover:text-[#d4af37] transition-colors"></i>
+                        <div class="text-[10px] font-bold uppercase tracking-wider text-[#8b7e76]">Phone</div>
+                    </div>
+                    <div id="cm-phone" class="text-sm font-semibold text-[#2c2420]"></div>
                 </div>
-                <div class="rounded-xl p-3" style="background:#faf8f5;border:1px solid #e5e0db;">
-                    <div class="text-[10px] font-semibold uppercase tracking-wider text-[#8b7e76] mb-1">Position</div>
-                    <div id="cm-position" class="text-xs font-medium text-[#2c2420]"></div>
+
+                <div class="group relative p-3.5 rounded-xl bg-[#faf8f5] border border-[#e5e0db]/80 hover:border-[#d4af37]/50 hover:bg-white transition-colors hover:shadow-sm">
+                    <div class="flex items-center gap-2 mb-1.5">
+                        <i class="fas fa-briefcase text-[#a89f97] text-[10px] group-hover:text-[#d4af37] transition-colors"></i>
+                        <div class="text-[10px] font-bold uppercase tracking-wider text-[#8b7e76]">Position</div>
+                    </div>
+                    <div id="cm-position" class="text-sm font-semibold text-[#2c2420]"></div>
                 </div>
-                <div class="rounded-xl p-3" style="background:#faf8f5;border:1px solid #e5e0db;">
-                    <div class="text-[10px] font-semibold uppercase tracking-wider text-[#8b7e76] mb-1">Joined</div>
-                    <div id="cm-joined" class="text-xs font-medium text-[#2c2420]"></div>
+
+                <div class="group relative p-3.5 rounded-xl bg-[#faf8f5] border border-[#e5e0db]/80 hover:border-[#d4af37]/50 hover:bg-white transition-colors hover:shadow-sm">
+                    <div class="flex items-center gap-2 mb-1.5">
+                        <i class="fas fa-calendar-check text-[#a89f97] text-[10px] group-hover:text-[#d4af37] transition-colors"></i>
+                        <div class="text-[10px] font-bold uppercase tracking-wider text-[#8b7e76]">Joined</div>
+                    </div>
+                    <div id="cm-joined" class="text-sm font-semibold text-[#2c2420]"></div>
                 </div>
-                <div class="rounded-xl p-3 sm:col-span-2" style="background:#faf8f5;border:1px solid #e5e0db;">
-                    <div class="text-[10px] font-semibold uppercase tracking-wider text-[#8b7e76] mb-1">Credentials</div>
-                    <div id="cm-credentials" class="text-xs font-medium text-[#2c2420]"></div>
+
+                <div class="sm:col-span-2 group relative p-3.5 rounded-xl bg-[#faf8f5] border border-[#e5e0db]/80 hover:border-[#d4af37]/50 hover:bg-white transition-colors hover:shadow-sm">
+                    <div class="flex items-center gap-2 mb-1.5">
+                        <i class="fas fa-certificate text-[#a89f97] text-[10px] group-hover:text-[#d4af37] transition-colors"></i>
+                        <div class="text-[10px] font-bold uppercase tracking-wider text-[#8b7e76]">Credentials</div>
+                    </div>
+                    <div id="cm-credentials" class="text-sm font-semibold text-[#2c2420]"></div>
+                </div>
+
+                <div class="sm:col-span-2 group relative p-3.5 rounded-xl bg-[#faf8f5] border border-[#e5e0db]/80 hover:border-[#d4af37]/50 hover:bg-white transition-colors hover:shadow-sm">
+                    <div class="flex items-center gap-2 mb-1.5">
+                        <i class="fas fa-star text-[#a89f97] text-[10px] group-hover:text-[#d4af37] transition-colors"></i>
+                        <div class="text-[10px] font-bold uppercase tracking-wider text-[#8b7e76]">Specialization</div>
+                    </div>
+                    <div id="cm-specialization" class="text-sm font-semibold text-[#2c2420]"></div>
+                </div>
+
+                <div class="sm:col-span-2 group relative p-3.5 rounded-xl bg-[#faf8f5] border border-[#e5e0db]/80 hover:border-[#d4af37]/50 hover:bg-white transition-colors hover:shadow-sm">
+                    <div class="flex items-center gap-2 mb-1.5">
+                        <i class="fas fa-map-marker-alt text-[#a89f97] text-[10px] group-hover:text-[#d4af37] transition-colors"></i>
+                        <div class="text-[10px] font-bold uppercase tracking-wider text-[#8b7e76]">Address</div>
+                    </div>
+                    <div id="cm-address" class="text-sm font-semibold text-[#2c2420]"></div>
+                </div>
+
+                <div class="group relative p-3.5 rounded-xl bg-[#faf8f5] border border-[#e5e0db]/80 hover:border-[#d4af37]/50 hover:bg-white transition-colors hover:shadow-sm">
+                    <div class="flex items-center gap-2 mb-1.5">
+                        <i class="fas fa-birthday-cake text-[#a89f97] text-[10px] group-hover:text-[#d4af37] transition-colors"></i>
+                        <div class="text-[10px] font-bold uppercase tracking-wider text-[#8b7e76]">Birthday</div>
+                    </div>
+                    <div id="cm-birthday" class="text-sm font-semibold text-[#2c2420]"></div>
+                </div>
+
+                <div class="group relative p-3.5 rounded-xl bg-[#faf8f5] border border-[#e5e0db]/80 hover:border-[#d4af37]/50 hover:bg-white transition-colors hover:shadow-sm">
+                    <div class="flex items-center gap-2 mb-1.5">
+                        <i class="fas fa-users text-[#a89f97] text-[10px] group-hover:text-[#d4af37] transition-colors"></i>
+                        <div class="text-[10px] font-bold uppercase tracking-wider text-[#8b7e76]">Booking Limit</div>
+                    </div>
+                    <div id="cm-booking-limit" class="text-sm font-semibold text-[#2c2420]"></div>
+                </div>
+
+                <div class="sm:col-span-2 group relative p-3.5 rounded-xl bg-[#faf8f5] border border-[#e5e0db]/80 hover:border-[#d4af37]/50 hover:bg-white transition-colors hover:shadow-sm">
+                    <div class="flex items-center gap-2 mb-1.5">
+                        <i class="fab fa-facebook text-[#a89f97] text-[10px] group-hover:text-[#d4af37] transition-colors"></i>
+                        <div class="text-[10px] font-bold uppercase tracking-wider text-[#8b7e76]">Facebook</div>
+                    </div>
+                    <div id="cm-facebook-wrap" class="break-all"></div>
+                </div>
+
+                <div class="sm:col-span-2 group relative p-3.5 rounded-xl bg-[#faf8f5] border border-[#e5e0db]/80 hover:border-[#d4af37]/50 hover:bg-white transition-colors hover:shadow-sm">
+                    <div class="flex items-center gap-2 mb-1.5">
+                        <i class="fab fa-google text-[#a89f97] text-[10px] group-hover:text-[#d4af37] transition-colors"></i>
+                        <div class="text-[10px] font-bold uppercase tracking-wider text-[#8b7e76]">Google Calendar ID</div>
+                    </div>
+                    <div id="cm-google-id" class="text-sm font-semibold text-[#2c2420] break-all"></div>
                 </div>
             </div>
         </div>
 
         <!-- Footer -->
-        <div class="px-5 pb-5 flex justify-end gap-2">
-            <button onclick="closeCounselorModal()" class="px-4 py-2 rounded-lg text-xs font-semibold text-[#6b5e57] bg-white border border-[#e5e0db] hover:bg-[#f5f0eb] transition">Close</button>
-            <a id="cm-edit-btn" href="#" class="px-4 py-2 rounded-lg text-xs font-semibold text-[#fef9e7] transition" style="background:linear-gradient(135deg,#5c1a1a,#7a2a2a);box-shadow:0 4px 10px rgba(92,26,26,0.2);">
-                <i class="fas fa-pen-to-square mr-1.5"></i> Edit
+        <div class="p-5 sm:p-6 bg-gray-50/80 border-t border-[#e5e0db]/60 flex justify-end gap-3 flex-shrink-0">
+            <button onclick="closeCounselorModal()" class="px-5 py-2.5 rounded-xl text-sm font-semibold text-[#6b5e57] bg-white border border-[#e5e0db] hover:bg-[#f5f0eb] hover:text-[#2c2420] transition-all shadow-sm focus:outline-none focus:ring-2 focus:ring-[#e5e0db]">
+                Close
+            </button>
+            <a id="cm-edit-btn" href="#" class="px-5 py-2.5 rounded-xl text-sm font-semibold text-white transition-all transform hover:-translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-[#d4af37]/50" style="background:linear-gradient(135deg,#5c1a1a,#7a2a2a);box-shadow:0 4px 14px rgba(92,26,26,0.25);">
+                <i class="fas fa-pen-to-square mr-1.5"></i> Edit Profile
             </a>
         </div>
     </div>

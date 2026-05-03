@@ -341,8 +341,9 @@
                             <div class="relative">
                                 <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-[#a89f97] text-[9px] sm:text-xs"></i>
                                 <input type="text" name="search"
-                                       class="input-field w-full pl-8 sm:pl-9 pr-3 py-2 sm:py-2.5 text-xs sm:text-sm"
-                                       placeholder="    Search events..." value="{{ request('search') }}">
+                                       class="input-field w-full pr-3 py-2 sm:py-2.5 text-xs sm:text-sm"
+                                       style="padding-left: 2.25rem !important;"
+                                       placeholder="Search events..." value="{{ request('search') }}">
                             </div>
                         </div>
                         <div>
@@ -474,6 +475,29 @@
                                         {{ $event->registrations->where('status', 'registered')->count() }} registered
                                         @if($event->max_attendees)
                                             / {{ $event->max_attendees }} max
+                                        @endif
+                                    </span>
+                                </div>
+
+                                <div class="event-meta-row">
+                                    <span class="event-meta-icon bg-[#f3e8ff] text-purple-500">
+                                        <i class="fas fa-bullseye text-[9px] sm:text-xs"></i>
+                                    </span>
+                                    <span class="text-xs sm:text-sm truncate" title="Target Audience">
+                                        @if($event->for_all_colleges && empty($event->year_levels))
+                                            All Students
+                                        @else
+                                            @php
+                                                $targets = [];
+                                                if (!$event->for_all_colleges && $event->colleges) {
+                                                    $targets[] = $event->colleges->pluck('name')->implode(', ');
+                                                }
+                                                if (!empty($event->year_levels)) {
+                                                    $targets[] = implode(', ', $event->year_levels) . ' Year';
+                                                }
+                                                $targetText = implode(' | ', $targets);
+                                            @endphp
+                                            {{ $targetText ?: 'Specific Audience' }}
                                         @endif
                                     </span>
                                 </div>

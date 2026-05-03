@@ -439,8 +439,66 @@
                 </a>
             </div>
         @else
+            <!-- Statistics Tabs -->
+            <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-6 stat-grid-mobile">
+                <!-- Total -->
+                <button id="total-card" class="stat-card stat-card-active p-3 sm:p-4 focus:outline-none">
+                    <div class="flex items-center gap-3">
+                        <div class="stat-icon total">
+                            <i class="fas fa-layer-group"></i>
+                        </div>
+                        <div class="min-w-0">
+                            <p class="text-[10px] sm:text-xs font-semibold text-[#8b7e76] uppercase tracking-wider mb-0.5">All</p>
+                            <h3 class="text-base sm:text-lg font-bold text-[#2c2420]">{{ $registrations->count() }}</h3>
+                        </div>
+                    </div>
+                </button>
+
+                <!-- Active -->
+                <button id="active-card" class="stat-card p-3 sm:p-4 focus:outline-none">
+                    <div class="flex items-center gap-3">
+                        <div class="stat-icon active">
+                            <i class="fas fa-calendar-check"></i>
+                        </div>
+                        <div class="min-w-0">
+                            <p class="text-[10px] sm:text-xs font-semibold text-[#8b7e76] uppercase tracking-wider mb-0.5">Active</p>
+                            <h3 class="text-base sm:text-lg font-bold text-[#2c2420]">{{ $registrations->where('status', 'registered')->count() }}</h3>
+                        </div>
+                    </div>
+                </button>
+
+                <!-- Attended -->
+                <button id="attended-card" class="stat-card p-3 sm:p-4 focus:outline-none">
+                    <div class="flex items-center gap-3">
+                        <div class="stat-icon attended">
+                            <i class="fas fa-clipboard-check"></i>
+                        </div>
+                        <div class="min-w-0">
+                            <p class="text-[10px] sm:text-xs font-semibold text-[#8b7e76] uppercase tracking-wider mb-0.5">Attended</p>
+                            <h3 class="text-base sm:text-lg font-bold text-[#2c2420]">{{ $registrations->where('status', 'attended')->count() }}</h3>
+                        </div>
+                    </div>
+                </button>
+
+                <!-- Cancelled -->
+                <button id="cancelled-card" class="stat-card p-3 sm:p-4 focus:outline-none">
+                    <div class="flex items-center gap-3">
+                        <div class="stat-icon cancelled">
+                            <i class="fas fa-ban"></i>
+                        </div>
+                        <div class="min-w-0">
+                            <p class="text-[10px] sm:text-xs font-semibold text-[#8b7e76] uppercase tracking-wider mb-0.5">Cancelled</p>
+                            <h3 class="text-base sm:text-lg font-bold text-[#2c2420]">{{ $registrations->where('status', 'cancelled')->count() }}</h3>
+                        </div>
+                    </div>
+                </button>
+            </div>
+
             <!-- Active Registrations Section -->
             <div id="active-section" class="tab-content">
+                <div class="section-header">
+                    <h2><i class="fas fa-calendar-check"></i> Active Registrations</h2>
+                </div>
                 
                 @if($registrations->where('status', 'registered')->isEmpty())
                     <div class="glass-card empty-state mb-6">
@@ -466,7 +524,10 @@
             </div>
 
             <!-- Cancelled Registrations Section -->
-            <div id="cancelled-section" class="tab-content hidden">
+            <div id="cancelled-section" class="tab-content hidden mt-8">
+                <div class="section-header">
+                    <h2><i class="fas fa-ban"></i> Cancelled Registrations</h2>
+                </div>
                 
                 @if($registrations->where('status', 'cancelled')->isEmpty())
                     <div class="glass-card empty-state mb-6">
@@ -617,7 +678,10 @@
             </div>
 
             <!-- Attended Events Section -->
-            <div id="attended-section" class="tab-content hidden">
+            <div id="attended-section" class="tab-content hidden mt-8">
+                <div class="section-header">
+                    <h2><i class="fas fa-clipboard-check"></i> Attended Events</h2>
+                </div>
                 
                 @if($registrations->where('status', 'attended')->isEmpty())
                     <div class="glass-card empty-state mb-6">

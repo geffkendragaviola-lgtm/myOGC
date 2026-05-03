@@ -225,7 +225,7 @@
                         <label class="filter-label">Search</label>
                         <div class="relative">
                             <i class="fas fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-[#a89f97] text-xs"></i>
-                            <input type="text" name="search" value="{{ $search ?? '' }}" placeholder="   Title, description..." class="filter-input pl-9" />
+                            <input type="text" name="search" value="{{ $search ?? '' }}" placeholder="Title, description..." class="filter-input" style="padding-left: 2.25rem !important;" />
                         </div>
                     </div>
 

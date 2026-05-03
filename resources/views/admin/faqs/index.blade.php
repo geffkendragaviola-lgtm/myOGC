@@ -199,8 +199,9 @@
                             <div class="relative">
                                 <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-[#a89f97] text-[9px] sm:text-xs"></i>
                                 <input type="text" id="search" name="search" value="{{ request('search') }}"
-                                       placeholder="    Search question, answer, or category..."
-                                       class="input-field pl-8 sm:pl-9 text-xs sm:text-sm">
+                                       placeholder="Search question, answer, or category..."
+                                       class="input-field text-xs sm:text-sm"
+                                       style="padding-left: 2.25rem !important;">
                             </div>
                         </div>
 

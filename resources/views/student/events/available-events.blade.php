@@ -431,8 +431,10 @@
                                             <i class="fas fa-circle-exclamation text-[8px]"></i> Required
                                         </span>
                                     @endif
-                                    @if($isRegistered)
+                                    @if($status === 'registered')
                                         <span class="event-badge status">✓ Registered</span>
+                                    @elseif($status === 'attended')
+                                        <span class="event-badge status" style="background: rgba(16,185,129,0.9);">✓ Attended</span>
                                     @endif
                                 </div>
                                 <h3 class="text-base font-bold text-white line-clamp-2">{{ $event->title }}</h3>
@@ -501,7 +503,12 @@
 
                             <!-- Action Buttons -->
                             <div class="flex flex-wrap gap-2 btn-row-mobile">
-                                @if($isRegistered)
+                                @if($status === 'attended')
+                                    <button class="action-btn" disabled style="background:rgba(16,185,129,0.9);color:white;border:none">
+                                        <i class="fas fa-circle-check text-[9px]"></i>
+                                        <span class="hidden sm:inline">Attended</span>
+                                    </button>
+                                @elseif($isRegistered)
                                     @if($isRequiredEvent)
                                         <button class="action-btn" disabled title="Required events cannot be cancelled" style="background:rgba(209,213,219,0.8);color:#6b7280;border:1px solid #d1d5db">
                                             <i class="fas fa-lock text-[9px]"></i>

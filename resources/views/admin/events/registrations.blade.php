@@ -161,7 +161,6 @@
                         <div class="hero-icon">
                             <i class="fas fa-users text-base sm:text-lg"></i>
                         </div>
-
                         <div class="min-w-0">
                             <div class="hero-badge">
                                 <span class="hero-badge-dot"></span>
@@ -172,34 +171,53 @@
                             <p class="text-[#8b7e76] text-[10px] sm:text-xs mt-1.5 flex flex-wrap gap-x-2">
                                 <span><i class="fas fa-calendar-days mr-1"></i> {{ $event->date_range }}</span>
                                 <span><i class="fas fa-clock mr-1"></i> {{ $event->time_range }}</span>
-                                <span class="hidden sm:inline"><i class="far fa-location-dot mr-1"></i> {{ $event->location }}</span>
+                                <span class="hidden sm:inline"><i class="fas fa-location-dot mr-1"></i> {{ $event->location }}</span>
                             </p>
                         </div>
                     </div>
                 </div>
 
-                <div class="summary-card">
-                    <div class="relative h-full flex flex-col sm:flex-row xl:flex-col justify-center gap-2.5 p-4">
-                        <div class="flex items-center gap-3">
-                            <div class="summary-icon flex-shrink-0">
-                                <i class="fas fa-file-export text-sm"></i>
+                <div class="summary-card xl:min-w-[450px]">
+                    <div class="relative h-full flex flex-col justify-center p-4">
+                        <div class="flex items-center justify-between mb-3 pb-3 border-b border-white/20">
+                            <div class="flex items-center gap-3">
+                                <div class="summary-icon flex-shrink-0">
+                                    <i class="fas fa-chart-pie text-sm"></i>
+                                </div>
+                                <div class="min-w-0">
+                                    <p class="summary-label">Registration Summary</p>
+                                    <p class="summary-value text-[1.1rem]">Metrics</p>
+                                </div>
                             </div>
-                            <div class="min-w-0">
-                                <p class="summary-label">Quick Actions</p>
-                                <p class="summary-value">Export & Navigate</p>
-                                <p class="summary-subtext hidden sm:block">Export registrations or go back to the events list.</p>
+                            <div class="flex gap-2">
+                                <a href="{{ route('admin.events.export-registrations', $event) }}" 
+                                   class="primary-btn text-[10px] px-3 py-1.5 rounded-lg" title="Export CSV">
+                                    <i class="fas fa-file-export mr-1"></i> Export
+                                </a>
+                                <a href="{{ route('admin.events') }}" 
+                                   class="secondary-btn bg-white/10 text-white border-white/20 hover:bg-white/20 text-[10px] px-3 py-1.5 rounded-lg" title="Back to Events">
+                                    <i class="fas fa-arrow-left mr-1"></i> Back
+                                </a>
                             </div>
                         </div>
-
-                        <div class="flex flex-wrap gap-2 mt-2 sm:mt-3 justify-center sm:justify-start xl:justify-center">
-                            <a href="{{ route('counselor.events.export-registrations', $event) }}"
-                               class="primary-btn text-xs sm:text-sm rounded-lg">
-                                <i class="fas fa-file-export mr-1.5 text-[9px] sm:text-xs"></i> Export CSV
-                            </a>
-                            <a href="{{ route('counselor.events.index') }}"
-                               class="secondary-btn text-xs sm:text-sm rounded-lg">
-                                <i class="fas fa-calendar mr-1.5 text-[9px] sm:text-xs"></i> Back to Events
-                            </a>
+                        
+                        <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 text-[10px] sm:text-xs text-[rgba(255,255,255,0.9)]">
+                            <div>
+                                <span class="font-bold opacity-70 uppercase tracking-wider text-[8px] block mb-0.5">Capacity</span>
+                                {{ $event->max_attendees ? $event->max_attendees . ' slots' : 'Unlimited' }}
+                            </div>
+                            <div>
+                                <span class="font-bold opacity-70 uppercase tracking-wider text-[8px] block mb-0.5">Available</span>
+                                {{ $event->available_slots }} slots
+                            </div>
+                            <div>
+                                <span class="font-bold opacity-70 uppercase tracking-wider text-[8px] block mb-0.5">Reg. Rate</span>
+                                {{ number_format(($registrationStats['registered'] / max(1, $registrationStats['total'])) * 100, 1) }}%
+                            </div>
+                            <div>
+                                <span class="font-bold opacity-70 uppercase tracking-wider text-[8px] block mb-0.5">Att. Rate</span>
+                                {{ number_format(($registrationStats['attended'] / max(1, $registrationStats['total'])) * 100, 1) }}%
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -219,7 +237,7 @@
                     </div>
                 </div>
                 <div class="mt-3 mini-progress">
-                    <div class="bg-gradient-to-r from-[#7a2a2a] to-[#9a2a3a]" style="width: 100%"></div>
+                    <div class="bg-gradient-to-r from-[#7a2a2a] to-[#9a2a3a]" style="width: {{ $registrationStats['total'] > 0 ? 100 : 0 }}%"></div>
                 </div>
             </div>
 
@@ -272,13 +290,24 @@
         <!-- Registrations Table -->
         <div class="panel-card overflow-hidden">
             <div class="panel-topline"></div>
-            <div class="panel-header">
-                <div class="panel-icon">
-                    <i class="fas fa-clipboard-list text-[9px] sm:text-xs"></i>
+            <div class="panel-header flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div class="flex items-center gap-3">
+                    <div class="panel-icon">
+                        <i class="fas fa-clipboard-list text-[9px] sm:text-xs"></i>
+                    </div>
+                    <div>
+                        <h2 class="panel-title">Student Registrations</h2>
+                        <p class="panel-subtitle hidden sm:block">Review participant details, registration status, and attendance actions.</p>
+                    </div>
                 </div>
-                <div>
-                    <h2 class="panel-title">Student Registrations</h2>
-                    <p class="panel-subtitle hidden sm:block">Review participant details, registration status, and attendance actions.</p>
+                <div class="w-full sm:w-auto">
+                    <form method="GET" class="relative">
+                        <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-[#a89f97] text-[10px] sm:text-xs"></i>
+                        <input type="text" name="search" value="{{ $search ?? '' }}"
+                               placeholder="Search students..."
+                               class="w-full sm:w-64 border border-[#e5e0db] bg-white rounded-lg pl-8 pr-3 py-2 text-xs sm:text-sm focus:outline-none focus:border-[#7a2a2a] focus:ring-1 focus:ring-[#7a2a2a] transition-colors"
+                               style="padding-left: 2.25rem !important;">
+                    </form>
                 </div>
             </div>
 
@@ -363,9 +392,10 @@
                                     <!-- Actions -->
                                     <td class="px-3 sm:px-4 py-2.5 sm:py-3.5 whitespace-nowrap">
                                         <div class="flex items-center gap-1.5 sm:gap-2">
-                                            @if($registration->status === 'registered' && $event->is_upcoming)
-                                                <form action="{{ route('counselor.events.update-registration-status', [$event, $registration]) }}" method="POST">
+                                            @if($registration->status === 'registered')
+                                                <form action="{{ route('admin.events.update-registration-status', [$event, $registration]) }}" method="POST">
                                                     @csrf
+                                                    @method('PATCH')
                                                     <input type="hidden" name="status" value="attended">
                                                     <button type="submit"
                                                             class="action-icon-btn text-[#059669] hover:text-[#047857]"
@@ -381,9 +411,10 @@
                                                 </span>
                                             @endif
 
-                                            @if(in_array($registration->status, ['registered', 'attended']))
-                                                <form action="{{ route('counselor.events.update-registration-status', [$event, $registration]) }}" method="POST">
+                                            @if($registration->status === 'registered')
+                                                <form action="{{ route('admin.events.update-registration-status', [$event, $registration]) }}" method="POST">
                                                     @csrf
+                                                    @method('PATCH')
                                                     <input type="hidden" name="status" value="cancelled">
                                                     <button type="submit"
                                                             class="action-icon-btn text-[#b91c1c] hover:text-[#991b1b]"
@@ -400,36 +431,13 @@
                         </tbody>
                     </table>
                 </div>
+                
+                <!-- Pagination -->
+                <div class="px-4 sm:px-5 py-3 sm:py-3.5 border-t border-[#e5e0db]/60 bg-[#faf8f5]/40">
+                    {{ $registrations->appends(request()->query())->links('vendor.pagination.counselor-resources') }}
+                </div>
             @endif
         </div>
-
-        <!-- Registration Summary -->
-        @if(!$registrations->isEmpty())
-            <div class="mt-4 sm:mt-5 summary-box p-3.5 sm:p-4">
-                <h3 class="text-sm sm:text-base font-semibold text-[#7a2a2a] mb-2.5 sm:mb-3">Registration Summary</h3>
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 sm:gap-3 text-[10px] sm:text-xs text-[#7a4a2a]">
-                    <div>
-                        <strong>Total Capacity:</strong>
-                        {{ $event->max_attendees ? $event->max_attendees . ' students' : 'Unlimited' }}
-                    </div>
-                    <div>
-                        <strong>Available Slots:</strong>
-                        {{ $event->available_slots }}
-                        @if($event->max_attendees)
-                            ({{ number_format(($event->registered_count / $event->max_attendees) * 100, 1) }}% filled)
-                        @endif
-                    </div>
-                    <div>
-                        <strong>Registration Rate:</strong>
-                        {{ number_format(($registrationStats['registered'] / max(1, $registrationStats['total'])) * 100, 1) }}% active registrations
-                    </div>
-                    <div>
-                        <strong>Attendance Rate:</strong>
-                        {{ number_format(($registrationStats['attended'] / max(1, $registrationStats['total'])) * 100, 1) }}% attended
-                    </div>
-                </div>
-            </div>
-        @endif
     </div>
 </div>
 @endsection
