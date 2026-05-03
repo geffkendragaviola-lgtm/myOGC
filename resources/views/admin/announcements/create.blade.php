@@ -125,7 +125,7 @@
         border: 1px solid var(--border-soft); background: #fff;
         box-shadow: 0 2px 8px rgba(44,36,32,0.04);
     }
-    .image-preview-card img { width: 100%; height: 12rem; object-fit: cover; display: block; }
+    .image-preview-card img { width: 100%; max-height: 16rem; height: auto; object-fit: contain; display: block; background: #faf8f5; }
     .image-remove-btn {
         position: absolute; top: 0.5rem; right: 0.5rem;
         width: 1.75rem; height: 1.75rem; border-radius: 999px;
@@ -182,6 +182,50 @@
     .form-action-primary:hover { transform: translateY(-1px); box-shadow: 0 6px 14px rgba(92,26,26,0.2); }
     .form-action-secondary { background: #f5f0eb; color: var(--text-secondary); border: 1px solid var(--border-soft); }
     .form-action-secondary:hover { background: #e5e0db; }
+
+    .modal-backdrop {
+        position: fixed; inset: 0; background: rgba(44,36,32,0.6);
+        align-items: center; justify-content: center;
+        z-index: 50; padding: 1rem;
+    }
+    .modal-backdrop:not(.hidden) {
+        display: flex;
+    }
+    .modal-card {
+        background: rgba(255,255,255,0.98); border-radius: 0.75rem;
+        border: 1px solid var(--border-soft); backdrop-filter: blur(8px);
+        box-shadow: 0 8px 32px rgba(44,36,32,0.12);
+        max-width: 42rem; width: 100%; max-height: 90vh; overflow-y: auto;
+    }
+    .modal-header {
+        display: flex; align-items: center; justify-content: space-between;
+        padding: 1rem 1.25rem; border-bottom: 1px solid var(--border-soft)/60;
+    }
+    .modal-close {
+        width: 2rem; height: 2rem; border-radius: 0.5rem;
+        display: flex; align-items: center; justify-content: center;
+        color: var(--text-muted); transition: all 0.18s ease;
+        font-size: 1rem;
+    }
+    .modal-close:hover { background: rgba(254,249,231,0.7); color: var(--maroon-700); }
+    .modal-body { padding: 1.25rem; }
+    .modal-footer {
+        padding: 1rem 1.25rem; border-top: 1px solid var(--border-soft)/60;
+        display: flex; justify-content: flex-end; gap: 0.75rem;
+    }
+
+    .preview-card {
+        border: 1px solid var(--border-soft); border-radius: 0.75rem;
+        background: #fff; padding: 1.25rem;
+    }
+    .preview-image { width: 100%; max-height: 24rem; height: auto; object-fit: contain; border-radius: 0.5rem; margin-bottom: 1rem; background: #faf8f5; }
+    .preview-badge {
+        display: inline-flex; align-items: center; gap: 0.3rem;
+        padding: 0.2rem 0.45rem; border-radius: 999px;
+        font-size: 0.65rem; font-weight: 600;
+    }
+    .preview-badge.all { background: rgba(240,253,244,0.9); color: #065f46; }
+    .preview-badge.college { background: rgba(254,249,231,0.9); color: #7a2a2a; }
 
     @media (max-width: 639px) {
         .panel-header, .section-header { padding: 0.75rem 1rem; }
@@ -247,20 +291,12 @@
             </div>
         @endif
 
-        <!-- Form -->
-        <div class="panel-card">
-            <div class="panel-topline"></div>
-            <div class="panel-header">
-                <div class="panel-icon"><i class="fas fa-pen-ruler text-[9px] sm:text-xs"></i></div>
-                <div>
-                    <h2 class="panel-title">Announcement Form</h2>
-                    <p class="panel-subtitle hidden sm:block">Complete each section carefully to create a polished announcement.</p>
-                </div>
-            </div>
+        <form action="{{ route('admin.announcements.store') }}" method="POST" enctype="multipart/form-data">
+            @csrf
 
-            <div class="p-3 sm:p-4">
-                <form action="{{ route('admin.announcements.store') }}" method="POST" enctype="multipart/form-data">
-                    @csrf
+            <div class="grid grid-cols-1 xl:grid-cols-2 gap-5 sm:gap-6 items-start">
+                <!-- Left Column -->
+                <div class="space-y-5 sm:space-y-6">
 
                     <!-- Content Section -->
                     <div class="section-card mb-4">
@@ -332,7 +368,10 @@
                             </div>
                         </div>
                     </div>
+                </div>
 
+                <!-- Right Column -->
+                <div class="space-y-5 sm:space-y-6">
                     <!-- Target Audience Section -->
                     <div class="section-card mb-4">
                         <div class="section-topline"></div>
@@ -480,20 +519,75 @@
                             </div>
                         </div>
                     </div>
-
-                    <!-- Submit Buttons -->
-                    <div class="flex flex-col sm:flex-row justify-end gap-2 sm:gap-3 pt-2">
-                        <a href="{{ route('admin.announcements.index') }}"
-                           class="form-action-secondary">
-                            <i class="fas fa-times mr-2 text-[9px] sm:text-xs"></i> Cancel
-                        </a>
-                        <button type="submit"
-                                class="form-action-primary">
-                            <i class="fas fa-save mr-2 text-[9px] sm:text-xs"></i> Create Announcement
-                        </button>
-                    </div>
-                </form>
+                </div>
             </div>
+
+            <!-- Submit Buttons -->
+            <div class="mt-6 flex flex-col sm:flex-row justify-end gap-2 sm:gap-3">
+                <a href="{{ route('admin.announcements.index') }}"
+                   class="form-action-secondary">
+                    <i class="fas fa-times mr-2 text-[9px] sm:text-xs"></i> Cancel
+                </a>
+                <button type="button"
+                        onclick="previewAnnouncement()"
+                        class="form-action-secondary">
+                    <i class="fas fa-eye mr-2 text-[9px] sm:text-xs"></i> Preview
+                </button>
+                <button type="submit"
+                        class="form-action-primary">
+                    <i class="fas fa-save mr-2 text-[9px] sm:text-xs"></i> Create Announcement
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Preview Modal -->
+<div id="previewModal" class="modal-backdrop hidden">
+    <div class="modal-card">
+        <div class="modal-header">
+            <h3 class="text-sm font-semibold text-[#2c2420]">Announcement Preview</h3>
+            <button type="button" onclick="closePreview()" class="modal-close" title="Close">
+                <i class="fas fa-xmark"></i>
+            </button>
+        </div>
+
+        <div class="modal-body">
+            <div class="preview-card">
+                <!-- Image Preview -->
+                <div id="previewImageContainer" class="mb-4 hidden">
+                    <img id="previewImage" class="preview-image" alt="Preview">
+                </div>
+
+                <!-- College Targeting Preview -->
+                <div class="flex flex-wrap gap-2 mb-4" id="previewColleges">
+                    <!-- College badges will be populated by JavaScript -->
+                </div>
+
+                <div class="flex justify-between items-start mb-4">
+                    <div class="text-xs font-semibold text-[#7a2a2a]" id="previewDate">
+                        {{ \Carbon\Carbon::now()->format('F j, Y') }}
+                    </div>
+                    <div class="text-[10px] text-[#8b7e76] bg-[#f5f0eb] px-2 py-1 rounded hidden" id="previewDateRange">
+                        <!-- Date range will be populated by JavaScript -->
+                    </div>
+                </div>
+
+                <h3 class="text-base font-semibold text-[#2c2420] mb-3" id="previewTitle"></h3>
+                <div class="text-[#6b5e57] whitespace-pre-line leading-relaxed text-sm" id="previewContent"></div>
+
+                <div class="mt-5 pt-3 border-t border-[#e5e0db]/60">
+                    <div class="text-[10px] text-[#8b7e76]">
+                        Posted by: {{ Auth::user()->first_name }} {{ Auth::user()->last_name }}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal-footer">
+            <button type="button" onclick="closePreview()" class="form-action-primary">
+                Close Preview
+            </button>
         </div>
     </div>
 </div>
@@ -571,6 +665,102 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Initial toggle
     toggleCollegesSelection();
+});
+
+function previewAnnouncement() {
+    const title = document.getElementById('title').value;
+    const content = document.getElementById('content').value;
+    const startDate = document.getElementById('start_date').value;
+    const endDate = document.getElementById('end_date').value;
+    const forAllColleges = document.getElementById('for_all_colleges_true').checked;
+    const selectedColleges = Array.from(document.querySelectorAll('input[name="colleges[]"]:checked')).map(cb => cb.nextElementSibling.textContent.trim());
+    const imageFile = document.getElementById('image').files[0];
+
+    // Update preview content
+    document.getElementById('previewTitle').textContent = title || 'No title';
+    document.getElementById('previewContent').textContent = content || 'No content';
+
+    // Update college targeting preview
+    const collegesContainer = document.getElementById('previewColleges');
+    collegesContainer.innerHTML = '';
+
+    if (forAllColleges) {
+        collegesContainer.innerHTML = `
+            <span class="preview-badge all">
+                <i class="fas fa-globe"></i> All Colleges
+            </span>
+        `;
+    } else if (selectedColleges.length > 0) {
+        selectedColleges.slice(0, 3).forEach(college => {
+            const badge = document.createElement('span');
+            badge.className = 'preview-badge college';
+            badge.innerHTML = `<i class="fas fa-building-columns"></i> ${college}`;
+            collegesContainer.appendChild(badge);
+        });
+        if (selectedColleges.length > 3) {
+            const moreBadge = document.createElement('span');
+            moreBadge.className = 'preview-badge college';
+            moreBadge.textContent = `+${selectedColleges.length - 3} more`;
+            collegesContainer.appendChild(moreBadge);
+        }
+    }
+
+    // Update image preview
+    const imageContainer = document.getElementById('previewImageContainer');
+    const previewImage = document.getElementById('previewImage');
+
+    if (imageFile) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            previewImage.src = e.target.result;
+            imageContainer.classList.remove('hidden');
+        };
+        reader.readAsDataURL(imageFile);
+    } else {
+        imageContainer.classList.add('hidden');
+    }
+
+    // Update date range
+    const dateRangeElement = document.getElementById('previewDateRange');
+    if (startDate && endDate) {
+        const start = new Date(startDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+        const end = new Date(endDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+        dateRangeElement.textContent = `Valid: ${start} - ${end}`;
+        dateRangeElement.classList.remove('hidden');
+    } else if (startDate) {
+        const start = new Date(startDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+        dateRangeElement.textContent = `Starts: ${start}`;
+        dateRangeElement.classList.remove('hidden');
+    } else if (endDate) {
+        const end = new Date(endDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+        dateRangeElement.textContent = `Until: ${end}`;
+        dateRangeElement.classList.remove('hidden');
+    } else {
+        dateRangeElement.classList.add('hidden');
+    }
+
+    // Show modal
+    document.getElementById('previewModal').classList.remove('hidden');
+    document.body.style.overflow = 'hidden';
+}
+
+function closePreview() {
+    document.getElementById('previewModal').classList.add('hidden');
+    document.body.style.overflow = '';
+}
+
+// Close modal when clicking outside
+document.getElementById('previewModal').addEventListener('click', function(e) {
+    if (e.target === this) {
+        closePreview();
+    }
+});
+
+// Close modal with Escape key
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape' && !document.getElementById('previewModal').classList.contains('hidden')) {
+        closePreview();
+    }
 });
 </script>
 @endsection

@@ -195,6 +195,7 @@
         font-size: 0.75rem;
     }
     .action-icon:hover { transform: translateY(-1px); color: var(--maroon-700); background: rgba(254,249,231,0.6); }
+    .action-icon.pin-active { color: var(--maroon-700); background: rgba(254,249,231,0.6); }
     .action-icon.danger:hover { color: #b91c1c; background: rgba(253,242,242,0.8); }
     .action-icon.success:hover { color: #059669; background: rgba(240,253,244,0.8); }
     .action-icon.warning:hover { color: #d97706; background: rgba(254,249,231,0.9); }
@@ -387,7 +388,7 @@
                     </thead>
                     <tbody class="bg-white divide-y divide-[#e5e0db]/50">
                         @forelse($announcements as $announcement)
-                            <tr class="table-row group">
+                            <tr class="table-row group {{ $announcement->is_pinned ? 'bg-[rgba(254,249,231,0.35)]' : '' }}">
                                 <td class="px-4 sm:px-6 py-3.5">
                                     <div class="text-xs sm:text-sm font-semibold text-[#2c2420] truncate max-w-[180px] sm:max-w-[220px]">{{ $announcement->title }}</div>
                                     <div class="text-[10px] sm:text-xs text-[#8b7e76] mt-1 truncate max-w-[180px] sm:max-w-[220px]">
@@ -431,7 +432,7 @@
                                 <td class="px-4 sm:px-6 py-3.5 whitespace-nowrap">
                                     <div class="flex items-center gap-1.5 sm:gap-2">
                                         <button onclick="togglePin({{ $announcement->id }}, this)"
-                                                class="action-icon {{ $announcement->is_pinned ? 'text-yellow-500' : '' }}"
+                                                class="action-icon {{ $announcement->is_pinned ? 'pin-active' : '' }}"
                                                 title="{{ $announcement->is_pinned ? 'Unpin' : 'Pin to top' }}">
                                             <i class="fas fa-thumbtack {{ $announcement->is_pinned ? '' : 'opacity-40' }}"></i>
                                         </button>
@@ -533,14 +534,17 @@ function togglePin(id, btn) {
     .then(r => r.json())
     .then(data => {
         const icon = btn.querySelector('i');
+        const row = btn.closest('.table-row');
         if (data.is_pinned) {
-            btn.classList.add('text-yellow-500');
+            btn.classList.add('pin-active');
             icon.classList.remove('opacity-40');
             btn.title = 'Unpin';
+            if (row) row.classList.add('bg-[rgba(254,249,231,0.35)]');
         } else {
-            btn.classList.remove('text-yellow-500');
+            btn.classList.remove('pin-active');
             icon.classList.add('opacity-40');
             btn.title = 'Pin to top';
+            if (row) row.classList.remove('bg-[rgba(254,249,231,0.35)]');
         }
     });
 }

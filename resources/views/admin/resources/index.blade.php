@@ -386,7 +386,7 @@
                                                         class="delete-link"
                                                         onclick="return confirm('Are you sure you want to delete this resource?')"
                                                         title="Delete Resource">
-                                                    <i class="fas fa-trash-can-alt text-[10px] sm:text-base"></i>
+                                                    <i class="fas fa-trash-can text-[10px] sm:text-base"></i>
                                                 </button>
                                             </form>
                                         </div>

@@ -60,6 +60,26 @@
     }
     .hero-badge-dot { width: 0.3rem; height: 0.3rem; border-radius: 999px; background: var(--gold-400); }
 
+    .summary-card {
+        position: relative; overflow: hidden; border-radius: 0.75rem;
+        border: 1px solid rgba(92,26,26,0.15);
+        background: linear-gradient(135deg, var(--maroon-800) 0%, var(--maroon-900) 100%); color: white;
+        box-shadow: 0 4px 12px rgba(58,12,12,0.15);
+    }
+    .summary-card::before {
+        content: ""; position: absolute; inset: 0; opacity: 0.15;
+        background: radial-gradient(circle at top right, var(--gold-400), transparent 40%);
+        pointer-events: none;
+    }
+    .summary-icon {
+        width: 2.5rem; height: 2.5rem; border-radius: 0.75rem; display: flex;
+        align-items: center; justify-content: center; background: rgba(255,255,255,0.1);
+        border: 1px solid rgba(255,255,255,0.1); color: #fef9e7; flex-shrink: 0;
+    }
+    .summary-label { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.2em; color: rgba(255,255,255,0.7); }
+    .summary-value { font-size: 1.2rem; line-height: 1.2; font-weight: 800; margin-top: 0.35rem; }
+    .summary-subtext { font-size: 0.7rem; color: rgba(255,255,255,0.8); margin-top: 0.25rem; }
+
     .panel-topline, .section-topline { position: absolute; inset-inline: 0; top: 0; }
     .panel-topline { height: 3px; background: linear-gradient(90deg, var(--maroon-800) 0%, var(--gold-400) 50%, var(--maroon-800) 100%); }
     .section-topline { height: 2.5px; background: linear-gradient(90deg, var(--maroon-700), var(--gold-400)); }
@@ -107,7 +127,7 @@
         border: 1px solid var(--border-soft); background: #fff;
         box-shadow: 0 2px 8px rgba(44,36,32,0.04);
     }
-    .image-preview-card img { width: 100%; height: 12rem; object-fit: cover; display: block; }
+    .image-preview-card img { width: 100%; max-height: 16rem; height: auto; object-fit: contain; display: block; background: #faf8f5; }
     .image-remove-btn {
         position: absolute; top: 0.5rem; right: 0.5rem;
         width: 1.75rem; height: 1.75rem; border-radius: 999px;
@@ -218,7 +238,7 @@
         border: 1px solid var(--border-soft); border-radius: 0.75rem;
         background: #fff; padding: 1.25rem;
     }
-    .preview-image { width: 100%; height: 12rem; object-fit: cover; border-radius: 0.5rem; margin-bottom: 1rem; }
+    .preview-image { width: 100%; max-height: 24rem; height: auto; object-fit: contain; border-radius: 0.5rem; margin-bottom: 1rem; background: #faf8f5; }
     .preview-badge {
         display: inline-flex; align-items: center; gap: 0.3rem;
         padding: 0.2rem 0.45rem; border-radius: 999px;
@@ -259,20 +279,35 @@
     <div class="relative max-w-7xl mx-auto px-4 sm:px-6 py-5 md:py-8">
         <!-- Header -->
         <div class="mb-5 sm:mb-6">
-            <div class="hero-card">
-                <div class="relative p-4 sm:p-5 flex items-start gap-3">
-                    <div class="hero-icon">
-                        <i class="fas fa-pen-to-square text-base sm:text-lg"></i>
-                    </div>
-                    <div class="min-w-0">
-                        <div class="hero-badge">
-                            <span class="hero-badge-dot"></span>
-                            Edit Mode
+            <div class="grid grid-cols-1 xl:grid-cols-[1fr_auto] gap-4 items-stretch">
+                <div class="hero-card">
+                    <div class="relative p-4 sm:p-5 flex items-start gap-3">
+                        <div class="hero-icon">
+                            <i class="fas fa-pen-to-square text-base sm:text-lg"></i>
                         </div>
-                        <h1 class="text-lg sm:text-xl lg:text-2xl font-semibold tracking-tight text-[#2c2420] mt-2">Edit Announcement</h1>
-                        <p class="text-[#6b5e57] text-xs sm:text-sm mt-1.5 max-w-2xl">
-                            Update the announcement details below.
-                        </p>
+                        <div class="min-w-0">
+                            <div class="hero-badge">
+                                <span class="hero-badge-dot"></span>
+                                Edit Mode
+                            </div>
+                            <h1 class="text-lg sm:text-xl lg:text-2xl font-semibold tracking-tight text-[#2c2420] mt-2">Edit Announcement</h1>
+                            <p class="text-[#6b5e57] text-xs sm:text-sm mt-1.5 max-w-2xl">
+                                Update the announcement details below.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="summary-card">
+                    <div class="relative h-full flex flex-col sm:flex-row items-center gap-3 p-4">
+                        <div class="summary-icon flex-shrink-0">
+                            <i class="fas fa-wand-magic-sparkles text-sm"></i>
+                        </div>
+                        <div class="text-center sm:text-left min-w-0">
+                            <p class="summary-label">Edit Flow</p>
+                            <p class="summary-value">Update Details</p>
+                            <p class="summary-subtext">Modify content, targeting, and scheduling.</p>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -294,20 +329,13 @@
         @endif
 
         <!-- Form -->
-        <div class="panel-card">
-            <div class="panel-topline"></div>
-            <div class="panel-header">
-                <div class="panel-icon"><i class="fas fa-file-alt text-[9px] sm:text-xs"></i></div>
-                <div>
-                    <h2 class="panel-title">Announcement Details</h2>
-                    <p class="panel-subtitle hidden sm:block">Configure content, targeting, and scheduling</p>
-                </div>
-            </div>
+        <form action="{{ route('admin.announcements.update', $announcement) }}" method="POST" enctype="multipart/form-data">
+            @csrf
+            @method('PUT')
 
-            <div class="p-3 sm:p-4">
-                <form action="{{ route('admin.announcements.update', $announcement) }}" method="POST" enctype="multipart/form-data">
-                    @csrf
-                    @method('PUT')
+            <div class="grid grid-cols-1 xl:grid-cols-2 gap-5 sm:gap-6 items-start">
+                <!-- Left Column -->
+                <div class="space-y-5 sm:space-y-6">
 
                     <!-- Current Status Section -->
                     <div class="status-card p-4 mb-4">
@@ -413,7 +441,10 @@
                             </div>
                         </div>
                     </div>
+                </div>
 
+                <!-- Right Column -->
+                <div class="space-y-5 sm:space-y-6">
                     <!-- Target Audience Section -->
                     <div class="section-card mb-4">
                         <div class="section-topline"></div>
@@ -561,41 +592,41 @@
                             </div>
                         </div>
                     </div>
-
-                    <!-- Submit Buttons -->
-                    <div class="flex flex-col sm:flex-row justify-end gap-2 sm:gap-3 pt-2">
-                        <a href="{{ route('admin.announcements.index') }}"
-                           class="form-action-secondary">
-                            <i class="fas fa-times mr-2 text-[9px] sm:text-xs"></i> Cancel
-                        </a>
-
-                        <button type="button"
-                                onclick="previewAnnouncement()"
-                                class="form-action-secondary">
-                            <i class="fas fa-eye mr-2 text-[9px] sm:text-xs"></i> Preview
-                        </button>
-
-                        <button type="submit"
-                                class="form-action-primary">
-                            <i class="fas fa-save mr-2 text-[9px] sm:text-xs"></i> Update Announcement
-                        </button>
-                    </div>
-                </form>
-
-                @if($announcement->image_url)
-                <!-- Form placed OUTSIDE the main edit form to avoid nesting forms -->
-                <form action="{{ route('admin.announcements.remove-image', $announcement) }}" method="POST" class="mt-4 flex justify-end">
-                    @csrf
-                    @method('DELETE')
-                    <button type="submit"
-                            class="form-action-secondary !text-[#b91c1c] !border-[#b91c1c]/30 hover:!bg-[#fdf2f2]"
-                            onclick="return confirm('Are you sure you want to remove the current image?')">
-                        <i class="fas fa-xmark mr-2 text-[9px] sm:text-xs"></i> Remove Current Image
-                    </button>
-                </form>
-                @endif
+                </div>
             </div>
-        </div>
+
+            <!-- Submit Buttons -->
+            <div class="mt-6 flex flex-col sm:flex-row justify-end gap-2 sm:gap-3">
+                <a href="{{ route('admin.announcements.index') }}"
+                   class="form-action-secondary">
+                    <i class="fas fa-times mr-2 text-[9px] sm:text-xs"></i> Cancel
+                </a>
+
+                <button type="button"
+                        onclick="previewAnnouncement()"
+                        class="form-action-secondary">
+                    <i class="fas fa-eye mr-2 text-[9px] sm:text-xs"></i> Preview
+                </button>
+
+                <button type="submit"
+                        class="form-action-primary">
+                    <i class="fas fa-save mr-2 text-[9px] sm:text-xs"></i> Update Announcement
+                </button>
+            </div>
+        </form>
+
+        @if($announcement->image_url)
+        <!-- Form placed OUTSIDE the main edit form to avoid nesting forms -->
+        <form action="{{ route('admin.announcements.remove-image', $announcement) }}" method="POST" class="mt-4 flex justify-end">
+            @csrf
+            @method('DELETE')
+            <button type="submit"
+                    class="form-action-secondary !text-[#b91c1c] !border-[#b91c1c]/30 hover:!bg-[#fdf2f2]"
+                    onclick="return confirm('Are you sure you want to remove the current image?')">
+                <i class="fas fa-xmark mr-2 text-[9px] sm:text-xs"></i> Remove Current Image
+            </button>
+        </form>
+        @endif
     </div>
 </div>
 

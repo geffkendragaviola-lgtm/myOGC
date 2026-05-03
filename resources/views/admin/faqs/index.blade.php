@@ -306,7 +306,7 @@
                                                         class="delete-link"
                                                         onclick="return confirm('Are you sure you want to delete this FAQ?')" 
                                                         title="Delete FAQ">
-                                                    <i class="fas fa-trash-can-alt text-[10px] sm:text-sm"></i>
+                                                    <i class="fas fa-trash-can text-[10px] sm:text-sm"></i>
                                                 </button>
                                             </form>
                                         </div>

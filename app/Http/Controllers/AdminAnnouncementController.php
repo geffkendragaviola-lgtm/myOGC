@@ -39,7 +39,7 @@ class AdminAnnouncementController extends Controller
             'completed' => Announcement::where('is_active', false)->count()
         ];
 
-        $announcements = $query->latest()->paginate(10);
+        $announcements = $query->orderBy('is_pinned', 'desc')->latest()->paginate(10);
 
         return view('admin.announcements.index', compact('announcements', 'stats'));
     }

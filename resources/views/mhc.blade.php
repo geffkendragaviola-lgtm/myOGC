@@ -895,28 +895,65 @@
                 </div>
 
                 @php
-                    $faqs = \App\Models\FAQ::active()->ordered()->get();
+                    $allFaqs = \App\Models\FAQ::active()->ordered()->get();
+                    $pinnedFaqs = $allFaqs->where('is_pinned', true);
+                    $unpinnedGrouped = $allFaqs->where('is_pinned', false)->groupBy(function($faq) {
+                        return empty($faq->category) ? 'General' : ucfirst($faq->category);
+                    });
                 @endphp
 
-                @if($faqs->isEmpty())
+                @if($allFaqs->isEmpty())
                     <div class="mhc-card p-10 text-center">
                         <p class="text-[var(--text-secondary)]">We're still putting together our FAQ list. In the meantime, feel free to reach out to the guidance office directly.</p>
                     </div>
                 @else
-                    <div>
-                        @foreach($faqs as $index => $faq)
-                            <div class="faq-item" id="faq-{{ $faq->id }}">
-                                <div class="faq-question" onclick="toggleFaq({{ $faq->id }})">
-                                    <span class="text-base">{{ $faq->question }}</span>
-                                    <i class="fas fa-chevron-down text-[var(--accent-gold)] transition-transform duration-300"></i>
+                    <div class="space-y-10">
+                        @if($pinnedFaqs->isNotEmpty())
+                            <div>
+                                <div class="flex items-center gap-4 mb-6">
+                                    <span class="badge-soft badge-gold uppercase tracking-widest text-[0.75rem] px-4 py-2 drop-shadow-sm">
+                                        <i class="fas fa-star mr-1.5"></i> Top Questions
+                                    </span>
+                                    <div class="h-px flex-1 bg-gradient-to-r from-[var(--border-soft)] to-transparent"></div>
                                 </div>
-                                <div class="faq-answer">
-                                    <p>{{ $faq->answer }}</p>
-                                    @if($faq->category)
-                                        <p class="text-xs text-[var(--text-muted)] mt-4 font-bold uppercase tracking-wider">
-                                            Category: <span class="capitalize normal-case font-normal">{{ $faq->category }}</span>
-                                        </p>
-                                    @endif
+                                
+                                <div>
+                                    @foreach($pinnedFaqs as $faq)
+                                        <div class="faq-item" id="faq-{{ $faq->id }}">
+                                            <div class="faq-question" onclick="toggleFaq({{ $faq->id }})">
+                                                <span class="text-base">{{ $faq->question }}</span>
+                                                <i class="fas fa-chevron-down text-[var(--accent-gold)] transition-transform duration-300"></i>
+                                            </div>
+                                            <div class="faq-answer">
+                                                <p>{{ $faq->answer }}</p>
+                                            </div>
+                                        </div>
+                                    @endforeach
+                                </div>
+                            </div>
+                        @endif
+
+                        @foreach($unpinnedGrouped as $category => $faqs)
+                            <div>
+                                <div class="flex items-center gap-4 mb-6">
+                                    <span class="badge-soft badge-gray uppercase tracking-widest text-[0.75rem] px-4 py-2 drop-shadow-sm bg-white">
+                                        <i class="fas fa-layer-group text-[var(--text-muted)] mr-1.5"></i> {{ $category }}
+                                    </span>
+                                    <div class="h-px flex-1 bg-[var(--border-soft)]"></div>
+                                </div>
+                                
+                                <div>
+                                    @foreach($faqs as $faq)
+                                        <div class="faq-item" id="faq-{{ $faq->id }}">
+                                            <div class="faq-question" onclick="toggleFaq({{ $faq->id }})">
+                                                <span class="text-base">{{ $faq->question }}</span>
+                                                <i class="fas fa-chevron-down text-[var(--accent-gold)] transition-transform duration-300"></i>
+                                            </div>
+                                            <div class="faq-answer">
+                                                <p>{{ $faq->answer }}</p>
+                                            </div>
+                                        </div>
+                                    @endforeach
                                 </div>
                             </div>
                         @endforeach

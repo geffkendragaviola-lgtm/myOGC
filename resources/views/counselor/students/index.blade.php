@@ -193,7 +193,7 @@
                                                 </span>
                                                 @if($student->is_high_risk)
                                                 <span class="inline-flex items-center gap-1 text-[10px] font-semibold bg-orange-100 text-orange-700 px-1.5 py-0.5 rounded-full border border-orange-200">
-                                                    <i class="fas fa-flag text-[8px]"></i> Flagged
+                                                    <i class="fas fa-flag text-[8px]"></i> Flagged by the Counselor
                                                 </span>
                                                 @endif
                                             </div>

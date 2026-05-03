@@ -986,7 +986,7 @@ class AdminController extends Controller
             'email' => 'required|string|email|max:255|unique:users',
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
             'role' => 'required|in:student,counselor',
-            'phone_number' => 'nullable|string|max:20',
+            'phone_number' => 'nullable|string|max:20|unique:users,phone_number',
             'address' => 'nullable|string|max:500',
             'birthdate' => 'nullable|date',
             'sex' => 'nullable|in:male,female,other',
@@ -1089,9 +1089,10 @@ class AdminController extends Controller
 
         } catch (\Exception $e) {
             DB::rollBack();
+            Log::error('User creation failed: ' . $e->getMessage());
             return redirect()->back()
                 ->withInput()
-                ->withErrors(['error' => 'Failed to create user: ' . $e->getMessage()]);
+                ->withErrors(['error' => 'Failed to create user. Please ensure all details are correct.']);
         }
     }
 
@@ -1118,7 +1119,7 @@ class AdminController extends Controller
             'last_name' => 'required|string|max:255',
             'middle_name' => 'nullable|string|max:255',
             'email' => 'required|string|email|max:255|unique:users,email,' . $user->id,
-            'phone_number' => 'nullable|string|max:20',
+            'phone_number' => ['nullable', 'string', 'max:20', Rule::unique('users', 'phone_number')->ignore($user->id)],
             'address' => 'nullable|string|max:500',
             'birthdate' => 'nullable|date',
             'sex' => 'nullable|in:male,female,other',
@@ -1231,9 +1232,10 @@ class AdminController extends Controller
 
         } catch (\Exception $e) {
             DB::rollBack();
+            Log::error('User update failed: ' . $e->getMessage());
             return redirect()->back()
                 ->withInput()
-                ->withErrors(['error' => 'Failed to update user: ' . $e->getMessage()]);
+                ->withErrors(['error' => 'Failed to update user. Please ensure all details are correct.']);
         }
     }
 
@@ -1412,7 +1414,7 @@ class AdminController extends Controller
             'middle_name' => 'nullable|string|max:100',
             'last_name' => 'required|string|max:100',
             'email' => ['required', 'string', 'email', 'max:100', Rule::unique('users', 'email')->ignore($student->user_id)],
-            'phone_number' => 'nullable|string|max:20',
+            'phone_number' => ['nullable', 'string', 'max:20', Rule::unique('users', 'phone_number')->ignore($student->user_id)],
             'address' => 'nullable|string',
             'birthdate' => 'nullable|date',
             'sex' => 'nullable|in:male,female,other',
@@ -1678,7 +1680,8 @@ class AdminController extends Controller
             return redirect()->route('admin.students.edit', $student)->with('success', 'Student updated successfully.');
         } catch (\Exception $e) {
             DB::rollBack();
-            return redirect()->back()->withInput()->withErrors(['error' => 'Failed to update student: ' . $e->getMessage()]);
+            Log::error('Student update failed: ' . $e->getMessage());
+            return redirect()->back()->withInput()->withErrors(['error' => 'Failed to update student. Please ensure all details are correct.']);
         }
     }
 
@@ -1703,7 +1706,7 @@ class AdminController extends Controller
             'middle_name'         => 'nullable|string|max:100',
             'last_name'           => 'required|string|max:100',
             'email'               => ['required', 'string', 'email', 'max:100', Rule::unique('users', 'email')->ignore($counselor->user_id)],
-            'phone_number'        => 'nullable|string|max:20',
+            'phone_number'        => ['nullable', 'string', 'max:20', Rule::unique('users', 'phone_number')->ignore($counselor->user_id)],
             'address'             => 'nullable|string',
             'birthdate'           => 'nullable|date',
             'sex'                 => 'nullable|in:male,female,other',
@@ -1751,7 +1754,8 @@ class AdminController extends Controller
             return redirect()->route('admin.counselors.edit', $counselor)->with('success', 'Counselor updated successfully.');
         } catch (\Exception $e) {
             DB::rollBack();
-            return redirect()->back()->withInput()->withErrors(['error' => 'Failed to update counselor: ' . $e->getMessage()]);
+            Log::error('Counselor update failed: ' . $e->getMessage());
+            return redirect()->back()->withInput()->withErrors(['error' => 'Failed to update counselor. Please ensure all details are correct.']);
         }
     }
 
