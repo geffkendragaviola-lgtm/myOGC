@@ -50,6 +50,26 @@
         background: linear-gradient(135deg, var(--maroon-800) 0%, var(--maroon-700) 100%);
         box-shadow: 0 4px 12px rgba(92,26,26,0.15);
     }
+
+    .summary-card {
+        position: relative; overflow: hidden; border-radius: 0.75rem;
+        border: 1px solid rgba(92,26,26,0.15);
+        background: linear-gradient(135deg, #5c1a1a 0%, #3a0c0c 100%); color: white;
+        box-shadow: 0 4px 12px rgba(58,12,12,0.15);
+    }
+    .summary-card::before {
+        content: ""; position: absolute; inset: 0; opacity: 0.15;
+        background: radial-gradient(circle at top right, #d4af37, transparent 40%);
+        pointer-events: none;
+    }
+    .summary-icon {
+        width: 2.5rem; height: 2.5rem; border-radius: 0.75rem; display: flex;
+        align-items: center; justify-content: center; background: rgba(255,255,255,0.1);
+        border: 1px solid rgba(255,255,255,0.1); color: #fef9e7; flex-shrink: 0;
+    }
+    .summary-label { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.2em; color: rgba(255,255,255,0.7); }
+    .summary-value { font-size: 1.2rem; line-height: 1.2; font-weight: 800; margin-top: 0.35rem; }
+    .summary-subtext { font-size: 0.7rem; color: rgba(255,255,255,0.8); margin-top: 0.2rem; }
     .hero-badge {
         display: inline-flex; align-items: center; gap: 0.4rem; border-radius: 999px;
         border: 1px solid rgba(212,175,55,0.3); background: rgba(254,249,231,0.8);
@@ -94,8 +114,8 @@
     }
 
     .calendar-card {
-        border: 1px solid var(--border-soft); border-radius: 0.75rem;
-        background: rgba(255,255,255,0.95); padding: 1rem;
+        position: relative; border: 1px solid var(--border-soft); border-radius: 0.75rem;
+        background: rgba(255,255,255,0.95); padding: 1rem; overflow: hidden;
     }
     .calendar-nav {
         display: flex; align-items: center; justify-content: space-between;
@@ -196,10 +216,11 @@
     <div class="book-glow two"></div>
 
     <div class="relative max-w-7xl mx-auto px-4 sm:px-6 py-5 md:py-8">
-        <!-- Header -->
-        <div class="mb-5 sm:mb-6">
+        <!-- Header Section -->
+        <div class="grid grid-cols-1 xl:grid-cols-[1fr_auto] gap-4 sm:gap-6 mb-6 sm:mb-8">
+            <!-- Left: Hero Card -->
             <div class="hero-card">
-                <div class="relative p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                <div class="relative p-4 sm:p-5 flex flex-col md:flex-row md:items-start md:justify-between gap-4">
                     <div class="flex items-start gap-3">
                         <div class="hero-icon">
                             <i class="fas fa-calendar-plus text-base sm:text-lg"></i>
@@ -209,178 +230,298 @@
                                 <span class="hero-badge-dot"></span>
                                 New Session
                             </div>
-                            <h1 class="text-lg sm:text-xl lg:text-2xl font-semibold tracking-tight text-[#2c2420] mt-2">Book New Appointment</h1>
+                            <h1 class="text-lg sm:text-xl lg:text-2xl font-semibold tracking-tight text-[#2c2420] mt-2">Book Appointment</h1>
+                            <p class="text-[#6b5e57] text-xs sm:text-sm mt-1.5 max-w-2xl">
+                                Schedule a new session directly for a student.
+                            </p>
                         </div>
                     </div>
-                    <a href="{{ route('counselor.appointments') }}"
-                       class="secondary-btn px-4 py-2 text-xs sm:text-sm w-full sm:w-auto">
-                        <i class="fas fa-arrow-left mr-1.5 text-[9px] sm:text-xs"></i>Back
-                    </a>
+                </div>
+            </div>
+
+            <!-- Right: Summary Card -->
+            <div class="summary-card">
+                <div class="relative h-full flex flex-row items-center justify-between gap-4 p-4 sm:p-5">
+                    <div class="flex items-center gap-3 min-w-0">
+                        <div class="summary-icon flex-shrink-0">
+                            <i class="fas fa-calendar-plus text-sm"></i>
+                        </div>
+                        <div class="min-w-0">
+                            <p class="summary-label">Quick Actions</p>
+                            <p class="summary-value">Book Session</p>
+                            <p class="summary-subtext">Auto-approved upon booking by counselor.</p>
+                        </div>
+                    </div>
+                    <div class="flex flex-col gap-2 flex-shrink-0">
+                        <a href="{{ route('counselor.appointments') }}"
+                           class="primary-btn px-4 py-2 text-xs sm:text-sm whitespace-nowrap" style="background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); box-shadow: none;">
+                            <i class="fas fa-arrow-left mr-1.5 text-[9px] sm:text-xs"></i>
+                            <span>All Appointments</span>
+                        </a>
+                        <a href="{{ route('counselor.calendar') }}"
+                           class="primary-btn px-4 py-2 text-xs sm:text-sm whitespace-nowrap" style="background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); box-shadow: none;">
+                            <i class="fas fa-calendar-days mr-1.5 text-[9px] sm:text-xs"></i>
+                            <span>View Calendar</span>
+                        </a>
+                    </div>
                 </div>
             </div>
         </div>
 
-        <!-- Form -->
-        <div class="panel-card">
-            <div class="panel-topline"></div>
-            <form id="appointmentForm" action="{{ route('counselor.appointments.store') }}" method="POST" class="p-4 sm:p-5 md:p-6">
-                @csrf
-                <input type="hidden" name="counselor_id" id="counselorIdInput" value="{{ $selectedCounselor->id }}">
+        <!-- Form Content -->
+        <form id="appointmentForm" action="{{ route('counselor.appointments.store') }}" method="POST">
+            @csrf
+            <input type="hidden" name="counselor_id" id="counselorIdInput" value="{{ $selectedCounselor->id }}">
 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
-                    <div>
-                        @if($counselorAssignments->count() > 1)
-                            <label class="field-label">College</label>
-                            <select id="collegeSelect" class="select-field text-xs sm:text-sm" required>
-                                @foreach($counselorAssignments as $assignment)
-                                    <option value="{{ $assignment->id }}" {{ (int) $selectedCounselor->id === (int) $assignment->id ? 'selected' : '' }}>
-                                        {{ $assignment->college->name ?? 'N/A' }}
-                                    </option>
-                                @endforeach
-                            </select>
-                        @endif
+            <div class="grid grid-cols-1 xl:grid-cols-12 gap-5 lg:gap-6 items-start">
+                
+                <!-- Left Column: Booking Details -->
+                <div class="xl:col-span-7 flex flex-col gap-5 lg:gap-6">
+                    
+                    <!-- Student Info Panel -->
+                    <div class="panel-card">
+                        <div class="panel-topline"></div>
+                        <div class="p-4 sm:p-5 md:p-6">
+                            <h2 class="text-sm font-bold text-[#2c2420] uppercase tracking-wide mb-5 flex items-center gap-2.5">
+                                <div class="w-8 h-8 rounded-lg bg-[rgba(212,175,55,0.15)] text-[var(--gold-500)] flex items-center justify-center">
+                                    <i class="fas fa-user-graduate"></i>
+                                </div>
+                                Student Selection
+                            </h2>
+                            <div class="grid grid-cols-1 gap-4 sm:gap-5">
+                                @if($counselorAssignments->count() > 1)
+                                <div>
+                                    <label class="field-label">College</label>
+                                    <select id="collegeSelect" class="select-field text-xs sm:text-sm" required>
+                                        @foreach($counselorAssignments as $assignment)
+                                            <option value="{{ $assignment->id }}" {{ (int) $selectedCounselor->id === (int) $assignment->id ? 'selected' : '' }}>
+                                                {{ $assignment->college->name ?? 'N/A' }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                                @endif
 
-                        <label class="field-label mt-{{ $counselorAssignments->count() > 1 ? '6' : '0' }}">Student</label>
-                        <select name="student_id" id="studentSelect" class="select-field text-xs sm:text-sm" required>
-                            <option value="">Choose a student</option>
-                            @foreach($students as $student)
-                                <option value="{{ $student->id }}" {{ old('student_id') == $student->id ? 'selected' : '' }}>
-                                    {{ $student->student_id }} - {{ $student->user->first_name }} {{ $student->user->last_name }}
-                                </option>
-                            @endforeach
-                        </select>
-                        @error('student_id')
-                            <p class="error-text">{{ $message }}</p>
-                        @enderror
-                    </div>
-                </div>
-
-                <div class="mt-6">
-                    <label class="field-label">Type of Booking</label>
-                    <select name="booking_type" id="bookingType" class="select-field text-xs sm:text-sm" required>
-                        <option value="">Choose a booking type</option>
-                        <option value="Initial Interview" {{ old('booking_type') === 'Initial Interview' ? 'selected' : '' }}>Initial Interview</option>
-                        <option value="Counseling" {{ old('booking_type') === 'Counseling' ? 'selected' : '' }}>Counseling</option>
-                        <option value="Consultation" {{ old('booking_type') === 'Consultation' ? 'selected' : '' }}>Consultation</option>
-                    </select>
-                    <p class="helper-text" id="bookingTypeHelp">Select the reason for the appointment.</p>
-                    @error('booking_type')
-                        <p class="error-text">{{ $message }}</p>
-                    @enderror
-                </div>
-
-                <div class="mt-6">
-                    <label class="field-label">Booking Category</label>
-                    <select name="booking_category" id="bookingCategory" class="select-field text-xs sm:text-sm" required>
-                        
-                        <option value="walk-in" {{ old('booking_category') === 'walk-in' ? 'selected' : '' }}>Walk-in</option>
-                        <option value="referred" {{ old('booking_category') === 'referred' ? 'selected' : '' }}>Referred</option>
-                        <option value="called-in" {{ old('booking_category') === 'called-in' ? 'selected' : '' }}>Called-in</option>
-                    </select>
-                    <p class="helper-text">Select how the appointment was initiated.</p>
-                    @error('booking_category')
-                        <p class="error-text">{{ $message }}</p>
-                    @enderror
-                </div>
-
-                <div class="mt-4 {{ old('booking_category') === 'referred' ? '' : 'hidden' }}" id="referredByWrap">
-                    <label class="field-label">Referred by</label>
-                    <input type="text" name="referred_by" id="referredByInput" value="{{ old('referred_by') }}"
-                           class="input-field text-xs sm:text-sm" maxlength="255"
-                           placeholder="e.g. Teacher, Parent, Friend">
-                    @error('referred_by')
-                        <p class="error-text">{{ $message }}</p>
-                    @enderror
-                </div>
-
-                <div class="mt-6">
-                    <label class="field-label">Select Date</label>
-                    <div class="calendar-card">
-                        <div class="calendar-nav">
-                            <button type="button" id="calendarPrev" class="calendar-nav-btn">‹</button>
-                            <h3 id="calendarMonthLabel" class="text-sm font-semibold text-[#2c2420]"></h3>
-                            <button type="button" id="calendarNext" class="calendar-nav-btn">›</button>
-                        </div>
-                        <div class="calendar-grid mb-2">
-                            <span class="calendar-day-header">Sun</span>
-                            <span class="calendar-day-header">Mon</span>
-                            <span class="calendar-day-header">Tue</span>
-                            <span class="calendar-day-header">Wed</span>
-                            <span class="calendar-day-header">Thu</span>
-                            <span class="calendar-day-header">Fri</span>
-                            <span class="calendar-day-header">Sat</span>
-                        </div>
-                        <div id="calendarGrid" class="calendar-grid"></div>
-                        <p id="calendarStatus" class="calendar-status">Loading available dates...</p>
-                    </div>
-                    <input type="hidden" name="appointment_date" id="dateSelect" min="{{ date('Y-m-d', strtotime('+1 day')) }}" required>
-                    @error('appointment_date')
-                        <p class="error-text">{{ $message }}</p>
-                    @enderror
-                </div>
-
-                <div class="mt-6" id="createSlotWrap">
-                    <label class="field-label">Available Time Slots</label>
-                    <div id="timeSlots" class="grid grid-cols-2 md:grid-cols-3 gap-2 sm:gap-3">
-                        <div class="text-[#8b7e76] text-center p-4 border-2 border-dashed border-[#e5e0db] rounded-lg text-xs">
-                            Select a counselor and date to see available time slots
+                                <div>
+                                    <label class="field-label">Student</label>
+                                    <select name="student_id" id="studentSelect" class="select-field text-xs sm:text-sm" required>
+                                        <option value="">Choose a student</option>
+                                        @foreach($students as $student)
+                                            <option value="{{ $student->id }}" {{ old('student_id') == $student->id ? 'selected' : '' }}>
+                                                {{ $student->student_id }} - {{ $student->user->first_name }} {{ $student->user->last_name }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                    @error('student_id')
+                                        <p class="error-text">{{ $message }}</p>
+                                    @enderror
+                                </div>
+                            </div>
                         </div>
                     </div>
-                    <input type="hidden" name="start_time" id="selectedTime" required>
-                    @error('start_time')
-                        <p class="error-text">{{ $message }}</p>
-                    @enderror
-                </div>
 
-                {{-- Override Availability --}}
-                <div class="mt-4">
-                    <label style="display:flex;align-items:center;gap:0.6rem;cursor:pointer;padding:0.65rem 0.85rem;border:1px solid #fca5a5;border-radius:0.6rem;background:rgba(255,241,242,0.5);">
-                        <input type="checkbox" name="override_availability" id="createOverrideCheck" value="1"
-                               onchange="toggleCreateOverride(this.checked)"
-                               style="width:1rem;height:1rem;accent-color:#dc2626;cursor:pointer;">
-                        <span style="font-size:0.78rem;color:#991b1b;font-weight:600;display:flex;align-items:center;gap:0.4rem;">
-                            <i class="fas fa-bolt text-[10px]"></i>
-                            Override Availability — book outside set hours / daily limit
-                        </span>
-                    </label>
+                    <!-- Session Details Panel -->
+                    <div class="panel-card">
+                        <div class="panel-topline"></div>
+                        <div class="p-4 sm:p-5 md:p-6">
+                            <h2 class="text-sm font-bold text-[#2c2420] uppercase tracking-wide mb-5 flex items-center gap-2.5">
+                                <div class="w-8 h-8 rounded-lg bg-[rgba(212,175,55,0.15)] text-[var(--gold-500)] flex items-center justify-center">
+                                    <i class="fas fa-clipboard-list"></i>
+                                </div>
+                                Session Details
+                            </h2>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-5">
+                                <div class="col-span-1 md:col-span-2">
+                                    <label class="field-label">Type of Booking</label>
+                                    <select name="booking_type" id="bookingType" class="select-field text-xs sm:text-sm" required>
+                                        <option value="">Choose a booking type</option>
+                                        <option value="Initial Interview" {{ old('booking_type') === 'Initial Interview' ? 'selected' : '' }}>Initial Interview</option>
+                                        <option value="Counseling" {{ old('booking_type') === 'Counseling' ? 'selected' : '' }}>Counseling</option>
+                                        <option value="Consultation" {{ old('booking_type') === 'Consultation' ? 'selected' : '' }}>Consultation</option>
+                                    </select>
+                                    <p class="helper-text" id="bookingTypeHelp">Select the reason for the appointment.</p>
+                                    @error('booking_type')
+                                        <p class="error-text">{{ $message }}</p>
+                                    @enderror
+                                </div>
+
+                                <div class="col-span-1">
+                                    <label class="field-label">Booking Category</label>
+                                    <select name="booking_category" id="bookingCategory" class="select-field text-xs sm:text-sm" required>
+                                        <option value="walk-in" {{ old('booking_category') === 'walk-in' ? 'selected' : '' }}>Walk-in</option>
+                                        <option value="referred" {{ old('booking_category') === 'referred' ? 'selected' : '' }}>Referred</option>
+                                        <option value="called-in" {{ old('booking_category') === 'called-in' ? 'selected' : '' }}>Called-in</option>
+                                    </select>
+                                    <p class="helper-text">How it was initiated.</p>
+                                    @error('booking_category')
+                                        <p class="error-text">{{ $message }}</p>
+                                    @enderror
+                                </div>
+
+                                <div class="col-span-1 {{ old('booking_category') === 'referred' ? '' : 'hidden' }}" id="referredByWrap">
+                                    <label class="field-label">Referred by</label>
+                                    <input type="text" name="referred_by" id="referredByInput" value="{{ old('referred_by') }}"
+                                           class="input-field text-xs sm:text-sm" maxlength="255"
+                                           placeholder="e.g. Teacher, Parent">
+                                    @error('referred_by')
+                                        <p class="error-text">{{ $message }}</p>
+                                    @enderror
+                                </div>
+
+                                <div class="col-span-1 md:col-span-2">
+                                    <label class="field-label">Concern / Agenda</label>
+                                    <textarea name="concern" rows="3" class="textarea-field" required placeholder="Briefly describe the concern or agenda for this session...">{{ old('concern') }}</textarea>
+                                    @error('concern')
+                                        <p class="error-text">{{ $message }}</p>
+                                    @enderror
+                                </div>
+                            </div>
+                        </div>
                     </div>
 
-                <div class="mt-6">
-                    <label class="field-label">Concern / Agenda</label>
-                    <textarea name="concern" rows="3" class="textarea-field" required>{{ old('concern') }}</textarea>
-                    @error('concern')
-                        <p class="error-text">{{ $message }}</p>
-                    @enderror
                 </div>
 
-                <!-- High-Risk Flag -->
-                <div class="mt-5 rounded-lg border p-4" style="border-color:rgba(220,38,38,0.25);background:rgba(254,242,242,0.4);">
-                    <label class="flex items-center gap-2.5 cursor-pointer select-none mb-3">
-                        <input type="checkbox" name="flag_high_risk" id="flagHighRisk" value="1"
-                               class="w-4 h-4 rounded accent-red-600 cursor-pointer"
-                               {{ old('flag_high_risk') ? 'checked' : '' }}
-                               onchange="document.getElementById('highRiskNotesWrap').classList.toggle('hidden', !this.checked)">
-                        <span class="text-sm font-semibold" style="color:#991b1b;">
-                            <i class="fas fa-exclamation-triangle text-xs mr-1"></i>Flag this student as High-Risk
-                        </span>
-                    </label>
-                    <div id="highRiskNotesWrap" class="{{ old('flag_high_risk') ? '' : 'hidden' }}">
-                        <label class="field-label">Reason for High-Risk Flag</label>
-                        <textarea name="high_risk_notes" rows="2" class="textarea-field"
-                                  placeholder="Describe the reason for flagging this student as high-risk..."
-                                  style="border-color:rgba(220,38,38,0.3);">{{ old('high_risk_notes') }}</textarea>
+                <!-- Right Column: Scheduling & Actions -->
+                <div class="xl:col-span-5 flex flex-col gap-5 lg:gap-6">
+                    <div class="panel-card sticky top-6">
+                        <div class="panel-topline"></div>
+                        <div class="p-4 sm:p-5 md:p-6">
+                            <h2 class="text-sm font-bold text-[#2c2420] uppercase tracking-wide mb-5 flex items-center gap-2.5">
+                                <div class="w-8 h-8 rounded-lg bg-[rgba(212,175,55,0.15)] text-[var(--gold-500)] flex items-center justify-center">
+                                    <i class="fas fa-calendar-alt"></i>
+                                </div>
+                                Schedule Date & Time
+                            </h2>
+
+                            <div>
+                                <label class="field-label">Select Date</label>
+                                <div class="calendar-card shadow-sm border-[var(--border-soft)]">
+                                    <!-- Loading Overlay -->
+                                    <div id="calendarLoading" class="absolute inset-0 z-10 bg-white/80 backdrop-blur-[2px] flex flex-col items-center justify-center transition-opacity duration-200 hidden">
+                                        <div class="bg-white px-4 py-3 rounded-xl shadow-sm border border-[#e5e0db]/80 flex items-center gap-3">
+                                            <i class="fas fa-circle-notch fa-spin text-lg text-[#7a2a2a]"></i>
+                                            <span class="text-xs font-bold text-[#5c1a1a] tracking-wide uppercase">Checking Dates...</span>
+                                        </div>
+                                    </div>
+
+                                    <div class="calendar-nav">
+                                        <button type="button" id="calendarPrev" class="calendar-nav-btn">‹</button>
+                                        <h3 id="calendarMonthLabel" class="text-sm font-semibold text-[#2c2420]"></h3>
+                                        <button type="button" id="calendarNext" class="calendar-nav-btn">›</button>
+                                    </div>
+                                    <div class="calendar-grid mb-2">
+                                        <span class="calendar-day-header">Sun</span>
+                                        <span class="calendar-day-header">Mon</span>
+                                        <span class="calendar-day-header">Tue</span>
+                                        <span class="calendar-day-header">Wed</span>
+                                        <span class="calendar-day-header">Thu</span>
+                                        <span class="calendar-day-header">Fri</span>
+                                        <span class="calendar-day-header">Sat</span>
+                                    </div>
+                                    <div id="calendarGrid" class="calendar-grid"></div>
+                                    <p id="calendarStatus" class="calendar-status mt-3 text-center">Loading available dates...</p>
+                                </div>
+                                <input type="hidden" name="appointment_date" id="dateSelect" min="{{ date('Y-m-d', strtotime('+1 day')) }}" required>
+                                @error('appointment_date')
+                                    <p class="error-text">{{ $message }}</p>
+                                @enderror
+                            </div>
+
+                            <div class="mt-6" id="createSlotWrap">
+                                <label class="field-label">Available Time Slots</label>
+                                <div id="timeSlots" class="grid grid-cols-2 gap-2 sm:gap-3">
+                                    <div class="col-span-2 text-[#8b7e76] text-center p-4 border-2 border-dashed border-[#e5e0db] rounded-lg text-xs">
+                                        Select a date to see available time slots
+                                    </div>
+                                </div>
+                                <input type="hidden" name="start_time" id="selectedTime" required>
+                                @error('start_time')
+                                    <p class="error-text">{{ $message }}</p>
+                                @enderror
+                            </div>
+
+                        </div>
                     </div>
                 </div>
+            </div>
 
-                <div class="form-actions">
-                    <a href="{{ route('counselor.appointments') }}"
-                       class="secondary-btn px-5 py-2.5 text-xs sm:text-sm">Cancel</a>
-                    <button type="submit" class="primary-btn px-5 py-2.5 text-xs sm:text-sm">
-                        Book Now (Auto-Approved)
+            <!-- Special Options Panel (Full Width) -->
+            <div class="panel-card mt-5 lg:mt-6">
+                <div class="panel-topline"></div>
+                <div class="p-4 sm:p-5 md:p-6">
+                    <h2 class="text-sm font-bold text-[#2c2420] uppercase tracking-wide mb-5 flex items-center gap-2.5">
+                        <div class="w-8 h-8 rounded-lg bg-[rgba(212,175,55,0.15)] text-[var(--gold-500)] flex items-center justify-center">
+                            <i class="fas fa-sliders-h"></i>
+                        </div>
+                        Special Options
+                    </h2>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-5 sm:gap-6">
+                        <!-- Risk Assessment -->
+                        <div class="h-full rounded-xl border p-4 sm:p-5 transition-all duration-200" style="border-color: rgba(220,38,38,0.25); background: rgba(254,242,242,0.4);" onmouseover="this.style.background='rgba(254,242,242,0.8)';" onmouseout="this.style.background='rgba(254,242,242,0.4)';">
+                            <label class="flex items-center gap-3 cursor-pointer select-none">
+                                <input type="checkbox" name="flag_high_risk" id="flagHighRisk" value="1"
+                                       class="w-5 h-5 rounded accent-red-600 cursor-pointer"
+                                       {{ old('flag_high_risk') ? 'checked' : '' }}
+                                       onchange="document.getElementById('highRiskNotesWrap').classList.toggle('hidden', !this.checked)">
+                                <span class="text-sm font-bold uppercase tracking-wide" style="color:#991b1b;">
+                                    <i class="fas fa-exclamation-triangle mr-1.5 text-red-600"></i> Flag this student as High-Risk
+                                </span>
+                            </label>
+                            <p class="text-xs text-[var(--text-muted)] mt-1 ml-8">Mark this student for priority monitoring.</p>
+
+                            <div id="highRiskNotesWrap" class="mt-4 pt-4 border-t border-[rgba(220,38,38,0.15)] {{ old('flag_high_risk') ? '' : 'hidden' }}">
+                                <label class="field-label" style="color:#7f1d1d;">Reason for High-Risk Flag</label>
+                                <textarea name="high_risk_notes" rows="2" class="textarea-field w-full mt-2"
+                                          placeholder="Briefly describe the reason..."
+                                          style="border-color:rgba(220,38,38,0.3); background: white;">{{ old('high_risk_notes') }}</textarea>
+                            </div>
+                        </div>
+
+                        <!-- Override Availability -->
+                        <div class="h-full rounded-xl border p-4 sm:p-5 transition-all duration-200" style="border-color: rgba(212,175,55,0.4); background: rgba(254,249,231,0.4);" onmouseover="this.style.background='rgba(254,249,231,0.8)';" onmouseout="this.style.background='rgba(254,249,231,0.4)';">
+                            <label class="flex items-center gap-3 cursor-pointer select-none">
+                                <input type="checkbox" name="override_availability" id="createOverrideCheck" value="1"
+                                       onchange="toggleCreateOverride(this.checked)"
+                                       style="width:1.25rem;height:1.25rem;accent-color:var(--gold-500);cursor:pointer;">
+                                <span class="text-sm font-bold uppercase tracking-wide" style="color:var(--text-primary);">
+                                    <i class="fas fa-bolt mr-1.5 text-[var(--gold-500)]"></i> Override Availability
+                                </span>
+                            </label>
+                            <p class="text-xs text-[var(--text-muted)] mt-1 ml-8">Book outside set hours or daily limit.</p>
+                            
+                            <div id="createManualTimeWrap" class="mt-4 pt-4 border-t border-[rgba(212,175,55,0.2)] hidden">
+                                <div class="grid grid-cols-2 gap-4">
+                                    <div>
+                                        <label class="field-label">Date</label>
+                                        <input type="date" name="manual_date" id="createManualDate" class="input-field text-xs sm:text-sm bg-white mt-2"
+                                               onchange="document.getElementById('dateSelect').value = this.value; document.getElementById('selectedTime').value = document.getElementById('createManualTime').value;">
+                                    </div>
+                                    <div>
+                                        <label class="field-label">Time</label>
+                                        <input type="time" name="manual_time" id="createManualTime" class="input-field text-xs sm:text-sm bg-white mt-2"
+                                               onchange="document.getElementById('selectedTime').value = this.value;">
+                                    </div>
+                                </div>
+                                <p class="text-xs text-[var(--gold-500)] font-medium mt-3 flex items-center gap-1.5">
+                                    <i class="fas fa-info-circle"></i> Manual input overwrites calendar selection.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Form Actions -->
+            <div class="panel-card mt-5 lg:mt-6 bg-[rgba(255,255,255,0.95)] backdrop-blur-md border-t-0">
+                <div class="p-4 sm:p-5 flex flex-col sm:flex-row justify-end gap-3">
+                    <a href="{{ route('counselor.appointments') }}" class="secondary-btn px-6 py-2.5 text-sm w-full sm:w-auto text-center">Cancel</a>
+                    <button type="submit" class="primary-btn px-6 py-2.5 text-sm w-full sm:w-auto text-center flex justify-center items-center gap-2">
+                        <i class="fas fa-check-circle"></i> Book Now (Auto-Approved)
                     </button>
                 </div>
-            </form>
-        </div>
+            </div>
+        </form>
     </div>
 </div>
 
@@ -607,6 +748,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     async function loadMonthAvailability() {
         const counselorId = counselorIdInput.value;
+        const calendarLoading = document.getElementById('calendarLoading');
         availabilityByDate = new Map();
         renderCalendar();
 
@@ -617,6 +759,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
         const requestId = ++availabilityRequestId;
         setCalendarStatus('Checking available dates...');
+        if (calendarLoading) calendarLoading.classList.remove('hidden');
+
         const monthValue = `${currentMonth.getFullYear()}-${String(currentMonth.getMonth() + 1).padStart(2, '0')}`;
         const isOverride = overrideCheck && overrideCheck.checked;
 
@@ -634,11 +778,13 @@ document.addEventListener('DOMContentLoaded', function() {
         } catch (error) {
             if (requestId !== availabilityRequestId) return;
             setCalendarStatus('Unable to load available dates. Please try again.', 'error');
+            if (calendarLoading) calendarLoading.classList.add('hidden');
             renderCalendar();
             return;
         }
 
         if (requestId !== availabilityRequestId) return;
+        if (calendarLoading) calendarLoading.classList.add('hidden');
 
         const hasAnyAvailability = Array.from(availabilityByDate.values()).some(value => value);
         if (!hasAnyAvailability) {

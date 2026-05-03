@@ -1724,6 +1724,7 @@ class AdminController extends Controller
             'address'             => 'nullable|string',
             'birthdate'           => 'nullable|date',
             'sex'                 => 'nullable|in:male,female,other',
+            'religion'            => 'nullable|string|max:255',
             'college_id'          => 'required|exists:colleges,id',
             'position'            => 'required|string|max:100',
             'credentials'         => 'required|string|max:100',
@@ -1751,6 +1752,7 @@ class AdminController extends Controller
                 'birthdate'    => $validated['birthdate'] ?? null,
                 'age'          => $age,
                 'sex'          => $validated['sex'] ?? null,
+                'religion'     => isset($validated['religion']) ? strip_tags($validated['religion']) : null,
             ]);
 
             $counselor->update([

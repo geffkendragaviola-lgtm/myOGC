@@ -133,6 +133,26 @@
     }
     .secondary-btn:hover { background: rgba(254,249,231,0.7); border-color: var(--maroon-700); }
 
+    .summary-card {
+        position: relative; overflow: hidden; border-radius: 0.75rem;
+        border: 1px solid rgba(92,26,26,0.15);
+        background: linear-gradient(135deg, #5c1a1a 0%, #3a0c0c 100%); color: white;
+        box-shadow: 0 4px 12px rgba(58,12,12,0.15);
+    }
+    .summary-card::before {
+        content: ""; position: absolute; inset: 0; opacity: 0.15;
+        background: radial-gradient(circle at top right, #d4af37, transparent 40%);
+        pointer-events: none;
+    }
+    .summary-icon {
+        width: 2.5rem; height: 2.5rem; border-radius: 0.75rem; display: flex;
+        align-items: center; justify-content: center; background: rgba(255,255,255,0.1);
+        border: 1px solid rgba(255,255,255,0.1); color: #fef9e7; flex-shrink: 0;
+    }
+    .summary-label { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.2em; color: rgba(255,255,255,0.7); }
+    .summary-value { font-size: 1.2rem; line-height: 1.2; font-weight: 800; margin-top: 0.35rem; }
+    .summary-subtext { font-size: 0.7rem; color: rgba(255,255,255,0.8); margin-top: 0.2rem; }
+
     .profile-link {
         display: inline-flex; align-items: center; gap: 0.3rem;
         font-size: 0.7rem; font-weight: 500; color: var(--maroon-700);
@@ -255,43 +275,66 @@
 
     <div class="relative max-w-7xl mx-auto px-4 sm:px-6 py-5 md:py-8">
         <!-- Header -->
-        <div class="mb-5 sm:mb-6">
-            <div class="hero-card">
-                <div class="relative p-4 sm:p-5 flex flex-col md:flex-row md:items-start md:justify-between gap-4">
-                    <div class="flex items-start gap-3">
-                        <div class="hero-icon">
-                            <i class="fas fa-sticky-note text-base sm:text-lg"></i>
-                        </div>
-                        <div class="min-w-0">
-                            <div class="hero-badge">
-                                <span class="hero-badge-dot"></span>
-                                Case Record
+        <div class="mb-6 sm:mb-8">
+            <div class="grid grid-cols-1 xl:grid-cols-[1fr_auto] gap-4 items-stretch">
+                <div class="hero-card">
+                    <div class="relative p-4 sm:p-5 flex flex-col md:flex-row md:items-start md:justify-between gap-4">
+                        <div class="flex items-start gap-3">
+                            <div class="hero-icon">
+                                <i class="fas fa-sticky-note text-base sm:text-lg"></i>
                             </div>
-                            <h1 class="text-lg sm:text-xl lg:text-2xl font-semibold tracking-tight text-[#2c2420] mt-2">Appointment Session</h1>
-                            <p class="text-[#6b5e57] text-xs sm:text-sm mt-1.5">
-                                {{ $appointment->student->user->first_name }} {{ $appointment->student->user->last_name }}
-                                <span class="text-[#8b7e76]">({{ $appointment->student->student_id }})</span>
-                                @if($sessionIsHighRisk)
-                                    <span class="ml-2 inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-red-100 text-red-700 border border-red-200">
-                                        <i class="fas fa-exclamation-triangle text-[9px]"></i> High-risk individual
-                                    </span>
-                                @endif
-                            </p>
-                            <p class="text-[10px] sm:text-xs text-[#8b7e76] mt-0.5">
-                                {{ $appointment->student->college->name ?? 'N/A' }} • {{ $appointment->student->course }} • {{ $appointment->student->year_level }}
-                            </p>
+                            <div class="min-w-0">
+                                <div class="hero-badge">
+                                    <span class="hero-badge-dot"></span>
+                                    Case Record
+                                </div>
+                                <h1 class="text-lg sm:text-xl lg:text-2xl font-semibold tracking-tight text-[#2c2420] mt-2">Appointment Session</h1>
+                                <p class="text-[#6b5e57] text-xs sm:text-sm mt-1.5">
+                                    {{ $appointment->student->user->first_name }} {{ $appointment->student->user->last_name }}
+                                    <span class="text-[#8b7e76]">({{ $appointment->student->student_id }})</span>
+                                    @if($sessionIsHighRisk)
+                                        <span class="ml-2 inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-red-100 text-red-700 border border-red-200">
+                                            <i class="fas fa-exclamation-triangle text-[9px]"></i> High-risk individual
+                                        </span>
+                                    @endif
+                                </p>
+                                <p class="text-[10px] sm:text-xs text-[#8b7e76] mt-0.5">
+                                    {{ $appointment->student->college->name ?? 'N/A' }} • {{ $appointment->student->course }} • {{ $appointment->student->year_level }}
+                                </p>
+                            </div>
                         </div>
                     </div>
-                    <div class="flex flex-col sm:flex-row gap-2 sm:gap-3 w-full md:w-auto">
-                        <button type="button"
-                                onclick="openFollowupModal()"
-                                class="primary-btn px-4 py-2 text-xs sm:text-sm w-full sm:w-auto">
-                            <i class="fas fa-calendar-plus mr-1.5 text-[9px] sm:text-xs"></i> Book Follow-up
-                        </button>
-                        <a href="{{ route('counselor.appointments') }}"
-                           class="secondary-btn px-4 py-2 text-xs sm:text-sm w-full sm:w-auto">
-                            <i class="fas fa-arrow-left mr-1.5 text-[9px] sm:text-xs"></i> Back
-                        </a>
+                </div>
+
+                <div class="summary-card">
+                    <div class="relative h-full flex flex-row items-center justify-between gap-4 p-4 sm:p-5">
+                        <div class="flex items-center gap-3 min-w-0">
+                            <div class="summary-icon flex-shrink-0">
+                                <i class="fas fa-calendar-check text-sm"></i>
+                            </div>
+                            <div class="min-w-0">
+                                <p class="summary-label">Quick Actions</p>
+                                <p class="summary-value">Manage Session</p>
+                                <p class="summary-subtext">Book a follow-up or return to lists.</p>
+                            </div>
+                        </div>
+                        <div class="flex flex-col gap-2 flex-shrink-0">
+                            <button type="button" onclick="openFollowupModal()"
+                                    class="primary-btn px-4 py-2 text-xs sm:text-sm whitespace-nowrap" style="background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); box-shadow: none;">
+                                <i class="fas fa-calendar-plus mr-1.5 text-[9px] sm:text-xs"></i>
+                                <span>Book Follow-up</span>
+                            </button>
+                            <a href="{{ route('counselor.appointments') }}"
+                               class="primary-btn px-4 py-2 text-xs sm:text-sm whitespace-nowrap" style="background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); box-shadow: none;">
+                                <i class="fas fa-list mr-1.5 text-[9px] sm:text-xs"></i>
+                                <span>Appointments</span>
+                            </a>
+                            <a href="{{ route('counselor.appointment-sessions.dashboard') }}"
+                               class="primary-btn px-4 py-2 text-xs sm:text-sm whitespace-nowrap" style="background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); box-shadow: none;">
+                                <i class="fas fa-arrow-left mr-1.5 text-[9px] sm:text-xs"></i>
+                                <span>Back to Sessions</span>
+                            </a>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -299,7 +342,7 @@
 
         {{-- High-Risk Banner — only show if flagged, no "not flagged" noise --}}
         @if($sessionIsHighRisk)
-        <div class="panel-card mb-5" style="border-left:3px solid #dc2626;">
+        <div class="panel-card mb-6 sm:mb-8" style="border-left:3px solid #dc2626;">
             <div class="relative p-3 sm:p-4 flex flex-wrap items-center gap-3">
                 <div class="flex items-center gap-2 flex-1 min-w-0">
                     <span class="flex-shrink-0 w-7 h-7 rounded-lg flex items-center justify-center bg-red-100 text-red-600 text-xs">
@@ -330,7 +373,7 @@
 
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
             <!-- Left Sidebar -->
-            <div class="lg:col-span-1 space-y-4">
+            <div class="lg:col-span-1 space-y-4 sm:space-y-6">
 
                 <!-- Appointment + Student combined -->
                 <div class="detail-card">
@@ -633,7 +676,7 @@
 
     <!-- Follow-up Modal -->
     <div id="followupModal" class="modal-backdrop hidden" onclick="handleFollowupBackdropClick(event)">
-        <div class="modal-card" onclick="event.stopPropagation();" style="max-width:52rem;">
+        <div class="modal-card" onclick="event.stopPropagation();" style="max-width:52rem; max-height:80vh; overflow-y:auto;">
 
             {{-- Modal Header --}}
             <div class="modal-header" style="background:linear-gradient(135deg,var(--maroon-800) 0%,var(--maroon-700) 100%);border-radius:0.75rem 0.75rem 0 0;padding:1.1rem 1.5rem;">
@@ -707,15 +750,18 @@
                             </div>
 
                             {{-- Time Slots --}}
-                            <div id="fuSlotWrap" style="background:rgba(250,248,245,0.7);border:1px solid var(--border-soft);border-radius:0.65rem;padding:1rem;">
-                                <p style="font-size:0.65rem;font-weight:700;text-transform:uppercase;letter-spacing:0.12em;color:var(--text-muted);margin:0 0 0.75rem;">Available Time Slots</p>
-                                <div id="followup_time_slots" class="grid grid-cols-2 gap-2 max-h-44 overflow-y-auto">
-                                    <div class="col-span-full text-center text-[#8b7e76] text-xs py-4 border border-dashed border-[#e5e0db] rounded-lg">
+                            <div id="fuSlotWrap" style="background:#ffffff;border:1px solid var(--border-soft);border-radius:0.75rem;padding:1.25rem;box-shadow:0 2px 8px rgba(0,0,0,0.02);">
+                                <p style="font-size:0.65rem;font-weight:700;text-transform:uppercase;letter-spacing:0.12em;color:var(--maroon-700);margin:0 0 0.85rem;display:flex;align-items:center;gap:0.4rem;">
+                                    <i class="fas fa-clock"></i> Available Time Slots
+                                </p>
+                                <div id="followup_time_slots" class="grid grid-cols-2 gap-2 max-h-48 overflow-y-auto p-1">
+                                    <div class="col-span-full flex flex-col items-center justify-center text-[#8b7e76] text-xs py-6 border-2 border-dashed border-[#e5e0db] rounded-xl bg-[#faf8f5]">
+                                        <i class="fas fa-calendar-day mb-2 text-lg text-[#d4af37]"></i>
                                         Select a date to see available time slots
                                     </div>
                                 </div>
                                 <input type="hidden" name="start_time" id="followup_selected_time">
-                                @error('start_time')<p class="error-text">{{ $message }}</p>@enderror
+                                @error('start_time')<p class="error-text mt-2">{{ $message }}</p>@enderror
                             </div>
 
                             {{-- Override Availability --}}
@@ -739,28 +785,35 @@
 
                         {{-- Right column: calendar --}}
                         <div id="fuCalendarWrap">
-                            <div style="background:rgba(250,248,245,0.7);border:1px solid var(--border-soft);border-radius:0.65rem;padding:1rem;">
-                                <p style="font-size:0.65rem;font-weight:700;text-transform:uppercase;letter-spacing:0.12em;color:var(--text-muted);margin:0 0 0.75rem;">Select Date <span style="color:#b91c1c;">*</span></p>
-                                <div class="calendar-card" style="border:none;padding:0;background:transparent;">
-                                    <div class="calendar-nav">
-                                        <button type="button" id="fuCalPrev" class="calendar-nav-btn">‹</button>
-                                        <h3 id="fuCalMonthLabel" class="text-sm font-semibold text-[#2c2420]"></h3>
-                                        <button type="button" id="fuCalNext" class="calendar-nav-btn">›</button>
+                            <div style="background:#ffffff;border:1px solid var(--border-soft);border-radius:0.75rem;padding:1.25rem;box-shadow:0 2px 8px rgba(0,0,0,0.02);height:100%;display:flex;flex-direction:column;">
+                                <p style="font-size:0.65rem;font-weight:700;text-transform:uppercase;letter-spacing:0.12em;color:var(--maroon-700);margin:0 0 0.85rem;display:flex;align-items:center;gap:0.4rem;">
+                                    <i class="fas fa-calendar-alt"></i> Select Date <span style="color:#b91c1c;">*</span>
+                                </p>
+                                <div class="calendar-card flex-1" style="border:none;padding:0;background:transparent;display:flex;flex-direction:column;">
+                                    <div class="calendar-nav mb-3 bg-[#faf8f5] p-2 rounded-lg border border-[#e5e0db]">
+                                        <button type="button" id="fuCalPrev" class="calendar-nav-btn shadow-sm">‹</button>
+                                        <h3 id="fuCalMonthLabel" class="text-sm font-bold text-[#2c2420] tracking-wide"></h3>
+                                        <button type="button" id="fuCalNext" class="calendar-nav-btn shadow-sm">›</button>
                                     </div>
                                     <div class="calendar-grid mb-2">
-                                        <span class="calendar-day-header">Sun</span>
-                                        <span class="calendar-day-header">Mon</span>
-                                        <span class="calendar-day-header">Tue</span>
-                                        <span class="calendar-day-header">Wed</span>
-                                        <span class="calendar-day-header">Thu</span>
-                                        <span class="calendar-day-header">Fri</span>
-                                        <span class="calendar-day-header">Sat</span>
+                                        <span class="calendar-day-header text-[9px] font-bold text-[#a89f97]">Sun</span>
+                                        <span class="calendar-day-header text-[9px] font-bold text-[#a89f97]">Mon</span>
+                                        <span class="calendar-day-header text-[9px] font-bold text-[#a89f97]">Tue</span>
+                                        <span class="calendar-day-header text-[9px] font-bold text-[#a89f97]">Wed</span>
+                                        <span class="calendar-day-header text-[9px] font-bold text-[#a89f97]">Thu</span>
+                                        <span class="calendar-day-header text-[9px] font-bold text-[#a89f97]">Fri</span>
+                                        <span class="calendar-day-header text-[9px] font-bold text-[#a89f97]">Sat</span>
                                     </div>
                                     <div id="fuCalGrid" class="calendar-grid"></div>
-                                    <p id="fuCalStatus" class="calendar-status mt-2">Loading available dates...</p>
+                                    
+                                    <div class="mt-auto pt-4">
+                                        <div id="fuCalStatus">
+                                            <!-- Status container -->
+                                        </div>
+                                    </div>
                                 </div>
                                 <input type="hidden" name="appointment_date" id="followup_appointment_date" required>
-                                @error('appointment_date')<p class="error-text">{{ $message }}</p>@enderror
+                                @error('appointment_date')<p class="error-text mt-2">{{ $message }}</p>@enderror
                             </div>
                         </div>
 
@@ -909,11 +962,19 @@
             updateFollowupSubmitState();
 
             if (!dateValue) {
-                slotsContainer.innerHTML = '<div class="col-span-full text-center text-[#8b7e76] text-xs py-3">Select a date to see available time slots</div>';
+                slotsContainer.innerHTML = `
+                    <div class="col-span-full flex flex-col items-center justify-center text-[#8b7e76] text-xs py-6 border-2 border-dashed border-[#e5e0db] rounded-xl bg-[#faf8f5]">
+                        <i class="fas fa-calendar-day mb-2 text-lg text-[#d4af37]"></i>
+                        <span>Select a date to see available time slots</span>
+                    </div>`;
                 return;
             }
 
-            slotsContainer.innerHTML = '<div class="col-span-full text-center text-[#8b7e76] text-xs py-3">Loading slots...</div>';
+            slotsContainer.innerHTML = `
+                <div class="col-span-full flex flex-col items-center justify-center text-[#b48600] text-xs font-semibold py-6 border-2 border-dashed border-[#d4af37]/40 rounded-xl bg-[#fef9e7] shadow-sm">
+                    <i class="fas fa-circle-notch fa-spin mb-2 text-[1.25rem]"></i>
+                    <span>Loading available slots...</span>
+                </div>`;
 
             const counselorId = {{ (int) $effectiveCounselorId }};
             const isOverride = Boolean(overrideCheck && overrideCheck.checked);
@@ -924,7 +985,11 @@
                 const data = await res.json();
                 const available = Array.isArray(data.available_slots) ? data.available_slots : [];
                 if (!available.length) {
-                    slotsContainer.innerHTML = `<div class="col-span-full text-center text-[#8b7e76] text-xs py-3">${data.message || 'No available slots for this date'}</div>`;
+                    slotsContainer.innerHTML = `
+                        <div class="col-span-full flex flex-col items-center justify-center text-[#b91c1c] text-xs py-6 border-2 border-dashed border-[#ef4444]/30 rounded-xl bg-[#fef2f2]">
+                            <i class="fas fa-calendar-times mb-2 text-lg"></i>
+                            <span class="font-medium">${data.message || 'No available slots for this date'}</span>
+                        </div>`;
                     return;
                 }
                 slotsContainer.innerHTML = '';
@@ -938,7 +1003,11 @@
                     slotsContainer.appendChild(btn);
                 });
             } catch (e) {
-                slotsContainer.innerHTML = '<div class="col-span-full text-center text-red-500 text-xs py-3">Failed to load slots. Please try again.</div>';
+                slotsContainer.innerHTML = `
+                    <div class="col-span-full flex flex-col items-center justify-center text-[#b91c1c] text-xs py-6 border-2 border-dashed border-[#ef4444]/30 rounded-xl bg-[#fef2f2]">
+                        <i class="fas fa-exclamation-triangle mb-2 text-lg"></i>
+                        <span class="font-medium">Failed to load slots. Please try again.</span>
+                    </div>`;
             }
         }
 
@@ -988,8 +1057,36 @@
                 return a && b && a.getFullYear()===b.getFullYear() && a.getMonth()===b.getMonth() && a.getDate()===b.getDate();
             }
             function setStatus(msg, tone='') {
-                calStatus.textContent = msg;
-                calStatus.className = 'calendar-status' + (tone ? ' '+tone : '');
+                let icon = '';
+                let colorClass = 'text-[#6b5e57]';
+                let bgClass = 'bg-[#f5f0eb]/50 border border-[#e5e0db]';
+                let animateClass = '';
+                
+                if (msg === 'Checking available dates...') {
+                    icon = '<i class="fas fa-circle-notch fa-spin text-base"></i>';
+                    colorClass = 'text-[#b48600]';
+                    bgClass = 'bg-[#fef9e7] border border-[#d4af37]/40 shadow-[0_2px_10px_rgba(212,175,55,0.15)]';
+                    animateClass = 'animate-pulse';
+                } else if (tone === 'success' || msg.includes('Selected:')) {
+                    icon = '<i class="fas fa-check-circle text-base"></i>';
+                    colorClass = 'text-[#065f46]';
+                    bgClass = 'bg-[#f0fdf4] border border-[#10b981]/40 shadow-[0_2px_10px_rgba(16,185,129,0.15)]';
+                } else if (tone === 'error' || msg.includes('No available')) {
+                    icon = '<i class="fas fa-exclamation-circle text-base"></i>';
+                    colorClass = 'text-[#b91c1c]';
+                    bgClass = 'bg-[#fef2f2] border border-[#ef4444]/40 shadow-[0_2px_10px_rgba(239,68,68,0.15)]';
+                } else if (msg.includes('Available dates')) {
+                    icon = '<i class="fas fa-info-circle text-base"></i>';
+                    colorClass = 'text-[#0369a1]';
+                    bgClass = 'bg-[#f0f9ff] border border-[#0ea5e9]/40 shadow-[0_2px_10px_rgba(14,165,233,0.15)]';
+                }
+                
+                calStatus.innerHTML = `
+                    <div class="flex items-center justify-center gap-2.5 px-4 py-3 rounded-xl ${bgClass} ${colorClass} ${animateClass} font-semibold transition-all duration-300 transform w-full">
+                        ${icon}
+                        <span class="text-xs tracking-wide">${msg}</span>
+                    </div>
+                `;
             }
 
             function renderCal() {

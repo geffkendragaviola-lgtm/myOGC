@@ -68,20 +68,42 @@
     .panel-title { font-size: 0.8rem; font-weight: 600; color: var(--text-primary); }
     .panel-subtitle { font-size: 0.68rem; color: var(--text-muted); margin-top: 0.1rem; }
 
-    .field-label { 
+    .field-label, .filter-label { 
         display: block; font-size: 0.65rem; font-weight: 600; color: var(--text-secondary); 
         margin-bottom: 0.35rem; text-transform: uppercase; letter-spacing: 0.08em; 
     }
-    .input-field, .select-field, .textarea-field {
+    .input-field, .select-field, .textarea-field, .filter-input {
         width: 100%; border: 1px solid var(--border-soft); border-radius: 0.6rem;
         background: rgba(255,255,255,0.9); color: var(--text-primary); outline: none;
         transition: all 0.2s ease; font-size: 0.8rem; padding: 0.55rem 0.75rem;
         box-shadow: inset 0 1px 2px rgba(44,36,32,0.02);
     }
-    .input-field:focus, .select-field:focus, .textarea-field:focus { 
+    .input-field:focus, .select-field:focus, .textarea-field:focus, .filter-input:focus { 
         border-color: var(--maroon-700); box-shadow: 0 0 0 3px rgba(92,26,26,0.08); 
     }
     .textarea-field { resize: vertical; line-height: 1.5; }
+
+    .table-header-bar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 0.6rem;
+        padding: 0.75rem 1.25rem;
+        border-bottom: 1px solid #e5e0db;
+        background: rgba(250,248,245,0.4);
+    }
+
+    .table-header-icon {
+        width: 2rem;
+        height: 2rem;
+        border-radius: 0.6rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        background: rgba(254,249,231,0.6);
+    }
 
     /* Updated Stat Card Styles - Replace existing .stat-card rules */
 .stat-card {
@@ -194,6 +216,26 @@
         border: 1px solid var(--border-soft);
     }
     .secondary-btn:hover { background: rgba(254,249,231,0.7); border-color: var(--maroon-700); }
+
+    .summary-card {
+        position: relative; overflow: hidden; border-radius: 0.75rem;
+        border: 1px solid rgba(92,26,26,0.15);
+        background: linear-gradient(135deg, #5c1a1a 0%, #3a0c0c 100%); color: white;
+        box-shadow: 0 4px 12px rgba(58,12,12,0.15);
+    }
+    .summary-card::before {
+        content: ""; position: absolute; inset: 0; opacity: 0.15;
+        background: radial-gradient(circle at top right, #d4af37, transparent 40%);
+        pointer-events: none;
+    }
+    .summary-icon {
+        width: 2.5rem; height: 2.5rem; border-radius: 0.75rem; display: flex;
+        align-items: center; justify-content: center; background: rgba(255,255,255,0.1);
+        border: 1px solid rgba(255,255,255,0.1); color: #fef9e7; flex-shrink: 0;
+    }
+    .summary-label { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.2em; color: rgba(255,255,255,0.7); }
+    .summary-value { font-size: 1.2rem; line-height: 1.2; font-weight: 800; margin-top: 0.35rem; }
+    .summary-subtext { font-size: 0.7rem; color: rgba(255,255,255,0.8); margin-top: 0.2rem; }
 
     .action-icon {
         display: inline-flex; align-items: center; justify-content: center;
@@ -359,54 +401,69 @@
 
     <div class="relative max-w-7xl mx-auto px-4 sm:px-6 py-5 md:py-8">
         <!-- Header -->
-        <div class="mb-5 sm:mb-6">
-            <div class="hero-card">
-                <div class="relative p-4 sm:p-5 flex flex-col md:flex-row md:items-start md:justify-between gap-4">
-                    <div class="flex items-start gap-3">
-                        <div class="hero-icon">
-                            <i class="fas fa-calendar-check text-base sm:text-lg"></i>
-                        </div>
-                        <div class="min-w-0">
-                            <div class="hero-badge">
-                                <span class="hero-badge-dot"></span>
-                                Case Management
+        <div class="mb-6 sm:mb-8">
+            <div class="grid grid-cols-1 xl:grid-cols-[1fr_auto] gap-4 items-stretch">
+                <div class="hero-card">
+                    <div class="relative p-4 sm:p-5 flex flex-col md:flex-row md:items-start md:justify-between gap-4">
+                        <div class="flex items-start gap-3">
+                            <div class="hero-icon">
+                                <i class="fas fa-calendar-check text-base sm:text-lg"></i>
                             </div>
-                            <h1 class="text-lg sm:text-xl lg:text-2xl font-semibold tracking-tight text-[#2c2420] mt-2">Appointment Management</h1>
-                            <p class="text-[#6b5e57] text-xs sm:text-sm mt-1.5 max-w-2xl">
-                                Manage student appointments and session notes across all assigned colleges
-                            </p>
-                            @if(isset($allColleges) && $allColleges->count() > 1)
-                            <div class="flex flex-wrap items-center gap-1.5 mt-2">
-                                <span class="text-[10px] sm:text-xs text-[#8b7e76]">Assigned to:</span>
-                                @foreach($allColleges as $college)
-                                    <span class="college-badge">
-                                        {{ $college->name }}
-                                    </span>
-                                @endforeach
+                            <div class="min-w-0">
+                                <div class="hero-badge">
+                                    <span class="hero-badge-dot"></span>
+                                    Case Management
+                                </div>
+                                <h1 class="text-lg sm:text-xl lg:text-2xl font-semibold tracking-tight text-[#2c2420] mt-2">Appointment Management</h1>
+                                <p class="text-[#6b5e57] text-xs sm:text-sm mt-1.5 max-w-2xl">
+                                    Manage student appointments and session notes across all assigned colleges
+                                </p>
+                                @if(isset($allColleges) && $allColleges->count() > 1)
+                                <div class="flex flex-wrap items-center gap-1.5 mt-2">
+                                    <span class="text-[10px] sm:text-xs text-[#8b7e76]">Assigned to:</span>
+                                    @foreach($allColleges as $college)
+                                        <span class="college-badge">
+                                            {{ $college->name }}
+                                        </span>
+                                    @endforeach
+                                </div>
+                                @endif
                             </div>
-                            @endif
                         </div>
                     </div>
-                    <div class="flex flex-col sm:flex-row gap-2 sm:gap-3">
-                        <a href="{{ route('counselor.dashboard') }}"
-                        class="secondary-btn px-4 py-2 text-xs sm:text-sm">
-                            <i class="fas fa-arrow-left mr-1.5 text-[9px] sm:text-xs"></i>Dashboard
-                        </a>
-                        <a href="{{ route('counselor.appointments.create') }}"
-                        class="primary-btn px-4 py-2 text-xs sm:text-sm" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); border-color: rgba(16,185,129,0.3);">
-                            <i class="fas fa-plus mr-1.5 text-[9px] sm:text-xs"></i>Book New
-                        </a>
-                        <a href="{{ route('counselor.calendar') }}"
-                        class="primary-btn px-4 py-2 text-xs sm:text-sm">
-                            <i class="fas fa-calendar-days mr-1.5 text-[9px] sm:text-xs"></i>View Calendar
-                        </a>
+                </div>
+
+                <div class="summary-card">
+                    <div class="relative h-full flex flex-row items-center justify-between gap-4 p-4 sm:p-5">
+                        <div class="flex items-center gap-3 min-w-0">
+                            <div class="summary-icon flex-shrink-0">
+                                <i class="fas fa-calendar-check text-sm"></i>
+                            </div>
+                            <div class="min-w-0">
+                                <p class="summary-label">Quick Actions</p>
+                                <p class="summary-value">Manage Appointments</p>
+                                <p class="summary-subtext">Book sessions or view your schedule.</p>
+                            </div>
+                        </div>
+                        <div class="flex flex-col gap-2 flex-shrink-0">
+                            <a href="{{ route('counselor.appointments.create') }}"
+                               class="primary-btn px-4 py-2 text-xs sm:text-sm whitespace-nowrap" style="background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); box-shadow: none;">
+                                <i class="fas fa-plus mr-1.5 text-[9px] sm:text-xs"></i>
+                                <span>Book New</span>
+                            </a>
+                            <a href="{{ route('counselor.calendar') }}"
+                               class="primary-btn px-4 py-2 text-xs sm:text-sm whitespace-nowrap" style="background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); box-shadow: none;">
+                                <i class="fas fa-calendar-days mr-1.5 text-[9px] sm:text-xs"></i>
+                                <span>View Calendar</span>
+                            </a>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
 
         <!-- Status Filter Chips -->
-        <div class="flex gap-2 mb-6">
+        <div class="flex flex-wrap gap-2 mb-6 sm:mb-8">
                     @php
                         $currentStatus = request('status', 'all');
                         $currentDir    = request('referral_direction', '');
@@ -417,6 +474,8 @@
                             ['label' => 'Approved',          'status' => 'approved',  'dir' => '',    'count' => $stats['approved'] ?? 0,     'color' => '#2d7a4f'],
                             ['label' => 'Completed',         'status' => 'completed', 'dir' => '',    'count' => $stats['completed'] ?? 0,    'color' => '#2a5a7a'],
                             ['label' => 'Cancelled',         'status' => 'cancelled', 'dir' => '',    'count' => $stats['cancelled'] ?? 0,    'color' => '#b91c1c'],
+                            ['label' => 'No Show',           'status' => 'no_show',   'dir' => '',    'count' => $stats['no_show'] ?? 0,      'color' => '#9a3412'],
+                            ['label' => 'Rejected',          'status' => 'rejected',  'dir' => '',    'count' => $stats['rejected'] ?? 0,     'color' => '#9f1239'],
                             ['label' => 'Inbound Referral',  'status' => 'all',       'dir' => 'in',  'count' => $stats['referred_in'] ?? 0,  'color' => '#c9a227'],
                             ['label' => 'Outbound Referral', 'status' => 'all',       'dir' => 'out', 'count' => $stats['referred_out'] ?? 0, 'color' => '#7c3aed'],
                         ];
@@ -439,26 +498,27 @@
         </div>
 
         <!-- Filters -->
-        <div class="panel-card mb-6">
-            <div class="panel-topline"></div>
-            <form method="GET" action="{{ route('counselor.appointments') }}" class="p-4 sm:p-5">
-                <div class="flex flex-wrap items-end gap-3">
+        <div class="relative overflow-hidden rounded-xl border border-[#e5e0db]/80 bg-white/95 backdrop-blur-sm shadow-sm mb-6 sm:mb-8">
+            <div class="absolute inset-x-0 top-0 h-0.5 bg-gradient-to-r from-[#5c1a1a] via-[#d4af37] to-[#5c1a1a]"></div>
+            <div class="p-3 sm:p-4">
+                <form method="GET" action="{{ route('counselor.appointments') }}" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
                     <!-- Search -->
-                    <div class="flex-1 min-w-[180px]">
-                        <label for="search" class="field-label">Search</label>
+                    <div>
+                        <label for="search" class="filter-label">Search</label>
                         <div class="relative">
-                            <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-[#a89f97] text-xs"></i>
+                            <i class="fas fa-search absolute left-3 sm:left-3.5 top-1/2 -translate-y-1/2 text-[#a89f97] text-[10px] sm:text-xs"></i>
                             <input type="text" id="search" name="search"
-                                placeholder="‎‎ ‎ ‎  Student name, ID, college, or concern..."
+                                placeholder="Student name, ID, college..."
                                 value="{{ request('search') }}"
-                                class="input-field pl-9 text-xs sm:text-sm">
+                                class="filter-input"
+                                style="padding-left: 2.25rem !important;">
                         </div>
                     </div>
 
                     <!-- Date Range -->
-                    <div class="w-36 sm:w-40">
-                        <label for="date_range" class="field-label">Date Range</label>
-                        <select id="date_range" name="date_range" class="select-field text-xs sm:text-sm">
+                    <div>
+                        <label for="date_range" class="filter-label">Date Range</label>
+                        <select id="date_range" name="date_range" class="filter-input bg-white">
                             <option value="">All Dates</option>
                             <option value="today"    {{ request('date_range') == 'today'    ? 'selected' : '' }}>Today</option>
                             <option value="week"     {{ request('date_range') == 'week'     ? 'selected' : '' }}>This Week</option>
@@ -469,9 +529,9 @@
                     </div>
 
                     <!-- College -->
-                    <div class="w-36 sm:w-44">
-                        <label for="college" class="field-label">College</label>
-                        <select id="college" name="college" class="select-field text-xs sm:text-sm">
+                    <div>
+                        <label for="college" class="filter-label">College</label>
+                        <select id="college" name="college" class="filter-input bg-white">
                             <option value="">All Colleges</option>
                             @foreach($colleges as $college)
                                 <option value="{{ $college->id }}" {{ request('college') == $college->id ? 'selected' : '' }}>
@@ -481,42 +541,63 @@
                         </select>
                     </div>
 
-                    <!-- Buttons -->
-                    <div class="flex items-end gap-2 pb-0.5">
-                        <a href="{{ route('counselor.appointments') }}" class="secondary-btn px-3 py-2 text-xs sm:text-sm">
-                            <i class="fas fa-rotate-left mr-1 text-[9px]"></i>Reset
-                        </a>
-                        <button type="submit" class="primary-btn px-3 py-2 text-xs sm:text-sm">
-                            <i class="fas fa-magnifying-glass mr-1 text-[9px]"></i>Apply
-                        </button>
-                    </div>
-                </div>
+                    <!-- Hidden Fields to maintain state -->
+                    <input type="hidden" name="status" value="{{ request('status', 'all') }}">
+                    <input type="hidden" name="referral_direction" value="{{ request('referral_direction', '') }}">
 
-                <!-- Result count -->
-                <div class="mt-3 text-[10px] sm:text-xs text-[#8b7e76]">
-                    Showing {{ $appointments->firstItem() ?? 0 }}–{{ $appointments->lastItem() ?? 0 }} of {{ $appointments->total() }} appointments
-                    @if(isset($allColleges) && $allColleges->count() > 1)
-                        <span class="text-[#7a2a2a] ml-1">(Across {{ $allColleges->count() }} colleges)</span>
-                    @endif
-                </div>
-            </form>
+                    <!-- Buttons -->
+                    <div class="flex items-end gap-2 sm:gap-3">
+                        <button type="submit" class="flex-1 inline-flex items-center justify-center gap-2 px-3 sm:px-4 py-2 sm:py-2.5 rounded-lg bg-gradient-to-r from-[#5c1a1a] to-[#7a2a2a] text-white font-medium shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 text-xs sm:text-sm">
+                            <i class="fas fa-search text-[10px] sm:text-xs"></i>
+                            <span>Apply</span>
+                        </button>
+                        <a href="{{ route('counselor.appointments') }}" class="inline-flex items-center justify-center px-3 sm:px-4 py-2 sm:py-2.5 rounded-lg bg-[#f5f0eb] text-[#6b5e57] hover:bg-[#e5e0db] transition font-medium text-xs sm:text-sm">
+                            <i class="fas fa-rotate-left"></i>
+                        </a>
+                    </div>
+                </form>
+            </div>
         </div>
 
         <!-- Appointments Table -->
-        <div class="panel-card overflow-hidden">
-            <div class="table-scroll">
+        <div class="relative overflow-hidden rounded-xl border border-[#e5e0db]/80 bg-white/95 backdrop-blur-sm shadow-sm">
+            <div class="table-header-bar">
+                <div class="flex items-center gap-3">
+                    <div class="table-header-icon">
+                        <i class="fas fa-calendar-check text-[#7a2a2a] text-[10px] sm:text-xs"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-sm font-medium text-[#2c2420]">Appointments</h2>
+                        <p class="text-[10px] sm:text-xs text-[#8b7e76]">Showing <span class="font-bold text-[#2c2420]">{{ $appointments->firstItem() ?? 0 }} - {{ $appointments->lastItem() ?? 0 }}</span> of <span class="font-bold text-[#2c2420]">{{ $appointments->total() }}</span></p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="overflow-x-auto">
                 <table class="w-full min-w-[900px]" id="appointmentsTable">
-                    <thead class="bg-[#faf8f5]/80">
-                        <tr>
-                            <th class="px-4 sm:px-6 py-3 text-left text-[10px] sm:text-xs font-semibold text-[#8b7e76] uppercase tracking-wider whitespace-nowrap">Student</th>
-                            <th class="px-4 sm:px-6 py-3 text-left text-[10px] sm:text-xs font-semibold text-[#8b7e76] uppercase tracking-wider whitespace-nowrap">Date & Time</th>
-                            <th class="px-4 sm:px-6 py-3 text-left text-[10px] sm:text-xs font-semibold text-[#8b7e76] uppercase tracking-wider whitespace-nowrap">College</th>
-                            <th class="px-4 sm:px-6 py-3 text-left text-[10px] sm:text-xs font-semibold text-[#8b7e76] uppercase tracking-wider whitespace-nowrap">Booking Type</th>
-                            <th class="px-4 sm:px-6 py-3 text-left text-[10px] sm:text-xs font-semibold text-[#8b7e76] uppercase tracking-wider whitespace-nowrap">Status</th>
-                            <th class="px-4 sm:px-6 py-3 text-left text-[10px] sm:text-xs font-semibold text-[#8b7e76] uppercase tracking-wider whitespace-nowrap">Actions</th>
+                    <thead>
+                        <tr class="bg-[#faf8f5] border-b border-[#e5e0db]/80">
+                            <th class="px-3 sm:px-4 py-2.5 sm:py-3 text-left whitespace-nowrap">
+                                <span class="text-[10px] sm:text-[11px] font-semibold text-[#8b7e76] uppercase tracking-[0.15em]">Student</span>
+                            </th>
+                            <th class="px-3 sm:px-4 py-2.5 sm:py-3 text-left whitespace-nowrap">
+                                <span class="text-[10px] sm:text-[11px] font-semibold text-[#8b7e76] uppercase tracking-[0.15em]">Date & Time</span>
+                            </th>
+                            <th class="px-3 sm:px-4 py-2.5 sm:py-3 text-left whitespace-nowrap">
+                                <span class="text-[10px] sm:text-[11px] font-semibold text-[#8b7e76] uppercase tracking-[0.15em]">College</span>
+                            </th>
+                            <th class="px-3 sm:px-4 py-2.5 sm:py-3 text-left whitespace-nowrap">
+                                <span class="text-[10px] sm:text-[11px] font-semibold text-[#8b7e76] uppercase tracking-[0.15em]">Booking Type</span>
+                            </th>
+                            <th class="px-3 sm:px-4 py-2.5 sm:py-3 text-left whitespace-nowrap">
+                                <span class="text-[10px] sm:text-[11px] font-semibold text-[#8b7e76] uppercase tracking-[0.15em]">Status</span>
+                            </th>
+                            <th class="px-3 sm:px-4 py-2.5 sm:py-3 text-left whitespace-nowrap">
+                                <span class="text-[10px] sm:text-[11px] font-semibold text-[#8b7e76] uppercase tracking-[0.15em]">Actions</span>
+                            </th>
                         </tr>
                     </thead>
-                    <tbody class="bg-white divide-y divide-[#e5e0db]/50">
+                    <tbody class="divide-y divide-[#e5e0db]/50">
                         @forelse($appointments as $appointment)
                                 @php
                                     // Define status colors with ALL possible statuses
@@ -548,7 +629,7 @@
                                     }
                                 @endphp
                                 <tr id="appointment-{{ $appointment->id }}" class="{{ $rowClass }} fade-in" onclick="showAppointmentDetails({{ $appointment->id }})">
-                                    <td class="px-4 sm:px-6 py-3.5">
+                                    <td class="px-3 sm:px-4 py-2.5 sm:py-3">
                                         <div class="flex items-center gap-2.5 sm:gap-3">
                                             @php
                                                 $isHighRisk = $appointment->is_appointment_high_risk;
@@ -597,7 +678,7 @@
                                     </td>
 
                                     <!-- Date & Time Column -->
-                                    <td class="px-4 sm:px-6 py-3.5 whitespace-nowrap text-xs sm:text-sm text-[#6b5e57]">
+                                    <td class="px-3 sm:px-4 py-2.5 sm:py-3 whitespace-nowrap text-xs sm:text-sm text-[#6b5e57]">
                                         @if($appointment->status === 'reschedule_requested' && $appointment->proposed_date)
                                             <div class="text-[10px] font-semibold text-[#92400e] uppercase tracking-wide">New</div>
                                             <div class="text-xs text-[#92400e] font-semibold">
@@ -640,12 +721,12 @@
                                     </td>
 
                                     <!-- College Column -->
-                                    <td class="px-4 sm:px-6 py-3.5 whitespace-nowrap text-xs sm:text-sm text-[#6b5e57]">
+                                    <td class="px-3 sm:px-4 py-2.5 sm:py-3 whitespace-nowrap text-xs sm:text-sm text-[#6b5e57]">
                                         {{ $appointment->student->college->name ?? 'N/A' }}
                                     </td>
 
                                     <!-- Booking Type Column -->
-                                    <td class="px-4 sm:px-6 py-3.5 whitespace-nowrap text-xs sm:text-sm text-[#6b5e57]">
+                                    <td class="px-3 sm:px-4 py-2.5 sm:py-3 whitespace-nowrap text-xs sm:text-sm text-[#6b5e57]">
                                         <div class="flex flex-col">
                                             <span class="text-xs sm:text-sm text-[#2c2420]">
                                                 {{ $appointment->booking_type ? ucwords(str_replace('_', ' ', $appointment->booking_type)) : '—' }}{{ $appointment->notes && str_contains(strtolower($appointment->notes), 'follow-up appointment') ? ' • Follow up' : '' }}
@@ -662,7 +743,7 @@
                                     </td>
 
                                     <!-- Status Column -->
-                                    <td class="px-4 sm:px-6 py-3.5 whitespace-nowrap">
+                                    <td class="px-3 sm:px-4 py-2.5 sm:py-3 whitespace-nowrap">
                                         <div class="flex flex-col gap-1">
                                             <span class="status-chip {{ $statusColor }}">
                                                 {{ $statusText }}
@@ -694,7 +775,7 @@
                                     </td>
 
                                     <!-- Actions Column -->
-                                    <td class="px-4 sm:px-6 py-3.5 whitespace-nowrap" onclick="event.stopPropagation();">
+                                    <td class="px-3 sm:px-4 py-2.5 sm:py-3 whitespace-nowrap" onclick="event.stopPropagation();">
                                         @if(!in_array($appointment->status, ['cancelled', 'rejected'], true))
                                             <div class="flex items-center gap-1.5 sm:gap-2">
                                                 <!-- Status Management Actions - Available for current counselor AND referred-to counselor -->
@@ -789,11 +870,9 @@
             </div>
 
             <!-- Pagination -->
-            @if($appointments->hasPages())
-            <div class="px-4 sm:px-5 py-3 border-t border-[#e5e0db]/60 bg-[#faf8f5]/40">
+            <div class="px-4 sm:px-5 py-3 sm:py-3.5 border-t border-[#e5e0db]/60 bg-[#faf8f5]/40">
                 {{ $appointments->appends(request()->query())->links('vendor.pagination.counselor-resources') }}
             </div>
-            @endif
         </div>
 
         <!-- Appointment Details Modal -->

@@ -20,15 +20,15 @@
     .cal-shell {
         position: relative;
         overflow: hidden;
-        background: var(--bg-warm);
+        background: #faf8f5;
         min-height: 100vh;
         padding-bottom: 2rem;
     }
     .cal-glow {
         position: absolute; border-radius: 50%; filter: blur(80px); pointer-events: none; opacity: 0.25;
     }
-    .cal-glow.one { top: -30px; left: -40px; width: 200px; height: 200px; background: var(--gold-400); }
-    .cal-glow.two { bottom: -30px; right: -60px; width: 220px; height: 220px; background: var(--maroon-800); }
+    .cal-glow.one { top: -30px; left: -40px; width: 200px; height: 200px; background: #d4af37; }
+    .cal-glow.two { bottom: -30px; right: -60px; width: 220px; height: 220px; background: #5c1a1a; }
 
     .hero-card, .panel-card, .glass-card, .slot-card, .legend-card {
         position: relative; overflow: hidden; border-radius: 0.75rem;
@@ -188,14 +188,24 @@
     .legend-label { font-size: 0.7rem; color: var(--text-secondary); }
 
     .summary-card {
-        background: rgba(250,248,245,0.9); border: 1px solid var(--border-soft);
-        border-radius: 0.6rem; padding: 0.75rem;
+        position: relative; overflow: hidden; border-radius: 0.75rem;
+        border: 1px solid rgba(92,26,26,0.15);
+        background: linear-gradient(135deg, #5c1a1a 0%, #3a0c0c 100%); color: white;
+        box-shadow: 0 4px 12px rgba(58,12,12,0.15);
     }
-    .summary-row { display: flex; justify-content: space-between; font-size: 0.7rem; color: var(--text-secondary); }
-    .summary-value { font-weight: 600; color: var(--text-primary); }
-    .summary-value.pending { color: #7a2a2a; }
-    .summary-value.approved { color: #065f46; }
-    .summary-value.completed { color: var(--maroon-700); }
+    .summary-card::before {
+        content: ""; position: absolute; inset: 0; opacity: 0.15;
+        background: radial-gradient(circle at top right, #d4af37, transparent 40%);
+        pointer-events: none;
+    }
+    .summary-icon {
+        width: 2.5rem; height: 2.5rem; border-radius: 0.75rem; display: flex;
+        align-items: center; justify-content: center; background: rgba(255,255,255,0.1);
+        border: 1px solid rgba(255,255,255,0.1); color: #fef9e7; flex-shrink: 0;
+    }
+    .summary-label { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.2em; color: rgba(255,255,255,0.7); }
+    .summary-value { font-size: 1.2rem; line-height: 1.2; font-weight: 800; margin-top: 0.35rem; }
+    .summary-subtext { font-size: 0.7rem; color: rgba(255,255,255,0.8); margin-top: 0.2rem; }
 
     .quick-stats {
         background: rgba(255,255,255,0.95); border: 1px solid var(--border-soft);
@@ -234,6 +244,7 @@
 
     @media (max-width: 639px) {
         .hero-card .flex { flex-direction: column; align-items: flex-start !important; }
+        .summary-card { flex-direction: column; align-items: flex-start; }
         .primary-btn, .secondary-btn { width: 100%; justify-content: center; }
         .date-nav { flex-direction: column; align-items: flex-start; }
         .date-picker { width: 100%; }
@@ -243,7 +254,6 @@
         .slot-student { font-size: 0.7rem; }
         .slot-btn { padding: 0.2rem 0.4rem; font-size: 0.6rem; }
         .legend-item { font-size: 0.65rem; }
-        .summary-row { font-size: 0.65rem; }
         .modal-card { max-height: 95vh; margin: 0.5rem; }
         .modal-header { padding: 0.85rem 1rem; }
         .modal-body { padding: 1rem; }
@@ -264,56 +274,68 @@
         @endphp
 
         <!-- Header -->
-        <div class="mb-5 sm:mb-6">
-            <div class="hero-card">
-                <div class="relative p-4 sm:p-5 flex flex-col md:flex-row md:items-start md:justify-between gap-4">
-                    <div class="flex items-start gap-3">
-                        <div class="hero-icon">
-                            <i class="fas fa-calendar-days text-base sm:text-lg"></i>
-                        </div>
-                        <div class="min-w-0">
-                            <div class="hero-badge">
-                                <span class="hero-badge-dot"></span>
-                                My Schedule
+        <div class="mb-6 sm:mb-8">
+            <div class="grid grid-cols-1 xl:grid-cols-[1fr_auto] gap-4 items-stretch">
+                <div class="hero-card">
+                    <div class="relative p-4 sm:p-5 flex flex-col md:flex-row md:items-start md:justify-between gap-4">
+                        <div class="flex items-start gap-3">
+                            <div class="hero-icon">
+                                <i class="fas fa-calendar-days text-base sm:text-lg"></i>
                             </div>
-                            <h1 class="text-lg sm:text-xl lg:text-2xl font-semibold tracking-tight text-[#2c2420] mt-2">Appointment Calendar</h1>
-                            <p class="text-[#6b5e57] text-xs sm:text-sm mt-1.5 max-w-2xl">
-                                View your schedule and manage booked time slots
-                            </p>
+                            <div class="min-w-0">
+                                <div class="hero-badge">
+                                    <span class="hero-badge-dot"></span>
+                                    My Schedule
+                                </div>
+                                <h1 class="text-lg sm:text-xl lg:text-2xl font-semibold tracking-tight text-[#2c2420] mt-2">Appointment Calendar</h1>
+                                <p class="text-[#6b5e57] text-xs sm:text-sm mt-1.5 max-w-2xl">
+                                    View your schedule and manage booked time slots
+                                </p>
+                            </div>
                         </div>
                     </div>
-                    <div class="flex flex-col sm:flex-row gap-2 sm:gap-3">
-                        <a href="{{ route('counselor.dashboard') }}"
-                           class="secondary-btn px-4 py-2 text-xs sm:text-sm">
-                            <i class="fas fa-arrow-left mr-1.5 text-[9px] sm:text-xs"></i>
-                            <span>Dashboard</span>
-                        </a>
-                        <a href="{{ route('counselor.appointments') }}"
-                           class="primary-btn px-4 py-2 text-xs sm:text-sm">
-                            <i class="fas fa-list mr-1.5 text-[9px] sm:text-xs"></i>
-                            <span>All Appointments</span>
-                        </a>
-                        @if($googleCalendarUrl)
-                            <a href="{{ $googleCalendarUrl }}"
-                               target="_blank" rel="noopener"
-                               class="primary-btn px-4 py-2 text-xs sm:text-sm" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); border-color: rgba(16,185,129,0.3);">
-                                <i class="fab fa-google mr-1.5 text-[9px] sm:text-xs"></i>
-                                <span>Google Calendar</span>
+                </div>
+
+                <div class="summary-card">
+                    <div class="relative h-full flex flex-row items-center justify-between gap-4 p-4 sm:p-5">
+                        <div class="flex items-center gap-3 min-w-0">
+                            <div class="summary-icon flex-shrink-0">
+                                <i class="fas fa-clock text-sm"></i>
+                            </div>
+                            <div class="min-w-0">
+                                <p class="summary-label">Quick Actions</p>
+                                <p class="summary-value">Manage Calendar</p>
+                                <p class="summary-subtext">Access appointments and sync with Google Calendar.</p>
+                            </div>
+                        </div>
+                        <div class="flex flex-col gap-2 flex-shrink-0">
+                            <a href="{{ route('counselor.appointments') }}"
+                               class="primary-btn px-4 py-2 text-xs sm:text-sm whitespace-nowrap" style="background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); box-shadow: none;">
+                                <i class="fas fa-list mr-1.5 text-[9px] sm:text-xs"></i>
+                                <span>All Appointments</span>
                             </a>
-                        @else
-                            <a href="{{ route('profile.edit') }}"
-                               class="secondary-btn px-4 py-2 text-xs sm:text-sm" style="border-color: rgba(212,175,55,0.4); color: #7a2a2a;">
-                                <i class="fas fa-link mr-1.5 text-[9px] sm:text-xs"></i>
-                                <span>Add Calendar ID</span>
-                            </a>
-                        @endif
+                            @if($googleCalendarUrl)
+                                <a href="{{ $googleCalendarUrl }}"
+                                   target="_blank" rel="noopener"
+                                   class="primary-btn px-4 py-2 text-xs sm:text-sm whitespace-nowrap" style="background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); box-shadow: none;">
+                                    <i class="fab fa-google mr-1.5 text-[9px] sm:text-xs"></i>
+                                    <span>Google Calendar</span>
+                                </a>
+                            @else
+                                <a href="{{ route('profile.edit') }}"
+                                   class="primary-btn px-4 py-2 text-xs sm:text-sm whitespace-nowrap" style="background: rgba(255,255,255,0.9); border: 1px solid rgba(212,175,55,0.4); color: #7a2a2a; box-shadow: none;">
+                                    <i class="fas fa-link mr-1.5 text-[9px] sm:text-xs"></i>
+                                    <span>Add Calendar ID</span>
+                                </a>
+                            @endif
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
 
         <!-- Date Navigation -->
-        <div class="panel-card mb-6">
+        <div class="panel-card mb-6 sm:mb-8">
             <div class="panel-topline"></div>
             <div class="p-4 sm:p-5">
                 <div class="date-nav">
@@ -364,7 +386,7 @@
 
         <!-- Weekend Message -->
         @if($date->isWeekend())
-        <div class="alert-weekend mb-6">
+        <div class="alert-weekend mb-6 sm:mb-8">
             <div class="alert-weekend-icon">
                 <i class="fas fa-calendar-xmark"></i>
             </div>
@@ -392,9 +414,10 @@
                 return false;
             };
 
-            $findEventForSlot = function (\Carbon\Carbon $slotStart, \Carbon\Carbon $slotEnd) use ($googleCalendarEvents) {
+            $findEventForSlot = function (\Carbon\Carbon $slotStart, \Carbon\Carbon $slotEnd, ?string $excludeEventId = null) use ($googleCalendarEvents) {
                 foreach ($googleCalendarEvents as $event) {
                     if (!isset($event['start'], $event['end'])) { continue; }
+                    if ($excludeEventId && isset($event['id']) && (string) $event['id'] === (string) $excludeEventId) { continue; }
                     if ($slotStart < $event['end'] && $slotEnd > $event['start']) { return $event; }
                 }
                 return null;
@@ -416,7 +439,7 @@
                                     });
                                     $slotStart = $date->copy()->setTimeFromTimeString($slot);
                                     $slotEnd = $slotStart->copy()->addHour();
-                                    $event = $findEventForSlot($slotStart, $slotEnd);
+                                    $event = $findEventForSlot($slotStart, $slotEnd, $appointment->google_calendar_event_id ?? null);
                                     $isBusy = !$appointment && $event;
                                     $isOverlap = $appointment && $event;
                                     $slotClass = $isOverlap ? 'overlap' : ($appointment ? $appointment->status : ($isBusy ? 'busy' : 'available'));
@@ -514,7 +537,7 @@
                                     });
                                     $slotStart = $date->copy()->setTimeFromTimeString($slot);
                                     $slotEnd = $slotStart->copy()->addHour();
-                                    $event = $findEventForSlot($slotStart, $slotEnd);
+                                    $event = $findEventForSlot($slotStart, $slotEnd, $appointment->google_calendar_event_id ?? null);
                                     $isBusy = !$appointment && $event;
                                     $isOverlap = $appointment && $event;
                                     $slotClass = $isOverlap ? 'overlap' : ($appointment ? $appointment->status : ($isBusy ? 'busy' : 'available'));
@@ -622,10 +645,10 @@
                     <div class="p-4">
                         <h3 class="text-sm font-semibold text-[#2c2420] border-b border-[#e5e0db]/60 pb-2 mb-3">Daily Summary</h3>
                         <div class="space-y-2">
-                            <div class="summary-row"><span>Total Bookings:</span><span class="summary-value">{{ $appointments->count() }}</span></div>
-                            <div class="summary-row"><span>Pending:</span><span class="summary-value pending">{{ $appointments->where('status', 'pending')->count() }}</span></div>
-                            <div class="summary-row"><span>Approved:</span><span class="summary-value approved">{{ $appointments->where('status', 'approved')->count() }}</span></div>
-                            <div class="summary-row"><span>Completed:</span><span class="summary-value completed">{{ $appointments->where('status', 'completed')->count() }}</span></div>
+                            <div class="flex justify-between items-center text-[0.7rem] text-[#6b5e57]"><span>Total Bookings:</span><span class="font-semibold text-[#2c2420]">{{ $appointments->count() }}</span></div>
+                            <div class="flex justify-between items-center text-[0.7rem] text-[#6b5e57]"><span>Pending:</span><span class="font-semibold" style="color: #7a2a2a;">{{ $appointments->where('status', 'pending')->count() }}</span></div>
+                            <div class="flex justify-between items-center text-[0.7rem] text-[#6b5e57]"><span>Approved:</span><span class="font-semibold" style="color: #065f46;">{{ $appointments->where('status', 'approved')->count() }}</span></div>
+                            <div class="flex justify-between items-center text-[0.7rem] text-[#6b5e57]"><span>Completed:</span><span class="font-semibold" style="color: var(--maroon-700);">{{ $appointments->where('status', 'completed')->count() }}</span></div>
                             @php
                                 $bookedSlots = $appointments->whereIn('status', ['pending', 'approved', 'completed'])->count();
                                 $busySlots = 0;
@@ -640,7 +663,7 @@
                                 }
                                 $availableSlots = count($allSlots) - $bookedSlots - $busySlots;
                             @endphp
-                            <div class="summary-row"><span>Available Slots:</span><span class="summary-value">{{ $availableSlots }}</span></div>
+                            <div class="flex justify-between items-center text-[0.7rem] text-[#6b5e57]"><span>Available Slots:</span><span class="font-semibold text-[#2c2420]">{{ $availableSlots }}</span></div>
                         </div>
                     </div>
                 </div>

@@ -963,88 +963,99 @@
         </div>
     </main>
 
-    <!-- Event Details Modal -->
+        <!-- Event Details Modal -->
     <div id="eventModal"
-         class="fixed inset-0 z-50 hidden items-center justify-center p-4"
-         style="background:rgba(47,37,34,0.55);backdrop-filter:blur(4px);">
-        <div class="relative w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-[24px] shadow-2xl"
+         class="fixed inset-0 z-[2000] hidden items-center justify-center p-4 sm:p-6 opacity-0 transition-opacity duration-300"
+         style="background:rgba(47,37,34,0.65);backdrop-filter:blur(6px);">
+        <div id="eventModalContent" class="relative w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-[24px] shadow-2xl scale-95 translate-y-4 transition-all duration-300"
              style="background:linear-gradient(180deg,#fffdfa,#faf4ed);border:1px solid var(--border-soft);">
 
             <!-- Modal image header -->
-            <div class="relative overflow-hidden rounded-t-[24px] bg-black">
-                <img id="modalImage" src="" alt="" class="w-full h-auto max-h-[70vh] object-contain block">
-                <div class="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent pointer-events-none"></div>
+            <div class="relative overflow-hidden rounded-t-[24px] bg-black group">
+                <img id="modalImage" src="" alt="" class="w-full h-auto max-h-[60vh] object-cover block opacity-90 transition-opacity duration-500 group-hover:opacity-100">
+                <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent pointer-events-none"></div>
 
                 <!-- Close button -->
                 <button onclick="closeEventModal()"
-                        class="absolute top-4 right-4 w-9 h-9 rounded-full flex items-center justify-center text-white transition"
+                        class="absolute top-4 right-4 w-9 h-9 rounded-full flex items-center justify-center text-white transition hover:bg-black/50 hover:scale-105"
                         style="background:rgba(0,0,0,0.35);backdrop-filter:blur(6px);">
                     <i class="fas fa-xmark text-sm"></i>
                 </button>
 
                 <!-- Type badge -->
                 <div class="absolute top-4 left-4">
-                    <span id="modalType" class="badge-soft badge-maroon capitalize text-xs"></span>
+                    <span id="modalType" class="badge-soft badge-maroon capitalize text-xs shadow-lg"></span>
                 </div>
 
                 <!-- Required badge -->
                 <div id="modalRequiredBadge" class="absolute top-4 left-4 mt-8 hidden">
-                    <span class="badge-soft badge-red text-xs"><i class="fas fa-star mr-1"></i> Required</span>
+                    <span class="badge-soft badge-red text-xs shadow-lg"><i class="fas fa-star mr-1"></i> Required</span>
+                </div>
+
+                <div class="absolute bottom-0 left-0 p-6 sm:p-8 w-full">
+                    <h2 id="modalTitle" class="text-3xl sm:text-4xl font-extrabold text-white mb-2 leading-tight drop-shadow-md"></h2>
                 </div>
             </div>
 
             <!-- Modal body -->
             <div class="p-6 sm:p-8">
-                <h2 id="modalTitle" class="text-2xl font-bold mb-1" style="color:var(--text-dark);letter-spacing:-0.02em;"></h2>
-
                 <!-- Meta row -->
-                <div class="flex flex-wrap gap-4 mt-4 mb-6 text-sm" style="color:var(--text-secondary);">
-                    <div class="flex items-center gap-2">
+                <div class="flex flex-wrap gap-5 mb-6 text-sm" style="color:var(--text-secondary);">
+                    <div class="flex items-center gap-2 bg-white/60 px-3 py-1.5 rounded-lg border border-[#e8ddd2]">
                         <i class="fas fa-calendar-days text-[var(--accent-gold)]"></i>
-                        <span id="modalDate"></span>
+                        <span id="modalDate" class="font-medium text-[var(--text-dark)]"></span>
                     </div>
-                    <div class="flex items-center gap-2">
+                    <div class="flex items-center gap-2 bg-white/60 px-3 py-1.5 rounded-lg border border-[#e8ddd2]">
                         <i class="fas fa-clock text-[var(--accent-gold)]"></i>
-                        <span id="modalTime"></span>
+                        <span id="modalTime" class="font-medium text-[var(--text-dark)]"></span>
                     </div>
-                    <div class="flex items-center gap-2">
+                    <div class="flex items-center gap-2 bg-white/60 px-3 py-1.5 rounded-lg border border-[#e8ddd2]">
                         <i class="fas fa-location-dot text-[var(--primary-red)]"></i>
-                        <span id="modalLocation"></span>
+                        <span id="modalLocation" class="font-medium text-[var(--text-dark)]"></span>
                     </div>
-                    <div id="modalSlotsWrap" class="flex items-center gap-2">
+                    <div id="modalSlotsWrap" class="flex items-center gap-2 bg-white/60 px-3 py-1.5 rounded-lg border border-[#e8ddd2]">
                         <i class="fas fa-users" style="color:var(--text-muted)"></i>
-                        <span id="modalSlots"></span>
+                        <span id="modalSlots" class="font-medium text-[var(--text-dark)]"></span>
                     </div>
                 </div>
 
                 <!-- Divider -->
-                <hr style="border-color:var(--border-soft);margin-bottom:1.25rem;">
+                <hr style="border-color:var(--border-soft);margin-bottom:1.5rem;">
 
                 <!-- Description -->
-                <p id="modalDescription" class="leading-relaxed text-sm" style="color:var(--text-secondary);"></p>
+                <div class="prose prose-sm max-w-none text-[#5c504a] leading-relaxed">
+                    <p id="modalDescription" class="whitespace-pre-wrap"></p>
+                </div>
 
                 <!-- Required note -->
-                <div id="modalRequiredNote" class="hidden mt-5 p-4 rounded-[14px] text-xs border border-red-100 bg-red-50 text-red-800">
-                    <i class="fas fa-circle-info mr-1"></i>
-                    <strong>Heads up:</strong> This event is mandatory for your college.
+                <div id="modalRequiredNote" class="hidden mt-6 p-4 rounded-2xl text-sm border flex items-start gap-3" style="background:#fff5f5;border-color:#fecdd3;color:#9f1239;">
+                    <i class="fas fa-circle-exclamation mt-0.5 text-lg"></i>
+                    <div>
+                        <strong>Mandatory Event</strong>
+                        <p class="mt-0.5 opacity-90">This event is required for your college. Your attendance is expected.</p>
+                    </div>
                 </div>
 
                 <!-- Registered note -->
-                <div id="modalRegisteredNote" class="hidden mt-5 p-4 rounded-[14px] text-xs border flex items-center gap-2"
+                <div id="modalRegisteredNote" class="hidden mt-6 p-4 rounded-2xl text-sm border flex items-start gap-3"
                      style="background:#eefaf2;border-color:#bfe5c8;color:#166534;">
-                    <i class="fas fa-circle-check"></i>
-                    <span>You're already registered for this event.</span>
+                    <i class="fas fa-circle-check mt-0.5 text-lg"></i>
+                    <div>
+                        <strong>You're Registered!</strong>
+                        <p class="mt-0.5 opacity-90">Your spot is secured. Check your email or notifications for updates.</p>
+                    </div>
                 </div>
 
                 <!-- Close action -->
-                <div class="mt-7 flex justify-end">
+                <div class="mt-8 flex justify-end pt-5 border-t border-[#e8ddd2]">
                     <button onclick="closeEventModal()"
-                            class="btn-secondary px-6 py-2.5 rounded-[14px] text-sm font-semibold">
-                        Close
+                            class="btn-secondary px-8 py-2.5 rounded-[14px] text-sm font-bold shadow-sm hover:shadow-md transition-all">
+                        Close Details
                     </button>
                 </div>
             </div>
         </div>
+    </div>
     </div>
 
     <!-- Footer -->
@@ -1148,8 +1159,9 @@
         });
 
         // Event Details Modal
-        function openEventModal(data) {
+                function openEventModal(data) {
             document.getElementById('modalImage').src       = data.imageUrl || '';
+            document.getElementById('modalImage').style.display = data.imageUrl ? 'block' : 'none';
             document.getElementById('modalImage').alt       = data.title;
             document.getElementById('modalTitle').textContent      = data.title;
             document.getElementById('modalType').textContent       = data.type;
@@ -1163,8 +1175,10 @@
             if (data.maxAttendees) {
                 document.getElementById('modalSlots').textContent = data.registeredCount + '/' + data.maxAttendees + ' spots filled';
                 slotsWrap.classList.remove('hidden');
+                slotsWrap.classList.add('flex');
             } else {
                 slotsWrap.classList.add('hidden');
+                slotsWrap.classList.remove('flex');
             }
 
             // Required badge & note
@@ -1173,27 +1187,54 @@
             if (data.isRequired) {
                 reqBadge.classList.remove('hidden');
                 reqNote.classList.remove('hidden');
+                reqNote.classList.add('flex');
             } else {
                 reqBadge.classList.add('hidden');
                 reqNote.classList.add('hidden');
+                reqNote.classList.remove('flex');
             }
 
             // Registered note
             const regNote = document.getElementById('modalRegisteredNote');
-            data.isRegistered ? regNote.classList.remove('hidden') : regNote.classList.add('hidden');
+            if (data.isRegistered) {
+                regNote.classList.remove('hidden');
+                regNote.classList.add('flex');
+            } else {
+                regNote.classList.add('hidden');
+                regNote.classList.remove('flex');
+            }
 
-            // Show modal
+            // Show modal with animation
             const modal = document.getElementById('eventModal');
+            const modalContent = document.getElementById('eventModalContent');
             modal.classList.remove('hidden');
             modal.classList.add('flex');
+            
+            // Small delay to allow display:flex to apply before animating opacity
+            setTimeout(() => {
+                modal.classList.remove('opacity-0');
+                if (modalContent) {
+                    modalContent.classList.remove('scale-95', 'translate-y-4');
+                }
+            }, 10);
+            
             document.body.style.overflow = 'hidden';
         }
 
         function closeEventModal() {
             const modal = document.getElementById('eventModal');
-            modal.classList.add('hidden');
-            modal.classList.remove('flex');
-            document.body.style.overflow = '';
+            const modalContent = document.getElementById('eventModalContent');
+            
+            modal.classList.add('opacity-0');
+            if (modalContent) {
+                modalContent.classList.add('scale-95', 'translate-y-4');
+            }
+            
+            setTimeout(() => {
+                modal.classList.add('hidden');
+                modal.classList.remove('flex');
+                document.body.style.overflow = '';
+            }, 300);
         }
 
         // Close on backdrop click

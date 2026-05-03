@@ -11,15 +11,40 @@ use Illuminate\Support\Facades\Log;
 
 class CounselorAnnouncementController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
         $counselor = Auth::user()->counselor;
-        $announcements = Announcement::with(['user', 'colleges'])
-            ->byCounselor(Auth::id())
-            ->latest()
-            ->paginate(10);
 
-        return view('counselor.announcements.index', compact('announcements', 'counselor'));
+        $query = Announcement::with(['user', 'colleges'])
+            ->byCounselor(Auth::id());
+
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function ($q) use ($search) {
+                $q->where('title', 'like', "%{$search}%")
+                  ->orWhere('content', 'like', "%{$search}%");
+            });
+        }
+
+        if ($request->filled('status') && $request->status !== 'all') {
+            if ($request->status === 'active') {
+                $query->where('is_active', true);
+            } elseif ($request->status === 'inactive') {
+                $query->where('is_active', false);
+            }
+        }
+
+        $statsBase = Announcement::query()->byCounselor(Auth::id());
+        $stats = [
+            'total' => (clone $statsBase)->count(),
+            'active' => (clone $statsBase)->where('is_active', true)->count(),
+            'scheduled' => (clone $statsBase)->where('is_active', true)->where('start_date', '>', now())->count(),
+            'completed' => (clone $statsBase)->where('is_active', false)->count(),
+        ];
+
+        $announcements = $query->orderBy('is_pinned', 'desc')->latest()->paginate(10);
+
+        return view('counselor.announcements.index', compact('announcements', 'counselor', 'stats'));
     }
 
     public function create()

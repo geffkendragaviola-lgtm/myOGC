@@ -17,315 +17,419 @@
         --text-muted: #8b7e76;
     }
 
-    /* Base Layout & Glow */
-    .resource-shell {
+    .create-resource-shell {
         position: relative;
+        overflow: hidden;
         background: var(--bg-warm);
         min-height: 100vh;
-        padding-bottom: 3rem;
     }
-    .resource-glow {
-        position: absolute; border-radius: 50%; filter: blur(80px); pointer-events: none; opacity: 0.2; z-index: 0;
+    .create-resource-glow {
+        position: absolute; border-radius: 50%; filter: blur(80px); pointer-events: none; opacity: 0.25;
     }
-    .resource-glow.one { top: -50px; left: -50px; width: 250px; height: 250px; background: var(--gold-400); }
-    .resource-glow.two { bottom: 10%; right: -50px; width: 220px; height: 220px; background: var(--maroon-800); }
+    .create-resource-glow.one { top: -30px; left: -40px; width: 200px; height: 200px; background: var(--gold-400); }
+    .create-resource-glow.two { bottom: -30px; right: -60px; width: 220px; height: 220px; background: var(--maroon-800); }
 
-    /* Glass Cards */
-    .panel-card {
-        position: relative; z-index: 1; overflow: hidden; border-radius: 0.75rem;
+    .hero-card, .panel-card, .section-card {
+        position: relative; overflow: hidden; border-radius: 0.75rem;
         border: 1px solid var(--border-soft); background: rgba(255,255,255,0.95);
         backdrop-filter: blur(8px); box-shadow: 0 2px 8px rgba(44,36,32,0.04);
         transition: box-shadow 0.2s ease;
     }
-    .panel-card::before {
+    .hero-card:hover, .panel-card:hover, .section-card:hover {
+        box-shadow: 0 4px 14px rgba(44,36,32,0.06);
+    }
+    .hero-card::before, .panel-card::before, .section-card::before {
         content: ""; position: absolute; inset: 0; pointer-events: none;
         background: radial-gradient(circle at top right, rgba(212,175,55,0.06), transparent 30%);
     }
 
-    /* Header Specifics */
-    .page-header h1 { color: var(--text-primary); font-weight: 700; letter-spacing: -0.02em; }
-    .page-header p { color: var(--text-secondary); }
-
-    /* Form Elements */
-    .section-title {
-        font-size: 0.8rem; font-weight: 600; color: var(--text-primary);
-        text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 0.35rem; display: block;
+    .hero-icon, .panel-icon, .section-icon {
+        display: flex; align-items: center; justify-content: center; flex-shrink: 0;
     }
-    
-    .input-field, .select-field, .textarea-field {
+    .hero-icon {
+        width: 2.75rem; height: 2.75rem; border-radius: 0.75rem; color: #fef9e7;
+        background: linear-gradient(135deg, var(--maroon-800) 0%, var(--maroon-700) 100%);
+        box-shadow: 0 4px 12px rgba(92,26,26,0.15);
+    }
+    .hero-badge {
+        display: inline-flex; align-items: center; gap: 0.4rem; border-radius: 999px;
+        border: 1px solid rgba(212,175,55,0.3); background: rgba(254,249,231,0.8);
+        padding: 0.2rem 0.55rem; font-size: 9px; font-weight: 700; text-transform: uppercase;
+        letter-spacing: 0.16em; color: var(--maroon-700);
+    }
+    .hero-badge-dot { width: 0.3rem; height: 0.3rem; border-radius: 999px; background: var(--gold-400); }
+
+    .summary-card {
+        position: relative; overflow: hidden; border-radius: 0.75rem;
+        border: 1px solid rgba(92,26,26,0.15);
+        background: linear-gradient(135deg, var(--maroon-800) 0%, var(--maroon-900) 100%); color: white;
+        box-shadow: 0 4px 12px rgba(58,12,12,0.15);
+    }
+    .summary-card::before {
+        content: ""; position: absolute; inset: 0; opacity: 0.15;
+        background: radial-gradient(circle at top right, var(--gold-400), transparent 40%);
+        pointer-events: none;
+    }
+    .summary-icon {
+        width: 2.5rem; height: 2.5rem; border-radius: 0.75rem; display: flex;
+        align-items: center; justify-content: center; background: rgba(255,255,255,0.1);
+        border: 1px solid rgba(255,255,255,0.1); color: #fef9e7; flex-shrink: 0;
+    }
+    .summary-label { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.2em; color: rgba(255,255,255,0.7); }
+    .summary-value { font-size: 1.15rem; line-height: 1.2; font-weight: 800; margin-top: 0.35rem; }
+    .summary-subtext { font-size: 0.7rem; color: rgba(255,255,255,0.8); margin-top: 0.2rem; }
+
+    .primary-btn, .secondary-btn {
+        border-radius: 0.6rem; font-weight: 600; transition: all 0.2s ease;
+        display: inline-flex; align-items: center; justify-content: center; white-space: nowrap;
+        padding: 0.55rem 0.85rem;
+    }
+    .primary-btn {
+        color: #fef9e7; background: linear-gradient(135deg, var(--maroon-800) 0%, var(--maroon-700) 100%);
+        box-shadow: 0 4px 10px rgba(92,26,26,0.15);
+    }
+    .primary-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 14px rgba(92,26,26,0.2); }
+    .secondary-btn {
+        background: #ffffff; color: var(--text-secondary); border: 1px solid var(--border-soft);
+        box-shadow: 0 2px 6px rgba(44,36,32,0.03);
+    }
+    .secondary-btn:hover { background: #f5f0eb; }
+
+    .panel-topline, .section-topline { position: absolute; inset-inline: 0; top: 0; height: 3px; background: linear-gradient(90deg, var(--maroon-800) 0%, var(--gold-400) 50%, var(--maroon-800) 100%); }
+    .panel-header, .section-header {
+        display: flex; align-items: center; gap: 0.7rem; padding: 0.85rem 1.25rem;
+        border-bottom: 1px solid var(--border-soft)/60;
+    }
+    .panel-icon, .section-icon {
+        width: 2rem; height: 2rem; border-radius: 0.6rem; background: rgba(254,249,231,0.7); color: var(--maroon-700);
+    }
+    .panel-title, .section-title { font-size: 0.8rem; font-weight: 600; color: var(--text-primary); }
+    .panel-subtitle, .section-subtitle { font-size: 0.68rem; color: var(--text-muted); margin-top: 0.1rem; }
+
+    .field-label {
+        display: block; font-size: 0.65rem; font-weight: 600; color: var(--text-secondary);
+        margin-bottom: 0.35rem; text-transform: uppercase; letter-spacing: 0.08em;
+    }
+    .input-field, .textarea-field, .select-field, .file-field {
         width: 100%; border: 1px solid var(--border-soft); border-radius: 0.6rem;
         background: rgba(255,255,255,0.9); color: var(--text-primary); outline: none;
-        transition: all 0.2s ease; font-size: 0.85rem; padding: 0.6rem 0.75rem;
+        transition: all 0.2s ease; font-size: 0.8rem;
         box-shadow: inset 0 1px 2px rgba(44,36,32,0.02);
     }
-    .input-field:focus, .select-field:focus, .textarea-field:focus {
+    .input-field, .select-field, .file-field { padding: 0.55rem 0.75rem; }
+    .textarea-field { padding: 0.65rem 0.75rem; resize: vertical; }
+    .input-field:focus, .textarea-field:focus, .select-field:focus {
         border-color: var(--maroon-700); box-shadow: 0 0 0 3px rgba(92,26,26,0.08);
     }
-    .textarea-field { resize: vertical; line-height: 1.5; }
+    .file-field { padding: 0.6rem 0.7rem; }
+    .helper-text { font-size: 0.7rem; color: var(--text-muted); margin-top: 0.3rem; line-height: 1.5; }
+    .error-text { font-size: 0.7rem; color: #b91c1c; margin-top: 0.25rem; }
 
-    /* Custom Checkbox */
-    .custom-checkbox {
-        appearance: none; -webkit-appearance: none;
-        width: 1.1rem; height: 1.1rem; border: 1px solid var(--border-soft);
-        border-radius: 0.25rem; background: white; cursor: pointer;
-        position: relative; transition: all 0.2s; flex-shrink: 0;
+    .option-card {
+        display: flex; align-items: flex-start; padding: 0.7rem 0.85rem; border-radius: 0.65rem;
+        background: rgba(250,248,245,0.7); border: 1px solid var(--border-soft);
+        transition: all 0.2s ease;
     }
-    .custom-checkbox:checked {
-        background: var(--maroon-700); border-color: var(--maroon-700);
-    }
-    .custom-checkbox:checked::after {
-        content: ''; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(45deg);
-        width: 0.3rem; height: 0.6rem; border: solid white; border-width: 0 2px 2px 0;
-    }
-    .custom-control-label {
-        font-size: 0.85rem; color: var(--text-secondary); cursor: pointer; user-select: none;
-    }
+    .option-card:hover { border-color: rgba(212,175,55,0.4); background: rgba(254,249,231,0.5); }
 
-    /* Helper Text */
-    .helper-text { font-size: 0.75rem; color: var(--text-muted); margin-top: 0.35rem; }
-    .error-msg { color: #b91c1c; font-size: 0.75rem; margin-top: 0.35rem; font-weight: 500; }
-
-    /* Buttons */
-    .btn-primary {
-        background: linear-gradient(135deg, var(--maroon-800) 0%, var(--maroon-700) 100%);
-        color: #fef9e7; font-weight: 600; border-radius: 0.6rem;
-        padding: 0.75rem 1.5rem; display: inline-flex; align-items: center; justify-content: center;
-        box-shadow: 0 4px 10px rgba(92,26,26,0.15); transition: all 0.2s ease;
-        border: none; text-decoration: none;
-    }
-    .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 6px 14px rgba(92,26,26,0.2); }
-    
-    .btn-secondary {
-        background: white; color: var(--text-secondary); border: 1px solid var(--border-soft);
-        font-weight: 600; border-radius: 0.6rem; padding: 0.75rem 1.5rem;
-        display: inline-flex; align-items: center; justify-content: center;
-        transition: all 0.2s ease; text-decoration: none;
-    }
-    .btn-secondary:hover { background: var(--bg-warm); color: var(--text-primary); border-color: var(--maroon-700); }
-
-    /* Disclaimer Box */
-    .disclaimer-box {
-        background: rgba(255, 249, 230, 0.4); border: 1px dashed rgba(212, 175, 55, 0.4);
-        border-radius: 0.6rem; padding: 1rem; margin-top: 0.5rem;
-    }
-
-    /* Mobile Adjustments */
     @media (max-width: 639px) {
-        .panel-card { padding: 1rem; }
-        .btn-primary, .btn-secondary { width: 100%; justify-content: center; }
-        .action-group { flex-direction: column-reverse; gap: 0.75rem; }
-        .action-group > * { width: 100%; }
+        .panel-header, .section-header { padding: 0.75rem 1rem; }
+        .input-field, .textarea-field, .select-field { padding: 0.6rem 0.75rem; font-size: 0.85rem; }
+        .primary-btn, .secondary-btn { width: 100%; justify-content: center; padding: 0.6rem 1rem; }
+        .space-x-3 > * + * { margin-left: 0; margin-top: 0.5rem; }
+        .flex.justify-end { flex-direction: column; }
     }
 </style>
 
-<div class="min-h-screen resource-shell">
-    <div class="resource-glow one"></div>
-    <div class="resource-glow two"></div>
+<div class="min-h-screen create-resource-shell">
+    <div class="create-resource-glow one"></div>
+    <div class="create-resource-glow two"></div>
 
-    <div class="relative max-w-4xl mx-auto px-4 sm:px-6 py-6 md:py-8">
-        
-        <!-- Header -->
-        <div class="mb-6 panel-card p-5 sm:p-6">
-            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                <div class="page-header">
-                    <h1 class="text-xl sm:text-2xl font-bold">Create New Resource</h1>
-                    <p class="text-sm mt-1">Add a new mental health resource for students.</p>
+    <div class="relative max-w-7xl mx-auto px-4 sm:px-6 py-5 md:py-8">
+        <div class="mb-6 sm:mb-8">
+            <div class="grid grid-cols-1 xl:grid-cols-[1fr_auto] gap-4 items-stretch">
+                <div class="hero-card">
+                    <div class="relative p-4 sm:p-5 flex items-start gap-3">
+                        <div class="hero-icon">
+                            <i class="fas fa-book-medical text-base sm:text-lg"></i>
+                        </div>
+                        <div class="min-w-0">
+                            <div class="hero-badge">
+                                <span class="hero-badge-dot"></span>
+                                Resource Creation
+                            </div>
+                            <h1 class="text-lg sm:text-xl lg:text-2xl font-semibold tracking-tight text-[#2c2420] mt-2">Create New Resource</h1>
+                            <p class="text-[#6b5e57] text-xs sm:text-sm mt-1.5 max-w-2xl">
+                                Add a new mental health resource for students.
+                            </p>
+                        </div>
+                    </div>
                 </div>
-                <a href="{{ route('counselor.resources.index') }}"
-                   class="btn-secondary">
-                    <i class="fas fa-arrow-left mr-2"></i> Back to Resources
-                </a>
+
+                <div class="summary-card">
+                    <div class="relative h-full flex flex-col sm:flex-row items-center justify-between gap-3 p-4">
+                        <div class="flex items-center gap-3 text-center sm:text-left">
+                            <div class="summary-icon flex-shrink-0">
+                                <i class="fas fa-arrow-left text-sm"></i>
+                            </div>
+                            <div class="min-w-0">
+                                <p class="summary-label">Navigation</p>
+                                <p class="summary-value">Back to Resources</p>
+                                <p class="summary-subtext hidden sm:block">Return to the resource library anytime.</p>
+                            </div>
+                        </div>
+                        <a href="{{ route('counselor.resources.index') }}"
+                           class="secondary-btn px-3 py-2 text-xs sm:text-sm rounded-lg">
+                            <i class="fas fa-arrow-left mr-1.5 text-[9px] sm:text-xs"></i> Back
+                        </a>
+                    </div>
+                </div>
             </div>
         </div>
 
-        <!-- Form -->
-        <div class="panel-card p-5 sm:p-6 md:p-8">
-            <form action="{{ route('counselor.resources.store') }}" method="POST" enctype="multipart/form-data">
-                @csrf
+        <form action="{{ route('counselor.resources.store') }}" method="POST" enctype="multipart/form-data">
+            @csrf
 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-5 sm:gap-6">
-                    
-                    <!-- Title -->
-                    <div class="md:col-span-2">
-                        <label for="title" class="section-title">Title *</label>
-                        <input type="text" name="title" id="title" value="{{ old('title') }}"
-                               class="input-field" required placeholder="Enter resource title">
-                        @error('title')
-                            <p class="error-msg">{{ $message }}</p>
-                        @enderror
-                    </div>
-
-                    <!-- Description -->
-                    <div class="md:col-span-2">
-                        <label for="description" class="section-title">Description *</label>
-                        <textarea name="description" id="description" rows="3"
-                                  class="textarea-field" required placeholder="Briefly describe this resource...">{{ old('description') }}</textarea>
-                        @error('description')
-                            <p class="error-msg">{{ $message }}</p>
-                        @enderror
-                    </div>
-
-                    <!-- Icon -->
-                    <div>
-                        <label for="icon" class="section-title">Icon *</label>
-                        <select name="icon" id="icon" class="select-field" required>
-                            <option value="">Select an icon</option>
-                            @foreach($icons as $icon)
-                                <option value="{{ $icon }}" {{ old('icon') == $icon ? 'selected' : '' }}>
-                                    {{ $icon }}
-                                </option>
-                            @endforeach
-                        </select>
-                        @error('icon')
-                            <p class="error-msg">{{ $message }}</p>
-                        @enderror
-                    </div>
-
-                    <!-- Category -->
-                    <div>
-                        <label for="category" class="section-title">Category *</label>
-                        <select name="category" id="category" class="select-field" required>
-                            <option value="">Select a category</option>
-                            @foreach($categories as $value => $label)
-                                <option value="{{ $value }}" {{ old('category') == $value ? 'selected' : '' }}>
-                                    {{ $label }}
-                                </option>
-                            @endforeach
-                        </select>
-                        @error('category')
-                            <p class="error-msg">{{ $message }}</p>
-                        @enderror
-                    </div>
-
-                    <!-- Button Text -->
-                    <div>
-                        <label for="button_text" class="section-title">Button Text *</label>
-                        <input type="text" name="button_text" id="button_text" value="{{ old('button_text') }}"
-                               class="input-field" required placeholder="e.g., Watch Video, Read eBook">
-                        @error('button_text')
-                            <p class="error-msg">{{ $message }}</p>
-                        @enderror
-                    </div>
-
-                    <!-- Link -->
-                    <div class="md:col-span-2">
-                        <label for="link" class="section-title">Resource Link *</label>
-                        <input type="url" name="link" id="link" value="{{ old('link') }}"
-                               class="input-field" required placeholder="https://example.com or https://youtube.com/watch?v=...">
-                        <p class="helper-text">Supports direct links or YouTube video URLs.</p>
-                        @error('link')
-                            <p class="error-msg">{{ $message }}</p>
-                        @enderror
-                    </div>
-
-                    <!-- Image Upload -->
-                    <div class="md:col-span-2">
-                        <label for="image" class="section-title">Resource Image (Optional)</label>
-                        <input type="file" name="image" id="image" accept="image/*"
-                               class="input-field file-input">
-                        <p class="helper-text">Upload a custom image for this resource. If empty, a default or YouTube thumbnail will be used.</p>
-                        @error('image')
-                            <p class="error-msg">{{ $message }}</p>
-                        @enderror
-                    </div>
-
-                    <!-- YouTube Thumbnail Option -->
-                    <div class="md:col-span-2">
-                        <div class="flex items-center gap-3 p-3 rounded-lg bg-[rgba(250,248,245,0.6)] border border-[var(--border-soft)]">
-                            <input type="checkbox" name="use_yt_thumbnail" id="use_yt_thumbnail" value="1"
-                                   {{ old('use_yt_thumbnail') ? 'checked' : '' }}
-                                   class="custom-checkbox">
-                            <label for="use_yt_thumbnail" class="custom-control-label font-medium text-[var(--text-primary)]">
-                                Use YouTube thumbnail (for YouTube links only)
-                            </label>
-                        </div>
-                        <p class="helper-text ml-0">If checked and this is a YouTube link, the video thumbnail will be fetched automatically.</p>
-                    </div>
-
-                    <!-- Disclaimer Section -->
-                    <div class="md:col-span-2 border-t border-[var(--border-soft)] pt-6 mt-2">
-                        <h3 class="text-base font-bold text-[var(--text-primary)] mb-4 flex items-center gap-2">
-                            <i class="fas fa-shield-alt text-[var(--gold-500)]"></i> Disclaimer Settings
-                        </h3>
-
-                        <!-- Show Disclaimer Checkbox -->
-                        <div class="mb-4">
-                            <div class="flex items-center gap-3">
-                                <input type="checkbox" name="show_disclaimer" id="show_disclaimer" value="1"
-                                       {{ old('show_disclaimer') ? 'checked' : '' }}
-                                       class="custom-checkbox">
-                                <label for="show_disclaimer" class="custom-control-label font-medium text-[var(--text-primary)]">
-                                    Show disclaimer for this resource
-                                </label>
+            <div class="grid grid-cols-1 xl:grid-cols-2 gap-5 sm:gap-6 items-start">
+                <div class="space-y-5 sm:space-y-6">
+                    <div class="section-card">
+                        <div class="section-topline"></div>
+                        <div class="section-header">
+                            <div class="section-icon">
+                                <i class="fas fa-circle-info text-[9px] sm:text-xs"></i>
                             </div>
-                            <p class="helper-text ml-0">When checked, a disclaimer will be displayed prominently with this resource.</p>
-                        </div>
-
-                        <!-- Disclaimer Text -->
-                        <div id="disclaimer_text_container" class="{{ old('show_disclaimer') ? '' : 'hidden' }}">
-                            <label for="disclaimer_text" class="section-title">Custom Disclaimer Text (Optional)</label>
-                            <textarea name="disclaimer_text" id="disclaimer_text" rows="3"
-                                      class="textarea-field"
-                                      placeholder="Enter custom disclaimer text. If left empty, a default disclaimer will be used.">{{ old('disclaimer_text') }}</textarea>
-                            
-                            <div class="disclaimer-box">
-                                <p class="text-xs text-[var(--text-secondary)] italic">
-                                    <strong>Default disclaimer:</strong> "We do not claim ownership of this content. All rights, credits, and copyrights belong to the original owners. These resources are shared for educational and informational purposes only."
-                                </p>
+                            <div>
+                                <h3 class="section-title">Resource Details</h3>
+                                <p class="section-subtitle hidden sm:block">Set the title, description, category, and main link.</p>
                             </div>
-                            @error('disclaimer_text')
-                                <p class="error-msg">{{ $message }}</p>
-                            @enderror
                         </div>
-                    </div>
 
-                    <!-- Active Status -->
-                    <div class="md:col-span-2">
-                        <div class="flex items-center gap-3 p-3 rounded-lg bg-[rgba(250,248,245,0.6)] border border-[var(--border-soft)]">
-                            <input type="checkbox" name="is_active" id="is_active" value="1"
-                                   {{ old('is_active', true) ? 'checked' : '' }}
-                                   class="custom-checkbox">
-                            <label for="is_active" class="custom-control-label font-medium text-[var(--text-primary)]">
-                                Make this resource active and visible to students immediately
-                            </label>
+                        <div class="p-3 sm:p-4 md:p-6 grid grid-cols-1 gap-3 sm:gap-4 md:gap-6">
+                            <div>
+                                <label for="title" class="field-label">Title *</label>
+                                <input type="text" name="title" id="title" value="{{ old('title') }}"
+                                       class="input-field" required>
+                                @error('title')
+                                    <p class="error-text">{{ $message }}</p>
+                                @enderror
+                            </div>
+
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
+                                <div>
+                                    <label for="category" class="field-label">Category *</label>
+                                    <select name="category" id="category" class="select-field" required>
+                                        <option value="">Select a category</option>
+                                        @foreach($categories as $value => $label)
+                                            <option value="{{ $value }}" {{ old('category') == $value ? 'selected' : '' }}>{{ $label }}</option>
+                                        @endforeach
+                                    </select>
+                                    @error('category')
+                                        <p class="error-text">{{ $message }}</p>
+                                    @enderror
+                                </div>
+                                <div>
+                                    <label for="button_text" class="field-label">Button Text *</label>
+                                    <input type="text" name="button_text" id="button_text" value="{{ old('button_text') }}"
+                                           class="input-field" required>
+                                    @error('button_text')
+                                        <p class="error-text">{{ $message }}</p>
+                                    @enderror
+                                </div>
+                            </div>
+
+                            <div>
+                                <label for="description" class="field-label">Description *</label>
+                                <textarea name="description" id="description" rows="4"
+                                          class="textarea-field" required>{{ old('description') }}</textarea>
+                                @error('description')
+                                    <p class="error-text">{{ $message }}</p>
+                                @enderror
+                            </div>
+
+                            <div>
+                                <label for="link" class="field-label">Resource Link *</label>
+                                <input type="url" name="link" id="link" value="{{ old('link') }}"
+                                       class="input-field" required>
+                                @error('link')
+                                    <p class="error-text">{{ $message }}</p>
+                                @enderror
+                            </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Submit Button -->
-                <div class="mt-8 action-group flex flex-col md:flex-row gap-4 justify-end">
-                    <a href="{{ route('counselor.resources.index') }}"
-                       class="btn-secondary">
-                        Cancel
-                    </a>
-                    <button type="submit"
-                            class="btn-primary">
-                        <i class="fas fa-plus mr-2 text-xs"></i> Create Resource
-                    </button>
+                <div class="space-y-5 sm:space-y-6">
+                    <div class="section-card">
+                        <div class="section-topline"></div>
+                        <div class="section-header">
+                            <div class="section-icon">
+                                <i class="fas fa-sliders text-[9px] sm:text-xs"></i>
+                            </div>
+                            <div>
+                                <h3 class="section-title">Media & Settings</h3>
+                                <p class="section-subtitle hidden sm:block">Icon selection, thumbnail, and display preferences.</p>
+                            </div>
+                        </div>
+
+                        <div class="p-3 sm:p-4 md:p-6 grid grid-cols-1 gap-3 sm:gap-4 md:gap-6">
+                            <div>
+                                <label for="icon" class="field-label">Icon *</label>
+                                <div class="grid grid-cols-5 sm:grid-cols-6 md:grid-cols-7 gap-2">
+                                    @foreach($icons as $icon)
+                                        <label class="option-card cursor-pointer flex items-center justify-center gap-2 p-2 sm:p-2.5 !m-0">
+                                            <input type="radio"
+                                                   name="icon"
+                                                   value="{{ $icon }}"
+                                                   class="sr-only peer"
+                                                   {{ old('icon') == $icon ? 'checked' : '' }}
+                                                   required>
+                                            <span class="inline-flex items-center justify-center w-9 h-9 rounded-lg bg-white border border-[#e5e0db] text-[#6b5e57] peer-checked:border-[#7a2a2a] peer-checked:text-[#7a2a2a] peer-checked:bg-[#fef9e7]">
+                                                <i class="{{ $icon }}"></i>
+                                            </span>
+                                        </label>
+                                    @endforeach
+                                </div>
+                                @error('icon')
+                                    <p class="error-text">{{ $message }}</p>
+                                @enderror
+                            </div>
+
+                            <div class="pt-2">
+                                <label class="field-label mb-2">Resource Image (Optional)</label>
+                                <div class="flex flex-col sm:flex-row gap-5 items-start">
+                                    <div class="flex-shrink-0">
+                                        <div class="w-full sm:w-48 h-32 rounded-lg overflow-hidden border border-[#e5e0db] bg-[#f5f0eb] relative">
+                                            <div class="w-full h-full flex flex-col items-center justify-center text-[#8b7e76]" id="resource-img-placeholder">
+                                                <i class="fas fa-image text-2xl mb-1 opacity-40"></i>
+                                                <span class="text-xs">No image</span>
+                                            </div>
+                                            <img src="" alt="" class="w-full h-full object-contain hidden bg-black/5" id="resource-img-preview">
+                                        </div>
+                                    </div>
+
+                                    <div class="flex-1 min-w-0 w-full">
+                                        <input type="file"
+                                               name="image"
+                                               id="image"
+                                               accept="image/jpeg,image/png,image/jpg,image/gif"
+                                               class="input-field mt-1"
+                                               onchange="previewResourceImage(this)">
+                                        <p class="helper-text mt-1">JPG, PNG or GIF · Max 10MB.</p>
+                                        @error('image')
+                                            <p class="error-text mt-1">{{ $message }}</p>
+                                        @enderror
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="space-y-3 sm:space-y-4">
+                                <div class="option-card">
+                                    <input type="checkbox" name="use_yt_thumbnail" id="use_yt_thumbnail" value="1" {{ old('use_yt_thumbnail') ? 'checked' : '' }}
+                                           class="h-4 w-4 text-[#7a2a2a] focus:ring-[#7a2a2a] border-[#e5e0db] rounded mt-0.5 flex-shrink-0">
+                                    <label for="use_yt_thumbnail" class="ml-3 text-xs sm:text-sm font-medium text-[#4a3f3a] cursor-pointer">Use YouTube thumbnail (for YouTube links)</label>
+                                </div>
+
+                                <div class="option-card">
+                                    <input type="checkbox" name="is_pinned" id="is_pinned" value="1" {{ old('is_pinned') ? 'checked' : '' }}
+                                           class="h-4 w-4 text-[#7a2a2a] focus:ring-[#7a2a2a] border-[#e5e0db] rounded mt-0.5 flex-shrink-0">
+                                    <label for="is_pinned" class="ml-3 text-xs sm:text-sm font-medium text-[#4a3f3a] cursor-pointer">Pin this resource to appear first</label>
+                                </div>
+
+                                <div class="option-card">
+                                    <input type="checkbox" name="show_disclaimer" id="show_disclaimer" value="1" {{ old('show_disclaimer') ? 'checked' : '' }}
+                                           class="h-4 w-4 text-[#7a2a2a] focus:ring-[#7a2a2a] border-[#e5e0db] rounded mt-0.5 flex-shrink-0">
+                                    <label for="show_disclaimer" class="ml-3 text-xs sm:text-sm font-medium text-[#4a3f3a] cursor-pointer">Show disclaimer</label>
+                                </div>
+
+                                <div>
+                                    <label for="disclaimer_text" class="field-label">Disclaimer Text *</label>
+                                    <textarea name="disclaimer_text" id="disclaimer_text" rows="3"
+                                              class="textarea-field">{{ old('disclaimer_text') }}</textarea>
+                                    @error('disclaimer_text')
+                                        <p class="error-text">{{ $message }}</p>
+                                    @enderror
+                                </div>
+
+                                <div class="option-card">
+                                    <input type="checkbox" name="is_active" id="is_active" value="1" {{ old('is_active', true) ? 'checked' : '' }}
+                                           class="h-4 w-4 text-[#7a2a2a] focus:ring-[#7a2a2a] border-[#e5e0db] rounded mt-0.5 flex-shrink-0">
+                                    <label for="is_active" class="ml-3 text-xs sm:text-sm font-medium text-[#4a3f3a] cursor-pointer">Make this resource active and visible to students</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-            </form>
-        </div>
+            </div>
+
+            <div class="mt-6 flex justify-end gap-3">
+                <a href="{{ route('counselor.resources.index') }}" class="secondary-btn w-full sm:w-auto rounded-lg text-center">Cancel</a>
+                <button type="submit" class="primary-btn w-full sm:w-auto rounded-lg">
+                    <i class="fas fa-save mr-1.5 text-[9px] sm:text-xs"></i>Create Resource
+                </button>
+            </div>
+        </form>
     </div>
 </div>
 
 <script>
-    // Auto-check YouTube thumbnail option for YouTube links
-    document.getElementById('link').addEventListener('input', function() {
-        const link = this.value;
+    document.addEventListener('DOMContentLoaded', function() {
+        const linkInput = document.getElementById('link');
         const ytCheckbox = document.getElementById('use_yt_thumbnail');
+        const disclaimerCheckbox = document.getElementById('show_disclaimer');
+        const disclaimerContainer = document.getElementById('disclaimer_text').parentElement;
+        const disclaimerTextarea = document.getElementById('disclaimer_text');
 
-        if (link.includes('youtube.com') || link.includes('youtu.be')) {
-            ytCheckbox.checked = true;
+        if (linkInput && ytCheckbox) {
+            linkInput.addEventListener('input', function() {
+                const link = this.value || '';
+                if (link.includes('youtube.com') || link.includes('youtu.be')) {
+                    ytCheckbox.checked = true;
+                }
+            });
         }
-    });
 
-    // Toggle disclaimer text visibility
-    document.getElementById('show_disclaimer').addEventListener('change', function() {
-        const disclaimerContainer = document.getElementById('disclaimer_text_container');
-        if (this.checked) {
-            disclaimerContainer.classList.remove('hidden');
-        } else {
-            disclaimerContainer.classList.add('hidden');
+        function toggleDisclaimer() {
+            if (disclaimerCheckbox.checked) {
+                disclaimerContainer.style.display = 'block';
+                disclaimerTextarea.setAttribute('required', 'required');
+            } else {
+                disclaimerContainer.style.display = 'none';
+                disclaimerTextarea.removeAttribute('required');
+            }
+        }
+
+        disclaimerCheckbox.addEventListener('change', toggleDisclaimer);
+        toggleDisclaimer();
+
+        window.previewResourceImage = function(input) {
+            if (input.files && input.files[0]) {
+                const file = input.files[0];
+                if (file.size > 10 * 1024 * 1024) {
+                    alert('File size must be less than 10MB');
+                    input.value = '';
+                    return;
+                }
+
+                const reader = new FileReader();
+                reader.onload = e => {
+                    const preview = document.getElementById('resource-img-preview');
+                    const placeholder = document.getElementById('resource-img-placeholder');
+                    if (preview) {
+                        preview.src = e.target.result;
+                        preview.classList.remove('hidden');
+                    }
+                    if (placeholder) placeholder.classList.add('hidden');
+                };
+                reader.readAsDataURL(file);
+            } else {
+                const preview = document.getElementById('resource-img-preview');
+                const placeholder = document.getElementById('resource-img-placeholder');
+                if (preview) {
+                    preview.src = '';
+                    preview.classList.add('hidden');
+                }
+                if (placeholder) placeholder.classList.remove('hidden');
+            }
         }
     });
 </script>

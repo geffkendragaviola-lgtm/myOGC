@@ -193,6 +193,11 @@
                         </select>
                         @error('sex')<p class="error-text">{{ $message }}</p>@enderror
                     </div>
+                    <div>
+                        <label class="field-label">Religion</label>
+                        <input type="text" name="religion" value="{{ old('religion', $counselor->user->religion) }}" class="field-input">
+                        @error('religion')<p class="error-text">{{ $message }}</p>@enderror
+                    </div>
                     <div class="md:col-span-2">
                         <label class="field-label">Address</label>
                         <textarea name="address" rows="2" class="field-textarea">{{ old('address', $counselor->user->address) }}</textarea>

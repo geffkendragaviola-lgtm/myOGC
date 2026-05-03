@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Counselor Dashboard - OGC')
+@section('title', 'Edit Event - OGC')
 
 @section('content')
 <style>
@@ -17,646 +17,659 @@
         --text-muted: #8b7e76;
     }
 
-    /* Base Layout & Glow */
-    .event-shell {
+    .edit-event-shell {
         position: relative;
+        overflow: hidden;
         background: var(--bg-warm);
         min-height: 100vh;
-        padding-bottom: 3rem;
     }
-    .event-glow {
-        position: absolute; border-radius: 50%; filter: blur(80px); pointer-events: none; opacity: 0.2; z-index: 0;
+    .edit-event-glow {
+        position: absolute; border-radius: 50%; filter: blur(80px); pointer-events: none; opacity: 0.25;
     }
-    .event-glow.one { top: -50px; left: -50px; width: 250px; height: 250px; background: var(--gold-400); }
-    .event-glow.two { bottom: 10%; right: -50px; width: 220px; height: 220px; background: var(--maroon-800); }
+    .edit-event-glow.one { top: -30px; left: -40px; width: 200px; height: 200px; background: var(--gold-400); }
+    .edit-event-glow.two { bottom: -30px; right: -60px; width: 220px; height: 220px; background: var(--maroon-800); }
 
-    /* Glass Cards */
-    .panel-card {
-        position: relative; z-index: 1; overflow: hidden; border-radius: 0.75rem;
+    .hero-card, .panel-card, .section-card, .info-card {
+        position: relative; overflow: hidden; border-radius: 0.75rem;
         border: 1px solid var(--border-soft); background: rgba(255,255,255,0.95);
         backdrop-filter: blur(8px); box-shadow: 0 2px 8px rgba(44,36,32,0.04);
         transition: box-shadow 0.2s ease;
     }
-    .panel-card::before {
+    .hero-card:hover, .panel-card:hover, .section-card:hover, .info-card:hover {
+        box-shadow: 0 4px 14px rgba(44,36,32,0.06);
+    }
+    .hero-card::before, .panel-card::before, .section-card::before, .info-card::before {
         content: ""; position: absolute; inset: 0; pointer-events: none;
         background: radial-gradient(circle at top right, rgba(212,175,55,0.06), transparent 30%);
     }
 
-    /* Typography & Headers */
-    .page-header h1 { color: var(--text-primary); font-weight: 700; letter-spacing: -0.02em; }
-    .page-header p { color: var(--text-secondary); }
-    
-    .section-title {
-        font-size: 0.8rem; font-weight: 600; color: var(--text-primary);
-        text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 0.35rem; display: block;
+    .hero-icon, .panel-icon, .section-icon {
+        display: flex; align-items: center; justify-content: center; flex-shrink: 0;
     }
+    .hero-icon {
+        width: 2.75rem; height: 2.75rem; border-radius: 0.75rem; color: #fef9e7;
+        background: linear-gradient(135deg, var(--maroon-800) 0%, var(--maroon-700) 100%);
+        box-shadow: 0 4px 12px rgba(92,26,26,0.15);
+    }
+    .hero-badge {
+        display: inline-flex; align-items: center; gap: 0.4rem; border-radius: 999px;
+        border: 1px solid rgba(212,175,55,0.3); background: rgba(254,249,231,0.8);
+        padding: 0.2rem 0.55rem; font-size: 9px; font-weight: 700; text-transform: uppercase;
+        letter-spacing: 0.16em; color: var(--maroon-700);
+    }
+    .hero-badge-dot { width: 0.3rem; height: 0.3rem; border-radius: 999px; background: var(--gold-400); }
 
-    /* Form Elements */
-    .input-field, .select-field, .textarea-field {
+    .summary-card {
+        position: relative; overflow: hidden; border-radius: 0.75rem;
+        border: 1px solid rgba(92,26,26,0.15);
+        background: linear-gradient(135deg, var(--maroon-800) 0%, var(--maroon-900) 100%); color: white;
+        box-shadow: 0 4px 12px rgba(58,12,12,0.15);
+    }
+    .summary-card::before {
+        content: ""; position: absolute; inset: 0; opacity: 0.15;
+        background: radial-gradient(circle at top right, var(--gold-400), transparent 40%);
+        pointer-events: none;
+    }
+    .summary-icon {
+        width: 2.5rem; height: 2.5rem; border-radius: 0.75rem; display: flex;
+        align-items: center; justify-content: center; background: rgba(255,255,255,0.1);
+        border: 1px solid rgba(255,255,255,0.1); color: #fef9e7; flex-shrink: 0;
+    }
+    .summary-label { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.2em; color: rgba(255,255,255,0.7); }
+    .summary-value { font-size: 1.2rem; line-height: 1.2; font-weight: 800; margin-top: 0.35rem; }
+    .summary-subtext { font-size: 0.7rem; color: rgba(255,255,255,0.8); margin-top: 0.25rem; }
+
+    .panel-topline, .section-topline { position: absolute; inset-inline: 0; top: 0; }
+    .panel-topline { height: 3px; background: linear-gradient(90deg, var(--maroon-800) 0%, var(--gold-400) 50%, var(--maroon-800) 100%); }
+    .section-topline { height: 2.5px; background: linear-gradient(90deg, var(--maroon-700), var(--gold-400)); }
+
+    .panel-header, .section-header {
+        display: flex; align-items: center; gap: 0.7rem; padding: 0.85rem 1.25rem;
+        border-bottom: 1px solid var(--border-soft)/60;
+    }
+    .panel-icon, .section-icon {
+        width: 2rem; height: 2rem; border-radius: 0.6rem;
+        background: rgba(254,249,231,0.7); color: var(--maroon-700);
+    }
+    .panel-title, .section-title { font-size: 0.8rem; font-weight: 600; color: var(--text-primary); }
+    .panel-subtitle, .section-subtitle { font-size: 0.68rem; color: var(--text-muted); margin-top: 0.1rem; }
+
+    .field-label {
+        display: block; font-size: 0.65rem; font-weight: 600; color: var(--text-secondary);
+        margin-bottom: 0.35rem; text-transform: uppercase; letter-spacing: 0.08em;
+    }
+    .input-field, .textarea-field, .select-field, .form-input {
         width: 100%; border: 1px solid var(--border-soft); border-radius: 0.6rem;
         background: rgba(255,255,255,0.9); color: var(--text-primary); outline: none;
-        transition: all 0.2s ease; font-size: 0.85rem; padding: 0.6rem 0.75rem;
+        transition: all 0.2s ease; font-size: 0.8rem;
         box-shadow: inset 0 1px 2px rgba(44,36,32,0.02);
     }
-    .input-field:focus, .select-field:focus, .textarea-field:focus {
+    .input-field, .select-field { padding: 0.55rem 0.75rem; }
+    .textarea-field { padding: 0.65rem 0.75rem; resize: vertical; }
+    .input-field:focus, .textarea-field:focus, .select-field:focus, .form-input:focus {
         border-color: var(--maroon-700); box-shadow: 0 0 0 3px rgba(92,26,26,0.08);
     }
-    .textarea-field { resize: vertical; line-height: 1.5; }
+    .helper-text { font-size: 0.7rem; color: var(--text-muted); margin-top: 0.3rem; line-height: 1.5; }
+    .error-text { font-size: 0.7rem; color: #b91c1c; margin-top: 0.25rem; }
 
-    /* Custom File Upload */
-    .file-upload-zone {
-        border: 2px dashed var(--border-soft); border-radius: 0.75rem;
-        background: rgba(250,248,245,0.5); transition: all 0.2s ease;
-        cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center;
-        padding: 1.5rem; text-align: center; min-height: 160px;
-    }
-    .file-upload-zone:hover { border-color: var(--gold-400); background: rgba(254,249,231,0.4); }
-    .file-icon { color: var(--text-muted); margin-bottom: 0.5rem; }
-    .file-text-main { font-size: 0.85rem; font-weight: 600; color: var(--text-primary); }
-    .file-text-sub { font-size: 0.7rem; color: var(--text-muted); margin-top: 0.25rem; }
-    .file-warning { font-size: 0.7rem; color: var(--maroon-700); font-weight: 600; margin-top: 0.5rem; }
+    .alert-success, .alert-error { border-radius: 0.6rem; padding: 0.65rem 0.85rem; border-width: 1px; margin-bottom: 1rem; }
 
-    /* Image Preview Box */
-    .current-image-box {
-        position: relative; display: inline-block; border-radius: 0.75rem; overflow: hidden;
-        border: 1px solid var(--border-soft); box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+    .radio-group { display: flex; flex-direction: column; gap: 0.75rem; }
+    .radio-option, .checkbox-option, .option-card {
+        display: flex; align-items: flex-start; gap: 0.5rem;
+        padding: 0.5rem; border-radius: 0.5rem;
+        transition: background-color 0.15s ease;
     }
-    .remove-img-btn {
-        position: absolute; top: 0.5rem; right: 0.5rem;
-        background: rgba(185, 28, 28, 0.9); color: white;
-        width: 1.75rem; height: 1.75rem; border-radius: 50%;
-        display: flex; align-items: center; justify-content: center;
-        transition: all 0.2s; backdrop-filter: blur(2px);
-    }
-    .remove-img-btn:hover { background: #b91c1c; transform: scale(1.1); }
+    .radio-option:hover, .checkbox-option:hover { background: rgba(254,249,231,0.4); }
 
-    /* Radio/Checkbox Styling */
-    .custom-radio, .custom-checkbox {
-        appearance: none; -webkit-appearance: none;
-        width: 1.1rem; height: 1.1rem; border: 1px solid var(--border-soft);
-        border-radius: 0.25rem; background: white; cursor: pointer;
-        position: relative; transition: all 0.2s; flex-shrink: 0;
+    .radio-option input, .checkbox-option input, .option-card input[type="checkbox"] {
+        margin-top: 0.15rem; width: 1rem; height: 1rem;
+        accent-color: var(--maroon-700); cursor: pointer; flex-shrink: 0;
     }
-    .custom-radio { border-radius: 50%; }
-    .custom-radio:checked, .custom-checkbox:checked {
-        background: var(--maroon-700); border-color: var(--maroon-700);
-    }
-    .custom-radio:checked::after {
-        content: ''; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-        width: 0.4rem; height: 0.4rem; background: white; border-radius: 50%;
-    }
-    .custom-checkbox:checked::after {
-        content: ''; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(45deg);
-        width: 0.3rem; height: 0.6rem; border: solid white; border-width: 0 2px 2px 0;
-    }
-    .custom-control-label {
-        font-size: 0.85rem; color: var(--text-secondary); cursor: pointer; user-select: none;
+    .radio-option label, .checkbox-option label, .option-card label {
+        font-size: 0.8rem; color: var(--text-secondary); cursor: pointer; line-height: 1.4;
     }
 
-    /* College Grid */
     .college-grid {
-        max-height: 300px; overflow-y: auto; border: 1px solid var(--border-soft);
-        border-radius: 0.6rem; padding: 0.75rem; background: rgba(255,255,255,0.5);
+        display: grid; grid-template-columns: repeat(1, 1fr); gap: 0.5rem;
+        max-height: 12rem; overflow-y: auto; padding: 0.75rem;
+        border: 1px solid var(--border-soft); border-radius: 0.6rem;
+        background: rgba(255,255,255,0.9);
     }
-    .college-item { display: flex; align-items: center; gap: 0.6rem; padding: 0.4rem 0; }
-    .college-item label { margin: 0; font-size: 0.8rem; color: var(--text-primary); }
+    @media (min-width: 768px) { .college-grid { grid-template-columns: repeat(2, 1fr); } }
 
-    /* Info Box (Yellowish) */
-    .info-box {
-        background: rgba(255, 249, 230, 0.6); border: 1px solid rgba(212, 175, 55, 0.3);
-        border-radius: 0.75rem; padding: 1rem;
+    .option-card {
+        display: flex; align-items: flex-start; padding: 0.7rem 0.85rem; border-radius: 0.65rem;
+        background: rgba(250,248,245,0.7); border: 1px solid var(--border-soft);
+        transition: all 0.2s ease;
     }
-    .info-title { color: var(--maroon-800); font-weight: 700; font-size: 0.95rem; margin-bottom: 0.75rem; }
-    .info-label { color: var(--text-secondary); font-weight: 600; font-size: 0.8rem; }
-    .info-value { color: var(--text-primary); font-size: 0.85rem; }
-    
-    /* Badges */
-    .badge {
-        display: inline-flex; align-items: center; padding: 0.25rem 0.6rem;
-        border-radius: 999px; font-size: 0.7rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em;
-    }
-    .badge-green { background: rgba(16, 185, 129, 0.1); color: #059669; border: 1px solid rgba(16, 185, 129, 0.2); }
-    .badge-red { background: rgba(185, 28, 28, 0.1); color: #b91c1c; border: 1px solid rgba(185, 28, 28, 0.2); }
-    .badge-gray { background: rgba(107, 94, 87, 0.1); color: var(--text-secondary); border: 1px solid var(--border-soft); }
-    .badge-maroon { background: rgba(122, 42, 42, 0.1); color: var(--maroon-700); border: 1px solid rgba(122, 42, 42, 0.2); }
+    .option-card:hover { border-color: rgba(212,175,55,0.4); background: rgba(254,249,231,0.5); }
 
-    /* Buttons */
-    .btn-primary {
-        background: linear-gradient(135deg, var(--maroon-800) 0%, var(--maroon-700) 100%);
-        color: #fef9e7; font-weight: 600; border-radius: 0.6rem;
-        padding: 0.75rem 1.5rem; display: inline-flex; align-items: center; justify-content: center;
-        box-shadow: 0 4px 10px rgba(92,26,26,0.15); transition: all 0.2s ease;
-        border: none; width: 100%;
+    .form-action-primary, .form-action-secondary, .back-btn {
+        border-radius: 0.6rem; font-weight: 600; transition: all 0.2s ease;
+        display: inline-flex; align-items: center; justify-content: center; font-size: 0.8rem;
+        padding: 0.55rem 0.85rem;
     }
-    .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 6px 14px rgba(92,26,26,0.2); }
-    
-    .btn-secondary {
-        background: white; color: var(--text-secondary); border: 1px solid var(--border-soft);
-        font-weight: 600; border-radius: 0.6rem; padding: 0.75rem 1.5rem;
-        display: inline-flex; align-items: center; justify-content: center;
-        transition: all 0.2s ease; width: 100%;
+    .form-action-primary {
+        color: #fef9e7; background: linear-gradient(135deg, var(--maroon-800) 0%, var(--maroon-700) 100%);
+        box-shadow: 0 4px 10px rgba(92,26,26,0.15);
     }
-    .btn-secondary:hover { background: var(--bg-warm); color: var(--text-primary); border-color: var(--maroon-700); }
+    .form-action-primary:hover { transform: translateY(-1px); box-shadow: 0 6px 14px rgba(92,26,26,0.2); }
+    .form-action-secondary, .back-btn {
+        background: #ffffff; color: var(--text-secondary); border: 1px solid var(--border-soft);
+        box-shadow: 0 2px 6px rgba(44,36,32,0.03);
+    }
+    .form-action-secondary:hover, .back-btn:hover { background: #f5f0eb; }
 
-    /* Error Message */
-    .error-msg { color: #b91c1c; font-size: 0.75rem; margin-top: 0.35rem; font-weight: 500; }
-
-    /* Mobile Adjustments */
     @media (max-width: 639px) {
-        .panel-card { padding: 1rem; }
-        .file-upload-zone { padding: 1rem; min-height: 140px; }
-        .btn-primary, .btn-secondary { width: 100%; }
-        .action-group { flex-direction: column-reverse; }
-        .action-group > * { width: 100%; }
-        .current-image-box img { width: 100%; height: auto; max-width: 100%; }
+        .panel-header, .section-header { padding: 0.75rem 1rem; }
+        .input-field, .select-field { padding: 0.5rem 0.7rem; font-size: 0.85rem; }
+        .textarea-field { padding: 0.6rem 0.7rem; }
+        .form-action-primary, .form-action-secondary, .back-btn { width: 100%; justify-content: center; }
+        .flex-col.sm\:flex-row > * + * { margin-left: 0; margin-top: 0.5rem; }
     }
 </style>
 
-<div class="min-h-screen event-shell">
-    <div class="event-glow one"></div>
-    <div class="event-glow two"></div>
+<div class="min-h-screen edit-event-shell">
+    <div class="edit-event-glow one"></div>
+    <div class="edit-event-glow two"></div>
 
-    <div class="relative max-w-7xl mx-auto px-4 sm:px-6 py-6 md:py-10">
+    <div class="relative max-w-7xl mx-auto px-4 sm:px-6 py-5 md:py-8">
         
         <!-- Header -->
-        <div class="mb-6 panel-card p-5 sm:p-6">
-            <div class="flex items-start gap-4">
-                <div class="w-12 h-12 rounded-lg bg-gradient-to-br from-maroon-800 to-maroon-700 flex items-center justify-center text-white shadow-sm flex-shrink-0" style="background: linear-gradient(135deg, var(--maroon-800), var(--maroon-700));">
-                    <i class="fas fa-pen-to-square text-lg"></i>
+        <div class="mb-6 sm:mb-8">
+            <div class="grid grid-cols-1 lg:grid-cols-[1fr_auto] gap-4 items-stretch">
+                <div class="hero-card">
+                    <div class="relative p-4 sm:p-5 flex items-start gap-3">
+                        <div class="hero-icon">
+                            <i class="fas fa-pen-to-square text-base sm:text-lg"></i>
+                        </div>
+
+                        <div class="min-w-0">
+                            <div class="hero-badge">
+                                <span class="hero-badge-dot"></span>
+                                Event Editor
+                            </div>
+                            <h1 class="text-lg sm:text-xl lg:text-2xl font-semibold tracking-tight text-[#2c2420] mt-2">Edit Event</h1>
+                            <p class="text-[#6b5e57] text-xs sm:text-sm mt-1.5 max-w-2xl">
+                                Update the event details below.
+                            </p>
+                        </div>
+                    </div>
                 </div>
-                <div class="page-header">
-                    <h1 class="text-xl sm:text-2xl font-bold">Edit Event</h1>
-                    <p class="text-sm mt-1">Update the event details below.</p>
+
+                <div class="summary-card">
+                    <div class="relative h-full flex items-center justify-between gap-3 p-4">
+                        <div class="flex items-center gap-3">
+                            <div class="summary-icon">
+                                <i class="fas fa-calendar-days text-sm"></i>
+                            </div>
+                            <div>
+                                <p class="summary-label">Event Management</p>
+                                <p class="summary-value">Update Event</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <a href="{{ route('counselor.events.index') }}"
+                               class="back-btn px-3 py-2 whitespace-nowrap text-xs sm:text-sm rounded-lg">
+                                <i class="fas fa-arrow-left mr-1.5 text-[9px] sm:text-xs"></i> Back
+                            </a>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
 
-        <!-- Form Card -->
-        <div class="panel-card p-5 sm:p-6 md:p-8">
-            <form method="POST" action="{{ route('counselor.events.update', $event) }}" enctype="multipart/form-data">
-                @csrf
-                @method('PUT')
+        <!-- Error Messages -->
+        @if($errors->any())
+            <div class="alert-error bg-[#fdf2f2] border-[#b91c1c]/30 text-[#b91c1c]">
+                <div class="flex items-start">
+                    <i class="fas fa-circle-exclamation mr-2 text-rose-500 mt-0.5 text-sm"></i>
+                    <ul class="list-disc list-inside text-[10px] sm:text-xs space-y-1">
+                        @foreach($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+            </div>
+        @endif
 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-5 sm:gap-6">
-                    
-                    <!-- Event Image -->
-                    <div class="md:col-span-2">
-                        <label class="section-title">Event Image (Optional)</label>
+        <!-- Event Form -->
+        <form method="POST" action="{{ route('counselor.events.update', $event) }}" enctype="multipart/form-data">
+            @csrf
+            @method('PUT')
+            <input type="hidden" name="remove_image" id="remove_image" value="0">
 
-                        <!-- Current Image Preview -->
-                        @if($event->image)
-                            <div class="mb-4">
-                                <p class="text-xs font-semibold text-[var(--text-secondary)] mb-2 uppercase tracking-wide">Current Image:</p>
-                                <div class="current-image-box">
-                                    <img src="{{ $event->image_url }}" alt="{{ $event->title }}" class="w-64 h-48 object-cover">
-                                    <button type="button" onclick="confirmImageRemoval()" class="remove-img-btn" title="Remove Image">
-                                        <i class="fas fa-xmark text-xs"></i>
-                                    </button>
-                                </div>
-                                <input type="hidden" name="remove_image" id="remove_image" value="0">
+            <div class="grid grid-cols-1 xl:grid-cols-2 gap-5 sm:gap-6 items-start">
+                <!-- Left Column -->
+                <div class="space-y-5 sm:space-y-6">
+
+                    {{-- Event Image --}}
+                    <div class="section-card mb-4">
+                        <div class="section-topline"></div>
+                        <div class="section-header">
+                            <div class="section-icon">
+                                <i class="fas fa-image text-[9px] sm:text-xs"></i>
                             </div>
-                        @endif
-
-                        <!-- Image Upload -->
-                        <div class="mt-2">
-                            <label for="image" class="file-upload-zone group">
-                                <input id="image" name="image" type="file" class="hidden" accept="image/*" />
-                                <i class="fas fa-cloud-upload-alt text-3xl file-icon group-hover:text-[var(--gold-500)] transition"></i>
-                                <p class="file-text-main"><span class="text-[var(--maroon-700)]">Click to upload</span> or drag and drop</p>
-                                <p class="file-text-sub">PNG, JPG, GIF (MAX. 2MB)</p>
-                                @if($event->image)
-                                    <p class="file-warning">Uploading a new image will replace the current one</p>
-                                @endif
-                            </label>
-                        </div>
-
-                        <!-- New Image Preview -->
-                        <div id="image-preview" class="mt-4 hidden">
-                            <p class="text-xs font-semibold text-[var(--text-secondary)] mb-2 uppercase tracking-wide">New Image Preview:</p>
-                            <img id="preview" class="w-full max-w-xs h-48 object-cover rounded-lg shadow-md border border-[var(--border-soft)]">
-                        </div>
-
-                        @error('image')
-                            <p class="error-msg">{{ $message }}</p>
-                        @enderror
-                    </div>
-
-                    <!-- Event Title -->
-                    <div class="md:col-span-2">
-                        <label for="title" class="section-title">Event Title *</label>
-                        <input type="text" id="title" name="title" value="{{ old('title', $event->title) }}"
-                               class="input-field"
-                               placeholder="Enter event title" required>
-                        @error('title')
-                            <p class="error-msg">{{ $message }}</p>
-                        @enderror
-                    </div>
-
-                    <!-- Event Type -->
-                    <div>
-                        <label for="type" class="section-title">Event Type *</label>
-                        <select id="type" name="type" class="select-field" required>
-                            <option value="">Select Event Type</option>
-                            <option value="webinar" {{ old('type', $event->type) == 'webinar' ? 'selected' : '' }}>Webinar</option>
-                            <option value="workshop" {{ old('type', $event->type) == 'workshop' ? 'selected' : '' }}>Workshop</option>
-                            <option value="seminar" {{ old('type', $event->type) == 'seminar' ? 'selected' : '' }}>Seminar</option>
-                            <option value="activity" {{ old('type', $event->type) == 'activity' ? 'selected' : '' }}>Activity</option>
-                            <option value="conference" {{ old('type', $event->type) == 'conference' ? 'selected' : '' }}>Conference</option>
-                        </select>
-                        @error('type')
-                            <p class="error-msg">{{ $message }}</p>
-                        @enderror
-                    </div>
-
-                    <!-- Max Attendees -->
-                    <div>
-                        <label for="max_attendees" class="section-title">Max Attendees (Optional)</label>
-                        <input type="number" id="max_attendees" name="max_attendees" value="{{ old('max_attendees', $event->max_attendees) }}"
-                               class="input-field"
-                               placeholder="Leave empty for unlimited" min="1">
-                        @error('max_attendees')
-                            <p class="error-msg">{{ $message }}</p>
-                        @enderror
-                    </div>
-
-                    <!-- College Selection -->
-                    <div class="md:col-span-2">
-                        <label class="section-title">College Availability *</label>
-
-                        <!-- All Colleges Option -->
-                        <div class="mt-2 space-y-3">
-                            <div class="flex items-center gap-3">
-                                <input type="radio" id="for_all_colleges_true" name="for_all_colleges" value="1"
-                                       {{ old('for_all_colleges', $event->for_all_colleges) ? 'checked' : '' }}
-                                       class="custom-radio">
-                                <label for="for_all_colleges_true" class="custom-control-label">
-                                    All Colleges - Event available to students from all colleges
-                                </label>
-                            </div>
-
-                            <div class="flex items-center gap-3">
-                                <input type="radio" id="for_all_colleges_false" name="for_all_colleges" value="0"
-                                       {{ old('for_all_colleges', $event->for_all_colleges) === '0' || !$event->for_all_colleges ? 'checked' : '' }}
-                                       class="custom-radio">
-                                <label for="for_all_colleges_false" class="custom-control-label">
-                                    Specific Colleges - Choose which colleges can see this event
-                                </label>
-                            </div>
-                        </div>
-
-                        <!-- College Selection (shown only when specific colleges is selected) -->
-                        <div id="colleges_selection" class="{{ old('for_all_colleges', $event->for_all_colleges) === '0' || !$event->for_all_colleges ? 'mt-4' : 'hidden' }}">
-                            <label class="section-title">Select Colleges</label>
-                            <div class="college-grid">
-                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-2">
-                                    @foreach($colleges as $college)
-                                        <div class="college-item">
-                                            <input type="checkbox" id="college_{{ $college->id }}" name="colleges[]"
-                                                   value="{{ $college->id }}"
-                                                   {{ in_array($college->id, old('colleges', $selectedColleges)) ? 'checked' : '' }}
-                                                   class="custom-checkbox">
-                                            <label for="college_{{ $college->id }}" class="custom-control-label">
-                                                {{ $college->name }}
-                                            </label>
-                                        </div>
-                                    @endforeach
-                                </div>
-                            </div>
-                            <p class="text-xs text-[var(--text-muted)] mt-2 flex items-center">
-                                <i class="fas fa-circle-info mr-1.5 text-[var(--gold-500)]"></i>
-                                Selected colleges will automatically be saved when you update.
-                            </p>
-                            @error('colleges')
-                                <p class="error-msg">{{ $message }}</p>
-                            @enderror
-                        </div>
-                    </div>
-
-                    <!-- Required Event -->
-                    <div class="md:col-span-2">
-                        <div class="flex items-center gap-3 p-3 rounded-lg bg-[rgba(250,248,245,0.6)] border border-[var(--border-soft)]">
-                            <input type="checkbox" id="is_required" name="is_required" value="1"
-                                   {{ old('is_required', $event->is_required) ? 'checked' : '' }}
-                                   class="custom-checkbox">
                             <div>
-                                <label for="is_required" class="custom-control-label font-medium text-[var(--text-primary)] block">
-                                    Required Event
-                                </label>
-                                <p class="text-xs text-[var(--text-muted)] mt-0.5">Students from selected colleges must attend this event.</p>
-                            </div>
-                        </div>
-                        @error('is_required')
-                            <p class="error-msg">{{ $message }}</p>
-                        @enderror
-                    </div>
-
-                    <!-- Year Level Availability -->
-                    <div class="md:col-span-2">
-                        <label class="section-title">Year Level Availability</label>
-
-                        @php $savedYearLevels = old('year_levels', $event->year_levels ?? []); @endphp
-                        <div class="mt-2 space-y-3">
-                            <div class="flex items-center gap-3">
-                                <input type="radio" id="for_all_year_levels_true" name="for_all_year_levels" value="1"
-                                       {{ empty($savedYearLevels) ? 'checked' : '' }}
-                                       class="custom-radio">
-                                <label for="for_all_year_levels_true" class="custom-control-label">
-                                    All Year Levels - Available to students from all year levels
-                                </label>
-                            </div>
-                            <div class="flex items-center gap-3">
-                                <input type="radio" id="for_all_year_levels_false" name="for_all_year_levels" value="0"
-                                       {{ !empty($savedYearLevels) ? 'checked' : '' }}
-                                       class="custom-radio">
-                                <label for="for_all_year_levels_false" class="custom-control-label">
-                                    Specific Year Levels - Choose which year levels can see this event
-                                </label>
+                                <h3 class="section-title">Event Image</h3>
+                                <p class="section-subtitle hidden sm:block">Upload or replace the event cover photo.</p>
                             </div>
                         </div>
 
-                        <div id="year_levels_selection" class="{{ !empty($savedYearLevels) ? 'mt-4' : 'hidden' }}">
-                            <label class="section-title">Select Year Levels *</label>
-                            <div class="college-grid">
-                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-2">
-                                    @foreach(['1st Year','2nd Year','3rd Year','4th Year','5th Year'] as $yl)
-                                    <div class="college-item">
-                                        <input type="checkbox" id="yl_{{ Str::slug($yl) }}" name="year_levels[]"
-                                               value="{{ $yl }}"
-                                               {{ in_array($yl, $savedYearLevels) ? 'checked' : '' }}
-                                               class="custom-checkbox">
-                                        <label for="yl_{{ Str::slug($yl) }}" class="custom-control-label">{{ $yl }}</label>
+                        <div class="p-3 sm:p-4">
+                            <div class="flex flex-col sm:flex-row gap-5 items-start">
+                                {{-- Current image preview --}}
+                                <div class="flex-shrink-0">
+                                    <div class="w-full sm:w-48 h-32 rounded-lg overflow-hidden border border-[#e5e0db] bg-[#f5f0eb] relative">
+                                        <div class="w-full h-full flex flex-col items-center justify-center text-[#8b7e76] {{ $event->image_url ? 'hidden' : '' }}" id="event-img-placeholder">
+                                            <i class="fas fa-image text-2xl mb-1 opacity-40"></i>
+                                            <span class="text-xs">No image</span>
+                                        </div>
+                                        <img src="{{ $event->image_url }}" alt="" class="w-full h-full object-contain {{ $event->image_url ? '' : 'hidden' }} bg-black/5" id="event-img-preview">
                                     </div>
-                                    @endforeach
+                                    @if($event->image_url)
+                                        <button type="button" onclick="confirmEventImageRemoval()"
+                                                class="form-action-secondary mt-3 w-full rounded-lg" style="padding: 0.5rem 0.9rem;">
+                                            <i class="fas fa-trash-can mr-1.5 text-[9px] sm:text-xs"></i>
+                                            Remove Image
+                                        </button>
+                                    @endif
+                                </div>
+
+                                {{-- Upload controls --}}
+                                <div class="flex-1 min-w-0">
+                                    <label class="field-label">Add Image</label>
+                                    <input type="file"
+                                           name="image"
+                                           id="event-image-input"
+                                           accept="image/jpeg,image/png,image/jpg,image/gif"
+                                           class="input-field mt-1"
+                                           onchange="previewEventImage(this)">
+                                    <p class="helper-text mt-1">JPG, PNG or GIF · Max 10MB.</p>
+                                    @error('image')
+                                        <p class="error-text mt-1">{{ $message }}</p>
+                                    @enderror
                                 </div>
                             </div>
-                            @error('year_levels')
-                                <p class="error-msg">{{ $message }}</p>
-                            @enderror
                         </div>
                     </div>
 
-                    <!-- Start Date -->
-                    <div>
-                        <label for="event_start_date" class="section-title">Start Date *</label>
-                        <input type="date" id="event_start_date" name="event_start_date" value="{{ old('event_start_date', $event->event_start_date->format('Y-m-d')) }}"
-                               class="input-field" required>
-                        @error('event_start_date')
-                            <p class="error-msg">{{ $message }}</p>
-                        @enderror
-                    </div>
+                    <div class="section-card mb-4">
+                        <div class="section-topline"></div>
+                        <div class="section-header">
+                            <div class="section-icon">
+                                <i class="fas fa-circle-info text-[9px] sm:text-xs"></i>
+                            </div>
+                            <div>
+                                <h3 class="section-title">Event Details</h3>
+                                <p class="section-subtitle hidden sm:block">Update the event title, type, and attendance settings.</p>
+                            </div>
+                        </div>
 
-                    <!-- End Date -->
-                    <div>
-                        <label for="event_end_date" class="section-title">End Date *</label>
-                        <input type="date" id="event_end_date" name="event_end_date" value="{{ old('event_end_date', $event->event_end_date->format('Y-m-d')) }}"
-                               class="input-field" required>
-                        @error('event_end_date')
-                            <p class="error-msg">{{ $message }}</p>
-                        @enderror
-                    </div>
+                        <div class="p-3 sm:p-4 grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
+                            <div class="md:col-span-2">
+                                <label for="title" class="field-label">Event Title <span class="text-[#b91c1c]">*</span></label>
+                                <input type="text" id="title" name="title" value="{{ old('title', $event->title) }}"
+                                       class="input-field form-input" placeholder="Enter event title" required>
+                                @error('title')
+                                    <p class="error-text">{{ $message }}</p>
+                                @enderror
+                            </div>
 
-                    <!-- Start Time -->
-                    <div>
-                        <label for="start_time" class="section-title">Start Time *</label>
-                        <input type="time" id="start_time" name="start_time" value="{{ old('start_time', $event->start_time) }}"
-                               class="input-field" required>
-                        @error('start_time')
-                            <p class="error-msg">{{ $message }}</p>
-                        @enderror
-                    </div>
+                            <div>
+                                <label for="type" class="field-label">Event Type <span class="text-[#b91c1c]">*</span></label>
+                                <select id="type" name="type" class="select-field" required>
+                                    <option value="">Select Event Type</option>
+                                    @foreach(['workshop'=>'Workshop','seminar'=>'Seminar','webinar'=>'Webinar','conference'=>'Conference','activity'=>'Activity','other'=>'Other'] as $key => $label)
+                                        <option value="{{ $key }}" {{ old('type', $event->type) == $key ? 'selected' : '' }}>{{ $label }}</option>
+                                    @endforeach
+                                </select>
+                                @error('type')
+                                    <p class="error-text">{{ $message }}</p>
+                                @enderror
+                            </div>
 
-                    <!-- End Time -->
-                    <div>
-                        <label for="end_time" class="section-title">End Time *</label>
-                        <input type="time" id="end_time" name="end_time" value="{{ old('end_time', $event->end_time) }}"
-                               class="input-field" required>
-                        @error('end_time')
-                            <p class="error-msg">{{ $message }}</p>
-                        @enderror
-                    </div>
+                            <div>
+                                <label for="max_attendees" class="field-label">Max Attendees <span class="text-[#8b7e76] text-[10px]">(Optional)</span></label>
+                                <input type="number" id="max_attendees" name="max_attendees" value="{{ old('max_attendees', $event->max_attendees) }}"
+                                       class="input-field form-input" placeholder="Leave empty for unlimited" min="1">
+                                @error('max_attendees')
+                                    <p class="error-text">{{ $message }}</p>
+                                @enderror
+                            </div>
 
-                    <!-- Location -->
-                    <div class="md:col-span-2">
-                        <label for="location" class="section-title">Location *</label>
-                        <input type="text" id="location" name="location" value="{{ old('location', $event->location) }}"
-                               class="input-field"
-                               placeholder="e.g., Room 101, Online, Main Hall" required>
-                        @error('location')
-                            <p class="error-msg">{{ $message }}</p>
-                        @enderror
-                    </div>
+                            <div>
+                                <label for="event_start_date" class="field-label">Start Date <span class="text-[#b91c1c]">*</span></label>
+                                <input type="date" id="event_start_date" name="event_start_date"
+                                       value="{{ old('event_start_date', optional($event->event_start_date)->format('Y-m-d')) }}"
+                                       class="input-field form-input" required>
+                                @error('event_start_date')
+                                    <p class="error-text">{{ $message }}</p>
+                                @enderror
+                            </div>
 
-                    <!-- Attending Counselors -->
-                    <div class="md:col-span-2">
-                        <label class="section-title">Attending Counselors (Google Calendar)</label>
-                        <p class="text-xs text-[var(--text-muted)] mb-3 flex items-center gap-1.5">
-                            <i class="fab fa-google text-[var(--gold-500)]"></i>
-                            Selected counselors will have this event added to their Google Calendar.
-                        </p>
-                        @php
-                            $oldCounselorIds = old('counselor_ids') !== null
-                                ? collect(old('counselor_ids'))->map('intval')->filter()->all()
-                                : $selectedCounselors;
-                        @endphp
-                        <div class="college-grid">
+                            <div>
+                                <label for="event_end_date" class="field-label">End Date <span class="text-[#b91c1c]">*</span></label>
+                                <input type="date" id="event_end_date" name="event_end_date"
+                                       value="{{ old('event_end_date', optional($event->event_end_date)->format('Y-m-d')) }}"
+                                       class="input-field form-input" required>
+                                @error('event_end_date')
+                                    <p class="error-text">{{ $message }}</p>
+                                @enderror
+                            </div>
+
+                            <div>
+                                <label for="start_time" class="field-label">Start Time <span class="text-[#b91c1c]">*</span></label>
+                                <input type="time" id="start_time" name="start_time" value="{{ old('start_time', $event->start_time) }}"
+                                       class="input-field form-input" required>
+                                @error('start_time')
+                                    <p class="error-text">{{ $message }}</p>
+                                @enderror
+                            </div>
+
+                            <div>
+                                <label for="end_time" class="field-label">End Time <span class="text-[#b91c1c]">*</span></label>
+                                <input type="time" id="end_time" name="end_time" value="{{ old('end_time', $event->end_time) }}"
+                                       class="input-field form-input" required>
+                                @error('end_time')
+                                    <p class="error-text">{{ $message }}</p>
+                                @enderror
+                            </div>
+
+                            <div class="md:col-span-2">
+                                <label for="location" class="field-label">Location <span class="text-[#b91c1c]">*</span></label>
+                                <input type="text" id="location" name="location" value="{{ old('location', $event->location) }}"
+                                       class="input-field form-input"
+                                       placeholder="Enter event location (e.g., Room 101, Online, etc.)" required>
+                                @error('location')
+                                    <p class="error-text">{{ $message }}</p>
+                                @enderror
+                            </div>
+
+                            <div class="md:col-span-2">
+                                <label for="description" class="field-label">Description <span class="text-[#b91c1c]">*</span></label>
+                                <textarea id="description" name="description" rows="4"
+                                          class="textarea-field form-input"
+                                          placeholder="Describe the event, its purpose, and what attendees can expect..." required>{{ old('description', $event->description) }}</textarea>
+                                @error('description')
+                                    <p class="error-text">{{ $message }}</p>
+                                @enderror
+                            </div>
+
+                            <div class="md:col-span-2">
+                                <div class="option-card">
+                                    <input type="checkbox" id="is_active" name="is_active" value="1"
+                                           {{ old('is_active', $event->is_active) ? 'checked' : '' }}
+                                           class="w-4 h-4 text-[#7a2a2a] border-[#e5e0db] rounded focus:ring-[#7a2a2a] mt-0.5 flex-shrink-0">
+                                    <label for="is_active" class="ml-3 text-xs font-medium text-[#4a3f3a]">
+                                        Activate this event immediately
+                                    </label>
+                                </div>
+                                @error('is_active')
+                                    <p class="error-text">{{ $message }}</p>
+                                @enderror
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Column -->
+                <div class="space-y-5 sm:space-y-6">
+                    <div class="section-card">
+                        <div class="section-topline"></div>
+                        <div class="section-header">
+                            <div class="section-icon">
+                                <i class="fab fa-google text-[9px] sm:text-xs"></i>
+                            </div>
+                            <div>
+                                <h3 class="section-title">Attending Counselors (Google Calendar)</h3>
+                                <p class="section-subtitle hidden sm:block">Selected counselors will have this event synced to their Google Calendar.</p>
+                            </div>
+                        </div>
+                        <div class="p-3 sm:p-4">
+                            @php
+                                $oldCounselorIds = old('counselor_ids') !== null
+                                    ? collect(old('counselor_ids'))->map('intval')->filter()->all()
+                                    : ($selectedCounselors ?? []);
+                            @endphp
                             <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-2">
                                 @foreach($counselors as $counselor)
                                     @php $isChecked = in_array($counselor->id, $oldCounselorIds); @endphp
-                                    <div class="college-item">
+                                    <label class="option-card cursor-pointer gap-2" style="padding:0.5rem 0.75rem;">
                                         <input type="checkbox"
-                                               id="counselor_ui_{{ $counselor->id }}"
                                                name="counselor_ids[]"
                                                value="{{ $counselor->id }}"
-                                               class="custom-checkbox"
-                                               {{ $isChecked ? 'checked' : '' }}>
-                                        <label for="counselor_ui_{{ $counselor->id }}" class="custom-control-label">
+                                               {{ $isChecked ? 'checked' : '' }}
+                                               class="w-4 h-4 text-[#7a2a2a] border-[#e5e0db] rounded focus:ring-[#7a2a2a] flex-shrink-0">
+                                        <span class="text-xs font-medium text-[#4a3f3a]">
                                             {{ trim($counselor->user->first_name . ' ' . $counselor->user->last_name) }}
                                             @if($counselor->college_names)
-                                                <span class="text-xs text-[var(--text-muted)]">({{ $counselor->college_names }})</span>
+                                                <span class="text-[10px] text-[#8b7e76]">({{ $counselor->college_names }})</span>
                                             @endif
                                             @if(!$counselor->google_calendar_id)
-                                                <span class="text-xs text-[var(--text-muted)]">(no calendar)</span>
+                                                <span class="text-[10px] text-[#b45309]">(no calendar)</span>
                                             @endif
+                                        </span>
+                                    </label>
+                                @endforeach
+                            </div>
+                            @error('counselor_ids')
+                                <p class="error-text mt-2">{{ $message }}</p>
+                            @enderror
+                        </div>
+                    </div>
+
+                    <div class="section-card mb-4">
+                        <div class="section-topline"></div>
+                        <div class="section-header">
+                            <div class="section-icon">
+                                <i class="fas fa-users-viewfinder text-[9px] sm:text-xs"></i>
+                            </div>
+                            <div>
+                                <h3 class="section-title">Target Audience</h3>
+                                <p class="section-subtitle hidden sm:block">Colleges and year levels that can access this event.</p>
+                            </div>
+                        </div>
+                        <div class="p-3 sm:p-4 grid grid-cols-1 gap-3 sm:gap-4">
+                            <div>
+                                <label class="field-label">College Availability <span class="text-[#b91c1c]">*</span></label>
+                                <div class="mb-4 radio-group">
+                                    <div class="radio-option">
+                                        <input type="radio" id="for_all_colleges_true" name="for_all_colleges" value="1"
+                                               {{ old('for_all_colleges', $event->for_all_colleges) ? 'checked' : '' }}>
+                                        <label for="for_all_colleges_true">
+                                            <strong>All Colleges</strong> — Event visible to students from all colleges
                                         </label>
                                     </div>
-                                @endforeach
+                                    <div class="radio-option">
+                                        <input type="radio" id="for_all_colleges_false" name="for_all_colleges" value="0"
+                                               {{ old('for_all_colleges', $event->for_all_colleges) === '0' ? 'checked' : '' }}>
+                                        <label for="for_all_colleges_false">
+                                            <strong>Specific Colleges</strong> — Choose which colleges can see this event
+                                        </label>
+                                    </div>
+                                </div>
+
+                                <div id="colleges_selection" class="{{ old('for_all_colleges', $event->for_all_colleges) ? 'hidden' : '' }}">
+                                    <label class="field-label">Select Colleges <span class="text-[#b91c1c]">*</span></label>
+                                    <div class="college-grid">
+                                        @foreach($colleges as $college)
+                                            <div class="checkbox-option">
+                                                <input type="checkbox" id="college_{{ $college->id }}" name="colleges[]"
+                                                       value="{{ $college->id }}"
+                                                       {{ in_array($college->id, old('colleges', $selectedColleges ?? [])) ? 'checked' : '' }}>
+                                                <label for="college_{{ $college->id }}">{{ $college->name }}</label>
+                                            </div>
+                                        @endforeach
+                                    </div>
+                                    @error('colleges')
+                                        <p class="error-text">{{ $message }}</p>
+                                    @enderror
+                                </div>
                             </div>
-                        </div>
-                        @error('counselor_ids')
-                            <p class="error-msg">{{ $message }}</p>
-                        @enderror
-                    </div>
 
-                    <!-- Description -->
-                    <div class="md:col-span-2">
-                        <label for="description" class="section-title">Description *</label>
-                        <textarea id="description" name="description" rows="5"
-                                  class="textarea-field"
-                                  placeholder="Describe the event, its purpose, and what attendees can expect..." required>{{ old('description', $event->description) }}</textarea>
-                        @error('description')
-                            <p class="error-msg">{{ $message }}</p>
-                        @enderror
-                    </div>
-
-                    <!-- Active Status -->
-                    <div class="md:col-span-2">
-                        <div class="flex items-center gap-3 p-3 rounded-lg bg-[rgba(250,248,245,0.6)] border border-[var(--border-soft)]">
-                            <input type="checkbox" id="is_active" name="is_active" value="1"
-                                   {{ old('is_active', $event->is_active) ? 'checked' : '' }}
-                                   class="custom-checkbox">
                             <div>
-                                <label for="is_active" class="custom-control-label font-medium text-[var(--text-primary)] block">
-                                    Activate this event
+                                <label class="field-label">Year Level Availability <span class="text-[#b91c1c]">*</span></label>
+                                <div class="mb-4 radio-group">
+                                    <div class="radio-option">
+                                        <input type="radio" id="for_all_year_levels_true" name="for_all_year_levels" value="1"
+                                               {{ empty(old('year_levels', $event->year_levels ?? [])) ? 'checked' : '' }}>
+                                        <label for="for_all_year_levels_true">
+                                            <strong>All Year Levels</strong> — Visible to students from all year levels
+                                        </label>
+                                    </div>
+                                    <div class="radio-option">
+                                        <input type="radio" id="for_all_year_levels_false" name="for_all_year_levels" value="0"
+                                               {{ !empty(old('year_levels', $event->year_levels ?? [])) ? 'checked' : '' }}>
+                                        <label for="for_all_year_levels_false">
+                                            <strong>Specific Year Levels</strong> — Choose which year levels can see this event
+                                        </label>
+                                    </div>
+                                </div>
+
+                                <div id="year_levels_selection" class="{{ !empty(old('year_levels', $event->year_levels ?? [])) ? '' : 'hidden' }}">
+                                    <label class="field-label">Select Year Levels <span class="text-[#b91c1c]">*</span></label>
+                                    <div class="college-grid" style="max-height:none;">
+                                        @php $oldYearLevels = old('year_levels', $event->year_levels ?? []); @endphp
+                                        @foreach(['1st Year','2nd Year','3rd Year','4th Year','5th Year'] as $yl)
+                                        <div class="checkbox-option">
+                                            <input type="checkbox" id="yl_event_{{ Str::slug($yl) }}" name="year_levels[]"
+                                                   value="{{ $yl }}"
+                                                   {{ in_array($yl, $oldYearLevels) ? 'checked' : '' }}>
+                                            <label for="yl_event_{{ Str::slug($yl) }}">{{ $yl }}</label>
+                                        </div>
+                                        @endforeach
+                                    </div>
+                                    @error('year_levels')
+                                        <p class="error-text">{{ $message }}</p>
+                                    @enderror
+                                </div>
+                            </div>
+
+                            <div class="option-card mt-2">
+                                <input type="checkbox" id="is_required" name="is_required" value="1"
+                                       {{ old('is_required', $event->is_required) ? 'checked' : '' }}>
+                                <label for="is_required">
+                                    <span class="font-semibold text-[#7a2a2a]">Required Event</span> — mandatory for selected colleges
                                 </label>
-                                <p class="text-xs text-[var(--text-muted)] mt-0.5">Active events are visible to students. Uncheck to hide.</p>
                             </div>
                         </div>
-                        @error('is_active')
-                            <p class="error-msg">{{ $message }}</p>
-                        @enderror
                     </div>
                 </div>
+            </div>
 
-                <!-- Current Event Information -->
-                <div class="mt-8 info-box">
-                    <h3 class="info-title">Current Event Information</h3>
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
-                        <div class="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2">
-                            <span class="info-label">College Availability:</span>
-                            <span>
-                                @if($event->for_all_colleges)
-                                    <span class="badge badge-green">All Colleges</span>
-                                @else
-                                    <span class="badge badge-maroon">
-                                        {{ $event->colleges->count() }} Specific {{ Str::plural('College', $event->colleges->count()) }}
-                                    </span>
-                                @endif
-                            </span>
-                        </div>
-                        <div class="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2">
-                            <span class="info-label">Event Status:</span>
-                            <span>
-                                @if($event->is_required)
-                                    <span class="badge badge-red">Required Event</span>
-                                @else
-                                    <span class="badge badge-gray">Optional Event</span>
-                                @endif
-                            </span>
-                        </div>
-                        <div class="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2">
-                            <span class="info-label">Current Registrations:</span>
-                            <span class="info-value">{{ $event->registered_count }} registered</span>
-                        </div>
-                        <div class="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2">
-                            <span class="info-label">Available Slots:</span>
-                            <span class="info-value">
-                                @if($event->max_attendees)
-                                    {{ $event->available_slots }} of {{ $event->max_attendees }}
-                                @else
-                                    Unlimited
-                                @endif
-                            </span>
-                        </div>
-                    </div>
-
-                    <!-- Show current colleges if specific colleges are selected -->
-                    @if(!$event->for_all_colleges && $event->colleges->isNotEmpty())
-                        <div class="mt-4 pt-3 border-t border-[rgba(212, 175, 55, 0.2)]">
-                            <span class="info-label block mb-2">Currently Available For:</span>
-                            <div class="flex flex-wrap gap-2">
-                                @foreach($event->colleges as $college)
-                                    <span class="badge badge-green">{{ $college->name }}</span>
-                                @endforeach
-                            </div>
-                        </div>
-                    @endif
-                </div>
-
-                <!-- Form Actions -->
-                <div class="mt-8 action-group flex flex-col md:flex-row gap-4 justify-end">
-                    <a href="{{ route('counselor.events.index') }}"
-                       class="btn-secondary">
-                        Cancel
-                    </a>
-                    <button type="submit"
-                            class="btn-primary">
-                        <i class="fas fa-save mr-2 text-xs"></i> Update Event
-                    </button>
-                </div>
-            </form>
-        </div>
+            <!-- Form Actions -->
+            <div class="mt-6 flex flex-col sm:flex-row gap-3 justify-end">
+                <a href="{{ route('counselor.events.index') }}"
+                   class="form-action-secondary w-full sm:w-auto rounded-lg text-center" style="padding: 0.6rem 1.25rem;">
+                    Cancel
+                </a>
+                <button type="submit"
+                        class="form-action-primary w-full sm:w-auto rounded-lg" style="padding: 0.6rem 1.25rem;">
+                    <i class="fas fa-save mr-1.5 text-[9px] sm:text-xs"></i>
+                    Update Event
+                </button>
+            </div>
+        </form>
     </div>
 </div>
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
+        const startDate = document.getElementById('event_start_date');
+        const endDate = document.getElementById('event_end_date');
+        const startTime = document.getElementById('start_time');
+        const endTime = document.getElementById('end_time');
+
+        function validateTimeRange() {
+            if (startDate && endDate && startTime && endTime && startDate.value === endDate.value && startTime.value && endTime.value) {
+                if (startTime.value >= endTime.value) {
+                    endTime.setCustomValidity('End time must be after start time');
+                } else {
+                    endTime.setCustomValidity('');
+                }
+            } else if (endTime) {
+                endTime.setCustomValidity('');
+            }
+        }
+
+        if (startTime && endTime) {
+            startTime.addEventListener('change', validateTimeRange);
+            endTime.addEventListener('change', validateTimeRange);
+        }
+        if (startDate && endDate) {
+            startDate.addEventListener('change', validateTimeRange);
+            endDate.addEventListener('change', validateTimeRange);
+        }
+
         const allCollegesRadio = document.getElementById('for_all_colleges_true');
         const specificCollegesRadio = document.getElementById('for_all_colleges_false');
         const collegesSelection = document.getElementById('colleges_selection');
 
         function toggleCollegesSelection() {
+            if (!specificCollegesRadio || !collegesSelection) return;
             if (specificCollegesRadio.checked) {
                 collegesSelection.classList.remove('hidden');
-                collegesSelection.classList.add('mt-4');
             } else {
                 collegesSelection.classList.add('hidden');
-                collegesSelection.classList.remove('mt-4');
+                document.querySelectorAll('input[name="colleges[]"]').forEach(checkbox => {
+                    checkbox.checked = false;
+                });
             }
         }
 
-        allCollegesRadio.addEventListener('change', toggleCollegesSelection);
-        specificCollegesRadio.addEventListener('change', toggleCollegesSelection);
+        if (allCollegesRadio && specificCollegesRadio) {
+            allCollegesRadio.addEventListener('change', toggleCollegesSelection);
+            specificCollegesRadio.addEventListener('change', toggleCollegesSelection);
+            toggleCollegesSelection();
+        }
 
-        // Year level selection toggle
         const allYearLevelsRadio = document.getElementById('for_all_year_levels_true');
         const specificYearLevelsRadio = document.getElementById('for_all_year_levels_false');
         const yearLevelsSelection = document.getElementById('year_levels_selection');
 
         function toggleYearLevelsSelection() {
+            if (!specificYearLevelsRadio || !yearLevelsSelection) return;
             if (specificYearLevelsRadio.checked) {
                 yearLevelsSelection.classList.remove('hidden');
-                yearLevelsSelection.classList.add('mt-4');
             } else {
                 yearLevelsSelection.classList.add('hidden');
-                yearLevelsSelection.classList.remove('mt-4');
                 document.querySelectorAll('input[name="year_levels[]"]').forEach(cb => cb.checked = false);
             }
         }
 
-        allYearLevelsRadio.addEventListener('change', toggleYearLevelsSelection);
-        specificYearLevelsRadio.addEventListener('change', toggleYearLevelsSelection);
-
-        // Image preview functionality
-        const imageInput = document.getElementById('image');
-        const imagePreview = document.getElementById('image-preview');
-        const preview = document.getElementById('preview');
-
-        imageInput.addEventListener('change', function() {
-            const file = this.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.addEventListener('load', function() {
-                    preview.setAttribute('src', this.result);
-                    imagePreview.classList.remove('hidden');
-                });
-                reader.readAsDataURL(file);
-            } else {
-                imagePreview.classList.add('hidden');
-            }
-        });
-
-        // Initial toggle
-        toggleCollegesSelection();
+        if (allYearLevelsRadio && specificYearLevelsRadio) {
+            allYearLevelsRadio.addEventListener('change', toggleYearLevelsSelection);
+            specificYearLevelsRadio.addEventListener('change', toggleYearLevelsSelection);
+            toggleYearLevelsSelection();
+        }
     });
 
-    function confirmImageRemoval() {
+    function previewEventImage(input) {
+        if (input.files && input.files[0]) {
+            const reader = new FileReader();
+            reader.onload = e => {
+                const preview = document.getElementById('event-img-preview');
+                const placeholder = document.getElementById('event-img-placeholder');
+                if (preview) {
+                    preview.src = e.target.result;
+                    preview.classList.remove('hidden');
+                }
+                if (placeholder) placeholder.classList.add('hidden');
+            };
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+
+    function confirmEventImageRemoval() {
         if (confirm('Are you sure you want to remove the current event image?')) {
-            document.getElementById('remove_image').value = '1';
-            // Hide the current image preview visually
-            const currentImgBox = event.target.closest('.mb-4');
-            if(currentImgBox) {
-                currentImgBox.style.display = 'none';
-            }
+            const removeInput = document.getElementById('remove_image');
+            if (removeInput) removeInput.value = '1';
+            const preview = document.getElementById('event-img-preview');
+            const placeholder = document.getElementById('event-img-placeholder');
+            if (preview) preview.classList.add('hidden');
+            if (placeholder) placeholder.classList.remove('hidden');
         }
     }
 </script>

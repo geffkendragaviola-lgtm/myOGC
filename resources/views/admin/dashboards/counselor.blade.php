@@ -564,7 +564,9 @@ const counselorData = {
         email: "{{ $c->user->email }}",
         phone: "{{ $c->user->phone_number ?? '' }}",
         address: "{{ $c->user->address ?? '' }}",
-        birthday: "{{ $c->user->birthday?->format('F j, Y') ?? '' }}",
+        birthday: "{{ $c->user->birthdate?->format('F j, Y') ?? '' }}",
+        sex: "{{ $c->user->sex ?? '' }}",
+        religion: "{{ $c->user->religion ?? '' }}",
         college: "{{ $c->college->name ?? 'N/A' }}",
         position: "{{ $c->position ?? 'N/A' }}",
         credentials: "{{ $c->credentials ?? '' }}",
@@ -611,6 +613,8 @@ function openCounselorModal(id) {
     document.getElementById('cm-joined').textContent = d.joined;
     document.getElementById('cm-address').textContent = d.address || '—';
     document.getElementById('cm-birthday').textContent = d.birthday || '—';
+    document.getElementById('cm-sex').textContent = d.sex ? (d.sex.charAt(0).toUpperCase() + d.sex.slice(1)) : '—';
+    document.getElementById('cm-religion').textContent = d.religion || '—';
     document.getElementById('cm-booking-limit').textContent = (d.bookingLimit !== '' && d.bookingLimit !== null && d.bookingLimit !== undefined) ? d.bookingLimit : '—';
     document.getElementById('cm-google-id').textContent = d.googleCalendarId || '—';
     const fbWrap = document.getElementById('cm-facebook-wrap');
@@ -766,6 +770,22 @@ function closeCounselorModal() {
                         <div class="text-[10px] font-bold uppercase tracking-wider text-[#8b7e76]">Birthday</div>
                     </div>
                     <div id="cm-birthday" class="text-sm font-semibold text-[#2c2420]"></div>
+                </div>
+
+                <div class="group relative p-3.5 rounded-xl bg-[#faf8f5] border border-[#e5e0db]/80 hover:border-[#d4af37]/50 hover:bg-white transition-colors hover:shadow-sm">
+                    <div class="flex items-center gap-2 mb-1.5">
+                        <i class="fas fa-venus-mars text-[#a89f97] text-[10px] group-hover:text-[#d4af37] transition-colors"></i>
+                        <div class="text-[10px] font-bold uppercase tracking-wider text-[#8b7e76]">Sex</div>
+                    </div>
+                    <div id="cm-sex" class="text-sm font-semibold text-[#2c2420]"></div>
+                </div>
+
+                <div class="group relative p-3.5 rounded-xl bg-[#faf8f5] border border-[#e5e0db]/80 hover:border-[#d4af37]/50 hover:bg-white transition-colors hover:shadow-sm">
+                    <div class="flex items-center gap-2 mb-1.5">
+                        <i class="fas fa-hands-praying text-[#a89f97] text-[10px] group-hover:text-[#d4af37] transition-colors"></i>
+                        <div class="text-[10px] font-bold uppercase tracking-wider text-[#8b7e76]">Religion</div>
+                    </div>
+                    <div id="cm-religion" class="text-sm font-semibold text-[#2c2420]"></div>
                 </div>
 
                 <div class="group relative p-3.5 rounded-xl bg-[#faf8f5] border border-[#e5e0db]/80 hover:border-[#d4af37]/50 hover:bg-white transition-colors hover:shadow-sm">

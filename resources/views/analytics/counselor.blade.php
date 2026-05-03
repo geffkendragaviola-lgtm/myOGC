@@ -10,14 +10,14 @@
     border: 1px solid var(--border-soft);
     border-radius: 1rem;
     box-shadow: 0 4px 18px rgba(44,36,32,0.07);
-    padding: 1.5rem;
+    padding: 1rem;
 }
 .stat-card {
     background: #fff;
     border: 1px solid var(--border-soft);
     border-radius: 1rem;
     box-shadow: 0 4px 18px rgba(44,36,32,0.07);
-    padding: 1.25rem 1.5rem;
+    padding: 0.75rem 1rem;
     display: flex;
     align-items: center;
     gap: 1rem;
@@ -107,6 +107,27 @@
 .progress-bar-fill { height: 100%; border-radius: 999px; transition: width 0.6s ease; }
 .progress-bar-count { font-size: 0.8rem; font-weight: 600; color: var(--text-primary); min-width: 2.5rem; text-align: right; }
 
+.college-tabs {
+    display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 0;
+}
+.college-tab-btn {
+    background: #fff; border: 1px solid var(--border-soft); border-radius: 0.5rem;
+    padding: 0.5rem 1rem; font-size: 0.8rem; font-weight: 600; color: var(--text-secondary);
+    cursor: pointer; transition: all 0.2s; display: inline-flex; align-items: center; gap: 0.5rem;
+    box-shadow: 0 2px 8px rgba(44,36,32,0.03);
+}
+.college-tab-btn:hover { border-color: var(--maroon-soft); color: var(--maroon-soft); }
+.college-tab-btn.active {
+    background: linear-gradient(135deg,var(--maroon-soft),var(--maroon-medium));
+    color: #fff; border-color: transparent; box-shadow: 0 4px 12px rgba(92,26,26,0.15);
+}
+.college-tab-btn .tab-dot {
+    width: 0.5rem; height: 0.5rem; border-radius: 50%; background: currentColor; opacity: 0.7;
+}
+.college-tab-btn.active .tab-dot { opacity: 1; color: #d4af37; }
+.college-tab-pane { display: none; }
+.college-tab-pane.active { display: block; animation: fadeIn 0.4s ease forwards; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
 /* ── Print styles ── */
 @media print {
     * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; color-adjust: exact !important; box-sizing: border-box; }
@@ -288,7 +309,7 @@
     <div class="admin-glow one"></div>
     <div class="admin-glow two"></div>
 
-    <div class="relative max-w-7xl mx-auto px-4 sm:px-6 py-5 md:py-8 space-y-5">
+    <div class="relative max-w-7xl mx-auto px-4 sm:px-6 py-5 md:py-8">
 
     <div class="print-header">
         <div class="print-header-top">
@@ -311,7 +332,7 @@
     </div>
 
     <!-- Header -->
-    <div class="mb-5 sm:mb-6">
+    <div class="mb-6 sm:mb-8">
         <div class="grid grid-cols-1 xl:grid-cols-[1fr_auto] gap-4 items-stretch">
             <div class="hero-card no-print">
                 <div class="relative p-4 sm:p-5 flex items-start gap-3">
@@ -345,7 +366,7 @@
     </div>
 
     <!-- Filter Bar -->
-    <div class="filter-bar no-print">
+    <div class="filter-bar no-print mb-6 sm:mb-8">
         <form method="GET" action="{{ route('counselor.analytics') }}">
             <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 items-end">
                 <div>
@@ -381,10 +402,10 @@
     </div>
 
     @if(empty($collegeAnalytics))
-        <div class="analytics-card"><div class="empty-state"><i class="fas fa-chart-column"></i>No data found for the selected filters.</div></div>
+        <div class="analytics-card mb-6 sm:mb-8"><div class="empty-state"><i class="fas fa-chart-column"></i>No data found for the selected filters.</div></div>
     @else
 
-    <div class="analytics-card" style="padding:0;overflow:hidden;">
+    <div class="analytics-card mb-6 sm:mb-8" style="padding:0;overflow:hidden;">
         <div class="college-tabs px-4 pt-4 no-print">
             @foreach($collegeAnalytics as $idx => $ca)
             <button class="college-tab-btn {{ $idx === 0 ? 'active' : '' }}"
@@ -399,7 +420,7 @@
             @endforeach
         </div>
 
-        <div class="p-5 space-y-5">
+        <div class="p-4 space-y-5 sm:space-y-6">
         @foreach($collegeAnalytics as $idx => $ca)
         @php
             $cid            = 'college_'.$ca['college']->id;
@@ -455,69 +476,84 @@
                 </tbody>
             </table>
 
-            {{-- Summary stat cards --}}
-            <div class="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-3 mb-5">
-                <div class="stat-card"><div class="stat-icon maroon"><i class="fas fa-calendar-check"></i></div><div><div class="stat-value">{{ number_format($ca['totalAppointments']) }}</div><div class="stat-label">Total Appts</div></div></div>
-                <div class="stat-card"><div class="stat-icon gold"><i class="fas fa-user-graduate"></i></div><div><div class="stat-value">{{ number_format($ca['totalStudents']) }}</div><div class="stat-label">Students Seen</div></div></div>
-                <div class="stat-card"><div class="stat-icon green"><i class="fas fa-circle-check"></i></div><div><div class="stat-value">{{ number_format($ca['completedCount']) }}</div><div class="stat-label">Completed</div></div></div>
-                <div class="stat-card"><div class="stat-icon blue"><i class="fas fa-hourglass-half"></i></div><div><div class="stat-value">{{ number_format($ca['pendingCount']) }}</div><div class="stat-label">Pending</div></div></div>
-                <div class="stat-card"><div class="stat-icon purple"><i class="fas fa-arrow-right-arrow-left"></i></div><div><div class="stat-value">{{ number_format($ca['referralCount']) }}</div><div class="stat-label">Referrals</div></div></div>
-                <div class="stat-card"><div class="stat-icon red"><i class="fas fa-circle-xmark"></i></div><div><div class="stat-value">{{ number_format($ca['cancelledCount']) }}</div><div class="stat-label">No Show</div></div></div>
+            {{-- Summary cards (screen only) --}}
+            <div class="print-summary" style="margin-bottom:1.5rem;">
+                <h2 style="font-size:13pt;font-weight:600;color:#7a2a2a;margin-bottom:0.75rem;display:none;" class="print-only">Executive Summary</h2>
             </div>
 
-            {{-- Student Reach cards --}}
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-5">
-                <div class="reach-card">
-                    <div class="text-xs font-semibold uppercase tracking-wide mb-2" style="color:var(--text-secondary)">
-                        <i class="fas fa-users mr-1"></i>Students Booked / Enrolled
+            <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 mb-6">
+                <div class="stat-card">
+                    <div class="stat-icon maroon"><i class="fas fa-calendar-check"></i></div>
+                    <div><div class="stat-value">{{ number_format($ca['totalAppointments']) }}</div><div class="stat-label">Total Appointments</div></div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon gold"><i class="fas fa-user-graduate"></i></div>
+                    <div><div class="stat-value">{{ number_format($ca['totalStudents']) }}</div><div class="stat-label">Students Served</div></div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon green"><i class="fas fa-circle-check"></i></div>
+                    <div><div class="stat-value">{{ number_format($ca['completedCount']) }}</div><div class="stat-label">Completed Sessions</div></div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon blue"><i class="fas fa-hourglass-half"></i></div>
+                    <div><div class="stat-value">{{ number_format($ca['pendingCount']) }}</div><div class="stat-label">Pending / Approved</div></div>
+                </div>
+            </div>
+
+            {{-- Rate & insight cards --}}
+            <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4 mb-6">
+                <div class="stat-card" style="flex-direction:column;align-items:flex-start;gap:0.5rem;">
+                    <div style="display:flex;align-items:center;gap:0.75rem;width:100%;">
+                        <div class="stat-icon" style="background:#ecfdf5;color:#2d7a4f;border:1px solid #d1fae5;"><i class="fas fa-chart-pie"></i></div>
+                        <div><div class="stat-value" style="color:#2d7a4f;font-weight:600;">{{ $completionRate }}%</div><div class="stat-label">Completion Rate</div></div>
                     </div>
-                    <div class="reach-ratio">
-                        {{ number_format($ca['studentsBooked']) }}<span style="font-size:1rem;font-weight:500;color:var(--text-secondary)"> / {{ number_format($ca['totalEnrolled']) }}</span>
-                    </div>
-                    <div class="reach-sub">{{ $bookedPct }}% of enrolled students have booked at least once</div>
-                    <div class="reach-bar-track">
-                        <div class="reach-bar-fill" style="width:{{ min($bookedPct,100) }}%;background:linear-gradient(90deg,#7a2a2a,#d4af37)"></div>
+                    <div style="width:100%;height:5px;border-radius:999px;background:#e5e0db;overflow:hidden;">
+                        <div style="height:100%;border-radius:999px;width:{{ $completionRate }}%;background:#2d7a4f;transition:width 0.6s;"></div>
                     </div>
                 </div>
-                <div class="reach-card">
-                    <div class="text-xs font-semibold uppercase tracking-wide mb-2" style="color:var(--text-secondary)">
-                        <i class="fas fa-circle-check mr-1"></i>Students Completed / Enrolled
+                <div class="stat-card" style="flex-direction:column;align-items:flex-start;gap:0.5rem;">
+                    <div style="display:flex;align-items:center;gap:0.75rem;width:100%;">
+                        <div class="stat-icon" style="background:#fee2e2;color:#b91c1c;border:1px solid #fecaca;"><i class="fas fa-user-xmark"></i></div>
+                        <div><div class="stat-value" style="color:#b91c1c;font-weight:600;">{{ $noShowRate }}%</div><div class="stat-label">No-Show Rate</div></div>
                     </div>
-                    <div class="reach-ratio">
-                        {{ number_format($ca['studentsCompleted']) }}<span style="font-size:1rem;font-weight:500;color:var(--text-secondary)"> / {{ number_format($ca['totalEnrolled']) }}</span>
-                    </div>
-                    <div class="reach-sub">{{ $completedPct }}% of enrolled students completed a session</div>
-                    <div class="reach-bar-track">
-                        <div class="reach-bar-fill" style="width:{{ min($completedPct,100) }}%;background:linear-gradient(90deg,#2d7a4f,#17a2b8)"></div>
+                    <div style="width:100%;height:5px;border-radius:999px;background:#e5e0db;overflow:hidden;">
+                        <div style="height:100%;border-radius:999px;width:{{ $noShowRate }}%;background:#dc2626;transition:width 0.6s;"></div>
                     </div>
                 </div>
-                <div class="reach-card">
-                    <div class="text-xs font-semibold uppercase tracking-wide mb-2" style="color:var(--text-secondary)">
-                        <i class="fas fa-gauge-high mr-1"></i>Session Quality
+                <div class="stat-card" style="flex-direction:column;align-items:flex-start;gap:0.5rem;">
+                    <div style="display:flex;align-items:center;gap:0.75rem;width:100%;">
+                        <div class="stat-icon" style="background:#f5e6e8;color:#5c1a1a;border:1px solid #e5d0d3;"><i class="fas fa-share-nodes"></i></div>
+                        <div><div class="stat-value" style="color:#5c1a1a;font-weight:600;">{{ number_format($ca['referralCount']) }}</div><div class="stat-label">Referrals</div></div>
                     </div>
-                    <div class="flex gap-4 mt-1 flex-wrap">
-                        <div>
-                            <div class="reach-ratio" style="font-size:1.2rem;">{{ $completionRate }}%</div>
-                            <div class="reach-sub">Completion rate</div>
-                            <span class="rate-pill {{ $rateClass }} mt-1">
-                                <i class="fas fa-{{ $completionRate >= 70 ? 'arrow-trend-up' : ($completionRate >= 40 ? 'minus' : 'arrow-trend-down') }}"></i>
-                                {{ $completionRate >= 70 ? 'Good' : ($completionRate >= 40 ? 'Fair' : 'Low') }}
-                            </span>
-                        </div>
-                        <div>
-                            <div class="reach-ratio" style="font-size:1.2rem;">{{ $noShowRate }}%</div>
-                            <div class="reach-sub">No-show rate</div>
-                            <span class="rate-pill {{ $nsClass }} mt-1">
-                                <i class="fas fa-{{ $noShowRate <= 10 ? 'check' : ($noShowRate <= 25 ? 'triangle-exclamation' : 'xmark') }}"></i>
-                                {{ $noShowRate <= 10 ? 'Low' : ($noShowRate <= 25 ? 'Moderate' : 'High') }}
-                            </span>
-                        </div>
-                        @if($ca['peakDay'])
-                        <div>
-                            <div class="reach-ratio" style="font-size:1.1rem;">{{ $ca['peakDay'] }}</div>
-                            <div class="reach-sub">Busiest day</div>
-                        </div>
-                        @endif
+                    <div style="width:100%;height:5px;border-radius:999px;background:#e5e0db;overflow:hidden;">
+                        <div style="height:100%;border-radius:999px;width:{{ $ca['totalAppointments'] > 0 ? round(($ca['referralCount']/$ca['totalAppointments'])*100) : 0 }}%;background:#7a2a2a;transition:width 0.6s;"></div>
+                    </div>
+                </div>
+                <div class="stat-card" style="flex-direction:column;align-items:flex-start;gap:0.5rem;">
+                    <div style="display:flex;align-items:center;gap:0.75rem;width:100%;">
+                        <div class="stat-icon" style="background:#eff6ff;color:#1e40af;border:1px solid #bfdbfe;"><i class="fas fa-users"></i></div>
+                        <div><div class="stat-value" style="color:#1e40af;font-weight:600;">{{ $bookedPct }}%</div><div class="stat-label">Booked / Enrolled</div></div>
+                    </div>
+                    <div style="width:100%;height:5px;border-radius:999px;background:#e5e0db;overflow:hidden;">
+                        <div style="height:100%;border-radius:999px;width:{{ min($bookedPct,100) }}%;background:#1e40af;transition:width 0.6s;"></div>
+                    </div>
+                </div>
+                <div class="stat-card" style="flex-direction:column;align-items:flex-start;gap:0.5rem;">
+                    <div style="display:flex;align-items:center;gap:0.75rem;width:100%;">
+                        <div class="stat-icon" style="background:#fef9e7;color:#c9a227;border:1px solid #f5e6b8;"><i class="fas fa-circle-check"></i></div>
+                        <div><div class="stat-value" style="color:#c9a227;font-weight:600;">{{ $completedPct }}%</div><div class="stat-label">Completed / Enrolled</div></div>
+                    </div>
+                    <div style="width:100%;height:5px;border-radius:999px;background:#e5e0db;overflow:hidden;">
+                        <div style="height:100%;border-radius:999px;width:{{ min($completedPct,100) }}%;background:#c9a227;transition:width 0.6s;"></div>
+                    </div>
+                </div>
+                <div class="stat-card" style="flex-direction:column;align-items:flex-start;gap:0.5rem;">
+                    <div style="display:flex;align-items:center;gap:0.75rem;width:100%;">
+                        <div class="stat-icon" style="background:#f3e8ff;color:#6b21a8;border:1px solid #e9d5ff;"><i class="fas fa-calendar-day"></i></div>
+                        <div><div class="stat-value" style="color:#6b21a8;font-weight:600;font-size:1.1rem;margin-top:0.4rem;">{{ $ca['peakDay'] ?? 'N/A' }}</div><div class="stat-label">Busiest Day</div></div>
+                    </div>
+                    <div style="width:100%;height:5px;border-radius:999px;background:#e5e0db;overflow:hidden;">
+                        <div style="height:100%;border-radius:999px;width:100%;background:#6b21a8;transition:width 0.6s;"></div>
                     </div>
                 </div>
             </div>
@@ -661,8 +697,8 @@
 
 {{-- Outside-College Students Section --}}
 @if($outsideTotal > 0)
-<div class="mt-2">
-    <div class="analytics-card">
+<div class="mt-5 sm:mt-6">
+    <div class="analytics-card mb-5 sm:mb-6">
         <div class="section-title" style="margin-bottom:1.25rem;">
             <i class="fas fa-arrow-right-arrow-left"></i>
             Students from Outside Your Assigned College(s)

@@ -319,6 +319,22 @@
         color: var(--gold-primary);
     }
 
+    .sidebar-divider {
+        border: 0;
+        height: 1px;
+        margin: 0.8rem 0 0.65rem;
+        background: linear-gradient(90deg, transparent, rgba(255,255,255,0.14), transparent);
+    }
+
+    .sidebar-section-header {
+        font-size: 0.68rem;
+        font-weight: 700;
+        color: rgba(255,255,255,0.42);
+        text-transform: uppercase;
+        letter-spacing: 0.12em;
+        padding: 0.4rem 0.9rem 0.35rem;
+    }
+
     .sidebar-footer {
         border-top: 1px solid rgba(255,255,255,0.08);
         padding: 0.9rem 0.75rem;
@@ -343,6 +359,7 @@
     html.sidebar-pre-collapsed .sidebar-user-email,
     html.sidebar-pre-collapsed .sidebar-link span,
     html.sidebar-pre-collapsed .logout-link span,
+    html.sidebar-pre-collapsed .sidebar-section-header,
     html.sidebar-pre-collapsed .sidebar-role-pill { opacity: 0; width: 0; max-width: 0; overflow: hidden; white-space: nowrap; pointer-events: none; }
     html.sidebar-pre-collapsed .sidebar-role-pill { display: none; }
     html.sidebar-pre-collapsed .sidebar-link,
@@ -372,7 +389,8 @@
     body.sidebar-collapsed .sidebar-user-name,
     body.sidebar-collapsed .sidebar-user-email,
     body.sidebar-collapsed .sidebar-link span,
-    body.sidebar-collapsed .logout-link span {
+    body.sidebar-collapsed .logout-link span,
+    body.sidebar-collapsed .sidebar-section-header {
         opacity: 0;
         width: 0;
         max-width: 0;
@@ -941,7 +959,7 @@
                     <span>Calendar</span>
                 </a>
 
-                <a href="{{ route('counselor.appointments') }}" class="sidebar-link {{ request()->routeIs('counselor.appointments') ? 'active' : '' }}">
+                <a href="{{ route('counselor.appointments') }}" class="sidebar-link {{ request()->routeIs('counselor.appointments', 'counselor.appointments.*') ? 'active' : '' }}">
                     <i class="fas fa-calendar-check"></i>
                     <span>Appointments</span>
                 </a>
@@ -980,6 +998,27 @@
                     <i class="fas fa-clock-rotate-left"></i>
                     <span>Availability</span>
                 </a>
+
+                @if(Auth::user()->role === 'counselor')
+                    <div class="sidebar-divider"></div>
+
+                    <div class="sidebar-section-header">
+                        Quick Actions
+                    </div>
+
+                    <a href="{{ route('counselor.events.create') }}" class="sidebar-link {{ request()->routeIs('counselor.events.create') ? 'active' : '' }}">
+                        <i class="fas fa-calendar-plus"></i>
+                        <span>Create Event</span>
+                    </a>
+                    <a href="{{ route('counselor.announcements.create') }}" class="sidebar-link {{ request()->routeIs('counselor.announcements.create') ? 'active' : '' }}">
+                        <i class="fas fa-bullhorn"></i>
+                        <span>Create Announcement</span>
+                    </a>
+                    <a href="{{ route('counselor.resources.create') }}" class="sidebar-link {{ request()->routeIs('counselor.resources.create') ? 'active' : '' }}">
+                        <i class="fas fa-folder-plus"></i>
+                        <span>Create Resource</span>
+                    </a>
+                @endif
             </div>
         </div>
 

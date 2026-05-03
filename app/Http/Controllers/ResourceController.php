@@ -14,28 +14,47 @@ class ResourceController extends Controller
      */
     public function index(Request $request)
     {
-        $query = Resource::with('user')->ordered();
+        $search = $request->string('search')->trim()->toString();
+        $category = $request->string('category')->trim()->toString();
+        $status = $request->string('status')->trim()->toString();
+        $pinned = $request->string('pinned')->trim()->toString();
 
-        if ($request->filled('search')) {
-            $search = $request->search;
+        $query = Resource::query()->with('user');
+
+        if ($search !== '') {
             $query->where(function ($q) use ($search) {
                 $q->where('title', 'like', "%{$search}%")
                   ->orWhere('description', 'like', "%{$search}%");
             });
         }
 
-        if ($request->filled('category')) {
-            $query->where('category', $request->category);
+        if ($category !== '' && $category !== 'all') {
+            $query->where('category', $category);
         }
 
-        if ($request->filled('status') && $request->status !== 'all') {
-            $query->where('is_active', $request->status === 'active');
+        if ($status === 'active') {
+            $query->where('is_active', true);
+        } elseif ($status === 'inactive') {
+            $query->where('is_active', false);
         }
 
-        $resources = $query->paginate(10)->appends($request->query());
+        if ($pinned === 'pinned') {
+            $query->where('is_pinned', true);
+        } elseif ($pinned === 'unpinned') {
+            $query->where('is_pinned', false);
+        }
+
+        $resources = $query->ordered()->paginate(10)->appends($request->query());
         $categories = Resource::getCategories();
 
-        return view('counselor.resources.index', compact('resources', 'categories'));
+        return view('counselor.resources.index', compact(
+            'resources',
+            'categories',
+            'search',
+            'category',
+            'status',
+            'pinned'
+        ));
     }
 
     /**
@@ -251,6 +270,19 @@ class ResourceController extends Controller
             'success' => true,
             'message' => "Resource {$status} successfully!",
             'resource' => $resource
+        ]);
+    }
+
+    public function togglePin(Resource $resource)
+    {
+        $resource->update(['is_pinned' => !$resource->is_pinned]);
+
+        $state = $resource->is_pinned ? 'pinned' : 'unpinned';
+
+        return response()->json([
+            'success' => true,
+            'is_pinned' => $resource->is_pinned,
+            'message' => "Resource {$state} successfully!",
         ]);
     }
 }

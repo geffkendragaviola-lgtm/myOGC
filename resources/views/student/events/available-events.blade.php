@@ -1,8 +1,627 @@
-@extends('layouts.student')
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <title>Mental Health Corner - Office of Guidance and Counseling</title>
+    <link rel="icon" type="image/png" href="{{ asset('images/msu-iit-logo.png') }}">
+    <link rel="shortcut icon" type="image/png" href="{{ asset('images/msu-iit-logo.png') }}">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
 
-@section('title', 'All Events - Mental Health Corner')
+    <style>
+    :root {
+        --primary-red: #9f1f24;
+        --primary-red-dark: #7f171b;
+        --primary-red-deep: #651114;
+        --primary-red-rich: #b32028;
 
-@section('content')
+        --accent-gold: #d4af37;
+        --accent-gold-soft: #e7c766;
+
+        --bg-light: #f6efe8;
+        --bg-soft: #fbf6f1;
+        --bg-white: #fffdfa;
+
+        --text-dark: #2f2522;
+        --text-secondary: #766864;
+        --text-muted: #a09490;
+
+        --border-soft: #eadfd4;
+        --danger-red: #dc3545;
+
+        --shadow-soft: 0 12px 32px rgba(101, 17, 20, 0.08);
+        --shadow-medium: 0 18px 42px rgba(101, 17, 20, 0.13);
+        --shadow-strong: 0 24px 56px rgba(101, 17, 20, 0.18);
+
+        --radius-lg: 28px;
+        --radius-md: 20px;
+        --radius-sm: 16px;
+    }
+
+    * {
+        box-sizing: border-box;
+    }
+
+    body.mhc-container {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background:
+            radial-gradient(circle at top left, rgba(159, 31, 36, 0.08), transparent 22%),
+            radial-gradient(circle at top right, rgba(212, 175, 55, 0.08), transparent 18%),
+            linear-gradient(180deg, #fbf6f1 0%, #f6efe8 100%);
+        color: var(--text-dark);
+    }
+
+    .gold-text {
+        color: #f0cd63;
+    }
+
+    .mhc-navbar {
+        position: sticky;
+        top: 0;
+        left: 0;
+        right: 0;
+        z-index: 1000;
+        background: linear-gradient(90deg, #5b0f0f, #8f1d1d, #a11f2f);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        box-shadow: 0 8px 24px rgba(91, 15, 15, 0.18);
+        backdrop-filter: blur(10px);
+        transition: all 0.3s ease;
+    }
+
+    .mhc-navbar.scrolled {
+        box-shadow: 0 12px 28px rgba(91, 15, 15, 0.24);
+    }
+
+    .nav-link {
+        color: white;
+        font-weight: 600;
+        transition: 0.25s ease;
+    }
+
+    .nav-link:hover {
+        color: rgba(255, 245, 235, 0.88);
+    }
+
+    .dropdown-panel {
+        position: absolute;
+        top: calc(100% + 10px);
+        left: 0;
+        background: #fffdfb;
+        box-shadow: 0 16px 40px rgba(91, 15, 15, 0.12);
+        border-radius: 16px;
+        padding: 0.5rem;
+        width: 220px;
+        z-index: 1001;
+        border: 1px solid #e8ddd2;
+    }
+
+    .dropdown-link {
+        display: block;
+        padding: 0.75rem 0.9rem;
+        border-radius: 12px;
+        color: #2f2522;
+        transition: all 0.2s ease;
+    }
+
+    .dropdown-link:hover {
+        color: #8f1d1d;
+        background: #f8f1e8;
+    }
+
+    .profile-dropdown-content {
+        position: absolute;
+        right: 0;
+        top: calc(100% + 10px);
+        background: #fffdfb;
+        box-shadow: 0 16px 40px rgba(91, 15, 15, 0.12);
+        border-radius: 16px;
+        padding: 1rem;
+        min-width: 220px;
+        z-index: 1001;
+        border: 1px solid #e8ddd2;
+    }
+
+    .mhc-page-header {
+        position: relative;
+        overflow: hidden;
+        padding: 6.25rem 0 7.5rem;
+        background:
+            linear-gradient(135deg, rgba(95, 15, 18, 0.84), rgba(143, 29, 29, 0.74), rgba(179, 32, 40, 0.65)),
+            url('https://images.unsplash.com/photo-1499209974431-2761385a0a28?ixlib=rb-4.0.3&auto=format&fit=crop&w=2000&q=80');
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+        box-shadow: inset 0 -60px 120px rgba(0, 0, 0, 0.14);
+    }
+
+    .mhc-page-header::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background:
+            radial-gradient(circle at 18% 20%, rgba(231, 199, 102, 0.16), transparent 18%),
+            radial-gradient(circle at 82% 12%, rgba(255,255,255,0.08), transparent 18%),
+            linear-gradient(180deg, rgba(255,255,255,0.03) 0%, rgba(0,0,0,0.08) 100%);
+        pointer-events: none;
+    }
+
+    .mhc-page-header::after {
+        content: "";
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: -1px;
+        height: 130px;
+        background: linear-gradient(180deg, rgba(246,239,232,0) 0%, rgba(246,239,232,1) 88%);
+        pointer-events: none;
+    }
+
+    .hero-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.55rem;
+        padding: 0.72rem 1.1rem;
+        border-radius: 999px;
+        background: rgba(255, 248, 240, 0.14);
+        border: 1px solid rgba(255, 240, 220, 0.22);
+        color: white;
+        backdrop-filter: blur(10px);
+        box-shadow: 0 12px 24px rgba(0,0,0,0.14);
+        font-size: 0.88rem;
+        font-weight: 700;
+        letter-spacing: 0.02em;
+    }
+
+    .hero-title {
+        color: white;
+        font-weight: 800;
+        letter-spacing: -0.04em;
+        line-height: 1;
+        text-shadow: 0 10px 28px rgba(0,0,0,0.2);
+    }
+
+    .hero-title-accent {
+        color: #f3d991;
+        font-family: Georgia, 'Times New Roman', serif;
+        font-style: italic;
+        font-weight: 700;
+    }
+
+    .hero-description {
+        color: rgba(255,255,255,0.93);
+        line-height: 1.85;
+        max-width: 46rem;
+        margin-left: auto;
+        margin-right: auto;
+        text-shadow: 0 4px 16px rgba(0,0,0,0.14);
+    }
+
+    .section-shell {
+        position: relative;
+    }
+
+    .section-head {
+        display: flex;
+        align-items: center;
+        gap: 0.95rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .section-bar {
+        width: 6px;
+        height: 36px;
+        border-radius: 999px;
+        background: linear-gradient(to bottom, var(--accent-gold), var(--primary-red));
+        flex-shrink: 0;
+        box-shadow: 0 6px 14px rgba(212, 175, 55, 0.18);
+    }
+
+    .section-title {
+        color: var(--text-dark);
+        font-weight: 800;
+        letter-spacing: -0.02em;
+    }
+
+    .section-subtitle {
+        color: var(--text-secondary);
+    }
+
+    .section-link {
+        color: var(--primary-red);
+        font-weight: 700;
+        transition: all 0.25s ease;
+    }
+
+    .section-link:hover {
+        color: var(--primary-red-deep);
+    }
+
+    .mhc-card {
+        background: linear-gradient(180deg, #fffdfa, #faf4ed);
+        border: 1px solid var(--border-soft);
+        border-radius: var(--radius-md);
+        box-shadow: var(--shadow-soft);
+        transition: all 0.3s ease;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        position: relative;
+    }
+
+    .mhc-card::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(180deg, rgba(255,255,255,0.22), transparent 20%);
+        pointer-events: none;
+    }
+
+    .mhc-card:hover {
+        transform: translateY(-5px);
+        box-shadow: var(--shadow-medium);
+        border-color: rgba(159, 31, 36, 0.18);
+    }
+
+    .soft-panel {
+        background: linear-gradient(180deg, #fffdfa, #faf4ed);
+        border: 1px solid var(--border-soft);
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-soft);
+    }
+
+    .category-overlay {
+        background: linear-gradient(to bottom, rgba(0,0,0,0.08), rgba(47, 37, 34, 0.62));
+    }
+
+    .badge-soft {
+        padding: 0.4rem 0.9rem;
+        border-radius: 999px;
+        font-size: 0.74rem;
+        font-weight: 700;
+        letter-spacing: 0.02em;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+        backdrop-filter: blur(6px);
+        box-shadow: 0 8px 18px rgba(0,0,0,0.12);
+    }
+
+    .badge-maroon {
+        background: linear-gradient(135deg, var(--primary-red), var(--primary-red-dark));
+        color: white;
+    }
+
+    .badge-gold {
+        background: #fbf4ea;
+        color: var(--primary-red);
+        border: 1px solid #ead8bf;
+    }
+
+    .badge-green {
+        background: #eefaf2;
+        color: #166534;
+        border: 1px solid #bfe5c8;
+    }
+
+    .badge-red {
+        background: linear-gradient(135deg, #dc3545 0%, #b91c1c 100%);
+        color: white;
+    }
+
+    .badge-gray {
+        background: rgba(255, 253, 250, 0.95);
+        color: var(--text-secondary);
+        border: 1px solid var(--border-soft);
+    }
+
+    .btn-primary {
+        background: linear-gradient(135deg, var(--primary-red), var(--primary-red-dark));
+        color: white;
+        border-radius: 16px;
+        padding: 0.9rem 1.35rem;
+        font-weight: 700;
+        box-shadow: 0 10px 22px rgba(159, 31, 36, 0.2);
+        transition: all 0.25s ease;
+        border: none;
+    }
+
+    .btn-primary:hover {
+        background: linear-gradient(135deg, var(--primary-red-rich), var(--primary-red-deep));
+        transform: translateY(-1px);
+        box-shadow: 0 14px 28px rgba(159, 31, 36, 0.25);
+    }
+
+    .btn-secondary {
+        background: #fffdfa;
+        color: var(--text-dark);
+        border: 1px solid #d9cec3;
+        border-radius: 16px;
+        font-weight: 700;
+        transition: all 0.25s ease;
+    }
+
+    .btn-secondary:hover {
+        background: #fbf4ea;
+        color: var(--primary-red);
+        border-color: #ead8bf;
+        transform: translateY(-1px);
+    }
+
+    .faq-item {
+        border-radius: var(--radius-sm);
+        overflow: hidden;
+        margin-bottom: 1rem;
+        background: linear-gradient(180deg, #fffdfa, #faf4ed);
+        border: 1px solid var(--border-soft);
+        box-shadow: var(--shadow-soft);
+        transition: all 0.25s ease;
+    }
+
+    .faq-item:hover {
+        border-color: rgba(159, 31, 36, 0.15);
+        box-shadow: var(--shadow-medium);
+    }
+
+    .faq-question {
+        padding: 1.25rem 1.4rem;
+        cursor: pointer;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-weight: 700;
+        color: var(--text-dark);
+        background: rgba(255, 253, 251, 0.78);
+        transition: background 0.2s ease;
+    }
+
+    .faq-question:hover {
+        background: rgba(159, 31, 36, 0.04);
+    }
+
+    .faq-answer {
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1), padding 0.4s ease;
+        background: transparent;
+        color: var(--text-secondary);
+        line-height: 1.8;
+        font-size: 0.96rem;
+    }
+
+    .faq-active .faq-answer {
+        max-height: 500px;
+        padding: 1.35rem 1.4rem 1.45rem;
+        border-top: 1px solid var(--border-soft);
+    }
+
+    .profile-dropdown-content {
+        position: absolute;
+        right: 0;
+        top: 100%;
+        background: linear-gradient(180deg, #fffdfa, #faf4ed);
+        box-shadow: var(--shadow-medium);
+        border-radius: 18px;
+        padding: 1rem;
+        min-width: 240px;
+        z-index: 1000;
+        margin-top: 0.7rem;
+        border: 1px solid var(--border-soft);
+    }
+
+    .footer-shell {
+        background: linear-gradient(180deg, #4d1212 0%, #3f0e0e 100%);
+        color: white;
+        border-top: 1px solid rgba(255,255,255,0.06);
+    }
+
+    .line-clamp-2 {
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+
+    .line-clamp-3 {
+        display: -webkit-box;
+        -webkit-line-clamp: 3;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+
+    ::-webkit-scrollbar {
+        width: 8px;
+    }
+
+    ::-webkit-scrollbar-track {
+        background: #f3eee8;
+    }
+
+    ::-webkit-scrollbar-thumb {
+        background: var(--primary-red);
+        border-radius: 999px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+        background: var(--primary-red-dark);
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    .animate-fade-in {
+        animation: fadeIn 0.45s ease-out forwards;
+    }
+
+    @media (max-width: 768px) {
+        .mhc-page-header {
+            padding: 5rem 0 6rem;
+        }
+
+        .hero-title {
+            font-size: 2.6rem;
+            line-height: 1.05;
+        }
+
+        .section-head {
+            align-items: flex-start;
+        }
+
+        .container { padding-left: 1rem !important; padding-right: 1rem !important; }
+        .grid.lg\:grid-cols-3 { grid-template-columns: repeat(2, 1fr); }
+        .grid.md\:grid-cols-2 { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 640px) {
+        .mhc-page-header { padding: 4rem 0 5rem; }
+        .hero-title { font-size: 2rem; }
+        .container { padding-left: 0.85rem !important; padding-right: 0.85rem !important; }
+        .grid.lg\:grid-cols-3,
+        .grid.md\:grid-cols-2,
+        .grid.grid-cols-2 { grid-template-columns: 1fr; }
+        /* Navbar: hide center links on mobile */
+        .hidden.md\:flex { display: none !important; }
+        /* Card padding */
+        .mhc-card { border-radius: 1rem; }
+        .p-6 { padding: 1rem; }
+        .p-8 { padding: 1.25rem; }
+    }
+</style>
+</head>
+<body class="mhc-container min-h-screen flex flex-col">
+
+    <!-- Navbar -->@php $unreadNotifications = Auth::user()->unreadNotifications->take(5); $unreadCount = Auth::user()->unreadNotifications->count(); @endphp
+    <nav class="mhc-navbar py-4" id="mainNavbar">
+        <div class="container mx-auto px-6 flex items-center" style="display:grid;grid-template-columns:1fr auto 1fr;align-items:center;">
+            <!-- Left: Logo -->
+            <div class="flex items-center">
+                <a href="{{ route('dashboard') }}" class="flex items-center gap-3 no-underline" style="text-decoration:none;">
+                    <div style="width:2.6rem;height:2.6rem;border-radius:0.9rem;background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.10);display:flex;align-items:center;justify-content:center;box-shadow:inset 0 1px 0 rgba(255,255,255,0.12);flex-shrink:0;">
+                        <img src="{{ asset('images/msu-iit-logo.png') }}" alt="MSU-IIT" class="h-8 w-8 object-contain" onerror="this.style.display='none'">
+                    </div>
+                    <span class="text-white font-bold text-sm hidden md:block" style="line-height:1.1;letter-spacing:0.01em;">
+                        my.OGC<br>
+                        <span class="font-medium text-xs" style="color:#d4af37;">MSU-IIT Office of Guidance & Counseling</span>
+                    </span>
+                </a>
+            </div>
+
+            <!-- Center: Nav Links -->
+            <div class="hidden md:flex items-center space-x-8">
+                <a href="{{ route('dashboard') }}" class="nav-link">Home</a>
+
+                @if(Auth::check() && Auth::user()->role === 'student')
+                    <a href="{{ route('student.show', Auth::user()->student->id) }}" class="nav-link">Profile</a>
+                    <div class="relative" id="services-dropdown">
+                        <button class="nav-link flex items-center" id="services-dropdown-btn">
+                            Services <i class="fas fa-chevron-down ml-1 text-sm"></i>
+                        </button>
+                        <div class="dropdown-panel hidden" id="services-dropdown-menu">
+                            <a href="{{ route('bap') }}" class="dropdown-link">Book an Appointment</a>
+                            <a href="{{ route('mhc') }}" class="dropdown-link" style="color:#8f1d1d;background:rgba(143,29,29,0.05);font-weight:600;">Mental Health Corner</a>
+                        </div>
+                    </div>
+                    <a href="{{ route('feedback') }}" class="nav-link">Feedback</a>
+                @endif
+            </div>
+
+            <!-- Right: Icons -->
+            <div class="flex items-center space-x-4 justify-end">
+                <div class="relative" id="notif-dropdown-wrapper">
+                    <button id="notif-bell-btn" class="text-white p-2 rounded-full hover:bg-white/10 transition relative" aria-label="Notifications">
+                        <i class="fas fa-bell"></i>
+                        @if($unreadCount > 0)
+                            <span id="notif-badge" class="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold rounded-full min-w-[16px] h-4 flex items-center justify-center px-1 leading-none">
+                                {{ $unreadCount > 99 ? '99+' : $unreadCount }}
+                            </span>
+                        @endif
+                    </button>
+                    <div id="notif-panel" class="hidden absolute right-0 top-[calc(100%+10px)] w-80 bg-white rounded-2xl shadow-xl border border-[#e8ddd2] z-[1002] overflow-hidden">
+                        <div class="flex items-center justify-between px-4 py-3 border-b border-[#e8ddd2]">
+                            <span class="font-semibold text-sm text-[#2f2522]">Notifications</span>
+                            @if($unreadCount > 0)
+                                <button id="mark-all-read-btn" class="text-xs text-[#8f1d1d] hover:underline font-medium">Mark all as read</button>
+                            @endif
+                        </div>
+                        <div class="overflow-y-auto divide-y divide-[#e8ddd2]" id="notif-list">
+                            @forelse($unreadNotifications as $notif)
+                                <div class="notif-item flex items-start gap-3 px-4 py-3 hover:bg-[#f6f1ea] cursor-pointer bg-blue-50/40" data-id="{{ $notif->id }}">
+                                    @php
+                                        $nType = $notif->data['type'] ?? '';
+                                        [$nIcon, $nBg] = match($nType) {
+                                            'appointment_booked', 'appointment_booked_by_counselor' => ['fa-calendar-plus', '#2d7a4f'],
+                                            'appointment_cancelled' => ['fa-calendar-xmark', '#b91c1c'],
+                                            'appointment_rescheduled', 'reschedule_response' => ['fa-calendar-days', '#c2410c'],
+                                            'appointment_referred', 'appointment_referred_to_counselor', 'referral_response' => ['fa-arrow-right-arrow-left', '#7a2a2a'],
+                                            'appointment_status_changed' => ['fa-circle-check', '#2a5a7a'],
+                                            'event_counselor_assigned', 'event_schedule_conflict', 'student_event_schedule_conflict' => ['fa-calendar-exclamation', '#92400e'],
+                                            default => ['fa-bell', '#7a2a2a'],
+                                        };
+                                    @endphp
+                                    <div class="mt-0.5 flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center" style="background:{{ $nBg }}">
+                                        <i class="fas {{ $nIcon }} text-white text-xs"></i>
+                                    </div>
+                                    <div class="flex-1 min-w-0">
+                                        <p class="text-xs font-semibold text-[#2f2522] truncate">{{ $notif->data['title'] ?? 'Notification' }}</p>
+                                        <p class="text-xs text-[#766864] mt-0.5 line-clamp-2">{{ $notif->data['message'] ?? '' }}</p>
+                                        <p class="text-[10px] text-[#a09490] mt-1">{{ $notif->created_at->diffForHumans() }}</p>
+                                    </div>
+                                </div>
+                            @empty
+                                <div class="px-4 py-8 text-center text-sm text-[#a09490]">
+                                    <i class="fas fa-bell-slash text-2xl mb-2 block opacity-40"></i>
+                                    No new notifications
+                                </div>
+                            @endforelse
+                        </div>
+                    </div>
+                </div>
+
+                <div class="relative">
+                    <button class="text-white p-2 rounded-full hover:bg-white/10 transition focus:outline-none" id="profileBtn">
+                        <i class="fas fa-user"></i>
+                    </button>
+                    <div class="profile-dropdown-content hidden" id="profileMenu">
+                        <div class="mb-3 border-b pb-2 border-[#e8ddd2]">
+                            <div class="font-semibold text-[#2f2522]">{{ Auth::user()->first_name }} {{ Auth::user()->last_name }}</div>
+                            <div class="text-sm text-[#766864]">{{ Auth::user()->email }}</div>
+                            <div class="text-xs text-[#8f1d1d] capitalize font-semibold mt-1">Role: {{ Auth::user()->role }}</div>
+                        </div>
+                        <a href="{{ route('profile.edit') }}" class="block py-2 text-[#2f2522] hover:text-[#8f1d1d] transition">
+                            <i class="fas fa-circle-user mr-2"></i> Profile
+                        </a>
+                        <form method="POST" action="{{ route('logout') }}" class="border-t pt-2 mt-2 border-[#e8ddd2]">
+                            @csrf
+                            <button type="submit" class="w-full text-left block py-2 text-[#2f2522] hover:text-[#8f1d1d] transition">
+                                <i class="fas fa-arrow-right-from-bracket mr-2"></i> Logout
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="flex-grow">
+        <!-- Page Header -->
+        <div class="mhc-page-header">
+            <div class="container mx-auto px-6 text-center relative z-10">
+                <div class="hero-badge mb-6">
+                    <i class="fas fa-calendar-check text-[var(--accent-gold)]"></i>
+                    <span>Connect, grow, and take care of you</span>
+                </div>
+                <h1 class="hero-title text-4xl md:text-7xl mb-6">
+                    Student <span class="hero-title-accent">Events</span>
+                </h1>
+                <p class="hero-description text-lg md:text-xl">
+                    Browse upcoming mental health events, workshops, and seminars designed for you. Register for sessions to learn new skills and find community support.
+                </p>
+            </div>
+        </div>
 <style>
     :root {
         --maroon-900: #3a0c0c;
@@ -21,7 +640,7 @@
         --student-error: #fee2e2;
     }
 
-    .ogc-shell {
+    .ogc-shell-inner {
         position: relative;
         overflow: hidden;
         background: var(--bg-warm);
@@ -243,58 +862,7 @@
         .filters-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; padding-bottom: 0.5rem; }
         .filters-scroll > div { display: flex; gap: 0.5rem; min-width: max-content; }
     }
-</style>
-
-<div class="min-h-screen ogc-shell">
-    <div class="ogc-glow one"></div>
-    <div class="ogc-glow two"></div>
-
-    <div class="relative max-w-7xl mx-auto px-4 sm:px-6 py-5 md:py-8">
-        <!-- Page Header -->
-        <div class="mb-5 sm:mb-6">
-            <div class="grid grid-cols-1 lg:grid-cols-[1fr_auto] gap-4 items-stretch">
-                <div class="hero-card h-full">
-                    <div class="relative p-4 sm:p-5 flex items-start gap-3">
-                        <div class="hero-icon">
-                            <i class="fas fa-calendar-days text-base sm:text-lg"></i>
-                        </div>
-                        <div class="min-w-0">
-                            <a href="{{ route('mhc') }}" class="back-link mb-2">
-                                <i class="fas fa-arrow-left text-[9px]"></i> Back to Mental Health Corner
-                            </a>
-                            <div class="hero-badge">
-                                <span class="hero-badge-dot"></span>
-                                Student Events
-                            </div>
-                            <h1 class="text-lg sm:text-xl lg:text-2xl font-semibold tracking-tight text-[#2c2420] mt-2">All Events</h1>
-                            <p class="text-[#6b5e57] text-xs sm:text-sm mt-1.5 max-w-2xl">
-                                Browse upcoming mental health events and workshops designed for you.
-                            </p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="summary-card h-full">
-                    <div class="relative h-full flex items-center justify-between gap-3 p-4">
-                        <div class="flex items-center gap-3">
-                            <div class="summary-icon">
-                                <i class="fas fa-heart text-sm"></i>
-                            </div>
-                            <div>
-                                <p class="summary-label">Your Wellness</p>
-                                <p class="summary-value">Take Care of You</p>
-                            </div>
-                        </div>
-                        <a href="{{ route('student.events.my-registrations') }}" class="btn-primary">
-                            <i class="fas fa-list-check"></i>
-                            <span>My Registrations</span>
-                        </a>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        @php
+</style><div class="container mx-auto px-6 py-10 -mt-14 relative z-20">@php
             $student = Auth::user()->student;
 
             if ($student) {
@@ -548,7 +1116,19 @@
                                 @endif
 
                                 <!-- View Details Button -->
-                                <button onclick="toggleDetails('details-{{ $event->id }}')"
+                                                                <button onclick="openEventModal({
+                                            title: `{{ addslashes($event->title) }}`,
+                                            type: `{{ addslashes($event->event_type) }}`,
+                                            dateRange: `{{ \Carbon\Carbon::parse($event->event_start_date)->format('M d, Y') }} - {{ \Carbon\Carbon::parse($event->event_end_date)->format('M d, Y') }}`,
+                                            timeRange: `{{ addslashes($event->time_range) }}`,
+                                            location: `{{ addslashes($event->location) }}`,
+                                            description: `{{ addslashes($event->description) }}`,
+                                            imageUrl: `{{ $event->image_path ? asset('storage/' . $event->image_path) : '' }}`,
+                                            maxAttendees: {{ $event->max_attendees ?? 'null' }},
+                                            registeredCount: {{ $event->registered_count ?? 0 }},
+                                            isRequired: {{ $isRequiredEvent ? 'true' : 'false' }},
+                                            isRegistered: {{ $isRegistered ? 'true' : 'false' }}
+                                        })"
                                         class="action-btn details flex-1 min-w-[100px]">
                                     <i class="fas fa-circle-info text-[9px]"></i>
                                     <span class="hidden sm:inline">Details</span>
@@ -620,11 +1200,75 @@
     </div>
 </div>
 
-<script>
-    function toggleDetails(id) {
-        const element = document.getElementById(id);
-        element.classList.toggle('hidden');
-    }
+</div></main>﻿    <footer style="background:linear-gradient(to right,#5b0f0f,#7b1717,#8f1d1d);color:white;" class="py-4 mt-auto">
+        <div class="container mx-auto px-6 text-center">
+            <p class="text-[#f3e8df]">&copy; {{ date('Y') }} Office of Guidance and Counseling. All rights reserved.</p>
+            <p class="text-sm text-[#e5caa9] mt-2">Committed to student support, wellness, and accessible guidance services</p>
+        </div>
+    </footer>
+
+    <script>
+        // Navbar scroll effect
+        const navbar = document.getElementById('mainNavbar');
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 10) navbar.classList.add('scrolled');
+            else navbar.classList.remove('scrolled');
+        });
+
+        // Profile dropdown
+        const profileBtn = document.getElementById('profileBtn');
+        const profileMenu = document.getElementById('profileMenu');
+        const notifBellBtn = document.getElementById('notif-bell-btn');
+        const notifPanel = document.getElementById('notif-panel');
+
+        if (profileBtn && profileMenu) {
+            profileBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                profileMenu.classList.toggle('hidden');
+                notifPanel?.classList.add('hidden');
+            });
+            document.addEventListener('click', () => profileMenu.classList.add('hidden'));
+            profileMenu.addEventListener('click', (e) => e.stopPropagation());
+        }
+
+        if (notifBellBtn && notifPanel) {
+            notifBellBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                notifPanel.classList.toggle('hidden');
+                profileMenu?.classList.add('hidden');
+            });
+            document.addEventListener('click', () => notifPanel.classList.add('hidden'));
+            notifPanel.addEventListener('click', (e) => e.stopPropagation());
+        }
+
+        // Mark all read
+        const markAllBtn = document.getElementById('mark-all-read-btn');
+        if (markAllBtn) {
+            markAllBtn.addEventListener('click', () => {
+                fetch('/notifications/mark-all-read', { method: 'POST', headers: { 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content } })
+                    .then(() => { document.getElementById('notif-badge')?.remove(); document.getElementById('notif-list').innerHTML = '<div class="px-4 py-8 text-center text-sm text-[#a09490]"><i class="fas fa-bell-slash text-2xl mb-2 block opacity-40"></i>No new notifications</div>'; markAllBtn.remove(); });
+            });
+        }
+
+        document.querySelectorAll('.notif-item').forEach(item => {
+            item.addEventListener('click', function() {
+                const id = this.dataset.id;
+                fetch(`/notifications/${id}/read`, { method: 'POST', headers: { 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content } })
+                    .then(() => { this.remove(); });
+            });
+        });
+
+        // Services dropdown
+        const servicesBtn = document.getElementById('services-dropdown-btn');
+        const servicesMenu = document.getElementById('services-dropdown-menu');
+        if (servicesBtn && servicesMenu) {
+            servicesBtn.addEventListener('click', (e) => { e.stopPropagation(); servicesMenu.classList.toggle('hidden'); });
+            document.addEventListener('click', () => servicesMenu.classList.add('hidden'));
+            servicesMenu.addEventListener('click', (e) => e.stopPropagation());
+        }
+
+        
+    
 
     document.addEventListener('DOMContentLoaded', function() {
         const typeFilter = document.getElementById('typeFilter');
@@ -639,12 +1283,10 @@
             eventCards.forEach(card => {
                 let show = true;
 
-                // Filter by type
                 if (selectedType && card.dataset.type !== selectedType) {
                     show = false;
                 }
 
-                // Filter by status
                 if (selectedStatus) {
                     switch (selectedStatus) {
                         case 'required':
@@ -665,9 +1307,8 @@
                 card.style.display = show ? 'block' : 'none';
             });
 
-            // Update event count
             const visibleCount = eventCards.filter(card => card.style.display !== 'none').length;
-            const countElement = document.querySelector('.text-sm.text-gray-600 span.font-semibold');
+            const countElement = document.querySelector('.text-[0.75rem].text-[#6b5e57] strong');
             if (countElement) {
                 countElement.textContent = visibleCount;
             }
@@ -676,5 +1317,127 @@
         if (typeFilter) typeFilter.addEventListener('change', filterEvents);
         if (statusFilter) statusFilter.addEventListener('change', filterEvents);
     });
-</script>
-@endsection
+
+        // FAQ Toggle
+        function toggleFaq(id) {
+            const faqItem = document.getElementById('faq-' + id);
+            const answer = faqItem.querySelector('.faq-answer');
+            const icon = faqItem.querySelector('.faq-question i');
+
+            // Close others (optional, remove if you want multiple open)
+            document.querySelectorAll('.faq-item').forEach(item => {
+                if(item.id !== 'faq-' + id) {
+                    item.classList.remove('faq-active');
+                    item.querySelector('.faq-answer').style.maxHeight = null;
+                    item.querySelector('i').style.transform = 'rotate(0deg)';
+                }
+            });
+
+            faqItem.classList.toggle('faq-active');
+
+            if (faqItem.classList.contains('faq-active')) {
+                answer.style.maxHeight = answer.scrollHeight + "px";
+                icon.style.transform = 'rotate(180deg)';
+            } else {
+                answer.style.maxHeight = null;
+                icon.style.transform = 'rotate(0deg)';
+            }
+        }
+
+        // Initialize first FAQ
+        document.addEventListener('DOMContentLoaded', () => {
+            const firstFaq = document.querySelector('.faq-item');
+            if(firstFaq) toggleFaq(firstFaq.id.split('-')[1]);
+        });
+
+        // Event Details Modal
+                function openEventModal(data) {
+            document.getElementById('modalImage').src       = data.imageUrl || '';
+            document.getElementById('modalImage').style.display = data.imageUrl ? 'block' : 'none';
+            document.getElementById('modalImage').alt       = data.title;
+            document.getElementById('modalTitle').textContent      = data.title;
+            document.getElementById('modalType').textContent       = data.type;
+            document.getElementById('modalDate').textContent       = data.dateRange;
+            document.getElementById('modalTime').textContent       = data.timeRange;
+            document.getElementById('modalLocation').textContent   = data.location;
+            document.getElementById('modalDescription').textContent = data.description;
+
+            // Slots
+            const slotsWrap = document.getElementById('modalSlotsWrap');
+            if (data.maxAttendees) {
+                document.getElementById('modalSlots').textContent = data.registeredCount + '/' + data.maxAttendees + ' spots filled';
+                slotsWrap.classList.remove('hidden');
+                slotsWrap.classList.add('flex');
+            } else {
+                slotsWrap.classList.add('hidden');
+                slotsWrap.classList.remove('flex');
+            }
+
+            // Required badge & note
+            const reqBadge = document.getElementById('modalRequiredBadge');
+            const reqNote  = document.getElementById('modalRequiredNote');
+            if (data.isRequired) {
+                reqBadge.classList.remove('hidden');
+                reqNote.classList.remove('hidden');
+                reqNote.classList.add('flex');
+            } else {
+                reqBadge.classList.add('hidden');
+                reqNote.classList.add('hidden');
+                reqNote.classList.remove('flex');
+            }
+
+            // Registered note
+            const regNote = document.getElementById('modalRegisteredNote');
+            if (data.isRegistered) {
+                regNote.classList.remove('hidden');
+                regNote.classList.add('flex');
+            } else {
+                regNote.classList.add('hidden');
+                regNote.classList.remove('flex');
+            }
+
+            // Show modal with animation
+            const modal = document.getElementById('eventModal');
+            const modalContent = document.getElementById('eventModalContent');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            
+            // Small delay to allow display:flex to apply before animating opacity
+            setTimeout(() => {
+                modal.classList.remove('opacity-0');
+                if (modalContent) {
+                    modalContent.classList.remove('scale-95', 'translate-y-4');
+                }
+            }, 10);
+            
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeEventModal() {
+            const modal = document.getElementById('eventModal');
+            const modalContent = document.getElementById('eventModalContent');
+            
+            modal.classList.add('opacity-0');
+            if (modalContent) {
+                modalContent.classList.add('scale-95', 'translate-y-4');
+            }
+            
+            setTimeout(() => {
+                modal.classList.add('hidden');
+                modal.classList.remove('flex');
+                document.body.style.overflow = '';
+            }, 300);
+        }
+
+        // Close on backdrop click
+        document.getElementById('eventModal').addEventListener('click', function(e) {
+            if (e.target === this) closeEventModal();
+        });
+
+        // Close on Escape key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') closeEventModal();
+        });
+    </script>
+</body>
+</html>

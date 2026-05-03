@@ -264,7 +264,7 @@
         </div>
 
         <!-- Page Header -->
-        <div class="mb-5 sm:mb-6">
+        <div class="mb-6 sm:mb-8">
             <div class="grid grid-cols-1 lg:grid-cols-[1fr_auto] gap-4 items-stretch">
                 <div class="hero-card h-full">
                     <div class="relative p-4 sm:p-5 flex items-start gap-3">
@@ -311,7 +311,7 @@
 
         <!-- Profile Completion Alert -->
         @if($student->profile_completion['percentage'] < 100)
-        <div class="alert alert-warning mb-4">
+        <div class="alert alert-warning mb-6 sm:mb-8">
             <i class="fas fa-exclamation-triangle"></i>
             <div>
                 <strong>Profile {{ $student->profile_completion['percentage'] }}% complete.</strong>
@@ -332,7 +332,7 @@
             $hasSelfHarmRisk = !$student->high_risk_overridden && count(array_intersect($riskResponses, $stressResponses)) > 0;
             $isHighRisk = $student->is_high_risk || $hasSelfHarmRisk;
         @endphp
-        <div class="info-card mb-4 {{ $isHighRisk ? 'risk-card-danger' : 'risk-card-safe' }}">
+        <div class="info-card mb-6 sm:mb-8 {{ $isHighRisk ? 'risk-card-danger' : 'risk-card-safe' }}">
             <div class="info-card-header" style="{{ $isHighRisk ? 'background:rgba(254,242,242,0.6);color:#991b1b;' : '' }}">
                 <div class="info-card-header-icon" style="{{ $isHighRisk ? 'background:rgba(239,68,68,0.1);color:#dc2626;' : 'background:rgba(16,185,129,0.1);color:#059669;' }}">
                     <i class="fas fa-{{ $isHighRisk ? 'exclamation-triangle' : 'shield-halved' }}"></i>
@@ -369,7 +369,7 @@
         @endif
 
         <!-- Top Info Grid: Profile + Contact + Stats -->
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-4">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-6 sm:mb-8">
 
             <!-- Profile Card -->
             <div class="info-card text-center">

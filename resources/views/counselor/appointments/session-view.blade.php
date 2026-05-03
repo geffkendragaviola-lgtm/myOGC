@@ -40,6 +40,26 @@
     .primary-btn:hover { transform:translateY(-1px); box-shadow:0 6px 14px rgba(92,26,26,0.2); }
     .secondary-btn { border-radius:0.6rem; font-weight:600; transition:all 0.2s ease; display:inline-flex; align-items:center; justify-content:center; white-space:nowrap; color:var(--text-secondary); background:rgba(255,255,255,0.9); border:1px solid var(--border-soft); }
     .secondary-btn:hover { background:rgba(254,249,231,0.7); border-color:var(--maroon-700); }
+
+    .summary-card {
+        position: relative; overflow: hidden; border-radius: 0.75rem;
+        border: 1px solid rgba(92,26,26,0.15);
+        background: linear-gradient(135deg, #5c1a1a 0%, #3a0c0c 100%); color: white;
+        box-shadow: 0 4px 12px rgba(58,12,12,0.15);
+    }
+    .summary-card::before {
+        content: ""; position: absolute; inset: 0; opacity: 0.15;
+        background: radial-gradient(circle at top right, #d4af37, transparent 40%);
+        pointer-events: none;
+    }
+    .summary-icon {
+        width: 2.5rem; height: 2.5rem; border-radius: 0.75rem; display: flex;
+        align-items: center; justify-content: center; background: rgba(255,255,255,0.1);
+        border: 1px solid rgba(255,255,255,0.1); color: #fef9e7; flex-shrink: 0;
+    }
+    .summary-label { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.2em; color: rgba(255,255,255,0.7); }
+    .summary-value { font-size: 1.2rem; line-height: 1.2; font-weight: 800; margin-top: 0.35rem; }
+    .summary-subtext { font-size: 0.7rem; color: rgba(255,255,255,0.8); margin-top: 0.2rem; }
     .edit-link { display:inline-flex; align-items:center; gap:0.3rem; padding:0.35rem 0.6rem; border-radius:0.5rem; font-size:0.65rem; font-weight:500; transition:all 0.18s ease; color:var(--maroon-700); border:1px solid rgba(122,42,42,0.4); background:rgba(254,249,231,0.6); }
     .edit-link:hover { background:rgba(212,175,55,0.2); border-color:var(--gold-400); }
     .profile-link { display:inline-flex; align-items:center; gap:0.3rem; font-size:0.7rem; font-weight:500; color:var(--maroon-700); transition:all 0.18s ease; }
@@ -81,39 +101,64 @@
     <div class="relative max-w-7xl mx-auto px-4 sm:px-6 py-5 md:py-8">
 
         {{-- Header --}}
-        <div class="mb-5 sm:mb-6">
-            <div class="hero-card">
-                <div class="relative p-4 sm:p-5 flex flex-col md:flex-row md:items-start md:justify-between gap-4">
-                    <div class="flex items-start gap-3">
-                        <div class="hero-icon"><i class="fas fa-notes-medical text-base sm:text-lg"></i></div>
-                        <div class="min-w-0">
-                            <div class="hero-badge"><span class="hero-badge-dot"></span>Case Record</div>
-                            <h1 class="text-lg sm:text-xl lg:text-2xl font-semibold tracking-tight text-[#2c2420] mt-2">View Appointment Session</h1>
-                            <p class="text-[#6b5e57] text-xs sm:text-sm mt-1.5">
-                                {{ $appointment->student->user->first_name }} {{ $appointment->student->user->last_name }}
-                                <span class="text-[#8b7e76]">({{ $appointment->student->student_id }})</span>
-                                @if($svHighRisk)
-                                    <span class="ml-2 inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-red-100 text-red-700 border border-red-200">
-                                        <i class="fas fa-exclamation-triangle text-[9px]"></i> High-risk individual
-                                    </span>
-                                @endif
-                            </p>
-                            <p class="text-[10px] sm:text-xs text-[#8b7e76] mt-0.5">
-                                {{ $appointment->student->college->name ?? 'N/A' }} • {{ $appointment->student->course }} • {{ $appointment->student->year_level }}
-                            </p>
+        <div class="mb-6 sm:mb-8">
+            <div class="grid grid-cols-1 xl:grid-cols-[1fr_auto] gap-4 items-stretch">
+                <div class="hero-card">
+                    <div class="relative p-4 sm:p-5 flex flex-col md:flex-row md:items-start md:justify-between gap-4">
+                        <div class="flex items-start gap-3">
+                            <div class="hero-icon"><i class="fas fa-notes-medical text-base sm:text-lg"></i></div>
+                            <div class="min-w-0">
+                                <div class="hero-badge"><span class="hero-badge-dot"></span>Case Record</div>
+                                <h1 class="text-lg sm:text-xl lg:text-2xl font-semibold tracking-tight text-[#2c2420] mt-2">View Appointment Session</h1>
+                                <p class="text-[#6b5e57] text-xs sm:text-sm mt-1.5">
+                                    {{ $appointment->student->user->first_name }} {{ $appointment->student->user->last_name }}
+                                    <span class="text-[#8b7e76]">({{ $appointment->student->student_id }})</span>
+                                    @if($svHighRisk)
+                                        <span class="ml-2 inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-red-100 text-red-700 border border-red-200">
+                                            <i class="fas fa-exclamation-triangle text-[9px]"></i> High-risk individual
+                                        </span>
+                                    @endif
+                                </p>
+                                <p class="text-[10px] sm:text-xs text-[#8b7e76] mt-0.5">
+                                    {{ $appointment->student->college->name ?? 'N/A' }} • {{ $appointment->student->course }} • {{ $appointment->student->year_level }}
+                                </p>
+                            </div>
                         </div>
                     </div>
-                    <a href="{{ route('counselor.appointment-sessions.dashboard') }}"
-                       class="secondary-btn px-4 py-2 text-xs sm:text-sm w-full md:w-auto">
-                        <i class="fas fa-arrow-left mr-1.5 text-[9px] sm:text-xs"></i>Back to Sessions
-                    </a>
+                </div>
+
+                <div class="summary-card">
+                    <div class="relative h-full flex flex-row items-center justify-between gap-4 p-4 sm:p-5">
+                        <div class="flex items-center gap-3 min-w-0">
+                            <div class="summary-icon flex-shrink-0">
+                                <i class="fas fa-calendar-check text-sm"></i>
+                            </div>
+                            <div class="min-w-0">
+                                <p class="summary-label">Quick Actions</p>
+                                <p class="summary-value">Session Tools</p>
+                                <p class="summary-subtext">Go back or open the appointment list.</p>
+                            </div>
+                        </div>
+                        <div class="flex flex-col gap-2 flex-shrink-0">
+                            <a href="{{ route('counselor.appointment-sessions.dashboard') }}"
+                               class="primary-btn px-4 py-2 text-xs sm:text-sm whitespace-nowrap" style="background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); box-shadow: none;">
+                                <i class="fas fa-arrow-left mr-1.5 text-[9px] sm:text-xs"></i>
+                                <span>Back to Sessions</span>
+                            </a>
+                            <a href="{{ route('counselor.appointments') }}"
+                               class="primary-btn px-4 py-2 text-xs sm:text-sm whitespace-nowrap" style="background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); box-shadow: none;">
+                                <i class="fas fa-list mr-1.5 text-[9px] sm:text-xs"></i>
+                                <span>Appointments</span>
+                            </a>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
 
         {{-- High-Risk Banner --}}
         @if($svHighRisk)
-        <div class="panel-card mb-5" style="border-left:3px solid #dc2626;">
+        <div class="panel-card mb-6 sm:mb-8" style="border-left:3px solid #dc2626;">
             <div class="relative p-3 sm:p-4 flex flex-wrap items-center gap-3">
                 <div class="flex items-center gap-2 flex-1 min-w-0">
                     <span class="flex-shrink-0 w-7 h-7 rounded-lg flex items-center justify-center bg-red-100 text-red-600 text-xs">

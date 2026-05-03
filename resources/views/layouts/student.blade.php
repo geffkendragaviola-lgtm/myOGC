@@ -1100,6 +1100,13 @@
 
     <div id="ogcMainContent" class="ml-64 min-h-screen ogc-main-shell" style="padding-top:var(--navbar-h);">
         @yield('content')
+
+        <footer class="dashboard-footer py-4 mt-4" style="background: linear-gradient(to right, #5b0f0f, #7b1717, #8f1d1d); color: white;">
+            <div class="container mx-auto px-6 text-center">
+                <p class="text-[#f3e8df]">&copy; 2025 Office of Guidance and Counseling. All rights reserved.</p>
+                <p class="text-sm text-[#e5caa9] mt-2">Committed to student support, wellness, and accessible guidance services</p>
+            </div>
+        </footer>
     </div>
 
     {{-- Mobile sidebar overlay backdrop --}}

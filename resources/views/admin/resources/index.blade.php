@@ -333,11 +333,23 @@
 
                         <div class="p-4 sm:p-5 flex flex-col flex-1">
                             <!-- Content -->
-                            <div class="mb-3 flex-1">
-                                <h3 class="text-sm sm:text-base font-semibold leading-tight text-[#2c2420] mb-1.5 line-clamp-2" title="{{ $resource->title }}">{{ $resource->title }}</h3>
-                                <p class="text-[#8b7e76] text-[10px] sm:text-xs line-clamp-3 leading-relaxed">
-                                    {{ $resource->description }}
-                                </p>
+                            <div class="mb-3 flex-1 flex flex-col gap-2">
+                                <div>
+                                    <h3 class="text-sm sm:text-base font-semibold leading-tight text-[#2c2420] mb-1.5 line-clamp-2" title="{{ $resource->title }}">{{ $resource->title }}</h3>
+                                    <p class="text-[#8b7e76] text-[10px] sm:text-xs line-clamp-3 leading-relaxed">
+                                        {{ $resource->description }}
+                                    </p>
+                                </div>
+                                @if($resource->show_disclaimer && $resource->disclaimer_text)
+                                    <div class="bg-[#fef9e7]/50 border border-[#d4af37]/30 rounded-md p-2 mt-auto">
+                                        <div class="flex items-start gap-1.5">
+                                            <i class="fas fa-circle-exclamation text-[#c9a227] mt-0.5 text-[10px]"></i>
+                                            <p class="text-[9px] sm:text-[10px] text-[#7a5a1a] leading-tight">
+                                                <strong>Disclaimer:</strong> {{ $resource->disclaimer_text }}
+                                            </p>
+                                        </div>
+                                    </div>
+                                @endif
                             </div>
 
                             <!-- Link -->

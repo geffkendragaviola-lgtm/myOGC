@@ -40,6 +40,10 @@ class ProfileController extends Controller
             // Get colleges for dropdown
             $colleges = College::all();
 
+            if ($user->role === 'counselor') {
+                return view('counselor.profile.edit', compact('user', 'counselorProfile', 'colleges'));
+            }
+
             return view('profile.edit', compact('user', 'studentProfile', 'counselorProfile', 'colleges'));
         } catch (\Exception $e) {
             // Log the error and return a simple view

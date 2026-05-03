@@ -17,24 +17,25 @@
         --text-muted: #8b7e76;
     }
 
-    .announce-shell {
+    .events-shell {
         position: relative;
         overflow: hidden;
         background: var(--bg-warm);
         min-height: 100vh;
+        padding-bottom: 2rem;
     }
 
-    .announce-glow {
+    .events-glow {
         position: absolute;
         border-radius: 50%;
         filter: blur(80px);
         pointer-events: none;
         opacity: 0.25;
     }
-    .announce-glow.one { top: -30px; left: -40px; width: 200px; height: 200px; background: var(--gold-400); }
-    .announce-glow.two { bottom: -30px; right: -60px; width: 220px; height: 220px; background: var(--maroon-800); }
+    .events-glow.one { top: -30px; left: -40px; width: 200px; height: 200px; background: var(--gold-400); }
+    .events-glow.two { bottom: -30px; right: -60px; width: 220px; height: 220px; background: var(--maroon-800); }
 
-    .glass-card, .hero-card, .panel-card, .stats-card, .event-card-new, .summary-card {
+    .glass-card, .hero-card, .panel-card, .stats-card, .event-card-new {
         position: relative;
         overflow: hidden;
         border-radius: 0.75rem;
@@ -44,10 +45,9 @@
         box-shadow: 0 2px 8px rgba(44, 36, 32, 0.04);
         transition: box-shadow 0.2s ease;
     }
-    .glass-card:hover, .panel-card:hover, .event-card-new:hover, .summary-card:hover {
+    .glass-card:hover, .panel-card:hover, .event-card-new:hover {
         box-shadow: 0 4px 14px rgba(44, 36, 32, 0.06);
     }
-
     .hero-card::before, .panel-card::before, .event-card-new::before {
         content: "";
         position: absolute;
@@ -56,8 +56,13 @@
         background: radial-gradient(circle at top right, rgba(212,175,55,0.06), transparent 30%);
     }
 
+    .hero-icon, .panel-icon, .stats-icon, .event-type-icon {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+    }
     .hero-icon {
-        display: flex; align-items: center; justify-content: center; flex-shrink: 0;
         width: 2.75rem; height: 2.75rem; border-radius: 0.75rem; color: #fef9e7;
         background: linear-gradient(135deg, var(--maroon-800) 0%, var(--maroon-700) 100%);
         box-shadow: 0 4px 12px rgba(92,26,26,0.15);
@@ -81,13 +86,12 @@
         background: radial-gradient(circle at top right, var(--gold-400), transparent 40%);
         pointer-events: none;
     }
-    .summary-label { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.2em; color: rgba(255,255,255,0.7); }
-
     .summary-icon {
         width: 2.5rem; height: 2.5rem; border-radius: 0.75rem; display: flex;
         align-items: center; justify-content: center; background: rgba(255,255,255,0.1);
         border: 1px solid rgba(255,255,255,0.1); color: #fef9e7; flex-shrink: 0;
     }
+    .summary-label { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.2em; color: rgba(255,255,255,0.7); }
     .summary-value { font-size: 1.2rem; line-height: 1.2; font-weight: 800; margin-top: 0.35rem; }
     .summary-subtext { font-size: 0.7rem; color: rgba(255,255,255,0.8); margin-top: 0.2rem; }
 
@@ -100,39 +104,54 @@
     .primary-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 14px rgba(92,26,26,0.2); }
 
     .filter-btn {
-        border-radius: 0.6rem; font-weight: 600; transition: all 0.2s ease;
-        display: inline-flex; align-items: center; justify-content: center; white-space: nowrap;
-        color: #fef9e7; background: linear-gradient(135deg, var(--maroon-800) 0%, var(--maroon-700) 100%);
-        box-shadow: 0 4px 10px rgba(92,26,26,0.15);
+        border-radius: 0.6rem; color: #fef9e7;
+        background: linear-gradient(135deg, var(--maroon-800) 0%, var(--maroon-700) 100%);
+        box-shadow: 0 4px 10px rgba(92,26,26,0.15); transition: all 0.2s ease;
     }
     .filter-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 14px rgba(92,26,26,0.2); }
 
     .panel-topline { position: absolute; inset-inline: 0; top: 0; height: 3px; background: linear-gradient(90deg, var(--maroon-800) 0%, var(--gold-400) 50%, var(--maroon-800) 100%); }
-    .panel-header { display: flex; align-items: center; gap: 0.7rem; padding: 0.85rem 1.25rem; border-bottom: 1px solid var(--border-soft); }
-    .panel-icon { width: 2rem; height: 2rem; border-radius: 0.6rem; display: flex; align-items: center; justify-content: center; background: rgba(254,249,231,0.7); color: var(--maroon-700); }
+    .panel-header { display: flex; align-items: center; gap: 0.7rem; padding: 0.85rem 1.25rem; border-bottom: 1px solid var(--border-soft)/60; }
+    .panel-icon { width: 2rem; height: 2rem; border-radius: 0.6rem; background: rgba(254,249,231,0.7); color: var(--maroon-700); }
     .panel-title { font-size: 0.8rem; font-weight: 600; color: var(--text-primary); }
     .panel-subtitle { font-size: 0.68rem; color: var(--text-muted); margin-top: 0.1rem; }
 
     .table-header-bar {
-        display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.6rem;
-        padding: 0.75rem 1.25rem; border-bottom: 1px solid var(--border-soft)/60; background: rgba(250,248,245,0.4);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 0.6rem;
+        padding: 0.75rem 1.25rem;
+        background: rgba(250,248,245,0.4);
     }
-    .table-live-pill {
-        display: inline-flex; align-items: center; font-size: 0.65rem; color: var(--text-secondary);
-        background: rgba(250,248,245,0.6); border: 1px solid var(--border-soft); padding: 0.25rem 0.5rem;
-        border-radius: 999px; font-weight: 500;
+
+    .table-header-icon {
+        width: 2rem;
+        height: 2rem;
+        border-radius: 0.6rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        background: rgba(254,249,231,0.6);
     }
 
     .input-field {
-        border: 1px solid var(--border-soft); border-radius: 0.6rem;
-        background: rgba(255,255,255,0.9); color: var(--text-primary);
-        outline: none; transition: all 0.2s ease; font-size: 0.8rem;
+        border: 1px solid var(--border-soft);
+        border-radius: 0.6rem;
+        background: rgba(255,255,255,0.9);
+        color: var(--text-primary);
+        outline: none;
+        transition: all 0.2s ease;
+        font-size: 0.8rem;
+        box-shadow: inset 0 1px 2px rgba(44,36,32,0.02);
     }
     .input-field:focus { border-color: var(--maroon-700); box-shadow: 0 0 0 3px rgba(92,26,26,0.08); }
 
     .stats-card { transition: all 0.2s ease; }
     .stats-card:hover { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(44,36,32,0.06); }
-    .stats-icon { width: 2rem; height: 2rem; border-radius: 0.6rem; display: flex; align-items: center; justify-content: center; }
+    .stats-icon { width: 2rem; height: 2rem; border-radius: 0.6rem; }
     .mini-progress { width: 100%; background: #f5f0eb; border-radius: 999px; height: 0.3rem; overflow: hidden; }
     .mini-progress > div { height: 100%; border-radius: 999px; }
 
@@ -140,21 +159,34 @@
     .event-card-new:hover { transform: translateY(-2px); box-shadow: 0 8px 18px rgba(44,36,32,0.06); }
 
     .event-banner {
-        position: relative; overflow: hidden; padding: 0.85rem; color: white;
-        background: linear-gradient(135deg, var(--maroon-800) 0%, var(--maroon-700) 100%);
+        position: relative; overflow: hidden; color: white;
+        height: 11rem;
+        background: linear-gradient(135deg, var(--maroon-800) 0%, var(--maroon-900) 100%);
     }
-    .event-banner::before {
-        content: ""; position: absolute; inset: 0; opacity: 0.15;
-        background: radial-gradient(circle at top right, var(--gold-400), transparent 35%); pointer-events: none;
+    .event-banner img {
+        position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain;
+        background-color: rgba(0,0,0,0.15);
+        transition: transform 0.3s ease;
+    }
+    .event-card-new:hover .event-banner img { transform: scale(1.04); }
+    .event-banner-overlay {
+        position: absolute; inset: 0;
+        background: linear-gradient(to top, rgba(44,20,20,0.82) 0%, rgba(44,20,20,0.25) 60%, transparent 100%);
+    }
+    .event-banner-content {
+        position: absolute; bottom: 0; left: 0; right: 0; padding: 0.65rem 0.85rem;
+    }
+    .event-banner-top {
+        position: absolute; top: 0.5rem; right: 0.5rem;
     }
     .event-type-pill {
         display: inline-flex; align-items: center; border-radius: 999px; background: rgba(255,255,255,0.18);
         border: 1px solid rgba(255,255,255,0.12); backdrop-filter: blur(6px);
         font-size: 9px; padding: 0.2rem 0.5rem; font-weight: 600; text-transform: capitalize;
     }
-    .status-badge { font-size: 0.65rem; padding: 0.2rem 0.5rem; border-radius: 9999px; font-weight: 700; }
-    .status-active { background-color: rgba(209,250,229,0.95); color: #059669; }
-    .status-inactive { background-color: rgba(254,226,226,0.95); color: #b91c1c; }
+    .status-badge { font-size: 0.65rem; padding: 0.2rem 0.5rem; border-radius: 9999px; font-weight: 700; backdrop-filter: blur(4px); }
+    .status-active { background-color: rgba(209, 250, 229, 0.95); color: #059669; }
+    .status-inactive { background-color: rgba(254, 226, 226, 0.95); color: #b91c1c; }
 
     .event-meta-row { display: flex; align-items: center; gap: 0.5rem; color: var(--text-secondary); font-size: 0.8rem; }
     .event-meta-icon { width: 1.5rem; height: 1.5rem; border-radius: 0.45rem; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; }
@@ -165,13 +197,13 @@
     }
     .action-btn-soft:hover { transform: translateY(-1px); }
 
+    .pagination-btn { border-radius: 0.6rem; transition: all 0.2s ease; }
+
     .empty-state-icon {
         width: 3rem; height: 3rem; border-radius: 999px; display: flex;
         align-items: center; justify-content: center; background: rgba(245,240,235,0.6);
         box-shadow: inset 0 1px 2px rgba(44,36,32,0.04); margin-inline: auto;
     }
-
-    .pagination-btn { border-radius: 0.6rem; transition: all 0.2s ease; }
 
     @media (max-width: 639px) {
         .panel-header { padding: 0.75rem 1rem; }
@@ -179,29 +211,34 @@
     }
 </style>
 
-<div class="min-h-screen announce-shell">
-    <div class="announce-glow one"></div>
-    <div class="announce-glow two"></div>
+<div class="min-h-screen events-shell">
+    <div class="events-glow one"></div>
+    <div class="events-glow two"></div>
 
     <div class="relative max-w-7xl mx-auto px-4 sm:px-6 py-5 md:py-8">
-
-        {{-- Header --}}
-        <div class="mb-5 sm:mb-6">
+        
+        <!-- Header -->
+        <div class="mb-6 sm:mb-8">
             <div class="grid grid-cols-1 xl:grid-cols-[1fr_auto] gap-4 items-stretch">
                 <div class="hero-card">
                     <div class="relative p-4 sm:p-5 flex items-start gap-3">
                         <div class="hero-icon">
                             <i class="fas fa-calendar-days text-base sm:text-lg"></i>
                         </div>
+
                         <div class="min-w-0">
                             <div class="hero-badge">
-                                <span class="hero-badge-dot"></span> Events Management
+                                <span class="hero-badge-dot"></span>
+                                Events Management
                             </div>
                             <h1 class="text-lg sm:text-xl lg:text-2xl font-semibold tracking-tight text-[#2c2420] mt-2">Manage Events</h1>
-                            <p class="text-[#6b5e57] text-xs sm:text-sm mt-1.5 max-w-2xl">Create and manage mental health events, workshops, and seminars.</p>
+                            <p class="text-[#6b5e57] text-xs sm:text-sm mt-1.5 max-w-2xl">
+                                Create and manage mental health events, workshops, and seminars.
+                            </p>
                         </div>
                     </div>
                 </div>
+
                 <div class="summary-card">
                     <div class="relative h-full flex flex-col sm:flex-row items-center justify-between gap-3 p-4">
                         <div class="flex items-center gap-3 text-center sm:text-left">
@@ -214,126 +251,117 @@
                                 <p class="summary-subtext hidden sm:block">Add workshops, webinars, seminars, and conferences.</p>
                             </div>
                         </div>
-                        <a href="{{ route('counselor.events.create') }}" class="primary-btn px-5 py-2.5 text-xs sm:text-sm rounded-lg">
-                            <i class="fas fa-plus mr-1.5 text-[9px] sm:text-xs"></i>
-                            <span>Create Event</span>
+                        <a href="{{ route('counselor.events.create') }}"
+                           class="primary-btn px-5 py-2.5 whitespace-nowrap text-xs sm:text-sm rounded-lg">
+                            <i class="fas fa-plus mr-1.5 text-[9px] sm:text-xs"></i> Create New Event
                         </a>
                     </div>
                 </div>
             </div>
         </div>
 
-        {{-- Stats --}}
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-5 sm:mb-6">
-            <div class="summary-card" style="background:#faf8f5; border-color:rgba(122,42,42,0.12);">
-                <div class="relative p-4 flex items-center gap-3">
-                    <div class="summary-icon flex-shrink-0" style="background:rgba(56,189,248,0.12); border-color:rgba(56,189,248,0.18); color:#0284c7;">
-                        <i class="fas fa-calendar text-sm"></i>
+        <!-- Stats Cards Row -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-6 sm:mb-8">
+            <!-- Total Events -->
+            <div class="stats-card p-3.5">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-[9px] sm:text-[10px] font-semibold text-[#8b7e76] uppercase tracking-[0.16em]">Total Events</p>
+                        <p class="text-xl sm:text-2xl font-semibold text-[#2c2420] mt-1.5">{{ method_exists($events, 'total') ? $events->total() : $events->count() }}</p>
                     </div>
-                    <div class="min-w-0">
-                        <p class="summary-label" style="color:var(--text-muted);">Total</p>
-                        <p class="summary-value" style="color:var(--text-primary);">{{ $events->count() }}</p>
-                        <p class="summary-subtext" style="color:var(--text-secondary);">Events</p>
+                    <div class="stats-icon bg-[#eff6ff]">
+                        <i class="fas fa-calendar text-sky-600 text-sm sm:text-base"></i>
                     </div>
+                </div>
+                <div class="mt-3 mini-progress">
+                    <div class="bg-gradient-to-r from-sky-500 to-sky-600" style="width: 100%"></div>
                 </div>
             </div>
 
-            <div class="summary-card" style="background:#f0fdf6; border-color:rgba(16,185,129,0.15);">
-                <div class="relative p-4 flex items-center gap-3">
-                    <div class="summary-icon flex-shrink-0" style="background:rgba(16,185,129,0.1); border-color:rgba(16,185,129,0.15); color:#059669;">
-                        <i class="fas fa-circle-play text-sm"></i>
+            <!-- Active Events -->
+            <div class="stats-card p-3.5">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-[9px] sm:text-[10px] font-semibold text-[#8b7e76] uppercase tracking-[0.16em]">Active Events</p>
+                        <p class="text-xl sm:text-2xl font-semibold text-[#2c2420] mt-1.5">{{ collect($events->items() ?? $events)->where('is_active', true)->count() }}</p>
                     </div>
-                    <div class="min-w-0">
-                        <p class="summary-label" style="color:var(--text-muted);">Active</p>
-                        <p class="summary-value" style="color:var(--text-primary);">{{ $events->where('is_active', true)->count() }}</p>
-                        <p class="summary-subtext" style="color:var(--text-secondary);">Currently live</p>
+                    <div class="stats-icon bg-[#ecfdf5]">
+                        <i class="fas fa-circle-play text-emerald-600 text-sm sm:text-base"></i>
                     </div>
+                </div>
+                <div class="mt-3 mini-progress">
+                    @php $evCount = method_exists($events, 'total') ? $events->total() : $events->count(); @endphp
+                    <div class="bg-gradient-to-r from-emerald-500 to-emerald-600" style="width: {{ $evCount > 0 ? (collect($events->items() ?? $events)->where('is_active', true)->count() / $evCount) * 100 : 0 }}%"></div>
                 </div>
             </div>
 
-            <div class="summary-card" style="background:#fffbeb; border-color:rgba(245,158,11,0.15);">
-                <div class="relative p-4 flex items-center gap-3">
-                    <div class="summary-icon flex-shrink-0" style="background:rgba(245,158,11,0.1); border-color:rgba(245,158,11,0.15); color:#b45309;">
-                        <i class="fas fa-clock text-sm"></i>
+            <!-- Upcoming Events -->
+            <div class="stats-card p-3.5">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-[9px] sm:text-[10px] font-semibold text-[#8b7e76] uppercase tracking-[0.16em]">Upcoming Events</p>
+                        <p class="text-xl sm:text-2xl font-semibold text-[#2c2420] mt-1.5">{{ collect($events->items() ?? $events)->filter(function($e) { return \Carbon\Carbon::parse($e->event_start_date)->gte(now()->startOfDay()); })->count() }}</p>
                     </div>
-                    <div class="min-w-0">
-                        <p class="summary-label" style="color:var(--text-muted);">Upcoming</p>
-                        <p class="summary-value" style="color:var(--text-primary);">{{ $events->where('event_start_date', '>=', now()->toDateString())->count() }}</p>
-                        <p class="summary-subtext" style="color:var(--text-secondary);">Scheduled ahead</p>
+                    <div class="stats-icon bg-[#fffbeb]">
+                        <i class="fas fa-clock text-amber-600 text-sm sm:text-base"></i>
                     </div>
+                </div>
+                <div class="mt-3 mini-progress">
+                    <div class="bg-gradient-to-r from-amber-500 to-amber-600" style="width: {{ $evCount > 0 ? (collect($events->items() ?? $events)->filter(function($e) { return \Carbon\Carbon::parse($e->event_start_date)->gte(now()->startOfDay()); })->count() / $evCount) * 100 : 0 }}%"></div>
                 </div>
             </div>
 
-            <div class="summary-card" style="background:#fef2f2; border-color:rgba(185,28,28,0.15);">
-                <div class="relative p-4 flex items-center gap-3">
-                    <div class="summary-icon flex-shrink-0" style="background:rgba(185,28,28,0.1); border-color:rgba(185,28,28,0.15); color:#b91c1c;">
-                        <i class="fas fa-circle-exclamation text-sm"></i>
+            <!-- Required Events -->
+            <div class="stats-card p-3.5">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-[9px] sm:text-[10px] font-semibold text-[#8b7e76] uppercase tracking-[0.16em]">Required Events</p>
+                        <p class="text-xl sm:text-2xl font-semibold text-[#2c2420] mt-1.5">{{ collect($events->items() ?? $events)->where('is_required', true)->count() }}</p>
                     </div>
-                    <div class="min-w-0">
-                        <p class="summary-label" style="color:var(--text-muted);">Required</p>
-                        <p class="summary-value" style="color:var(--text-primary);">{{ $events->where('is_required', true)->count() }}</p>
-                        <p class="summary-subtext" style="color:var(--text-secondary);">Mandatory events</p>
+                    <div class="stats-icon bg-[#fdf2f2]">
+                        <i class="fas fa-circle-exclamation text-[#b91c1c] text-sm sm:text-base"></i>
                     </div>
+                </div>
+                <div class="mt-3 mini-progress">
+                    <div class="bg-gradient-to-r from-[#b91c1c] to-[#9a1c1c]" style="width: {{ $evCount > 0 ? (collect($events->items() ?? $events)->where('is_required', true)->count() / $evCount) * 100 : 0 }}%"></div>
                 </div>
             </div>
         </div>
 
-        {{-- Flash --}}
         @if(session('success'))
-            <div class="mb-4 bg-[#ecfdf5] border border-emerald-200 text-emerald-800 rounded-lg p-3 flex items-center gap-2 text-xs sm:text-sm">
+            <div class="mb-6 sm:mb-8 bg-[#ecfdf5] border border-emerald-200 text-emerald-800 rounded-lg p-3 flex items-center gap-2 text-xs sm:text-sm">
                 <i class="fas fa-circle-check text-emerald-500"></i> {{ session('success') }}
             </div>
         @endif
 
-        <div class="panel-card overflow-hidden">
+        <!-- Filters Card -->
+        <div class="panel-card mb-6 sm:mb-8">
             <div class="panel-topline"></div>
-            <div class="panel-header">
-                <div class="panel-icon"><i class="fas fa-list text-[9px] sm:text-xs"></i></div>
-                <div>
-                    <h2 class="panel-title">Events List</h2>
-                    <p class="panel-subtitle hidden sm:block">Manage all created events and registrations</p>
-                </div>
-            </div>
 
-            <div class="table-header-bar">
-                <div class="flex items-center gap-3">
-                    <div class="table-header-icon" style="background: rgba(254,249,231,0.6); color: var(--gold-500); width: 2rem; height: 2rem; border-radius: 0.6rem; display: flex; align-items: center; justify-content: center;">
-                        <i class="fas fa-calendar-days text-[9px] sm:text-xs"></i>
-                    </div>
-                    <div>
-                        <h2 class="text-sm font-medium text-[#2c2420]">All Events</h2>
-                        <p class="text-[10px] sm:text-xs text-[#8b7e76]">Total: {{ $events->count() }} items</p>
-                    </div>
-                </div>
-                <div class="flex items-center gap-2">
-                    <span class="table-live-pill">
-                        <i class="fas fa-clock mr-1 text-[9px]"></i> Live updates
-                    </span>
-                </div>
-            </div>
-
-            <div class="p-3 sm:p-4 border-b border-[#e5e0db]/60">
+            <div class="p-3 sm:p-4">
                 <form method="GET" action="{{ route('counselor.events.index') }}">
                     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
                         <div class="sm:col-span-2 lg:col-span-1">
                             <div class="relative">
                                 <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-[#a89f97] text-[9px] sm:text-xs"></i>
                                 <input type="text" name="search"
-                                       class="input-field w-full pl-8 sm:pl-9 pr-3 py-2 sm:py-2.5 text-xs sm:text-sm"
+                                       class="input-field w-full pr-3 py-2 sm:py-2.5 text-xs sm:text-sm"
+                                       style="padding-left: 2.25rem !important;"
                                        placeholder="Search events..." value="{{ request('search') }}">
                             </div>
                         </div>
                         <div>
                             <select name="status" class="input-field w-full px-3 py-2 sm:py-2.5 bg-white text-[#4a3f3a] text-xs sm:text-sm">
-                                <option value="all" {{ request('status','all') == 'all' ? 'selected' : '' }}>All Status</option>
+                                <option value="all" {{ request('status') == 'all' ? 'selected' : '' }}>All Status</option>
                                 <option value="active" {{ request('status') == 'active' ? 'selected' : '' }}>Active</option>
                                 <option value="inactive" {{ request('status') == 'inactive' ? 'selected' : '' }}>Inactive</option>
                                 <option value="upcoming" {{ request('status') == 'upcoming' ? 'selected' : '' }}>Upcoming</option>
+                                <option value="past" {{ request('status') == 'past' ? 'selected' : '' }}>Past</option>
                             </select>
                         </div>
                         <div>
                             <select name="type" class="input-field w-full px-3 py-2 sm:py-2.5 bg-white text-[#4a3f3a] text-xs sm:text-sm">
-                                <option value="all" {{ request('type','all') == 'all' ? 'selected' : '' }}>All Types</option>
+                                <option value="all" {{ request('type') == 'all' ? 'selected' : '' }}>All Types</option>
                                 <option value="workshop" {{ request('type') == 'workshop' ? 'selected' : '' }}>Workshop</option>
                                 <option value="seminar" {{ request('type') == 'seminar' ? 'selected' : '' }}>Seminar</option>
                                 <option value="webinar" {{ request('type') == 'webinar' ? 'selected' : '' }}>Webinar</option>
@@ -343,77 +371,142 @@
                         </div>
                         <div class="flex items-end">
                             <button type="submit" class="filter-btn w-full px-4 py-2 sm:py-2.5 font-medium flex items-center justify-center gap-2 text-xs sm:text-sm rounded-lg">
-                                <i class="fas fa-filter text-[9px] sm:text-xs"></i> Filter
+                                <i class="fas fa-filter text-[9px] sm:text-xs"></i>
+                                <span>Filter</span>
                             </button>
                         </div>
                     </div>
                 </form>
             </div>
+        </div>
 
-            <div class="p-4 sm:p-5">
-                @if($events->isEmpty())
-                    <div class="glass-card p-6 sm:p-8 text-center">
-                        <div class="empty-state-icon mb-3">
-                            <i class="fas fa-calendar-plus text-[#a89f97] text-xl sm:text-2xl"></i>
-                        </div>
-                        <h3 class="text-base sm:text-lg font-semibold text-[#4a3f3a] mb-1.5">No Events Found</h3>
-                        <p class="text-[#8b7e76] text-xs sm:text-sm mb-4">No events match your current filters or none have been created yet.</p>
-                        <a href="{{ route('counselor.events.create') }}"
-                           class="inline-flex items-center px-4 py-2.5 primary-btn font-medium text-xs sm:text-sm rounded-lg">
-                            <i class="fas fa-plus mr-1.5 text-[9px] sm:text-xs"></i> Create Your First Event
-                        </a>
+        <!-- Events Grid -->
+        <div class="panel-card mb-6 sm:mb-8 overflow-hidden">
+            <div class="table-header-bar">
+                <div class="flex items-center gap-3">
+                    <div class="table-header-icon">
+                        <i class="fas fa-calendar-days text-[#7a2a2a] text-[10px] sm:text-xs"></i>
                     </div>
-                @else
-                    <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-                        @foreach($events as $event)
-                            <div class="event-card-new flex flex-col h-full">
-                        {{-- Banner --}}
+                    <div>
+                        <h2 class="text-sm font-medium text-[#2c2420]">All Events</h2>
+                        @if(method_exists($events, 'total') && $events->total() > 0)
+                            <p class="text-[10px] sm:text-xs text-[#8b7e76]">Showing <span class="font-bold text-[#2c2420]">{{ $events->firstItem() ?? 0 }} - {{ $events->lastItem() ?? 0 }}</span> of <span class="font-bold text-[#2c2420]">{{ $events->total() }}</span></p>
+                        @elseif(count($events) > 0)
+                            <p class="text-[10px] sm:text-xs text-[#8b7e76]">Showing <span class="font-bold text-[#2c2420]">{{ count($events) }}</span> events</p>
+                        @endif
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        @if($events->isEmpty())
+            <div class="glass-card p-6 sm:p-8 text-center">
+                <div class="empty-state-icon mb-3">
+                    <i class="fas fa-calendar-plus text-[#a89f97] text-xl sm:text-2xl"></i>
+                </div>
+                <h3 class="text-base sm:text-lg font-semibold text-[#4a3f3a] mb-1.5">No Events Found</h3>
+                <p class="text-[#8b7e76] text-xs sm:text-sm mb-4">No events match your current filters or no events have been created yet.</p>
+                <a href="{{ route('counselor.events.create') }}"
+                   class="inline-flex items-center px-4 py-2.5 primary-btn font-medium text-xs sm:text-sm rounded-lg">
+                    <i class="fas fa-plus mr-1.5 text-[9px] sm:text-xs"></i> Create Your First Event
+                </a>
+            </div>
+        @else
+            <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+                @foreach($events as $event)
+                    <div class="event-card-new flex flex-col h-full">
+                        <!-- Event Header -->
                         <div class="event-banner flex-shrink-0">
-                            <div class="relative flex justify-between items-start gap-2">
-                                <div class="min-w-0">
-                                    <div class="flex flex-wrap gap-1 mb-1.5">
-                                        <span class="event-type-pill">{{ $event->type }}</span>
-                                        @if($event->is_required)
-                                            <span class="event-type-pill" style="background:rgba(185,28,28,0.5);">
-                                                <i class="fas fa-circle-exclamation text-[8px] mr-0.5"></i> Required
-                                            </span>
-                                        @endif
-                                    </div>
-                                    <h3 class="text-sm sm:text-base font-semibold leading-tight truncate">{{ $event->title }}</h3>
-                                    <p class="text-[10px] sm:text-xs text-white/80 mt-1">
-                                        @if($event->for_all_colleges)
-                                            <i class="fas fa-globe mr-1"></i> All Colleges
-                                        @else
-                                            <i class="fas fa-building-columns mr-1"></i> {{ $event->colleges->count() }} college(s)
-                                        @endif
-                                    </p>
-                                </div>
-                                <span class="status-badge flex-shrink-0 {{ $event->is_active ? 'status-active' : 'status-inactive' }}">
+                            @if($event->image_url)
+                                <img src="{{ $event->image_url }}" alt="{{ $event->title }}"
+                                     onerror="this.style.display='none'">
+                            @endif
+                            <div class="event-banner-overlay"></div>
+
+                            <!-- Status badge top-right -->
+                            <div class="event-banner-top">
+                                <span class="status-badge {{ $event->is_active ? 'status-active' : 'status-inactive' }}">
                                     {{ $event->is_active ? 'Active' : 'Inactive' }}
                                 </span>
                             </div>
+
+                            <!-- Title + type bottom -->
+                            <div class="event-banner-content">
+                                <div class="flex flex-wrap gap-1 mb-1.5">
+                                    <span class="event-type-pill">{{ $event->type }}</span>
+                                    @if($event->is_required)
+                                        <span class="event-type-pill" style="background:rgba(185,28,28,0.5);">
+                                            <i class="fas fa-circle-exclamation text-[8px] mr-0.5"></i> Required
+                                        </span>
+                                    @endif
+                                </div>
+                                <h3 class="text-sm sm:text-base font-semibold leading-tight line-clamp-2">{{ $event->title }}</h3>
+                                <p class="text-[10px] sm:text-xs text-white/80 mt-0.5 truncate">
+                                    @if($event->for_all_colleges)
+                                        <i class="fas fa-globe mr-1"></i> All Colleges
+                                    @else
+                                        <i class="fas fa-building-columns mr-1"></i> {{ $event->colleges->count() }} college(s)
+                                    @endif
+                                </p>
+                            </div>
                         </div>
 
-                        {{-- Body --}}
+                        <!-- Event Details -->
                         <div class="p-4 flex flex-col flex-1">
                             <div class="space-y-2 mb-3">
                                 <div class="event-meta-row">
-                                    <span class="event-meta-icon bg-[#eff6ff] text-sky-500"><i class="fas fa-calendar-days text-[9px] sm:text-xs"></i></span>
+                                    <span class="event-meta-icon bg-[#eff6ff] text-sky-500">
+                                        <i class="fas fa-calendar-days text-[9px] sm:text-xs"></i>
+                                    </span>
                                     <span class="text-xs sm:text-sm truncate">{{ $event->date_range }}</span>
                                 </div>
+
                                 <div class="event-meta-row">
-                                    <span class="event-meta-icon bg-[#fffbeb] text-amber-500"><i class="fas fa-clock text-[9px] sm:text-xs"></i></span>
+                                    <span class="event-meta-icon bg-[#fffbeb] text-amber-500">
+                                        <i class="fas fa-clock text-[9px] sm:text-xs"></i>
+                                    </span>
                                     <span class="text-xs sm:text-sm truncate">{{ $event->time_range }}</span>
                                 </div>
+
                                 <div class="event-meta-row">
-                                    <span class="event-meta-icon bg-[#fdf2f2] text-[#7a2a2a]/60"><i class="fas fa-location-dot text-[9px] sm:text-xs"></i></span>
+                                    <span class="event-meta-icon bg-[#fdf2f2] text-[#7a2a2a]/60">
+                                        <i class="fas fa-location-dot text-[9px] sm:text-xs"></i>
+                                    </span>
                                     <span class="text-xs sm:text-sm truncate">{{ $event->location }}</span>
                                 </div>
+
                                 <div class="event-meta-row">
-                                    <span class="event-meta-icon bg-[#ecfdf5] text-emerald-500"><i class="fas fa-users text-[9px] sm:text-xs"></i></span>
+                                    <span class="event-meta-icon bg-[#ecfdf5] text-emerald-500">
+                                        <i class="fas fa-users text-[9px] sm:text-xs"></i>
+                                    </span>
                                     <span class="text-xs sm:text-sm truncate">
-                                        {{ $event->registered_count }} registered
-                                        @if($event->max_attendees) / {{ $event->max_attendees }} max @endif
+                                        {{ $event->registered_count ?? $event->registrations->where('status', 'registered')->count() }} registered
+                                        @if($event->max_attendees)
+                                            / {{ $event->max_attendees }} max
+                                        @endif
+                                    </span>
+                                </div>
+
+                                <div class="event-meta-row">
+                                    <span class="event-meta-icon bg-[#f3e8ff] text-purple-500">
+                                        <i class="fas fa-bullseye text-[9px] sm:text-xs"></i>
+                                    </span>
+                                    <span class="text-xs sm:text-sm truncate" title="Target Audience">
+                                        @if($event->for_all_colleges && empty($event->year_levels))
+                                            All Students
+                                        @else
+                                            @php
+                                                $targets = [];
+                                                if (!$event->for_all_colleges && $event->colleges) {
+                                                    $targets[] = $event->colleges->pluck('name')->implode(', ');
+                                                }
+                                                if (!empty($event->year_levels)) {
+                                                    $targets[] = implode(', ', $event->year_levels) . ' Year';
+                                                }
+                                                $targetText = implode(' | ', $targets);
+                                            @endphp
+                                            {{ $targetText ?: 'Specific Audience' }}
+                                        @endif
                                     </span>
                                 </div>
                             </div>
@@ -422,12 +515,13 @@
                                 {{ Str::limit($event->description, 100) }}
                             </p>
 
-                            {{-- Actions --}}
+                            <!-- Action Buttons -->
                             <div class="grid grid-cols-2 gap-2 mb-3">
                                 <a href="{{ route('counselor.events.registrations', $event) }}"
                                    class="action-btn-soft bg-[#fffbeb] text-[#9a7b0a] hover:bg-[#fef3d1] text-center">
                                     <i class="fas fa-users mr-1.5 text-[9px]"></i> Registrations
                                 </a>
+
                                 <a href="{{ route('counselor.events.edit', $event) }}"
                                    class="action-btn-soft bg-[#f5f0eb] text-[#6b5e57] hover:bg-[#e5e0db] text-center">
                                     <i class="fas fa-pen-to-square mr-1.5 text-[9px]"></i> Edit
@@ -435,24 +529,28 @@
 
                                 <button onclick="togglePin({{ $event->id }}, this)"
                                         class="action-btn-soft {{ $event->is_pinned ? 'bg-[#fef9e7] text-[#c9a227]' : 'bg-[#f5f0eb] text-[#8b7e76]' }} hover:bg-[#fef3c7] text-center"
-                                        title="{{ $event->is_pinned ? 'Unpin' : 'Pin to top' }}">
+                                        title="{{ $event->is_pinned ? 'Unpin event' : 'Pin to top' }}">
                                     <i class="fas fa-thumbtack mr-1.5 text-[9px] {{ $event->is_pinned ? '' : 'opacity-50' }}"></i>
                                     {{ $event->is_pinned ? 'Pinned' : 'Pin' }}
                                 </button>
+
                                 <form action="{{ route('counselor.events.toggle-status', $event) }}" method="POST" class="contents">
-                                    @csrf @method('PATCH')
+                                    @csrf
+                                    @method('PATCH')
                                     <button type="submit"
                                             class="action-btn-soft {{ $event->is_active ? 'bg-[#fffbeb] text-[#9a7b0a] hover:bg-[#fef3d1]' : 'bg-[#ecfdf5] text-[#059669] hover:bg-[#d1fae5]' }} text-center w-full">
                                         <i class="fas {{ $event->is_active ? 'fa-pause' : 'fa-play' }} mr-1.5 text-[9px]"></i>
                                         {{ $event->is_active ? 'Deactivate' : 'Activate' }}
                                     </button>
                                 </form>
+
                                 <form action="{{ route('counselor.events.destroy', $event) }}" method="POST" class="contents"
-                                      onsubmit="return confirm('Delete this event? This cannot be undone.')">
-                                    @csrf @method('DELETE')
+                                      onsubmit="return confirm('Are you sure you want to delete this event? This action cannot be undone.')">
+                                    @csrf
+                                    @method('DELETE')
                                     <button type="submit"
-                                            class="action-btn-soft bg-[#fdf2f2] text-[#b91c1c] hover:bg-[#fce4e4] text-center w-full">
-                                        <i class="fas fa-trash-can mr-1.5 text-[9px]"></i> Delete
+                                            class="action-btn-soft bg-[#fdf2f2] text-[#b91c1c] hover:bg-[#fce4e4] text-center w-full col-span-2">
+                                        <i class="fas fa-trash-can-alt mr-1.5 text-[9px]"></i> Delete
                                     </button>
                                 </form>
                             </div>
@@ -465,29 +563,25 @@
                             </div>
                         </div>
                     </div>
-                        @endforeach
-                    </div>
-                @endif
+                @endforeach
             </div>
 
-            <div class="p-4 sm:p-5 border-t border-[#e5e0db]/60 bg-[#faf8f5]/40">
-                @if($events->hasPages())
+            <!-- Pagination -->
+            @if(method_exists($events, 'links'))
+            <div class="mt-5 sm:mt-6 glass-card overflow-hidden">
+                <div class="px-4 sm:px-5 py-3 sm:py-3.5 border-t border-[#e5e0db]/60 bg-[#faf8f5]/40">
                     {{ $events->appends(request()->query())->links('vendor.pagination.counselor-resources') }}
-                @else
-                <div class="flex items-center justify-center gap-2 text-[10px] sm:text-xs text-[#8b7e76]">
-                    <i class="fas fa-circle-check text-[#059669]"></i>
-                    <span>Showing all <span class="font-semibold text-[#2c2420]">{{ $events->count() }}</span> events</span>
                 </div>
-                @endif
             </div>
-        </div>
-
+            @endif
+        @endif
     </div>
 </div>
 
 <script>
 function togglePin(id, btn) {
-    fetch(`/counselor/events/${id}/toggle-pin`, {
+    const url = `/counselor/events/${id}/toggle-pin`;
+    fetch(url, {
         method: 'PATCH',
         headers: {
             'X-CSRF-TOKEN': document.querySelector('meta[name=csrf-token]').content,
@@ -496,10 +590,13 @@ function togglePin(id, btn) {
     })
     .then(r => r.json())
     .then(data => {
+        const icon = btn.querySelector('i');
+        const label = btn.querySelector('span') ?? btn.childNodes[btn.childNodes.length - 1];
         if (data.is_pinned) {
             btn.classList.remove('bg-[#f5f0eb]', 'text-[#8b7e76]');
             btn.classList.add('bg-[#fef9e7]', 'text-[#c9a227]');
-            btn.title = 'Unpin';
+            icon.classList.remove('opacity-50');
+            btn.title = 'Unpin event';
             btn.innerHTML = '<i class="fas fa-thumbtack mr-1.5 text-[9px]"></i> Pinned';
         } else {
             btn.classList.remove('bg-[#fef9e7]', 'text-[#c9a227]');

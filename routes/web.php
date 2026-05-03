@@ -170,6 +170,7 @@ Route::middleware('auth')->group(function () {
         Route::patch('/resources/{resource}', [ResourceController::class, 'update'])->name('counselor.resources.update');
         Route::delete('/resources/{resource}', [ResourceController::class, 'destroy'])->name('counselor.resources.destroy');
         Route::patch('/resources/{resource}/status', [ResourceController::class, 'updateStatus'])->name('counselor.resources.update-status');
+        Route::patch('/resources/{resource}/pin', [ResourceController::class, 'togglePin'])->name('counselor.resources.toggle-pin');
 
         // Follow-up appointment slots
         Route::get('/appointments/followup-available-slots', [AppointmentController::class, 'getFollowupAvailableSlots'])->name('counselor.appointments.followup-available-slots');
