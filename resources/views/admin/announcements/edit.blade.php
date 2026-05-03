@@ -399,45 +399,48 @@
                             </div>
 
                             <!-- Announcement Image -->
-                            <div>
-                                <label for="image" class="field-label">Announcement Image (Optional)</label>
-
-                                <!-- Current Image Preview -->
-                                @if($announcement->image_url)
-                                    <div class="mb-4">
-                                        <div class="image-preview-card">
-                                            <img src="{{ $announcement->image_url }}" alt="Current announcement image">
+                            <div class="pt-2">
+                                <label class="field-label mb-2">Announcement Image (Optional)</label>
+                                <div class="flex flex-col sm:flex-row gap-5 items-start">
+                                    {{-- Current image preview --}}
+                                    <div class="flex-shrink-0">
+                                        <div class="w-full sm:w-48 h-32 rounded-lg overflow-hidden border border-[#e5e0db] bg-[#f5f0eb] relative">
+                                            @if($announcement->image_url)
+                                                <img src="{{ $announcement->image_url }}" alt="Current announcement image" class="w-full h-full object-contain bg-black/5" id="announcement-img-preview">
+                                            @else
+                                                <div class="w-full h-full flex flex-col items-center justify-center text-[#8b7e76]" id="announcement-img-placeholder">
+                                                    <i class="fas fa-image text-2xl mb-1 opacity-40"></i>
+                                                    <span class="text-xs">No image</span>
+                                                </div>
+                                                <img src="" alt="" class="w-full h-full object-contain hidden bg-black/5" id="announcement-img-preview">
+                                            @endif
                                         </div>
-                                        <p class="text-[10px] sm:text-xs text-[#8b7e76] mt-2">Current image — upload a new one to replace</p>
                                     </div>
-                                @endif
 
-                                <!-- Image Upload Area -->
-                                <div class="w-full">
-                                    <label for="image" class="upload-zone">
-                                        <i class="fas fa-cloud-upload-alt"></i>
-                                        <p class="text-xs sm:text-sm text-[#6b5e57]">
-                                            <span class="font-semibold">Click to upload</span> or drag and drop
-                                        </p>
-                                        <p class="hint">PNG, JPG, GIF (MAX. 10MB)</p>
-                                        <input id="image" name="image" type="file" class="hidden" accept="image/*" />
-                                    </label>
-                                </div>
-
-                                <!-- New Image Preview -->
-                                <div id="image-preview" class="mt-4 hidden">
-                                    <div class="image-preview-card">
-                                        <img id="preview" class="w-full h-48 object-cover" alt="Preview">
-                                        <button type="button" onclick="removeImagePreview()"
-                                                class="image-remove-btn" title="Remove Preview">
-                                            <i class="fas fa-xmark"></i>
-                                        </button>
+                                    {{-- Upload controls --}}
+                                    <div class="flex-1 min-w-0 w-full">
+                                        <input type="file"
+                                               name="image"
+                                               id="image"
+                                               accept="image/jpeg,image/png,image/jpg,image/gif"
+                                               class="input-field mt-1"
+                                               onchange="previewAnnouncementImage(this)">
+                                        <p class="helper-text mt-1">JPG, PNG or GIF · Max 10MB. @if($announcement->image_url) Upload a new one to replace the current image. @endif</p>
+                                        @error('image')
+                                            <p class="error-text mt-1">{{ $message }}</p>
+                                        @enderror
+                                        
+                                        @if($announcement->image_url)
+                                        <div class="mt-3">
+                                            <button type="button"
+                                                    class="form-action-secondary !text-[#b91c1c] !border-[#b91c1c]/30 hover:!bg-[#fdf2f2] !py-1 !px-2 !text-[10px]"
+                                                    onclick="if(confirm('Are you sure you want to remove the current image?')) { document.getElementById('remove-image-form').submit(); }">
+                                                <i class="fas fa-xmark mr-1"></i> Remove Image
+                                            </button>
+                                        </div>
+                                        @endif
                                     </div>
                                 </div>
-
-                                @error('image')
-                                    <p class="error-text">{{ $message }}</p>
-                                @enderror
                             </div>
                         </div>
                     </div>
@@ -617,14 +620,9 @@
 
         @if($announcement->image_url)
         <!-- Form placed OUTSIDE the main edit form to avoid nesting forms -->
-        <form action="{{ route('admin.announcements.remove-image', $announcement) }}" method="POST" class="mt-4 flex justify-end">
+        <form action="{{ route('admin.announcements.remove-image', $announcement) }}" method="POST" id="remove-image-form" class="hidden">
             @csrf
             @method('DELETE')
-            <button type="submit"
-                    class="form-action-secondary !text-[#b91c1c] !border-[#b91c1c]/30 hover:!bg-[#fdf2f2]"
-                    onclick="return confirm('Are you sure you want to remove the current image?')">
-                <i class="fas fa-xmark mr-2 text-[9px] sm:text-xs"></i> Remove Current Image
-            </button>
         </form>
         @endif
     </div>
@@ -720,35 +718,39 @@ document.addEventListener('DOMContentLoaded', function() {
     specificYearLevelsRadio.addEventListener('change', toggleYearLevelsSelection);
 
     // Image preview functionality
-    const imageInput = document.getElementById('image');
-    const imagePreview = document.getElementById('image-preview');
-    const preview = document.getElementById('preview');
-
-    imageInput.addEventListener('change', function() {
-        const file = this.files[0];
-        if (file) {
+    window.previewAnnouncementImage = function(input) {
+        if (input.files && input.files[0]) {
+            const file = input.files[0];
             // Validate file size (10MB)
             if (file.size > 10 * 1024 * 1024) {
                 alert('File size must be less than 10MB');
-                this.value = '';
+                input.value = '';
                 return;
             }
 
             const reader = new FileReader();
-            reader.addEventListener('load', function() {
-                preview.setAttribute('src', this.result);
-                imagePreview.classList.remove('hidden');
-            });
+            reader.onload = e => {
+                const preview = document.getElementById('announcement-img-preview');
+                const placeholder = document.getElementById('announcement-img-placeholder');
+                if (preview) {
+                    preview.src = e.target.result;
+                    preview.classList.remove('hidden');
+                }
+                if (placeholder) placeholder.classList.add('hidden');
+            };
             reader.readAsDataURL(file);
         } else {
-            imagePreview.classList.add('hidden');
+            const preview = document.getElementById('announcement-img-preview');
+            const placeholder = document.getElementById('announcement-img-placeholder');
+            if (preview) {
+                // If it's edit and we had an existing image, we might want to revert or just hide.
+                // Reverting might be complex, so we'll just show the placeholder or the old image.
+                // We don't have the old image URL in JS easily without adding it, let's just clear preview.
+                preview.src = '';
+                preview.classList.add('hidden');
+            }
+            if (placeholder) placeholder.classList.remove('hidden');
         }
-    });
-
-    // Remove image preview
-    window.removeImagePreview = function() {
-        imageInput.value = '';
-        imagePreview.classList.add('hidden');
     }
 
     // Initial toggle

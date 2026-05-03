@@ -44,6 +44,26 @@
     }
     .hero-badge-dot { width: 0.3rem; height: 0.3rem; border-radius: 999px; background: var(--gold-400); }
 
+    .summary-card {
+        position: relative; overflow: hidden; border-radius: 0.75rem;
+        border: 1px solid rgba(92,26,26,0.15);
+        background: linear-gradient(135deg, var(--maroon-800) 0%, var(--maroon-900) 100%); color: white;
+        box-shadow: 0 4px 12px rgba(58,12,12,0.15);
+    }
+    .summary-card::before {
+        content: ""; position: absolute; inset: 0; opacity: 0.15;
+        background: radial-gradient(circle at top right, var(--gold-400), transparent 40%);
+        pointer-events: none;
+    }
+    .summary-icon {
+        width: 2.5rem; height: 2.5rem; border-radius: 0.75rem; display: flex;
+        align-items: center; justify-content: center; background: rgba(255,255,255,0.1);
+        border: 1px solid rgba(255,255,255,0.1); color: #fef9e7; flex-shrink: 0;
+    }
+    .summary-label { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.2em; color: rgba(255,255,255,0.7); }
+    .summary-value { font-size: 1.2rem; line-height: 1.2; font-weight: 800; margin-top: 0.35rem; }
+    .summary-subtext { font-size: 0.7rem; color: rgba(255,255,255,0.8); margin-top: 0.25rem; }
+
     .section-card {
         position: relative; overflow: hidden; border-radius: 0.75rem;
         border: 1px solid var(--border-soft); background: rgba(255,255,255,0.95);
@@ -140,18 +160,33 @@
 
         <!-- Header -->
         <div class="mb-5 sm:mb-6">
-            <div class="hero-card">
-                <div class="relative p-4 sm:p-5 flex items-start gap-3">
-                    <div class="hero-icon flex-shrink-0">
-                        <i class="fas fa-concierge-bell text-base sm:text-lg"></i>
+            <div class="grid grid-cols-1 xl:grid-cols-[1fr_auto] gap-4 items-stretch">
+                <div class="hero-card">
+                    <div class="relative p-4 sm:p-5 flex items-start gap-3">
+                        <div class="hero-icon flex-shrink-0">
+                            <i class="fas fa-concierge-bell text-base sm:text-lg"></i>
+                        </div>
+                        <div class="min-w-0">
+                            <a href="{{ route('admin.services.index') }}" class="inline-flex items-center text-[#7a2a2a] hover:text-[#5c1a1a] mb-2 font-medium text-xs sm:text-sm">
+                                <i class="fas fa-arrow-left mr-1.5"></i> Back to Services
+                            </a>
+                            <div class="hero-badge"><span class="hero-badge-dot"></span>Service Editor</div>
+                            <h1 class="text-lg sm:text-xl font-semibold tracking-tight text-[#2c2420] mt-2">Edit Service</h1>
+                            <p class="text-[#6b5e57] text-xs sm:text-sm mt-1">Update the service details shown on the dashboard.</p>
+                        </div>
                     </div>
-                    <div class="min-w-0">
-                        <a href="{{ route('admin.services.index') }}" class="inline-flex items-center text-[#7a2a2a] hover:text-[#5c1a1a] mb-2 font-medium text-xs sm:text-sm">
-                            <i class="fas fa-arrow-left mr-1.5"></i> Back to Services
-                        </a>
-                        <div class="hero-badge"><span class="hero-badge-dot"></span>Service Editor</div>
-                        <h1 class="text-lg sm:text-xl font-semibold tracking-tight text-[#2c2420] mt-2">Edit Service</h1>
-                        <p class="text-[#6b5e57] text-xs sm:text-sm mt-1">Update the service details shown on the dashboard.</p>
+                </div>
+
+                <div class="summary-card">
+                    <div class="relative h-full flex flex-col sm:flex-row items-center gap-3 p-4">
+                        <div class="summary-icon flex-shrink-0">
+                            <i class="fas fa-wand-magic-sparkles text-sm"></i>
+                        </div>
+                        <div class="text-center sm:text-left min-w-0">
+                            <p class="summary-label">Edit Flow</p>
+                            <p class="summary-value">Update Details</p>
+                            <p class="summary-subtext">Modify service text, visibility, and image.</p>
+                        </div>
                     </div>
                 </div>
             </div>

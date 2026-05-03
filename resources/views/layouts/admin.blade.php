@@ -1144,11 +1144,11 @@
                     <i class="fas fa-circle-question"></i>
                     <span>FAQs</span>
                 </a>
-                <a href="{{ route('admin.events') }}" class="sidebar-link {{ request()->routeIs('admin.events') && !request()->routeIs('admin.events.create') ? 'active' : '' }}">
+                <a href="{{ route('admin.events') }}" class="sidebar-link {{ request()->routeIs('admin.events') || request()->routeIs('admin.events.create') ? 'active' : '' }}">
                     <i class="fas fa-calendar-days"></i>
                     <span>Events</span>
                 </a>
-                <a href="{{ route('admin.announcements.index') }}" class="sidebar-link {{ request()->routeIs('admin.announcements.*') && !request()->routeIs('admin.announcements.create') ? 'active' : '' }}">
+                <a href="{{ route('admin.announcements.index') }}" class="sidebar-link {{ request()->routeIs('admin.announcements.*') ? 'active' : '' }}">
                     <i class="fas fa-bullhorn"></i>
                     <span>Announcements</span>
                 </a>

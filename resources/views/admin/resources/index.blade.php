@@ -89,28 +89,9 @@
 
     .panel-topline { position: absolute; inset-inline: 0; top: 0; height: 3px; background: linear-gradient(90deg, var(--maroon-800) 0%, var(--gold-400) 50%, var(--maroon-800) 100%); z-index: 10; }
 
-    .table-header-bar {
-        display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.6rem;
-        padding: 0.75rem 1.25rem; border-bottom: 1px solid var(--border-soft)/60;
-        background: rgba(250,248,245,0.4);
-    }
-    .table-header-icon {
-        width: 2rem; height: 2rem; border-radius: 0.6rem;
-        background: rgba(254,249,231,0.6);
-    }
-    .table-live-pill {
-        display: inline-flex; align-items: center; font-size: 0.65rem; color: var(--text-secondary);
-        background: rgba(250,248,245,0.6); border: 1px solid var(--border-soft); padding: 0.25rem 0.5rem;
-        border-radius: 999px; font-weight: 500;
-    }
-    .table-row { transition: background-color 0.15s ease; }
-    .table-row:hover { background: rgba(254,249,231,0.35); }
-
-    .resource-icon-badge {
-        width: 2.5rem; height: 2.5rem; border-radius: 0.65rem;
-        display: flex; align-items: center; justify-content: center; flex-shrink: 0;
-        background: rgba(245,240,235,0.6); box-shadow: inset 0 1px 0 rgba(255,255,255,0.4);
-    }
+    .resource-card { transition: all 0.22s ease; position: relative; overflow: hidden; border-radius: 0.75rem; border: 1px solid var(--border-soft); background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(8px); box-shadow: 0 2px 8px rgba(44, 36, 32, 0.04); display: flex; flex-direction: column; height: 100%; }
+    .resource-card:hover { transform: translateY(-2px); box-shadow: 0 8px 18px rgba(44,36,32,0.06); }
+    .resource-card::before { content: ""; position: absolute; inset: 0; pointer-events: none; background: radial-gradient(circle at top right, rgba(212,175,55,0.06), transparent 30%); }
 
     .category-pill {
         display: inline-flex; align-items: center; padding: 0.2rem 0.5rem; border-radius: 999px;
@@ -118,11 +99,8 @@
         text-transform: capitalize;
     }
 
-    .action-link { color: var(--text-secondary); transition: all 0.18s ease; }
-    .action-link:hover { color: var(--maroon-800); transform: translateY(-1px); }
-    .pin-active { color: #7a2a2a !important; }
-    .delete-link { color: #b91c1c; transition: all 0.18s ease; }
-    .delete-link:hover { color: var(--maroon-900); transform: translateY(-1px); }
+    .status-badge { font-size: 0.65rem; padding: 0.2rem 0.5rem; border-radius: 9999px; font-weight: 700; backdrop-filter: blur(4px); display: inline-flex; }
+
     .empty-state-icon {
         width: 3.5rem; height: 3.5rem; border-radius: 999px; display: flex;
         align-items: center; justify-content: center; background: rgba(245,240,235,0.6);
@@ -133,8 +111,34 @@
         display: inline-flex; align-items: center; color: var(--maroon-700); font-weight: 600; transition: all 0.18s ease;
     }
     .visit-link:hover { color: var(--maroon-900); transform: translateY(-1px); }
-    .status-btn { transition: all 0.2s ease; }
-    .status-btn:hover { transform: translateY(-1px); }
+
+    .action-btn-soft {
+        display: inline-flex; align-items: center; justify-content: center; border-radius: 0.6rem;
+        padding: 0.45rem 0.55rem; font-size: 0.7rem; font-weight: 600; transition: all 0.15s ease;
+    }
+    .action-btn-soft:hover { transform: translateY(-1px); }
+
+    .resource-banner {
+        position: relative; overflow: hidden; color: white;
+        height: 10rem;
+        background: linear-gradient(135deg, var(--maroon-800) 0%, var(--maroon-900) 100%);
+    }
+    .resource-banner img {
+        position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain;
+        background-color: rgba(0,0,0,0.15);
+        transition: transform 0.3s ease;
+    }
+    .resource-card:hover .resource-banner img { transform: scale(1.04); }
+    .resource-banner-overlay {
+        position: absolute; inset: 0;
+        background: linear-gradient(to top, rgba(44,20,20,0.82) 0%, rgba(44,20,20,0.25) 60%, transparent 100%);
+    }
+    .resource-banner-content {
+        position: absolute; bottom: 0; left: 0; right: 0; padding: 0.65rem 0.85rem; display: flex; align-items: flex-end; gap: 0.5rem;
+    }
+    .resource-banner-top {
+        position: absolute; top: 0.5rem; right: 0.5rem; display: flex; flex-direction: column; gap: 0.35rem; align-items: flex-end; z-index: 10;
+    }
 
     .filter-label {
         display: block;
@@ -265,175 +269,160 @@
             </div>
         </div>
 
-        <!-- Main Content Card -->
-        <div class="panel-card overflow-hidden relative">
-            @if($resources->count() === 0)
-                <div class="p-6 sm:p-10 md:p-12 text-center">
-                    <div class="empty-state-icon mb-4">
-                        <i class="fas fa-folder-open text-[#a89f97] text-2xl sm:text-3xl"></i>
+        <!-- Main Content Grid -->
+        <div class="panel-card overflow-hidden relative mb-4">
+            <div class="panel-header">
+                <div class="flex items-center gap-3">
+                    <div class="panel-icon">
+                        <i class="fas fa-folder-open text-[#7a2a2a] text-[10px] sm:text-xs"></i>
                     </div>
-                    <h3 class="text-lg sm:text-xl font-semibold text-[#4a3f3a] mb-2">No Resources Yet</h3>
-                    <p class="text-[#8b7e76] text-xs sm:text-sm">Get started by creating your first resource.</p>
-                    <a href="{{ route('admin.resources.create') }}"
-                       class="inline-flex items-center mt-4 sm:mt-5 px-5 py-2.5 primary-btn text-xs sm:text-sm rounded-lg">
-                        <i class="fas fa-plus mr-1.5 text-[9px] sm:text-xs"></i> Create Resource
-                    </a>
+                    <div>
+                        <h2 class="text-sm font-medium text-[#2c2420]">Resource Library</h2>
+                        <p class="text-[10px] sm:text-xs text-[#8b7e76]">Showing <span class="font-bold text-[#2c2420]">{{ $resources->firstItem() ?? 0 }} - {{ $resources->lastItem() ?? 0 }}</span> of <span class="font-bold text-[#2c2420]">{{ $resources->total() }}</span></p>
+                    </div>
                 </div>
-            @else
-                <!-- Table Header Stats -->
-                <div class="table-header-bar">
-                    <div class="flex items-center gap-3">
-                        <div class="table-header-icon">
-                            <i class="fas fa-folder-open text-[#7a2a2a] text-[10px] sm:text-xs"></i>
+            </div>
+        </div>
+
+        @if($resources->isEmpty())
+            <div class="glass-card p-6 sm:p-10 md:p-12 text-center">
+                <div class="empty-state-icon mb-4">
+                    <i class="fas fa-folder-open text-[#a89f97] text-2xl sm:text-3xl"></i>
+                </div>
+                <h3 class="text-lg sm:text-xl font-semibold text-[#4a3f3a] mb-2">No Resources Yet</h3>
+                <p class="text-[#8b7e76] text-xs sm:text-sm">Get started by creating your first resource.</p>
+                <a href="{{ route('admin.resources.create') }}"
+                   class="inline-flex items-center mt-4 sm:mt-5 px-5 py-2.5 primary-btn text-xs sm:text-sm rounded-lg">
+                    <i class="fas fa-plus mr-1.5 text-[9px] sm:text-xs"></i> Create Resource
+                </a>
+            </div>
+        @else
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                @foreach($resources as $resource)
+                    <div class="resource-card flex flex-col h-full {{ $resource->is_pinned ? 'ring-2 ring-[#d4af37]/40 ring-offset-2 ring-offset-[#faf8f5]' : '' }}">
+                        
+                        <!-- Banner -->
+                        <div class="resource-banner flex-shrink-0">
+                            @if($resource->image_path || ($resource->use_yt_thumbnail && $resource->is_youtube))
+                                <img src="{{ $resource->image_url }}" alt="{{ $resource->title }}" onerror="this.style.display='none'">
+                            @endif
+                            <div class="resource-banner-overlay"></div>
+
+                            <div class="resource-banner-top">
+                                @if($resource->is_pinned)
+                                    <span class="status-badge bg-[#fef9e7]/95 text-[#c9a227] border border-[#d4af37]/30 shadow-sm">
+                                        <i class="fas fa-thumbtack mr-1"></i> Pinned
+                                    </span>
+                                @endif
+                                <span class="status-badge {{ $resource->is_active ? 'bg-[#ecfdf5]/95 text-[#059669] border border-[#10b981]/30' : 'bg-[#fdf2f2]/95 text-[#b91c1c] border border-[#b91c1c]/30' }} shadow-sm">
+                                    {{ $resource->is_active ? 'Active' : 'Inactive' }}
+                                </span>
+                            </div>
+
+                            <div class="resource-banner-content">
+                                <div class="w-10 h-10 rounded-xl bg-white/10 backdrop-blur-md flex items-center justify-center flex-shrink-0 text-white border border-white/20 shadow-sm">
+                                    <i class="{{ $resource->icon }} text-lg"></i>
+                                </div>
+                                <div class="min-w-0 pb-1">
+                                    <span class="category-pill !bg-white/20 !text-white !border-white/30 backdrop-blur-md shadow-sm">
+                                        <i class="fas fa-tag mr-1 text-[8px] sm:text-[10px]"></i> {{ $resource->category_label }}
+                                    </span>
+                                </div>
+                            </div>
                         </div>
-                        <div>
-                            <h2 class="text-sm font-medium text-[#2c2420]">Resource Library</h2>
-                            <p class="text-[10px] sm:text-xs text-[#8b7e76]">Showing <span class="font-bold text-[#2c2420]">{{ $resources->firstItem() ?? 0 }} - {{ $resources->lastItem() ?? 0 }}</span> of <span class="font-bold text-[#2c2420]">{{ $resources->total() }}</span></p>
+
+                        <div class="p-4 sm:p-5 flex flex-col flex-1">
+                            <!-- Content -->
+                            <div class="mb-3 flex-1">
+                                <h3 class="text-sm sm:text-base font-semibold leading-tight text-[#2c2420] mb-1.5 line-clamp-2" title="{{ $resource->title }}">{{ $resource->title }}</h3>
+                                <p class="text-[#8b7e76] text-[10px] sm:text-xs line-clamp-3 leading-relaxed">
+                                    {{ $resource->description }}
+                                </p>
+                            </div>
+
+                            <!-- Link -->
+                            @if($resource->link)
+                                <div class="mb-4 pt-3 border-t border-[#e5e0db]/60">
+                                    <a href="{{ $resource->link }}" target="_blank" rel="noopener noreferrer" class="visit-link text-xs group flex items-center w-full truncate">
+                                        <i class="fas fa-external-link-alt mr-1.5 group-hover:scale-110 transition-transform"></i>
+                                        <span class="truncate">Visit Resource Link</span>
+                                    </a>
+                                </div>
+                            @else
+                                <div class="mb-4 pt-3 border-t border-[#e5e0db]/60">
+                                    <span class="text-[#a89f97] text-xs italic">No link provided</span>
+                                </div>
+                            @endif
+
+                            <!-- Actions -->
+                            <div class="grid grid-cols-2 gap-2 mt-auto">
+                                <a href="{{ route('admin.resources.edit', $resource) }}"
+                                   class="action-btn-soft bg-[#f5f0eb] text-[#6b5e57] hover:bg-[#e5e0db] text-center w-full">
+                                    <i class="fas fa-pen-to-square mr-1.5 text-[9px]"></i> Edit
+                                </a>
+
+                                <button onclick="togglePin('resource', {{ $resource->id }}, this)"
+                                        class="action-btn-soft {{ $resource->is_pinned ? 'bg-[#fef9e7] text-[#c9a227]' : 'bg-[#f5f0eb] text-[#8b7e76]' }} hover:bg-[#fef3c7] text-center w-full"
+                                        title="{{ $resource->is_pinned ? 'Unpin' : 'Pin to top' }}">
+                                    <i class="fas fa-thumbtack mr-1.5 text-[9px] {{ $resource->is_pinned ? '' : 'opacity-50' }}"></i>
+                                    <span class="pin-text">{{ $resource->is_pinned ? 'Pinned' : 'Pin' }}</span>
+                                </button>
+
+                                <form action="{{ route('admin.resources.update-status', $resource) }}" method="POST" class="contents status-toggle-form">
+                                    @csrf
+                                    @method('PATCH')
+                                    <input type="hidden" name="is_active" value="{{ $resource->is_active ? 0 : 1 }}">
+                                    <button type="button" onclick="submitStatusForm(this)" class="action-btn-soft {{ $resource->is_active ? 'bg-[#fffbeb] text-[#9a7b0a] hover:bg-[#fef3d1]' : 'bg-[#ecfdf5] text-[#059669] hover:bg-[#d1fae5]' }} text-center w-full">
+                                        <i class="fas {{ $resource->is_active ? 'fa-pause' : 'fa-play' }} mr-1.5 text-[9px]"></i>
+                                        {{ $resource->is_active ? 'Deactivate' : 'Activate' }}
+                                    </button>
+                                </form>
+
+                                <form action="{{ route('admin.resources.destroy', $resource) }}" method="POST" class="contents" onsubmit="return confirm('Are you sure you want to delete this resource?')">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="action-btn-soft bg-[#fdf2f2] text-[#b91c1c] hover:bg-[#fce4e4] text-center w-full">
+                                        <i class="fas fa-trash-can-alt mr-1.5 text-[9px]"></i> Delete
+                                    </button>
+                                </form>
+                            </div>
                         </div>
                     </div>
-                    <div class="flex items-center gap-2">
+                @endforeach
+            </div>
 
-                    </div>
-                </div>
-
-                <div class="overflow-x-auto -webkit-overflow-scrolling: touch;">
-                    <table class="w-full min-w-[850px]">
-                        <thead class="bg-[#faf8f5]/80">
-                            <tr>
-                                <th class="px-3 sm:px-6 py-3 text-left text-[10px] sm:text-xs font-semibold text-[#8b7e76] uppercase tracking-wider whitespace-nowrap">Resource</th>
-                                <th class="px-3 sm:px-6 py-3 text-left text-[10px] sm:text-xs font-semibold text-[#8b7e76] uppercase tracking-wider whitespace-nowrap">Category</th>
-                                <th class="px-3 sm:px-6 py-3 text-left text-[10px] sm:text-xs font-semibold text-[#8b7e76] uppercase tracking-wider whitespace-nowrap">Link</th>
-                                <th class="px-3 sm:px-6 py-3 text-left text-[10px] sm:text-xs font-semibold text-[#8b7e76] uppercase tracking-wider whitespace-nowrap">Status</th>
-                                <th class="px-3 sm:px-6 py-3 text-left text-[10px] sm:text-xs font-semibold text-[#8b7e76] uppercase tracking-wider whitespace-nowrap">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody class="bg-white divide-y divide-[#e5e0db]/50">
-                            @foreach($resources as $resource)
-                                <tr class="table-row">
-                                    <td class="px-3 sm:px-6 py-3.5">
-                                        <div class="flex items-center gap-2.5 sm:gap-3">
-                                            <div class="resource-icon-badge">
-                                                <i class="{{ $resource->icon }} text-[#7a2a2a] text-base"></i>
-                                            </div>
-                                            <div class="min-w-0">
-                                                <div class="text-xs sm:text-sm font-semibold text-[#2c2420] truncate max-w-[140px] sm:max-w-[180px]">
-                                                    {{ $resource->title }}
-                                                </div>
-                                                <div class="text-[10px] sm:text-xs text-[#8b7e76] truncate max-w-[140px] sm:max-w-xs">
-                                                    {{ $resource->description }}
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </td>
-
-                                    <td class="px-3 sm:px-6 py-3.5 whitespace-nowrap">
-                                        <span class="category-pill">
-                                            <i class="fas fa-tag mr-1 text-[8px] sm:text-xs"></i>
-                                            {{ $resource->category_label }}
-                                        </span>
-                                    </td>
-
-                                    <td class="px-3 sm:px-6 py-3.5">
-                                        @if($resource->link)
-                                            <a href="{{ $resource->link }}"
-                                               target="_blank"
-                                               rel="noopener noreferrer"
-                                               class="visit-link text-xs sm:text-sm"
-                                               title="Open resource link">
-                                                <i class="fas fa-external-link-alt mr-1.5 text-[8px] sm:text-xs"></i>
-                                                <span class="hidden sm:inline">Visit Link</span>
-                                                <span class="sm:hidden">Open</span>
-                                            </a>
-                                            <div class="text-[9px] sm:text-xs text-[#a89f97] mt-1 truncate max-w-[100px] sm:max-w-xs font-mono" title="{{ $resource->link }}">
-                                                {{ Str::limit($resource->link, 35) }}
-                                            </div>
-                                        @else
-                                            <span class="text-[#a89f97] text-xs sm:text-sm italic">No link</span>
-                                        @endif
-                                    </td>
-
-                                    <td class="px-3 sm:px-6 py-3.5 whitespace-nowrap">
-                                        <form action="{{ route('admin.resources.update-status', $resource) }}" method="POST" class="inline">
-                                            @csrf
-                                            @method('PATCH')
-                                            <input type="hidden" name="is_active" value="{{ $resource->is_active ? 0 : 1 }}">
-                                            <button type="submit"
-                                                    class="status-btn inline-flex items-center px-2 sm:px-2.5 py-1 rounded-full text-[10px] sm:text-xs font-semibold
-                                                    {{ $resource->is_active ? 'bg-[#ecfdf5] text-[#059669] border border-[#10b981]/30 hover:bg-[#d1fae5]' : 'bg-[#f5f0eb] text-[#6b5e57] border border-[#e5e0db]/70 hover:bg-[#e5e0db]' }}">
-                                                <i class="fas {{ $resource->is_active ? 'fa-circle-check' : 'fa-circle' }} mr-1.5 text-[8px] sm:text-xs"></i>
-                                                {{ $resource->is_active ? 'Active' : 'Inactive' }}
-                                            </button>
-                                        </form>
-                                    </td>
-
-                                    <td class="px-3 sm:px-6 py-3.5 whitespace-nowrap">
-                                        <div class="flex items-center gap-1.5 sm:gap-3">
-                                            <button onclick="togglePin('resource', {{ $resource->id }}, this)"
-                                                    class="action-link {{ $resource->is_pinned ? 'pin-active' : '' }}"
-                                                    title="{{ $resource->is_pinned ? 'Unpin' : 'Pin to top' }}">
-                                                <i class="fas fa-thumbtack text-[10px] sm:text-base {{ $resource->is_pinned ? '' : 'opacity-40' }}"></i>
-                                            </button>
-                                            <a href="{{ route('admin.resources.edit', $resource) }}"
-                                               class="action-link"
-                                               title="Edit Resource">
-                                                <i class="fas fa-pen-to-square text-[10px] sm:text-base"></i>
-                                            </a>
-
-                                            <form action="{{ route('admin.resources.destroy', $resource) }}" method="POST" class="inline">
-                                                @csrf
-                                                @method('DELETE')
-                                                <button type="submit"
-                                                        class="delete-link"
-                                                        onclick="return confirm('Are you sure you want to delete this resource?')"
-                                                        title="Delete Resource">
-                                                    <i class="fas fa-trash-can text-[10px] sm:text-base"></i>
-                                                </button>
-                                            </form>
-                                        </div>
-                                    </td>
-                                </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
-                </div>
-
-                <!-- Pagination -->
+            <!-- Pagination -->
+            <div class="mt-5 sm:mt-6 glass-card overflow-hidden">
                 <div class="px-4 sm:px-5 py-3 sm:py-3.5 border-t border-[#e5e0db]/60 bg-[#faf8f5]/40">
                     {{ $resources->appends(request()->query())->links('vendor.pagination.counselor-resources') }}
                 </div>
-            @endif
+            </div>
+        @endif
         </div>
     </div>
 </div>
 
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const statusForms = document.querySelectorAll('form[action*="update-status"], form[action*="/status"]');
+    function submitStatusForm(btn) {
+        const form = btn.closest('form');
+        const formData = new FormData(form);
 
-        statusForms.forEach(form => {
-            form.addEventListener('submit', function(e) {
-                e.preventDefault();
-
-                const formData = new FormData(this);
-
-                fetch(this.action, {
-                    method: 'PATCH',
-                    headers: {
-                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                        'Accept': 'application/json',
-                    },
-                    body: formData
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        window.location.reload();
-                    }
-                })
-                .catch(() => window.location.reload());
-            });
-        });
-    });
+        fetch(form.action, {
+            method: 'POST',
+            headers: {
+                'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                'Accept': 'application/json',
+            },
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                window.location.reload();
+            }
+        })
+        .catch(() => window.location.reload());
+    }
 
     function togglePin(type, id, btn) {
         const url = type === 'faq'
@@ -453,14 +442,27 @@
         .then(r => r.json())
         .then(data => {
             const icon = btn.querySelector('i');
+            const textSpan = btn.querySelector('.pin-text');
+            const card = btn.closest('.resource-card');
+
             if (data.is_pinned) {
-                btn.classList.add('pin-active');
-                icon.classList.remove('opacity-40');
+                btn.classList.remove('bg-[#f5f0eb]', 'text-[#8b7e76]');
+                btn.classList.add('bg-[#fef9e7]', 'text-[#c9a227]');
+                icon.classList.remove('opacity-50');
                 btn.title = 'Unpin';
+                if (textSpan) textSpan.textContent = 'Pinned';
+                if (card) {
+                    card.classList.add('ring-2', 'ring-[#d4af37]/40', 'ring-offset-2', 'ring-offset-[#faf8f5]');
+                }
             } else {
-                btn.classList.remove('pin-active');
-                icon.classList.add('opacity-40');
+                btn.classList.remove('bg-[#fef9e7]', 'text-[#c9a227]');
+                btn.classList.add('bg-[#f5f0eb]', 'text-[#8b7e76]');
+                icon.classList.add('opacity-50');
                 btn.title = 'Pin to top';
+                if (textSpan) textSpan.textContent = 'Pin';
+                if (card) {
+                    card.classList.remove('ring-2', 'ring-[#d4af37]/40', 'ring-offset-2', 'ring-offset-[#faf8f5]');
+                }
             }
         })
         .catch(() => window.location.reload());

@@ -111,7 +111,8 @@
         border-color: rgba(143,29,29,0.16);
     }
     .service-card-img {
-        width: 100%; height: 11rem; object-fit: cover;
+        width: 100%; height: 11rem; object-fit: contain;
+        background-color: rgba(0,0,0,0.15);
         transition: transform 0.4s ease;
     }
     .service-card:hover .service-card-img { transform: scale(1.04); }

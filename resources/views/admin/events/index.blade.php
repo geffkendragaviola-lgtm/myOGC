@@ -342,7 +342,7 @@
                                 <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-[#a89f97] text-[9px] sm:text-xs"></i>
                                 <input type="text" name="search"
                                        class="input-field w-full pl-8 sm:pl-9 pr-3 py-2 sm:py-2.5 text-xs sm:text-sm"
-                                       placeholder="Search events..." value="{{ request('search') }}">
+                                       placeholder="    Search events..." value="{{ request('search') }}">
                             </div>
                         </div>
                         <div>

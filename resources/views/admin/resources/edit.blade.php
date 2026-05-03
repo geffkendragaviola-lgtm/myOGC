@@ -287,12 +287,40 @@
                                 @enderror
                             </div>
 
-                            <div>
-                                <label for="image" class="field-label">Replace Image (optional)</label>
-                                <input type="file" name="image" id="image" accept="image/*" class="file-field">
-                                @error('image')
-                                    <p class="error-text">{{ $message }}</p>
-                                @enderror
+                            <!-- Resource Image -->
+                            <div class="pt-2">
+                                <label class="field-label mb-2">Replace Image (Optional)</label>
+                                <div class="flex flex-col sm:flex-row gap-5 items-start">
+                                    {{-- Current image preview --}}
+                                    <div class="flex-shrink-0">
+                                        <div class="w-full sm:w-48 h-32 rounded-lg overflow-hidden border border-[#e5e0db] bg-[#f5f0eb] relative">
+                                            @if($resource->image_path)
+                                                <img src="{{ Storage::url($resource->image_path) }}" alt="{{ $resource->title }}"
+                                                     class="w-full h-full object-contain bg-black/5" id="resource-img-preview">
+                                            @else
+                                                <div class="w-full h-full flex flex-col items-center justify-center text-[#8b7e76]" id="resource-img-placeholder">
+                                                    <i class="fas fa-image text-2xl mb-1 opacity-40"></i>
+                                                    <span class="text-xs">No image</span>
+                                                </div>
+                                                <img src="" alt="" class="w-full h-full object-contain hidden bg-black/5" id="resource-img-preview">
+                                            @endif
+                                        </div>
+                                    </div>
+
+                                    {{-- Upload controls --}}
+                                    <div class="flex-1 min-w-0 w-full">
+                                        <input type="file"
+                                               name="image"
+                                               id="image"
+                                               accept="image/jpeg,image/png,image/jpg,image/gif"
+                                               class="input-field mt-1"
+                                               onchange="previewResourceImage(this)">
+                                        <p class="helper-text mt-1">JPG, PNG or GIF · Max 10MB.</p>
+                                        @error('image')
+                                            <p class="error-text mt-1">{{ $message }}</p>
+                                        @enderror
+                                    </div>
+                                </div>
                             </div>
 
                             <div class="space-y-3 sm:space-y-4">
@@ -362,6 +390,34 @@
 
         disclaimerCheckbox.addEventListener('change', toggleDisclaimer);
         toggleDisclaimer();
+
+        // Image preview functionality
+        window.previewResourceImage = function(input) {
+            if (input.files && input.files[0]) {
+                const file = input.files[0];
+                // Validate file size (10MB)
+                if (file.size > 10 * 1024 * 1024) {
+                    alert('File size must be less than 10MB');
+                    input.value = '';
+                    return;
+                }
+
+                const reader = new FileReader();
+                reader.onload = e => {
+                    const preview = document.getElementById('resource-img-preview');
+                    const placeholder = document.getElementById('resource-img-placeholder');
+
+                    if (preview) {
+                        preview.src = e.target.result;
+                        preview.classList.remove('hidden');
+                    }
+                    if (placeholder) {
+                        placeholder.classList.add('hidden');
+                    }
+                };
+                reader.readAsDataURL(file);
+            }
+        }
     });
 </script>
 @endsection

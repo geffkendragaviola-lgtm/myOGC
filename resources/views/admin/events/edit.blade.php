@@ -114,6 +114,30 @@
 
     .alert-success, .alert-error { border-radius: 0.6rem; padding: 0.65rem 0.85rem; border-width: 1px; margin-bottom: 1rem; }
 
+    .radio-group { display: flex; flex-direction: column; gap: 0.75rem; }
+    .radio-option, .checkbox-option, .option-card {
+        display: flex; align-items: flex-start; gap: 0.5rem;
+        padding: 0.5rem; border-radius: 0.5rem;
+        transition: background-color 0.15s ease;
+    }
+    .radio-option:hover, .checkbox-option:hover { background: rgba(254,249,231,0.4); }
+
+    .radio-option input, .checkbox-option input, .option-card input[type="checkbox"] {
+        margin-top: 0.15rem; width: 1rem; height: 1rem;
+        accent-color: var(--maroon-700); cursor: pointer; flex-shrink: 0;
+    }
+    .radio-option label, .checkbox-option label, .option-card label {
+        font-size: 0.8rem; color: var(--text-secondary); cursor: pointer; line-height: 1.4;
+    }
+
+    .college-grid {
+        display: grid; grid-template-columns: repeat(1, 1fr); gap: 0.5rem;
+        max-height: 12rem; overflow-y: auto; padding: 0.75rem;
+        border: 1px solid var(--border-soft); border-radius: 0.6rem;
+        background: rgba(255,255,255,0.9);
+    }
+    @media (min-width: 768px) { .college-grid { grid-template-columns: repeat(2, 1fr); } }
+
     .option-card {
         display: flex; align-items: flex-start; padding: 0.7rem 0.85rem; border-radius: 0.65rem;
         background: rgba(250,248,245,0.7); border: 1px solid var(--border-soft);
@@ -495,43 +519,89 @@
                                 <p class="section-subtitle hidden sm:block">Colleges and year levels that can access this event.</p>
                             </div>
                         </div>
-                        <div class="p-3 sm:p-4 space-y-4">
-                            <input type="hidden" name="for_all_colleges" id="for_all_colleges_hidden"
-                                   value="{{ $event->for_all_colleges ? '1' : '0' }}">
-
+                        <div class="p-3 sm:p-4 grid grid-cols-1 gap-3 sm:gap-4">
+                            <!-- College Targeting -->
                             <div>
-                                <label class="field-label">Target Colleges <span class="text-[#8b7e76] text-[10px]">(leave empty = all colleges)</span></label>
-                                <select id="colleges" name="colleges[]" multiple class="select-field" size="5">
-                                    @foreach($colleges as $college)
-                                        <option value="{{ $college->id }}"
-                                            {{ in_array($college->id, old('colleges', $selectedColleges)) ? 'selected' : '' }}>
-                                            {{ $college->name }}
-                                        </option>
-                                    @endforeach
-                                </select>
-                                <p class="helper-text">Hold Ctrl/Cmd to select multiple. Leave empty for all colleges.</p>
-                            </div>
+                                <label class="field-label">College Availability <span class="text-[#b91c1c]">*</span></label>
+                                <div class="mb-4 radio-group">
+                                    <div class="radio-option">
+                                        <input type="radio" id="for_all_colleges_true" name="for_all_colleges" value="1"
+                                               {{ old('for_all_colleges', $event->for_all_colleges) ? 'checked' : '' }}>
+                                        <label for="for_all_colleges_true">
+                                            <strong>All Colleges</strong> — Event visible to students from all colleges
+                                        </label>
+                                    </div>
+                                    <div class="radio-option">
+                                        <input type="radio" id="for_all_colleges_false" name="for_all_colleges" value="0"
+                                               {{ old('for_all_colleges', $event->for_all_colleges) === 0 || old('for_all_colleges', $event->for_all_colleges) === '0' || old('for_all_colleges', $event->for_all_colleges) === false ? 'checked' : '' }}>
+                                        <label for="for_all_colleges_false">
+                                            <strong>Specific Colleges</strong> — Choose which colleges can see this event
+                                        </label>
+                                    </div>
+                                </div>
 
-                            <div>
-                                <label class="field-label">Year Level Restriction <span class="text-[#8b7e76] text-[10px]">(leave unchecked = all)</span></label>
-                                @php $savedYearLevels = old('year_levels', $event->year_levels ?? []); @endphp
-                                <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-2 mt-1">
-                                    @foreach(['1st Year','2nd Year','3rd Year','4th Year','5th Year'] as $yl)
-                                    <label class="option-card cursor-pointer" style="gap:0.5rem;padding:0.5rem 0.75rem;">
-                                        <input type="checkbox" name="year_levels[]" value="{{ $yl }}"
-                                               {{ in_array($yl, $savedYearLevels) ? 'checked' : '' }}
-                                               class="w-4 h-4 text-[#7a2a2a] border-[#e5e0db] rounded focus:ring-[#7a2a2a] flex-shrink-0">
-                                        <span class="text-xs font-medium text-[#4a3f3a]">{{ $yl }}</span>
-                                    </label>
-                                    @endforeach
+                                <!-- College Selection -->
+                                <div id="colleges_selection" class="{{ old('for_all_colleges', $event->for_all_colleges) ? 'hidden' : '' }}">
+                                    <label class="field-label">Select Colleges <span class="text-[#b91c1c]">*</span></label>
+                                    <div class="college-grid">
+                                        @foreach($colleges as $college)
+                                            <div class="checkbox-option">
+                                                <input type="checkbox" id="college_{{ $college->id }}" name="colleges[]"
+                                                       value="{{ $college->id }}"
+                                                       {{ in_array($college->id, old('colleges', $selectedColleges)) ? 'checked' : '' }}>
+                                                <label for="college_{{ $college->id }}">{{ $college->name }}</label>
+                                            </div>
+                                        @endforeach
+                                    </div>
+                                    @error('colleges')
+                                        <p class="error-text">{{ $message }}</p>
+                                    @enderror
                                 </div>
                             </div>
 
-                            <div class="option-card">
+                            <!-- Year Level Targeting -->
+                            <div>
+                                <label class="field-label">Year Level Availability <span class="text-[#b91c1c]">*</span></label>
+                                <div class="mb-4 radio-group">
+                                    <div class="radio-option">
+                                        <input type="radio" id="for_all_year_levels_true" name="for_all_year_levels" value="1"
+                                               {{ empty(old('year_levels', $event->year_levels ?? [])) ? 'checked' : '' }}>
+                                        <label for="for_all_year_levels_true">
+                                            <strong>All Year Levels</strong> — Visible to students from all year levels
+                                        </label>
+                                    </div>
+                                    <div class="radio-option">
+                                        <input type="radio" id="for_all_year_levels_false" name="for_all_year_levels" value="0"
+                                               {{ !empty(old('year_levels', $event->year_levels ?? [])) ? 'checked' : '' }}>
+                                        <label for="for_all_year_levels_false">
+                                            <strong>Specific Year Levels</strong> — Choose which year levels can see this event
+                                        </label>
+                                    </div>
+                                </div>
+
+                                <div id="year_levels_selection" class="{{ !empty(old('year_levels', $event->year_levels ?? [])) ? '' : 'hidden' }}">
+                                    <label class="field-label">Select Year Levels <span class="text-[#b91c1c]">*</span></label>
+                                    <div class="college-grid" style="max-height:none;">
+                                        @php $oldYearLevels = old('year_levels', $event->year_levels ?? []); @endphp
+                                        @foreach(['1st Year','2nd Year','3rd Year','4th Year','5th Year'] as $yl)
+                                        <div class="checkbox-option">
+                                            <input type="checkbox" id="yl_ann_{{ Str::slug($yl) }}" name="year_levels[]"
+                                                   value="{{ $yl }}"
+                                                   {{ in_array($yl, $oldYearLevels) ? 'checked' : '' }}>
+                                            <label for="yl_ann_{{ Str::slug($yl) }}">{{ $yl }}</label>
+                                        </div>
+                                        @endforeach
+                                    </div>
+                                    @error('year_levels')
+                                        <p class="error-text">{{ $message }}</p>
+                                    @enderror
+                                </div>
+                            </div>
+
+                            <div class="option-card mt-2">
                                 <input type="checkbox" id="is_required" name="is_required" value="1"
-                                       {{ old('is_required', $event->is_required) ? 'checked' : '' }}
-                                       class="w-4 h-4 text-[#7a2a2a] border-[#e5e0db] rounded focus:ring-[#7a2a2a] mt-0.5 flex-shrink-0">
-                                <label for="is_required" class="ml-3 text-xs font-medium text-[#4a3f3a]">
+                                       {{ old('is_required', $event->is_required) ? 'checked' : '' }}>
+                                <label for="is_required">
                                     <span class="font-semibold text-[#7a2a2a]">Required Event</span> — mandatory for selected colleges
                                 </label>
                             </div>
@@ -631,13 +701,47 @@
         startDate.addEventListener('change', validateTimeRange);
         endDate.addEventListener('change', validateTimeRange);
 
-        // Set for_all_colleges based on college selection
-        const collegesSelect = document.getElementById('colleges');
-        const forAllCollegesHidden = document.getElementById('for_all_colleges_hidden');
-        if (collegesSelect) {
-            collegesSelect.addEventListener('change', function() {
-                forAllCollegesHidden.value = this.selectedOptions.length === 0 ? '1' : '0';
-            });
+        // College selection toggle
+        const allCollegesRadio = document.getElementById('for_all_colleges_true');
+        const specificCollegesRadio = document.getElementById('for_all_colleges_false');
+        const collegesSelection = document.getElementById('colleges_selection');
+
+        function toggleCollegesSelection() {
+            if (specificCollegesRadio.checked) {
+                collegesSelection.classList.remove('hidden');
+            } else {
+                collegesSelection.classList.add('hidden');
+                // Uncheck all college checkboxes when "all colleges" is selected
+                document.querySelectorAll('input[name="colleges[]"]').forEach(checkbox => {
+                    checkbox.checked = false;
+                });
+            }
+        }
+
+        if (allCollegesRadio && specificCollegesRadio) {
+            allCollegesRadio.addEventListener('change', toggleCollegesSelection);
+            specificCollegesRadio.addEventListener('change', toggleCollegesSelection);
+            toggleCollegesSelection();
+        }
+
+        // Year level selection toggle
+        const allYearLevelsRadio = document.getElementById('for_all_year_levels_true');
+        const specificYearLevelsRadio = document.getElementById('for_all_year_levels_false');
+        const yearLevelsSelection = document.getElementById('year_levels_selection');
+
+        function toggleYearLevelsSelection() {
+            if (specificYearLevelsRadio.checked) {
+                yearLevelsSelection.classList.remove('hidden');
+            } else {
+                yearLevelsSelection.classList.add('hidden');
+                document.querySelectorAll('input[name="year_levels[]"]').forEach(cb => cb.checked = false);
+            }
+        }
+
+        if (allYearLevelsRadio && specificYearLevelsRadio) {
+            allYearLevelsRadio.addEventListener('change', toggleYearLevelsSelection);
+            specificYearLevelsRadio.addEventListener('change', toggleYearLevelsSelection);
+            toggleYearLevelsSelection();
         }
 
         // Show confirmation for significant changes

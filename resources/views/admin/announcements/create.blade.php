@@ -336,35 +336,34 @@
                             </div>
 
                             <!-- Announcement Image -->
-                            <div>
-                                <label for="image" class="field-label">Announcement Image (Optional)</label>
+                            <div class="pt-2">
+                                <label class="field-label mb-2">Announcement Image (Optional)</label>
+                                <div class="flex flex-col sm:flex-row gap-5 items-start">
+                                    {{-- Current image preview --}}
+                                    <div class="flex-shrink-0">
+                                        <div class="w-full sm:w-48 h-32 rounded-lg overflow-hidden border border-[#e5e0db] bg-[#f5f0eb] relative">
+                                            <div class="w-full h-full flex flex-col items-center justify-center text-[#8b7e76]" id="announcement-img-placeholder">
+                                                <i class="fas fa-image text-2xl mb-1 opacity-40"></i>
+                                                <span class="text-xs">No image</span>
+                                            </div>
+                                            <img src="" alt="" class="w-full h-full object-contain hidden bg-black/5" id="announcement-img-preview">
+                                        </div>
+                                    </div>
 
-                                <!-- Image Upload Area -->
-                                <div class="w-full">
-                                    <label for="image" class="upload-zone">
-                                        <i class="fas fa-cloud-upload-alt"></i>
-                                        <p class="text-xs sm:text-sm text-[#6b5e57]">
-                                            <span class="font-semibold">Click to upload</span> or drag and drop
-                                        </p>
-                                        <p class="hint">PNG, JPG, GIF (MAX. 10MB)</p>
-                                        <input id="image" name="image" type="file" class="hidden" accept="image/*" />
-                                    </label>
-                                </div>
-
-                                <!-- New Image Preview -->
-                                <div id="image-preview" class="mt-4 hidden">
-                                    <div class="image-preview-card">
-                                        <img id="preview" class="w-full h-48 object-cover" alt="Preview">
-                                        <button type="button" onclick="removeImagePreview()"
-                                                class="image-remove-btn" title="Remove Preview">
-                                            <i class="fas fa-xmark"></i>
-                                        </button>
+                                    {{-- Upload controls --}}
+                                    <div class="flex-1 min-w-0 w-full">
+                                        <input type="file"
+                                               name="image"
+                                               id="image"
+                                               accept="image/jpeg,image/png,image/jpg,image/gif"
+                                               class="input-field mt-1"
+                                               onchange="previewAnnouncementImage(this)">
+                                        <p class="helper-text mt-1">JPG, PNG or GIF · Max 10MB.</p>
+                                        @error('image')
+                                            <p class="error-text mt-1">{{ $message }}</p>
+                                        @enderror
                                     </div>
                                 </div>
-
-                                @error('image')
-                                    <p class="error-text">{{ $message }}</p>
-                                @enderror
                             </div>
                         </div>
                     </div>
@@ -632,35 +631,36 @@ document.addEventListener('DOMContentLoaded', function() {
     specificYearLevelsRadio.addEventListener('change', toggleYearLevelsSelection);
 
     // Image preview functionality
-    const imageInput = document.getElementById('image');
-    const imagePreview = document.getElementById('image-preview');
-    const preview = document.getElementById('preview');
-
-    imageInput.addEventListener('change', function() {
-        const file = this.files[0];
-        if (file) {
+    window.previewAnnouncementImage = function(input) {
+        if (input.files && input.files[0]) {
+            const file = input.files[0];
             // Validate file size (10MB)
             if (file.size > 10 * 1024 * 1024) {
                 alert('File size must be less than 10MB');
-                this.value = '';
+                input.value = '';
                 return;
             }
 
             const reader = new FileReader();
-            reader.addEventListener('load', function() {
-                preview.setAttribute('src', this.result);
-                imagePreview.classList.remove('hidden');
-            });
+            reader.onload = e => {
+                const preview = document.getElementById('announcement-img-preview');
+                const placeholder = document.getElementById('announcement-img-placeholder');
+                if (preview) {
+                    preview.src = e.target.result;
+                    preview.classList.remove('hidden');
+                }
+                if (placeholder) placeholder.classList.add('hidden');
+            };
             reader.readAsDataURL(file);
         } else {
-            imagePreview.classList.add('hidden');
+            const preview = document.getElementById('announcement-img-preview');
+            const placeholder = document.getElementById('announcement-img-placeholder');
+            if (preview) {
+                preview.src = '';
+                preview.classList.add('hidden');
+            }
+            if (placeholder) placeholder.classList.remove('hidden');
         }
-    });
-
-    // Remove image preview
-    window.removeImagePreview = function() {
-        imageInput.value = '';
-        imagePreview.classList.add('hidden');
     }
 
     // Initial toggle
