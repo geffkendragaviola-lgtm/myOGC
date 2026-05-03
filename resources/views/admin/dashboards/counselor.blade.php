@@ -33,6 +33,7 @@
                 </div>
 
                 <div class="summary-card">
+                    <div class="summary-card-pattern"></div>
                     <div class="relative h-full flex flex-col sm:flex-row items-center justify-between gap-3 p-4">
                         <div class="flex items-center gap-3 text-center sm:text-left">
                             <div class="summary-icon flex-shrink-0">
@@ -44,6 +45,10 @@
                                 <p class="summary-subtext hidden sm:block">Live counselor directory count.</p>
                             </div>
                         </div>
+                        <a href="{{ route('admin.users.create', ['role' => 'counselor']) }}"
+                           class="primary-btn px-5 py-2.5 whitespace-nowrap text-xs sm:text-sm rounded-lg">
+                            <i class="fas fa-plus mr-1.5 text-[9px] sm:text-xs"></i> Add Counselor
+                        </a>
                     </div>
                 </div>
             </div>
@@ -86,6 +91,18 @@
 
         <!-- Counselors Table Card -->
         <div class="panel-card overflow-hidden">
+            <div class="table-header-bar">
+                <div class="flex items-center gap-3">
+                    <div class="table-header-icon">
+                        <i class="fas fa-user-doctor text-[#7a2a2a] text-[10px] sm:text-xs"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-sm font-medium text-[#2c2420]">Counselor Directory</h2>
+                        <p class="text-[10px] sm:text-xs text-[#8b7e76]">Showing <span class="font-bold text-[#2c2420]">{{ $counselors->firstItem() ?? 0 }} - {{ $counselors->lastItem() ?? 0 }}</span> of <span class="font-bold text-[#2c2420]">{{ $counselors->total() }}</span></p>
+                    </div>
+                </div>
+            </div>
+
             <div class="overflow-x-auto">
                 <table class="min-w-[700px] md:min-w-full divide-y divide-[#e5e0db]/60 w-full">
                     <thead class="bg-[#faf8f5]/85">
@@ -126,7 +143,21 @@
                                         <span class="mini-icon bg-[#f5f0eb] text-[#8b7e76]">
                                             <i class="fas fa-school text-[10px]"></i>
                                         </span>
-                                        <span class="truncate max-w-[100px] sm:max-w-[140px]">{{ collect(explode(' ', $counselor->college->name ?? ''))->map(fn($w) => strtoupper($w[0] ?? ''))->filter()->implode('') ?: 'N/A' }}</span>
+                                        @php
+                                            $abbrMap = [
+                                                'College of Engineering' => 'COE',
+                                                'College of Engineering Technology' => 'COET',
+                                                'College of Health Sciences' => 'CHS',
+                                                'College of Computer Studies' => 'CCS',
+                                                'College of Science and Mathematics' => 'CSM',
+                                                'College of Arts and Social Sciences' => 'CASS',
+                                                'College of Economics, Business and Accountancy' => 'CEBA',
+                                                'College of Education' => 'CED'
+                                            ];
+                                            $collegeName = $counselor->college->name ?? '';
+                                            $abbr = $abbrMap[$collegeName] ?? (collect(explode(' ', $collegeName))->map(fn($w) => strtoupper($w[0] ?? ''))->filter()->implode('') ?: 'N/A');
+                                        @endphp
+                                        <span class="truncate max-w-[100px] sm:max-w-[140px]">{{ $abbr }}</span>
                                     </div>
                                 </td>
 
@@ -175,11 +206,9 @@
             </div>
 
             <!-- Enhanced Pagination Section -->
-            @if($counselors->hasPages())
             <div class="px-4 sm:px-5 py-3 sm:py-3.5 border-t border-[#e5e0db]/60 bg-[#faf8f5]/40">
                 {{ $counselors->appends(request()->query())->links('vendor.pagination.counselor-resources') }}
             </div>
-            @endif
         </div>
     </div>
 </div>
@@ -298,13 +327,12 @@
         box-shadow: 0 4px 12px rgba(58,12,12,0.15);
         min-width: 200px;
     }
-    .summary-card::before {
-        content: "";
+
+    .summary-card-pattern {
         position: absolute;
         inset: 0;
         opacity: 0.15;
         background: radial-gradient(circle at top right, var(--gold-400), transparent 40%);
-        pointer-events: none;
     }
 
     .summary-icon {
@@ -536,7 +564,17 @@ function openCounselorModal(id) {
     const d = counselorData[id];
     if (!d) return;
 
-    const abbr = d.college.split(' ').map(w => w[0]?.toUpperCase() ?? '').join('');
+    const abbrMap = {
+        'College of Engineering': 'COE',
+        'College of Engineering Technology': 'COET',
+        'College of Health Sciences': 'CHS',
+        'College of Computer Studies': 'CCS',
+        'College of Science and Mathematics': 'CSM',
+        'College of Arts and Social Sciences': 'CASS',
+        'College of Economics, Business and Accountancy': 'CEBA',
+        'College of Education': 'CED'
+    };
+    const abbr = abbrMap[d.college] || d.college.split(' ').map(w => w[0]?.toUpperCase() ?? '').join('');
 
     document.getElementById('cm-avatar-wrap').innerHTML = d.avatar
         ? `<img src="${d.avatar}" class="w-full h-full object-cover" />`

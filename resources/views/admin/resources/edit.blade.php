@@ -315,7 +315,7 @@
                                 </div>
 
                                 <div>
-                                    <label for="disclaimer_text" class="field-label">Disclaimer Text (optional)</label>
+                                    <label for="disclaimer_text" class="field-label">Disclaimer Text *</label>
                                     <textarea name="disclaimer_text" id="disclaimer_text" rows="3"
                                               class="textarea-field">{{ old('disclaimer_text', $resource->disclaimer_text) }}</textarea>
                                     @error('disclaimer_text')
@@ -343,4 +343,25 @@
         </form>
     </div>
 </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const disclaimerCheckbox = document.getElementById('show_disclaimer');
+        const disclaimerContainer = document.getElementById('disclaimer_text').parentElement;
+        const disclaimerTextarea = document.getElementById('disclaimer_text');
+
+        function toggleDisclaimer() {
+            if (disclaimerCheckbox.checked) {
+                disclaimerContainer.style.display = 'block';
+                disclaimerTextarea.setAttribute('required', 'required');
+            } else {
+                disclaimerContainer.style.display = 'none';
+                disclaimerTextarea.removeAttribute('required');
+            }
+        }
+
+        disclaimerCheckbox.addEventListener('change', toggleDisclaimer);
+        toggleDisclaimer();
+    });
+</script>
 @endsection

@@ -985,7 +985,7 @@ class AdminController extends Controller
             'middle_name' => 'nullable|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
-            'role' => 'required|in:student,counselor,admin',
+            'role' => 'required|in:student,counselor',
             'phone_number' => 'nullable|string|max:20',
             'address' => 'nullable|string|max:500',
             'birthdate' => 'nullable|date',
@@ -1003,13 +1003,15 @@ class AdminController extends Controller
             $rules['year_level'] = 'required|in:1st Year,2nd Year,3rd Year,4th Year,5th Year,Graduate';
             $rules['course'] = 'required|string|max:255';
             $rules['college_id'] = 'required|exists:colleges,id';
+            $rules['msu_sase_score'] = 'nullable|numeric|min:0|max:180';
+            $rules['academic_year'] = 'nullable|string|max:20';
+            $rules['student_status'] = 'required|in:new,transferee,returnee,shiftee';
+            $rules['initial_interview_completed'] = 'nullable|in:yes,no';
         } elseif ($request->role === 'counselor') {
             $rules['position'] = 'required|string|max:255';
             $rules['credentials'] = 'required|string|max:255';
             $rules['counselor_college_id'] = 'required|exists:colleges,id';
             $rules['specialization'] = 'nullable|string|max:500';
-        } elseif ($request->role === 'admin') {
-            $rules['admin_credentials'] = 'required|string|max:255';
         }
 
         $request->validate($rules);
@@ -1046,13 +1048,24 @@ class AdminController extends Controller
 
             // Create role-specific profile
             if ($request->role === 'student') {
-                Student::create([
+                $student = Student::create([
                     'user_id' => $user->id,
                     'student_id' => $request->student_id,
                     'year_level' => $request->year_level,
                     'course' => strip_tags($request->course),
                     'college_id' => $request->college_id,
+                    'msu_sase_score' => $request->msu_sase_score,
+                    'academic_year' => $request->academic_year,
+                    'student_status' => $request->student_status,
+                    'initial_interview_completed' => $request->initial_interview_completed ?? 'no',
                 ]);
+                
+                \App\Models\StudentPersonalData::create(['student_id' => $student->id]);
+                \App\Models\StudentFamilyData::create(['student_id' => $student->id]);
+                \App\Models\StudentAcademicData::create(['student_id' => $student->id]);
+                \App\Models\StudentLearningResources::create(['student_id' => $student->id]);
+                \App\Models\StudentPsychosocialData::create(['student_id' => $student->id]);
+                \App\Models\StudentNeedsAssessment::create(['student_id' => $student->id]);
 
             } elseif ($request->role === 'counselor') {
                 Counselor::create([
@@ -1064,16 +1077,15 @@ class AdminController extends Controller
                     'is_head' => $request->has('is_head'),
                 ]);
 
-            } elseif ($request->role === 'admin') {
-                Admin::create([
-                    'user_id' => $user->id,
-                    'credentials' => strip_tags($request->admin_credentials),
-                ]);
             }
 
             DB::commit();
 
-            return redirect()->route('admin.users')->with('success', 'User created successfully.');
+            if ($request->role === 'student') {
+                return redirect()->route('admin.students.edit', $student)->with('success', 'Student created successfully. Please complete their profile details below.');
+            } else {
+                return redirect()->route('admin.counselors')->with('success', 'Counselor user created successfully.');
+            }
 
         } catch (\Exception $e) {
             DB::rollBack();
@@ -1281,7 +1293,7 @@ class AdminController extends Controller
         $search = $request->get('search');
         $college = $request->get('college');
 
-        $query = Student::with(['user', 'college', 'lastSessionNote']);
+        $query = Student::with(['user', 'college', 'lastSessionNote', 'needsAssessment']);
 
         // Search functionality
         if ($search) {
@@ -1317,6 +1329,49 @@ class AdminController extends Controller
             ->keyBy('college_id');
 
         return view('admin.dashboards.students', compact('admin', 'students', 'colleges', 'studentsPerCollege', 'search', 'college', 'totalStudents', 'collegeCounselors'));
+    }
+
+    public function showStudentProfile(Student $student)
+    {
+        $userId = Auth::id();
+        $admin = Admin::with('user')->where('user_id', $userId)->first();
+
+        $student->load([
+            'user',
+            'college',
+            'personalData',
+            'familyData',
+            'academicData',
+            'learningResources',
+            'psychosocialData',
+            'needsAssessment',
+            'appointments',
+            'events'
+        ]);
+
+        return view('student.show', compact('admin', 'student'));
+    }
+
+    public function toggleHighRisk(Request $request, Student $student)
+    {
+        $request->validate([
+            'is_high_risk'    => 'required|boolean',
+            'high_risk_notes' => 'nullable|string|max:1000',
+        ]);
+
+        $student->update([
+            'is_high_risk'           => $request->is_high_risk,
+            'high_risk_notes'        => $request->high_risk_notes,
+            'high_risk_flagged_at'   => $request->is_high_risk ? now() : null,
+            'high_risk_flagged_by'   => $request->is_high_risk ? auth()->id() : null,
+            // If admin explicitly unflagged, mark override so assessment logic doesn't re-trigger
+            'high_risk_overridden'   => ! $request->is_high_risk,
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'High risk status updated successfully.'
+        ]);
     }
 
     public function editStudent(Student $student)

@@ -236,16 +236,14 @@
 
             <!-- Table -->
             <div class="relative overflow-hidden rounded-xl border border-[#e5e0db]/80 bg-white/95 backdrop-blur-sm shadow-sm">
-                <div class="px-4 sm:px-5 py-3 border-b border-[#e5e0db]/60 bg-[#faf8f5]/50">
-                    <div class="flex items-center justify-between gap-4 flex-wrap">
-                        <div class="flex items-center gap-2.5">
-                            <div class="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-[#fdf2f2] flex items-center justify-center text-[#7a2a2a]">
-                                <i class="fas fa-table-list text-[10px] sm:text-xs"></i>
-                            </div>
-                            <div>
-                                <p class="text-sm font-medium text-[#2c2420]">Appointments</p>
-                                <p class="text-[11px] text-[#6b5e57] hidden sm:block">Complete record overview</p>
-                            </div>
+                <div class="table-header-bar">
+                    <div class="flex items-center gap-3">
+                        <div class="table-header-icon">
+                            <i class="fas fa-calendar-check text-[#7a2a2a] text-[10px] sm:text-xs"></i>
+                        </div>
+                        <div>
+                            <h2 class="text-sm font-medium text-[#2c2420]">Appointments</h2>
+                            <p class="text-[10px] sm:text-xs text-[#8b7e76]">Showing <span class="font-bold text-[#2c2420]">{{ $appointments->firstItem() ?? 0 }} - {{ $appointments->lastItem() ?? 0 }}</span> of <span class="font-bold text-[#2c2420]">{{ $appointments->total() }}</span></p>
                         </div>
                     </div>
                 </div>
@@ -688,6 +686,28 @@
         .filter-input:focus {
             border-color: var(--maroon-700);
             box-shadow: 0 0 0 3px rgba(122, 42, 42, 0.08);
+        }
+
+        .table-header-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 0.6rem;
+            padding: 0.75rem 1.25rem;
+            border-bottom: 1px solid #e5e0db;
+            background: rgba(250,248,245,0.4);
+        }
+
+        .table-header-icon {
+            width: 2rem;
+            height: 2rem;
+            border-radius: 0.6rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            background: rgba(254,249,231,0.6);
         }
 
         @keyframes fade-in-up {

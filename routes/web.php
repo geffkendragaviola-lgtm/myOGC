@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
@@ -20,6 +20,7 @@ use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\StudentController;
 use App\Http\Controllers\AdminResourceController;
 use App\Http\Controllers\AdminFAQController;
+use App\Http\Controllers\AdminAnnouncementController;
 
 Route::get('/', function () {
     return redirect()->route('login');
@@ -245,11 +246,21 @@ Route::middleware(['auth'])->group(function () {
 Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('dashboard');
 
+    // User Management
+    Route::get('/users', [AdminController::class, 'users'])->name('users');
+    Route::get('/users/create', [AdminController::class, 'createUser'])->name('users.create');
+    Route::post('/users', [AdminController::class, 'storeUser'])->name('users.store');
+    Route::get('/users/{user}/edit', [AdminController::class, 'editUser'])->name('users.edit');
+    Route::patch('/users/{user}', [AdminController::class, 'updateUser'])->name('users.update');
+    Route::delete('/users/{user}', [AdminController::class, 'deleteUser'])->name('users.delete');
+
     Route::get('/services', [AdminServiceController::class, 'index'])->name('services.index');
     Route::get('/services/{service}/edit', [AdminServiceController::class, 'edit'])->name('services.edit');
     Route::patch('/services/{service}', [AdminServiceController::class, 'update'])->name('services.update');
 
     Route::get('/students', [AdminController::class, 'students'])->name('students');
+    Route::get('/students/{student}/profile', [AdminController::class, 'showStudentProfile'])->name('students.profile');
+    Route::post('/students/{student}/toggle-high-risk', [AdminController::class, 'toggleHighRisk'])->name('students.toggle-high-risk');
     Route::get('/students/{student}/edit', [AdminController::class, 'editStudent'])->name('students.edit');
     Route::patch('/students/{student}', [AdminController::class, 'updateStudent'])->name('students.update');
     Route::get('/counselors', [AdminController::class, 'counselors'])->name('counselors');
@@ -287,6 +298,13 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
     Route::delete('/events/{event}', [AdminController::class, 'deleteEvent'])->name('events.destroy');
     Route::patch('/events/{event}/toggle-status', [AdminController::class, 'toggleEventStatus'])->name('events.toggle-status');
     Route::patch('/events/{event}/toggle-pin', [AdminController::class, 'toggleEventPin'])->name('events.toggle-pin');
+
+    // Admin Announcements
+    Route::resource('announcements', AdminAnnouncementController::class);
+    Route::patch('announcements/{announcement}/toggle-status', [AdminAnnouncementController::class, 'toggleStatus'])->name('announcements.toggle-status');
+    Route::patch('announcements/{announcement}/toggle-pin', [AdminAnnouncementController::class, 'togglePin'])->name('announcements.toggle-pin');
+    Route::patch('announcements/{announcement}/complete', [AdminAnnouncementController::class, 'complete'])->name('announcements.complete');
+    Route::delete('announcements/{announcement}/remove-image', [AdminAnnouncementController::class, 'removeImage'])->name('announcements.remove-image');
 
     // Event Registrations
     Route::get('/events/{event}/registrations', [AdminController::class, 'showEventRegistrations'])->name('events.registrations');

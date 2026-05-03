@@ -76,6 +76,21 @@
 }
 .btn-outline:hover { background: var(--maroon-soft); color: #fff; }
 
+.table-header-bar {
+    display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.6rem;
+    padding: 0.75rem 1.25rem; border-bottom: 1px solid var(--border-soft);
+    background: rgba(250,248,245,0.4);
+}
+.table-header-icon {
+    width: 1.75rem; height: 1.75rem; border-radius: 0.6rem; display: flex;
+    align-items: center; justify-content: center; background: rgba(254,249,231,0.6); flex-shrink: 0;
+}
+.table-live-pill {
+    display: inline-flex; align-items: center; font-size: 0.65rem; color: var(--text-secondary);
+    background: rgba(250,248,245,0.6); border: 1px solid var(--border-soft); padding: 0.25rem 0.5rem;
+    border-radius: 999px; font-weight: 500;
+}
+
 .table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
 .table-row { transition: background-color 0.15s ease; }
 .table-row:hover { background: rgba(254,249,231,0.35); }
@@ -265,15 +280,18 @@
 
     {{-- Table --}}
     <div class="analytics-card overflow-hidden" style="padding:0;">
-        <div class="px-5 py-4" style="border-bottom:1px solid var(--border-soft);">
-            <div class="flex flex-wrap items-end justify-between gap-3">
-                <div>
-                    <div class="text-sm font-semibold" style="color:var(--text-primary)">All Feedback Submissions</div>
-                    <div class="text-xs" style="color:var(--text-muted)">
-                        Showing {{ $feedbacks->firstItem() }} - {{ $feedbacks->lastItem() }} of {{ $feedbacks->total() }}
-                    </div>
+        <div class="table-header-bar">
+            <div class="flex items-center gap-3">
+                <div class="table-header-icon">
+                    <i class="fas fa-message text-[#7a2a2a] text-[10px] sm:text-xs"></i>
                 </div>
-                <span class="text-xs" style="color:var(--text-muted)"><i class="fas fa-clock mr-1"></i>Live data</span>
+                <div>
+                    <h2 class="text-sm font-medium text-[#2c2420]">All Feedback Submissions</h2>
+                    <p class="text-[10px] sm:text-xs text-[#8b7e76]">Showing <span class="font-bold text-[#2c2420]">{{ $feedbacks->firstItem() ?? 0 }} - {{ $feedbacks->lastItem() ?? 0 }}</span> of <span class="font-bold text-[#2c2420]">{{ $feedbacks->total() }}</span></p>
+                </div>
+            </div>
+            <div class="flex items-center gap-2">
+
             </div>
         </div>
 
@@ -400,12 +418,10 @@
             </table>
         </div>
 
-        @if($feedbacks->hasPages())
-            <!-- Pagination -->
-            <div class="px-4 sm:px-5 py-3 sm:py-3.5 border-t border-[#e5e0db]/60 bg-[#faf8f5]/40">
-                {{ $feedbacks->appends(request()->query())->links('vendor.pagination.counselor-resources') }}
-            </div>
-        @endif
+        <!-- Pagination -->
+        <div class="px-4 sm:px-5 py-3 sm:py-3.5 border-t border-[#e5e0db]/60 bg-[#faf8f5]/40">
+            {{ $feedbacks->appends(request()->query())->links('vendor.pagination.counselor-resources') }}
+        </div>
     </div>
 
     </div>

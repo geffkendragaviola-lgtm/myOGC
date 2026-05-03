@@ -45,7 +45,7 @@
                                 <p class="summary-subtext hidden sm:block">Live student directory count</p>
                             </div>
                         </div>
-                        <a href="#"
+                        <a href="{{ route('admin.users.create', ['role' => 'student']) }}"
                            class="primary-btn px-5 py-2.5 whitespace-nowrap text-xs sm:text-sm rounded-lg">
                             <i class="fas fa-plus mr-1.5 text-[9px] sm:text-xs"></i> Add Student
                         </a>
@@ -127,6 +127,18 @@
 
         <!-- Students Table Card -->
         <div class="panel-card overflow-hidden">
+            <div class="table-header-bar">
+                <div class="flex items-center gap-3">
+                    <div class="table-header-icon">
+                        <i class="fas fa-users text-[#7a2a2a] text-[10px] sm:text-xs"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-sm font-medium text-[#2c2420]">Student Directory</h2>
+                        <p class="text-[10px] sm:text-xs text-[#8b7e76]">Showing <span class="font-bold text-[#2c2420]">{{ $students->firstItem() ?? 0 }} - {{ $students->lastItem() ?? 0 }}</span> of <span class="font-bold text-[#2c2420]">{{ $students->total() }}</span></p>
+                    </div>
+                </div>
+            </div>
+
             <div class="overflow-x-auto">
                 <table class="min-w-[850px] md:min-w-full divide-y divide-[#e5e0db]/60 w-full">
                     <thead class="bg-[#faf8f5]/85">
@@ -144,7 +156,7 @@
 
                     <tbody class="bg-white divide-y divide-[#e5e0db]/50">
                         @forelse($students as $student)
-                            <tr class="table-row group">
+                            <tr class="table-row group cursor-pointer" onclick="window.location='{{ route('admin.students.profile', $student) }}'">
                                 <td class="px-3 sm:px-4 py-2.5 sm:py-3 whitespace-nowrap">
                                     <span class="text-[10px] sm:text-sm font-mono text-[#8b7e76]">{{ $student->id }}</span>
                                 </td>
@@ -202,22 +214,36 @@
                                 </td>
 
                                 <td class="px-3 sm:px-4 py-2.5 sm:py-3 whitespace-nowrap">
-                                    <span class="inline-flex items-center px-2 py-0.5 sm:px-2.5 sm:py-1 text-[10px] sm:text-xs font-semibold rounded-full 
-                                        {{ $student->student_status == 'new' ? 'bg-[#ecfdf5] text-[#059669] border border-[#10b981]/30' : 
-                                           ($student->student_status == 'transferee' ? 'bg-[#eff6ff] text-[#0284c7] border border-[#0ea5e9]/30' : 
-                                           ($student->student_status == 'returnee' ? 'bg-[#fffbeb] text-[#b45309] border border-[#f59e0b]/30' : 
-                                           'bg-[#f5f0eb] text-[#6b5e57] border border-[#e5e0db]/70')) }}">
-                                        <i class="fas {{ $student->student_status == 'new' ? 'fa-star' : ($student->student_status == 'transferee' ? 'fa-arrow-right-arrow-left' : ($student->student_status == 'returnee' ? 'fa-undo' : 'fa-user')) }} mr-1 text-[9px] sm:text-[10px]"></i>
-                                        {{ ucfirst($student->student_status ?? 'new') }}
-                                    </span>
+                                    <div class="flex flex-col gap-1.5 items-start">
+                                        @if($student->calculated_high_risk)
+                                            @if(in_array('assessment', $student->high_risk_reasons))
+                                            <span class="inline-flex items-center px-2 py-0.5 sm:px-2.5 sm:py-1 text-[10px] sm:text-xs font-semibold rounded-full bg-[#fff7ed] text-[#9a3412] border border-[#fed7aa]">
+                                                <i class="fas fa-notes-medical mr-1 text-[9px] sm:text-[10px]"></i> Assessment Risk
+                                            </span>
+                                            @endif
+                                            @if(in_array('flagged', $student->high_risk_reasons))
+                                            <span class="inline-flex items-center px-2 py-0.5 sm:px-2.5 sm:py-1 text-[10px] sm:text-xs font-semibold rounded-full bg-[#fef3c7] text-[#92400e] border border-[#fde68a]">
+                                                <i class="fas fa-flag mr-1 text-[9px] sm:text-[10px]"></i> Flagged
+                                            </span>
+                                            @endif
+                                        @endif
+                                        <span class="inline-flex items-center px-2 py-0.5 sm:px-2.5 sm:py-1 text-[10px] sm:text-xs font-semibold rounded-full 
+                                            {{ $student->student_status == 'new' ? 'bg-[#ecfdf5] text-[#059669] border border-[#10b981]/30' : 
+                                               ($student->student_status == 'transferee' ? 'bg-[#eff6ff] text-[#0284c7] border border-[#0ea5e9]/30' : 
+                                               ($student->student_status == 'returnee' ? 'bg-[#fffbeb] text-[#b45309] border border-[#f59e0b]/30' : 
+                                               'bg-[#f5f0eb] text-[#6b5e57] border border-[#e5e0db]/70')) }}">
+                                            <i class="fas {{ $student->student_status == 'new' ? 'fa-star' : ($student->student_status == 'transferee' ? 'fa-arrow-right-arrow-left' : ($student->student_status == 'returnee' ? 'fa-undo' : 'fa-user')) }} mr-1 text-[9px] sm:text-[10px]"></i>
+                                            {{ ucfirst($student->student_status ?? 'new') }}
+                                        </span>
+                                    </div>
                                 </td>
 
                                 <td class="px-3 sm:px-4 py-2.5 sm:py-3 whitespace-nowrap">
                                     <div class="flex items-center gap-2">
                                         <a href="{{ route('admin.students.edit', $student) }}"
                                            class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[10px] sm:text-xs font-semibold text-[#7a2a2a] bg-[rgba(122,42,42,0.07)] hover:bg-[rgba(122,42,42,0.14)] transition-colors"
-                                           title="Edit Student">
-                                            <i class="fas fa-pen-to-square"></i> Edit
+                                           title="Edit Profile">
+                                            <i class="fas fa-edit"></i> Edit
                                         </a>
                                     </div>
                                 </td>

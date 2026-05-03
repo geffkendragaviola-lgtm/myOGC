@@ -1,4 +1,14 @@
-@extends(Auth::check() && Auth::user()->role === 'counselor' ? 'layouts.app' : 'layouts.student')
+@php
+    $layout = 'layouts.student';
+    if (Auth::check()) {
+        if (Auth::user()->role === 'counselor') {
+            $layout = 'layouts.app';
+        } elseif (Auth::user()->role === 'admin') {
+            $layout = 'layouts.admin';
+        }
+    }
+@endphp
+@extends($layout)
 @section('title', 'Student Profile')
 @section('content')
 <style>
@@ -278,7 +288,12 @@
                                 <p class="summary-value">{{ $student->appointments->count() }}</p>
                             </div>
                         </div>
-                        @if(Auth::check() && Auth::user()->role === 'counselor')
+                        @if(Auth::check() && Auth::user()->role === 'admin')
+                        <a href="{{ route('admin.students') }}" class="btn-primary no-print">
+                            <i class="fas fa-arrow-left"></i>
+                            <span>Back to Student List</span>
+                        </a>
+                        @elseif(Auth::check() && Auth::user()->role === 'counselor')
                         <button onclick="window.print()" class="btn-primary no-print">
                             <i class="fas fa-print"></i>
                             <span>Print</span>
@@ -308,8 +323,8 @@
         </div>
         @endif
 
-        <!-- High-Risk Alert (Counselor Only) -->
-        @if(Auth::check() && Auth::user()->role === 'counselor')
+        <!-- High-Risk Alert (Counselor/Admin Only) -->
+        @if(Auth::check() && in_array(Auth::user()->role, ['counselor', 'admin']))
         @php
             $stressResponses = $student->needsAssessment?->stress_responses ?? [];
             $stressResponses = is_array($stressResponses) ? $stressResponses : [];
@@ -323,9 +338,11 @@
                     <i class="fas fa-{{ $isHighRisk ? 'exclamation-triangle' : 'shield-halved' }}"></i>
                 </div>
                 High-Risk Status
+                @if(in_array(Auth::user()->role, ['counselor', 'admin']))
                 <button type="button" onclick="toggleHighRiskModal()" class="btn ml-auto no-print" style="padding:0.3rem 0.7rem;font-size:0.72rem;">
                     <i class="fas fa-edit"></i> {{ $student->is_high_risk ? 'Update Flag' : 'Flag Student' }}
                 </button>
+                @endif
             </div>
             <div class="info-card-body">
                 @if($isHighRisk)
@@ -845,7 +862,10 @@ function submitHighRiskForm() {
     const btn = document.getElementById('submitHighRiskBtn');
     btn.disabled = true;
     btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
-    fetch('{{ route("counselor.students.toggle-high-risk", $student) }}', {
+    
+    const submitUrl = '{{ Auth::user()->role === "admin" ? route("admin.students.toggle-high-risk", $student) : route("counselor.students.toggle-high-risk", $student) }}';
+    
+    fetch(submitUrl, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
         body: JSON.stringify({ is_high_risk: isHighRisk, high_risk_notes: notes })
@@ -859,7 +879,7 @@ function submitHighRiskForm() {
 }
 </script>
 
-@if(Auth::check() && Auth::user()->role === 'counselor')
+@if(Auth::check() && in_array(Auth::user()->role, ['counselor', 'admin']))
 <div id="highRiskModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:9999;align-items:center;justify-content:center;padding:1rem;">
     <div style="background:white;border-radius:0.75rem;max-width:500px;width:100%;box-shadow:0 20px 25px -5px rgba(0,0,0,0.1);overflow:hidden;">
         <div style="padding:1rem 1.25rem;border-bottom:1px solid var(--border-soft);display:flex;align-items:center;justify-content:space-between;background:rgba(250,248,245,0.6);">

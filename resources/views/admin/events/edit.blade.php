@@ -227,22 +227,13 @@
         @endif
 
         <!-- Event Form -->
-        <div class="panel-card">
-            <div class="panel-topline"></div>
-            <div class="panel-header">
-                <div class="panel-icon">
-                    <i class="fas fa-file-pen text-[9px] sm:text-xs"></i>
-                </div>
-                <div>
-                    <h2 class="panel-title">Edit Event Form</h2>
-                    <p class="panel-subtitle hidden sm:block">Update core event information, schedule, counselor assignment, and status.</p>
-                </div>
-            </div>
+        <form method="POST" action="{{ route('admin.events.update', $event) }}" enctype="multipart/form-data">
+            @csrf
+            @method('PUT')
 
-            <div class="p-3 sm:p-4">
-                <form method="POST" action="{{ route('admin.events.update', $event) }}" enctype="multipart/form-data">
-                    @csrf
-                    @method('PUT')
+            <div class="grid grid-cols-1 xl:grid-cols-2 gap-5 sm:gap-6 items-start">
+                <!-- Left Column -->
+                <div class="space-y-5 sm:space-y-6">
 
                     {{-- Event Image --}}
                     <div class="section-card mb-4">
@@ -261,18 +252,18 @@
                             <div class="flex flex-col sm:flex-row gap-5 items-start">
                                 {{-- Current image preview --}}
                                 <div class="flex-shrink-0">
-                                    <div class="w-40 h-28 rounded-lg overflow-hidden border border-[#e5e0db] bg-[#f5f0eb] relative">
+                                    <div class="w-full sm:w-48 h-32 rounded-lg overflow-hidden border border-[#e5e0db] bg-[#f5f0eb] relative">
                                         @if($event->image_url)
                                             <img src="{{ $event->image_url }}"
                                                  alt="Current event image"
-                                                 class="w-full h-full object-cover"
+                                                 class="w-full h-full object-contain bg-black/5"
                                                  id="event-img-preview">
                                         @else
                                             <div class="w-full h-full flex flex-col items-center justify-center text-[#8b7e76]" id="event-img-placeholder">
                                                 <i class="fas fa-image text-2xl mb-1 opacity-40"></i>
                                                 <span class="text-xs">No image</span>
                                             </div>
-                                            <img src="" alt="" class="w-full h-full object-cover hidden" id="event-img-preview">
+                                            <img src="" alt="" class="w-full h-full object-contain hidden bg-black/5" id="event-img-preview">
                                         @endif
                                     </div>
                                 </div>
@@ -445,8 +436,12 @@
                         </div>
                     </div>
 
+                </div>
+
+                <!-- Right Column -->
+                <div class="space-y-5 sm:space-y-6">
                     <!-- Attending Counselors -->
-                    <div class="section-card mb-4">
+                    <div class="section-card">
                         <div class="section-topline"></div>
                         <div class="section-header">
                             <div class="section-icon">
@@ -578,21 +573,22 @@
                         </div>
                     </div>
 
-                    <!-- Form Actions -->
-                    <div class="mt-4 flex flex-col sm:flex-row gap-2 sm:gap-3 justify-end">
-                        <a href="{{ route('admin.events') }}"
-                           class="form-action-secondary text-center rounded-lg">
-                            Cancel
-                        </a>
-                        <button type="submit"
-                                class="form-action-primary rounded-lg">
-                            <i class="fas fa-save mr-1.5 text-[9px] sm:text-xs"></i>
-                            Update Event
-                        </button>
-                    </div>
-                </form>
+                </div>
+            </div> <!-- End Grid -->
+
+            <!-- Form Actions -->
+            <div class="mt-6 flex flex-col sm:flex-row gap-3 justify-end">
+                <a href="{{ route('admin.events') }}"
+                   class="form-action-secondary w-full sm:w-auto rounded-lg text-center" style="padding: 0.6rem 1.25rem;">
+                    Cancel
+                </a>
+                <button type="submit"
+                        class="form-action-primary w-full sm:w-auto rounded-lg" style="padding: 0.6rem 1.25rem;">
+                    <i class="fas fa-save mr-1.5 text-[9px] sm:text-xs"></i>
+                    Update Event
+                </button>
             </div>
-        </div>
+        </form>
     </div>
 </div>
 

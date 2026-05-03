@@ -143,7 +143,7 @@
     <div class="create-faq-glow one"></div>
     <div class="create-faq-glow two"></div>
 
-    <div class="relative max-w-4xl mx-auto px-4 sm:px-6 py-5 md:py-8">
+    <div class="relative max-w-7xl mx-auto px-4 sm:px-6 py-5 md:py-8">
         <div class="mb-5 sm:mb-6">
             <div class="grid grid-cols-1 xl:grid-cols-[1fr_auto] gap-4 items-stretch">
                 <div class="hero-card">

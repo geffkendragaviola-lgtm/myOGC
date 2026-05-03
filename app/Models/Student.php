@@ -373,29 +373,65 @@ class Student extends Model
 
 
 
-public function getCounselingConcerns()
-{
-    $concerns = [];
+    public function getCounselingConcerns()
+    {
+        $concerns = [];
 
-    // Check if psychosocial data exists and future_counseling_concerns is not empty
-    if ($this->psychosocialData && !empty($this->psychosocialData->future_counseling_concerns)) {
-        // If it's a string, convert to array with one element
-        if (is_string($this->psychosocialData->future_counseling_concerns)) {
-            $concerns = [$this->psychosocialData->future_counseling_concerns];
+        // Check if psychosocial data exists and future_counseling_concerns is not empty
+        if ($this->psychosocialData && !empty($this->psychosocialData->future_counseling_concerns)) {
+            // If it's a string, convert to array with one element
+            if (is_string($this->psychosocialData->future_counseling_concerns)) {
+                $concerns = [$this->psychosocialData->future_counseling_concerns];
+            }
+            // If it's already an array, use it directly
+            elseif (is_array($this->psychosocialData->future_counseling_concerns)) {
+                $concerns = $this->psychosocialData->future_counseling_concerns;
+            }
         }
-        // If it's already an array, use it directly
-        elseif (is_array($this->psychosocialData->future_counseling_concerns)) {
-            $concerns = $this->psychosocialData->future_counseling_concerns;
+
+        // Add other concern sources here if needed
+        if ($this->needsAssessment && !empty($this->needsAssessment->improvement_needs)) {
+            if (is_array($this->needsAssessment->improvement_needs)) {
+                $concerns = array_merge($concerns, $this->needsAssessment->improvement_needs);
+            }
         }
+
+        return $concerns;
     }
 
-    // Add other concern sources here if needed
-    if ($this->needsAssessment && !empty($this->needsAssessment->improvement_needs)) {
-        if (is_array($this->needsAssessment->improvement_needs)) {
-            $concerns = array_merge($concerns, $this->needsAssessment->improvement_needs);
-        }
+    /**
+     * Get whether the student is considered high risk (flagged or via assessment).
+     */
+    public function getCalculatedHighRiskAttribute()
+    {
+        return count($this->high_risk_reasons) > 0;
     }
 
-    return $concerns;
-}
+    /**
+     * Get detailed reasons for why a student is high risk.
+     */
+    public function getHighRiskReasonsAttribute()
+    {
+        $reasons = [];
+        
+        $needsAssessment = $this->needsAssessment;
+        $riskResponses = ['Hurt myself', 'Attempted to end my life', 'Thought it would be better dead'];
+        
+        $stressResponses = $needsAssessment ? $needsAssessment->stress_responses : [];
+        if (!is_array($stressResponses)) {
+            $stressResponses = is_string($stressResponses) ? json_decode($stressResponses, true) ?? [] : [];
+        }
+        
+        $hasSelfHarmRisk = !$this->high_risk_overridden && count(array_intersect($riskResponses, $stressResponses)) > 0;
+        
+        if ($hasSelfHarmRisk) {
+            $reasons[] = 'assessment';
+        }
+        
+        if ($this->is_high_risk) {
+            $reasons[] = 'flagged';
+        }
+        
+        return $reasons;
+    }
 }

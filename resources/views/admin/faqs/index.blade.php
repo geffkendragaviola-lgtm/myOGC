@@ -239,19 +239,17 @@
                 </div>
             @else
                 <div class="table-header-bar">
-                    <div class="flex items-center gap-2.5">
+                    <div class="flex items-center gap-3">
                         <div class="table-header-icon">
-                            <i class="fas fa-circle-question text-[#7a2a2a] text-[9px] sm:text-xs"></i>
+                            <i class="fas fa-circle-question text-[#7a2a2a] text-[10px] sm:text-xs"></i>
                         </div>
                         <div>
                             <h2 class="text-sm font-medium text-[#2c2420]">FAQ Library</h2>
-                            <p class="text-[10px] sm:text-[11px] text-[#8b7e76]">Total FAQs: {{ $faqs->total() }}</p>
+                            <p class="text-[10px] sm:text-xs text-[#8b7e76]">Showing <span class="font-bold text-[#2c2420]">{{ $faqs->firstItem() ?? 0 }} - {{ $faqs->lastItem() ?? 0 }}</span> of <span class="font-bold text-[#2c2420]">{{ $faqs->total() }}</span></p>
                         </div>
                     </div>
                     <div class="flex items-center gap-2">
-                        <span class="table-live-pill">
-                            <i class="fas fa-clock mr-1 text-[9px]"></i> Live data
-                        </span>
+
                     </div>
                 </div>
 
@@ -292,7 +290,7 @@
                                     <td class="px-3 sm:px-4 py-2.5 sm:py-3.5 whitespace-nowrap">
                                         <div class="flex items-center gap-1.5 sm:gap-2.5">
                                             <button onclick="togglePin('faq', {{ $faq->id }}, this)"
-                                                    class="action-link {{ $faq->is_pinned ? 'text-yellow-500' : '' }}"
+                                                    class="action-link {{ $faq->is_pinned ? '!text-[#7a2a2a]' : '' }}"
                                                     title="{{ $faq->is_pinned ? 'Unpin' : 'Pin to top' }}">
                                                 <i class="fas fa-thumbtack text-[10px] sm:text-sm {{ $faq->is_pinned ? 'rotate-0' : 'opacity-40' }}"></i>
                                             </button>
@@ -341,11 +339,11 @@ function togglePin(type, id, btn) {
     .then(data => {
         const icon = btn.querySelector('i');
         if (data.is_pinned) {
-            btn.classList.add('text-yellow-500');
+            btn.classList.add('!text-[#7a2a2a]');
             icon.classList.remove('opacity-40');
             btn.title = 'Unpin';
         } else {
-            btn.classList.remove('text-yellow-500');
+            btn.classList.remove('!text-[#7a2a2a]');
             icon.classList.add('opacity-40');
             btn.title = 'Pin to top';
         }

@@ -334,6 +334,112 @@
                     </div>
                 </div>
 
+                <!-- Citizen's Charter Answers -->
+                <div class="mb-6 sm:mb-8">
+                    <div class="info-card">
+                        <div class="section-topline"></div>
+                        <div class="section-header">
+                            <div class="section-icon">
+                                <i class="fas fa-file-lines text-xs sm:text-sm"></i>
+                            </div>
+                            <div>
+                                <h3 class="section-title">Citizen's Charter (CC) Answers</h3>
+                                <p class="section-subtitle hidden sm:block">Student responses regarding the Citizen's Charter.</p>
+                            </div>
+                        </div>
+
+                        <div class="p-4 sm:p-6 space-y-4">
+                            @php
+                                $cc1Map = [
+                                    'A' => 'I know what a CC is and I saw this office\'s CC.',
+                                    'B' => 'I know what a CC is but I did NOT see this office\'s CC.',
+                                    'C' => 'I learned of the CC only when I saw this office\'s CC.',
+                                    'D' => 'I do not know what a CC is and I did not see one in this office.'
+                                ];
+                            @endphp
+                            
+                            <div class="bg-[#faf8f5] rounded-xl p-4 border border-[#e5e0db]/60">
+                                <label class="metric-label">CC1. Which best describes your awareness of a Citizen's Charter?</label>
+                                <p class="text-[#4a3f3a] text-sm sm:text-base mt-1">{{ $cc1Map[$feedback->cc1] ?? $feedback->cc1 ?? 'N/A' }}</p>
+                            </div>
+                            
+                            <div class="bg-[#faf8f5] rounded-xl p-4 border border-[#e5e0db]/60">
+                                <label class="metric-label">CC2. If aware of the CC, was it easy to see?</label>
+                                <p class="text-[#4a3f3a] text-sm sm:text-base mt-1">{{ $feedback->cc2 ?? 'N/A' }}</p>
+                            </div>
+                            
+                            <div class="bg-[#faf8f5] rounded-xl p-4 border border-[#e5e0db]/60">
+                                <label class="metric-label">CC3. If aware of the CC, how much did it help in your transaction?</label>
+                                <p class="text-[#4a3f3a] text-sm sm:text-base mt-1">{{ $feedback->cc3 ?? 'N/A' }}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Service Quality Dimension -->
+                <div class="mb-6 sm:mb-8">
+                    <div class="info-card">
+                        <div class="section-topline"></div>
+                        <div class="section-header">
+                            <div class="section-icon">
+                                <i class="fas fa-list-check text-xs sm:text-sm"></i>
+                            </div>
+                            <div>
+                                <h3 class="section-title">Service Quality Dimension (SQD) Answers</h3>
+                                <p class="section-subtitle hidden sm:block">Detailed rating breakdown per dimension.</p>
+                            </div>
+                        </div>
+
+                        <div class="p-4 sm:p-6">
+                            @php
+                                $sqdQuestions = [
+                                    'sqd0' => 'I am satisfied with the service that I availed.',
+                                    'sqd1' => 'I spent a reasonable amount of time for my transaction.',
+                                    'sqd2' => 'The office followed the transaction\'s requirements and steps based on the information provided.',
+                                    'sqd3_1' => 'The steps (including payment) I needed to do for my transaction were easy and simple.',
+                                    'sqd3_2' => 'The receiving/waiting/processing/working area and office facilities have visual appeal and comfiness.',
+                                    'sqd4' => 'I easily found information about my transaction from the office or its website.',
+                                    'sqd5' => 'I paid a reasonable amount of fees for my transaction.',
+                                    'sqd6' => 'I feel the office was fair to everyone — "walang palakasan" — during my transaction.',
+                                    'sqd7_1' => 'I was treated courteously by the staff, and (if asked for help) the staff was helpful.',
+                                    'sqd7_2' => 'The staff is knowledgeable of the functions and/or operations of the office.',
+                                    'sqd7_3' => 'The staff has the ability to complete the transaction.',
+                                    'sqd8' => 'I got what I needed from the office, or (if denied) the denial was sufficiently explained to me.',
+                                    'sqd9' => 'The staff shows professionalism, politeness, and willingness to help.',
+                                ];
+                            @endphp
+                            
+                            <div class="space-y-3">
+                                @foreach($sqdQuestions as $key => $question)
+                                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3 bg-[#faf8f5] rounded-xl border border-[#e5e0db]/60 transition hover:bg-white hover:shadow-sm">
+                                        <div class="text-sm text-[#4a3f3a] flex-1">
+                                            <span class="font-medium text-[#7a2a2a] mr-2">SQD{{ str_replace('sqd', '', $key) }}.</span>
+                                            {{ $question }}
+                                        </div>
+                                        <div class="flex items-center gap-2 min-w-max">
+                                            @php
+                                                $rating = $feedback->$key;
+                                                $ratingLabel = \App\Models\Feedback::getRatingLabel($rating);
+                                            @endphp
+                                            <div class="text-[#c9a227] flex">
+                                                @for($i = 1; $i <= 5; $i++)
+                                                    <i class="fas fa-star{{ $i <= $rating ? '' : '-o' }} text-xs"></i>
+                                                @endfor
+                                            </div>
+                                            <div class="text-xs font-semibold px-2 py-1 bg-white border border-[#e5e0db] rounded-md text-center min-w-[30px]">
+                                                {{ $rating ?? 'N/A' }}
+                                            </div>
+                                            <div class="text-[10px] text-[#8b7e76] uppercase tracking-wider w-24 text-right hidden lg:block truncate">
+                                                {{ $ratingLabel }}
+                                            </div>
+                                        </div>
+                                    </div>
+                                @endforeach
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- Student Comments -->
                 <div class="mb-6 sm:mb-8">
                     <div class="info-card">

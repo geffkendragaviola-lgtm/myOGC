@@ -145,7 +145,7 @@
     <div class="create-resource-glow one"></div>
     <div class="create-resource-glow two"></div>
 
-    <div class="relative max-w-4xl mx-auto px-4 sm:px-6 py-5 md:py-8">
+    <div class="relative max-w-7xl mx-auto px-4 sm:px-6 py-5 md:py-8">
         <div class="mb-5 sm:mb-6">
             <div class="grid grid-cols-1 xl:grid-cols-[1fr_auto] gap-4 items-stretch">
                 <div class="hero-card">
@@ -187,22 +187,12 @@
             </div>
         </div>
 
-        <div class="panel-card">
-            <div class="panel-topline"></div>
-            <div class="panel-header">
-                <div class="panel-icon">
-                    <i class="fas fa-book-open text-[9px] sm:text-xs"></i>
-                </div>
-                <div>
-                    <h2 class="panel-title">Resource Form</h2>
-                    <p class="panel-subtitle hidden sm:block">Create content, metadata, link behavior, and visibility settings for a new resource.</p>
-                </div>
-            </div>
+        <form action="{{ route('admin.resources.store') }}" method="POST" enctype="multipart/form-data">
+            @csrf
 
-            <div class="p-3 sm:p-4 md:p-6">
-                <form action="{{ route('admin.resources.store') }}" method="POST" enctype="multipart/form-data">
-                    @csrf
-
+            <div class="grid grid-cols-1 xl:grid-cols-2 gap-5 sm:gap-6 items-start">
+                <!-- Left Column -->
+                <div class="space-y-5 sm:space-y-6">
                     <div class="section-card">
                         <div class="section-topline"></div>
                         <div class="section-header">
@@ -211,12 +201,12 @@
                             </div>
                             <div>
                                 <h3 class="section-title">Resource Details</h3>
-                                <p class="section-subtitle hidden sm:block">Set the title, description, category, icon, link, and other display settings.</p>
+                                <p class="section-subtitle hidden sm:block">Set the title, description, category, and main link.</p>
                             </div>
                         </div>
 
-                        <div class="p-3 sm:p-4 md:p-6 grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4 md:gap-6">
-                            <div class="md:col-span-2">
+                        <div class="p-3 sm:p-4 md:p-6 grid grid-cols-1 gap-3 sm:gap-4 md:gap-6">
+                            <div>
                                 <label for="title" class="field-label">Title *</label>
                                 <input type="text" name="title" id="title" value="{{ old('title') }}"
                                        class="input-field" required>
@@ -225,9 +215,32 @@
                                 @enderror
                             </div>
 
-                            <div class="md:col-span-2">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
+                                <div>
+                                    <label for="category" class="field-label">Category *</label>
+                                    <select name="category" id="category" class="select-field" required>
+                                        <option value="">Select a category</option>
+                                        @foreach($categories as $value => $label)
+                                            <option value="{{ $value }}" {{ old('category') == $value ? 'selected' : '' }}>{{ $label }}</option>
+                                        @endforeach
+                                    </select>
+                                    @error('category')
+                                        <p class="error-text">{{ $message }}</p>
+                                    @enderror
+                                </div>
+                                <div>
+                                    <label for="button_text" class="field-label">Button Text *</label>
+                                    <input type="text" name="button_text" id="button_text" value="{{ old('button_text') }}"
+                                           class="input-field" required>
+                                    @error('button_text')
+                                        <p class="error-text">{{ $message }}</p>
+                                    @enderror
+                                </div>
+                            </div>
+
+                            <div>
                                 <label for="description" class="field-label">Description *</label>
-                                <textarea name="description" id="description" rows="3"
+                                <textarea name="description" id="description" rows="4"
                                           class="textarea-field" required>{{ old('description') }}</textarea>
                                 @error('description')
                                     <p class="error-text">{{ $message }}</p>
@@ -235,51 +248,6 @@
                             </div>
 
                             <div>
-                                <label for="icon" class="field-label">Icon *</label>
-                                <select name="icon" id="icon"
-                                        class="select-field" required>
-                                    <option value="">Select an icon</option>
-                                    @foreach($icons as $icon)
-                                        <option value="{{ $icon }}" {{ old('icon') == $icon ? 'selected' : '' }}>{{ $icon }}</option>
-                                    @endforeach
-                                </select>
-                                @error('icon')
-                                    <p class="error-text">{{ $message }}</p>
-                                @enderror
-                            </div>
-
-                            <div>
-                                <label for="category" class="field-label">Category *</label>
-                                <select name="category" id="category"
-                                        class="select-field" required>
-                                    <option value="">Select a category</option>
-                                    @foreach($categories as $value => $label)
-                                        <option value="{{ $value }}" {{ old('category') == $value ? 'selected' : '' }}>{{ $label }}</option>
-                                    @endforeach
-                                </select>
-                                @error('category')
-                                    <p class="error-text">{{ $message }}</p>
-                                @enderror
-                            </div>
-
-                            <div>
-                                <label for="button_text" class="field-label">Button Text *</label>
-                                <input type="text" name="button_text" id="button_text" value="{{ old('button_text') }}"
-                                       class="input-field" required>
-                                @error('button_text')
-                                    <p class="error-text">{{ $message }}</p>
-                                @enderror
-                            </div>
-
-                            <div>
-                                <label class="field-label">Pin to Top</label>
-                                <label class="inline-flex items-center gap-2 cursor-pointer">
-                                    <input type="checkbox" name="is_pinned" value="1" {{ old('is_pinned') ? 'checked' : '' }} class="w-4 h-4 accent-[#7a2a2a]">
-                                    <span class="text-sm text-[#6b5e57]">Pin this resource to appear first</span>
-                                </label>
-                            </div>
-
-                            <div class="md:col-span-2">
                                 <label for="link" class="field-label">Resource Link *</label>
                                 <input type="url" name="link" id="link" value="{{ old('link') }}"
                                        class="input-field" required>
@@ -287,8 +255,48 @@
                                     <p class="error-text">{{ $message }}</p>
                                 @enderror
                             </div>
+                        </div>
+                    </div>
+                </div>
 
-                            <div class="md:col-span-2">
+                <!-- Right Column -->
+                <div class="space-y-5 sm:space-y-6">
+                    <div class="section-card">
+                        <div class="section-topline"></div>
+                        <div class="section-header">
+                            <div class="section-icon">
+                                <i class="fas fa-sliders text-[9px] sm:text-xs"></i>
+                            </div>
+                            <div>
+                                <h3 class="section-title">Media & Settings</h3>
+                                <p class="section-subtitle hidden sm:block">Icon selection, thumbnail, and display preferences.</p>
+                            </div>
+                        </div>
+
+                        <div class="p-3 sm:p-4 md:p-6 grid grid-cols-1 gap-3 sm:gap-4 md:gap-6">
+                            <div>
+                                <label for="icon" class="field-label">Icon *</label>
+                                <div class="grid grid-cols-5 sm:grid-cols-6 md:grid-cols-7 gap-2">
+                                    @foreach($icons as $icon)
+                                        <label class="option-card cursor-pointer flex items-center justify-center gap-2 p-2 sm:p-2.5 !m-0">
+                                            <input type="radio"
+                                                   name="icon"
+                                                   value="{{ $icon }}"
+                                                   class="sr-only peer"
+                                                   {{ old('icon') == $icon ? 'checked' : '' }}
+                                                   required>
+                                            <span class="inline-flex items-center justify-center w-9 h-9 rounded-lg bg-white border border-[#e5e0db] text-[#6b5e57] peer-checked:border-[#7a2a2a] peer-checked:text-[#7a2a2a] peer-checked:bg-[#fef9e7]">
+                                                <i class="{{ $icon }}"></i>
+                                            </span>
+                                        </label>
+                                    @endforeach
+                                </div>
+                                @error('icon')
+                                    <p class="error-text">{{ $message }}</p>
+                                @enderror
+                            </div>
+
+                            <div>
                                 <label for="image" class="field-label">Image (optional)</label>
                                 <input type="file" name="image" id="image" accept="image/*" class="file-field">
                                 @error('image')
@@ -296,11 +304,17 @@
                                 @enderror
                             </div>
 
-                            <div class="md:col-span-2 space-y-3 sm:space-y-4">
+                            <div class="space-y-3 sm:space-y-4">
                                 <div class="option-card">
                                     <input type="checkbox" name="use_yt_thumbnail" id="use_yt_thumbnail" value="1" {{ old('use_yt_thumbnail') ? 'checked' : '' }}
                                            class="h-4 w-4 text-[#7a2a2a] focus:ring-[#7a2a2a] border-[#e5e0db] rounded mt-0.5 flex-shrink-0">
                                     <label for="use_yt_thumbnail" class="ml-3 text-xs sm:text-sm font-medium text-[#4a3f3a] cursor-pointer">Use YouTube thumbnail (for YouTube links)</label>
+                                </div>
+
+                                <div class="option-card">
+                                    <input type="checkbox" name="is_pinned" id="is_pinned" value="1" {{ old('is_pinned') ? 'checked' : '' }}
+                                           class="h-4 w-4 text-[#7a2a2a] focus:ring-[#7a2a2a] border-[#e5e0db] rounded mt-0.5 flex-shrink-0">
+                                    <label for="is_pinned" class="ml-3 text-xs sm:text-sm font-medium text-[#4a3f3a] cursor-pointer">Pin this resource to appear first</label>
                                 </div>
 
                                 <div class="option-card">
@@ -310,7 +324,7 @@
                                 </div>
 
                                 <div>
-                                    <label for="disclaimer_text" class="field-label">Disclaimer Text (optional)</label>
+                                    <label for="disclaimer_text" class="field-label">Disclaimer Text *</label>
                                     <textarea name="disclaimer_text" id="disclaimer_text" rows="3"
                                               class="textarea-field">{{ old('disclaimer_text') }}</textarea>
                                     @error('disclaimer_text')
@@ -326,16 +340,38 @@
                             </div>
                         </div>
                     </div>
+                </div>
 
-                    <div class="mt-6 sm:mt-8 flex flex-col sm:flex-row justify-end gap-2 sm:gap-3">
-                        <a href="{{ route('admin.resources.index') }}" class="secondary-btn text-center rounded-lg">Cancel</a>
-                        <button type="submit" class="primary-btn rounded-lg">
-                            <i class="fas fa-save mr-1.5 text-[9px] sm:text-xs"></i> Create Resource
-                        </button>
-                    </div>
-                </form>
+            </div> <!-- End Grid -->
+
+            <div class="mt-6 flex justify-end gap-3">
+                <a href="{{ route('admin.resources.index') }}" class="secondary-btn w-full sm:w-auto rounded-lg text-center">Cancel</a>
+                <button type="submit" class="primary-btn w-full sm:w-auto rounded-lg">
+                    <i class="fas fa-save mr-1.5 text-[9px] sm:text-xs"></i>Create Resource
+                </button>
             </div>
-        </div>
+        </form>
     </div>
 </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const disclaimerCheckbox = document.getElementById('show_disclaimer');
+        const disclaimerContainer = document.getElementById('disclaimer_text').parentElement;
+        const disclaimerTextarea = document.getElementById('disclaimer_text');
+
+        function toggleDisclaimer() {
+            if (disclaimerCheckbox.checked) {
+                disclaimerContainer.style.display = 'block';
+                disclaimerTextarea.setAttribute('required', 'required');
+            } else {
+                disclaimerContainer.style.display = 'none';
+                disclaimerTextarea.removeAttribute('required');
+            }
+        }
+
+        disclaimerCheckbox.addEventListener('change', toggleDisclaimer);
+        toggleDisclaimer();
+    });
+</script>
 @endsection

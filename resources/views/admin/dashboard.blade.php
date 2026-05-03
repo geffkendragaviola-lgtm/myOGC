@@ -139,12 +139,12 @@
                 <div class="relative h-full flex flex-col sm:flex-row items-center justify-between gap-3 p-4">
                     <div class="flex items-center gap-3 text-center sm:text-left">
                         <div class="summary-icon flex-shrink-0">
-                            <i class="fas fa-calendar-days text-sm"></i>
+                            <i class="fas fa-server text-sm"></i>
                         </div>
                         <div class="min-w-0">
-                            <p class="summary-label">This Month</p>
-                            <p class="summary-value">{{ $stats['total_events'] ?? 0 }}</p>
-                            <p class="summary-subtext hidden sm:block">Total events in system</p>
+                            <p class="summary-label">System Overview</p>
+                            <p class="summary-value">{{ number_format($stats['total_users'] ?? 0) }}</p>
+                            <p class="summary-subtext hidden sm:block">Total registered users</p>
                         </div>
                     </div>
                 </div>
@@ -154,7 +154,7 @@
         {{-- Stat cards --}}
         @php
             $cards = [
-                ['label'=>'Total Users',  'value'=>$stats['total_users'],      'icon'=>'fa-users',          'bg'=>'background:linear-gradient(135deg,#7a2a2a,#5c1a1a);color:#fef9e7;', 'bar'=>'background:linear-gradient(90deg,#7a2a2a,#d4af37);', 'w'=>'100%'],
+                ['label'=>'Appointments', 'value'=>$stats['total_appointments'] ?? 0, 'icon'=>'fa-calendar-check', 'bg'=>'background:linear-gradient(135deg,#7a2a2a,#5c1a1a);color:#fef9e7;', 'bar'=>'background:linear-gradient(90deg,#7a2a2a,#d4af37);', 'w'=>'100%'],
                 ['label'=>'Students',     'value'=>$stats['total_students'],   'icon'=>'fa-user-graduate',  'bg'=>'background:rgba(254,249,231,0.8);color:#7a5a1a;',                  'bar'=>'background:linear-gradient(90deg,#c9a227,#f0cd63);',  'w'=>'75%'],
                 ['label'=>'Counselors',   'value'=>$stats['total_counselors'], 'icon'=>'fa-user-doctor',    'bg'=>'background:rgba(240,253,244,0.8);color:#065f46;',                  'bar'=>'background:linear-gradient(90deg,#2d7a4f,#4ade80);',  'w'=>'60%'],
                 ['label'=>'Admins',       'value'=>$stats['total_admins'],     'icon'=>'fa-shield-halved',  'bg'=>'background:rgba(245,240,235,0.8);color:#6b5e57;',                  'bar'=>'background:linear-gradient(90deg,#8b7e76,#c4b8b1);',  'w'=>'40%'],

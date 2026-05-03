@@ -331,11 +331,11 @@
 
                     <div class="md:col-span-2">
                         <label for="role" class="field-label">Role *</label>
+                        @php $prefilledRole = old('role', request('role')); @endphp
                         <select id="role" name="role" class="select-field" required>
                             <option value="">Select Role</option>
-                            <option value="student" {{ old('role') == 'student' ? 'selected' : '' }}>Student</option>
-                            <option value="counselor" {{ old('role') == 'counselor' ? 'selected' : '' }}>Counselor</option>
-                            <option value="admin" {{ old('role') == 'admin' ? 'selected' : '' }}>Admin</option>
+                            <option value="student" {{ $prefilledRole == 'student' ? 'selected' : '' }}>Student</option>
+                            <option value="counselor" {{ $prefilledRole == 'counselor' ? 'selected' : '' }}>Counselor</option>
                         </select>
                     </div>
                 </div>
@@ -387,6 +387,38 @@
                                     {{ $college->name }}
                                 </option>
                             @endforeach
+                        </select>
+                    </div>
+
+                    <div>
+                        <label for="academic_year" class="field-label">Academic Year</label>
+                        <input type="text" id="academic_year" name="academic_year" value="{{ old('academic_year') }}"
+                               class="input-field" placeholder="e.g. 2024-2025">
+                    </div>
+
+                    <div>
+                        <label for="student_status" class="field-label">Student Status *</label>
+                        <select id="student_status" name="student_status" class="select-field">
+                            <option value="">Select Status</option>
+                            <option value="new" {{ old('student_status') == 'new' ? 'selected' : '' }}>New</option>
+                            <option value="transferee" {{ old('student_status') == 'transferee' ? 'selected' : '' }}>Transferee</option>
+                            <option value="returnee" {{ old('student_status') == 'returnee' ? 'selected' : '' }}>Returnee</option>
+                            <option value="shiftee" {{ old('student_status') == 'shiftee' ? 'selected' : '' }}>Shiftee</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label for="msu_sase_score" class="field-label">MSU-SASE Score</label>
+                        <input type="number" step="0.01" id="msu_sase_score" name="msu_sase_score" value="{{ old('msu_sase_score') }}"
+                               class="input-field" placeholder="e.g. 85.50">
+                    </div>
+
+                    <div>
+                        <label for="initial_interview_completed" class="field-label">Initial Interview Completed</label>
+                        <select id="initial_interview_completed" name="initial_interview_completed" class="select-field">
+                            <option value="">Select</option>
+                            <option value="yes" {{ old('initial_interview_completed') == 'yes' ? 'selected' : '' }}>Yes, completed</option>
+                            <option value="no" {{ old('initial_interview_completed') == 'no' ? 'selected' : '' }}>No, not yet</option>
                         </select>
                     </div>
                 </div>
@@ -472,11 +504,10 @@
     </div>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function () {
+        document.addEventListener('DOMContentLoaded', function() {
             const roleSelect = document.getElementById('role');
             const studentFields = document.getElementById('student-fields');
             const counselorFields = document.getElementById('counselor-fields');
-            const adminFields = document.getElementById('admin-fields');
             const birthdateInput = document.getElementById('birthdate');
             const ageInput = document.getElementById('age');
 
@@ -504,15 +535,12 @@
                 // Hide all fields first
                 studentFields.classList.add('hidden');
                 counselorFields.classList.add('hidden');
-                adminFields.classList.add('hidden');
 
                 // Show fields based on selected role
                 if (roleSelect.value === 'student') {
                     studentFields.classList.remove('hidden');
                 } else if (roleSelect.value === 'counselor') {
                     counselorFields.classList.remove('hidden');
-                } else if (roleSelect.value === 'admin') {
-                    adminFields.classList.remove('hidden');
                 }
             }
 

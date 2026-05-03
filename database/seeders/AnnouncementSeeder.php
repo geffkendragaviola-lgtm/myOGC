@@ -6,91 +6,114 @@ use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 use App\Models\Announcement;
+use App\Models\User;
+use App\Models\College;
 
 class AnnouncementSeeder extends Seeder
 {
     public function run(): void
     {
-        $ccsCollegeId = DB::table('colleges')->where('name', 'College of Computer Studies')->value('id');
-        $chsCollegeId = DB::table('colleges')->where('name', 'College of Health Sciences')->value('id');
-        $cassCollegeId = DB::table('colleges')->where('name', 'College of Arts and Social Sciences')->value('id');
-
-        $ccsCounselorUserId = DB::table('users')->where('email', 'gabutan@g.msuiit.edu.ph')->value('id');
-        $cassCounselorUserId = DB::table('users')->where('email', 'jullianephilip.jullianephilip.ouano@g.msuiit.edu.ph')->value('id');
-
-        if (!$ccsCounselorUserId || !$cassCounselorUserId) {
+        $admin = User::where('role', 'admin')->first();
+        $counselors = User::where('role', 'counselor')->get();
+        $counselor1 = $counselors->first();
+        $counselor2 = $counselors->skip(1)->first() ?? $counselor1;
+        
+        $colleges = College::all();
+        if ($colleges->isEmpty() || !$admin || !$counselor1) {
             return;
         }
 
+        $ccs = $colleges->where('name', 'College of Computer Studies')->first() ?? $colleges->first();
+        $cass = $colleges->where('name', 'College of Arts and Social Sciences')->first() ?? $colleges->skip(1)->first();
+        $chs = $colleges->where('name', 'College of Health Sciences')->first() ?? $colleges->last();
+
+        // Clear existing announcements for a clean seed
+        DB::table('announcement_college')->delete();
+        Announcement::query()->delete();
+
         $announcements = [
+            // Active, Pinned, All Colleges (Admin)
             [
-                'user_id' => $ccsCounselorUserId,
-                'title' => 'CCS Counseling Advisory',
-                'content' => "CCS students are invited to schedule counseling appointments for academic and personal concerns.",
-                'start_date' => Carbon::now()->subDays(2),
-                'end_date' => Carbon::now()->addDays(30),
+                'user_id' => $admin->id,
+                'title' => 'Welcome to the New Academic Year',
+                'content' => 'Welcome students to the new academic year! The guidance and counseling office is open from Monday to Friday, 8AM to 5PM. Feel free to drop by or schedule an appointment online.',
+                'start_date' => Carbon::now()->subDays(5),
+                'end_date' => Carbon::now()->addDays(90),
                 'is_active' => true,
-                'for_all_colleges' => false,
-                'image' => null,
-                'created_at' => now(),
-                'updated_at' => now(),
+                'is_pinned' => true,
+                'for_all_colleges' => true,
+                'colleges' => [],
             ],
+            // Active, specific college (Counselor 1)
             [
-                'user_id' => $ccsCounselorUserId,
-                'title' => 'CHS Counseling Advisory',
-                'content' => "CHS students may visit the guidance office for counseling support and wellness check-ins.",
+                'user_id' => $counselor1->id,
+                'title' => 'Mental Health Awareness Month Workshops',
+                'content' => 'Join us for a series of workshops focusing on stress management, mindfulness, and healthy coping mechanisms. Open exclusively for CCS students this week.',
+                'start_date' => Carbon::now()->subDays(1),
+                'end_date' => Carbon::now()->addDays(14),
+                'is_active' => true,
+                'is_pinned' => false,
+                'for_all_colleges' => false,
+                'colleges' => [$ccs->id],
+            ],
+            // Scheduled (Future), specific college (Counselor 2)
+            [
+                'user_id' => $counselor2->id,
+                'title' => 'Midterm Survival Guide Seminar',
+                'content' => 'Midterms are approaching! Learn effective study habits and time management skills. Register early as slots are limited.',
+                'start_date' => Carbon::now()->addDays(7),
+                'end_date' => Carbon::now()->addDays(21),
+                'is_active' => true,
+                'is_pinned' => false,
+                'for_all_colleges' => false,
+                'colleges' => [$cass->id],
+            ],
+            // Completed/Expired (Admin)
+            [
+                'user_id' => $admin->id,
+                'title' => 'Holiday Notice: No Office Hours',
+                'content' => 'Please be advised that the Guidance Office will be closed during the national holiday. Normal operations will resume the following Monday.',
+                'start_date' => Carbon::now()->subDays(20),
+                'end_date' => Carbon::now()->subDays(18),
+                'is_active' => false,
+                'is_pinned' => false,
+                'for_all_colleges' => true,
+                'colleges' => [],
+            ],
+            // Active, Multiple Colleges
+            [
+                'user_id' => $counselor1->id,
+                'title' => 'Career Guidance Orientation',
+                'content' => 'Mandatory career guidance orientation for graduating students. Please check your department schedules for your specific time slots.',
+                'start_date' => Carbon::now()->subDays(2),
+                'end_date' => Carbon::now()->addDays(10),
+                'is_active' => true,
+                'is_pinned' => false,
+                'for_all_colleges' => false,
+                'colleges' => [$ccs->id, $chs->id],
+            ],
+            // Inactive (Draft)
+            [
+                'user_id' => $counselor2->id,
+                'title' => 'Peer Facilitators Recruitment',
+                'content' => 'We are looking for enthusiastic students to join our Peer Facilitators group. More details to follow soon.',
                 'start_date' => Carbon::now()->subDays(1),
                 'end_date' => Carbon::now()->addDays(30),
-                'is_active' => true,
-                'for_all_colleges' => false,
-                'image' => null,
-                'created_at' => now(),
-                'updated_at' => now(),
-            ],
-            [
-                'user_id' => $cassCounselorUserId,
-                'title' => 'University Guidance Announcement',
-                'content' => "Guidance services are available to all colleges. Please check counselor schedules and set appointments as needed.",
-                'start_date' => Carbon::now()->subDays(3),
-                'end_date' => Carbon::now()->addDays(45),
-                'is_active' => true,
+                'is_active' => false,
+                'is_pinned' => false,
                 'for_all_colleges' => true,
-                'image' => null,
-                'created_at' => now(),
-                'updated_at' => now(),
-            ],
-            [
-                'user_id' => $cassCounselorUserId,
-                'title' => 'CASS Student Wellness Update',
-                'content' => "CASS students: wellness resources and support sessions are available this month. Watch for schedules and sign-up links.",
-                'start_date' => Carbon::now()->subDays(5),
-                'end_date' => Carbon::now()->addDays(25),
-                'is_active' => true,
-                'for_all_colleges' => false,
-                'image' => null,
-                'created_at' => now(),
-                'updated_at' => now(),
+                'colleges' => [],
             ],
         ];
 
-        foreach ($announcements as $announcementData) {
-            $announcement = Announcement::updateOrCreate(
-                ['title' => $announcementData['title']],
-                $announcementData
-            );
+        foreach ($announcements as $data) {
+            $collegeIds = $data['colleges'];
+            unset($data['colleges']);
 
-            if ($announcement->for_all_colleges) {
-                $announcement->colleges()->sync([]);
-            } else {
-                $targetsByTitle = [
-                    'CCS Counseling Advisory' => [$ccsCollegeId],
-                    'CHS Counseling Advisory' => [$chsCollegeId],
-                    'CASS Student Wellness Update' => [$cassCollegeId],
-                ];
+            $announcement = Announcement::create($data);
 
-                $targetColleges = $targetsByTitle[$announcement->title] ?? [];
-                $targetColleges = array_values(array_filter($targetColleges));
-                $announcement->colleges()->sync($targetColleges);
+            if (!$data['for_all_colleges'] && !empty($collegeIds)) {
+                $announcement->colleges()->sync($collegeIds);
             }
         }
     }

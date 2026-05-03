@@ -115,6 +115,27 @@
     .panel-title { font-size: 0.8rem; font-weight: 600; color: var(--text-primary); }
     .panel-subtitle { font-size: 0.68rem; color: var(--text-muted); margin-top: 0.1rem; }
 
+    .table-header-bar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 0.6rem;
+        padding: 0.75rem 1.25rem;
+        background: rgba(250,248,245,0.4);
+    }
+
+    .table-header-icon {
+        width: 2rem;
+        height: 2rem;
+        border-radius: 0.6rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        background: rgba(254,249,231,0.6);
+    }
+
     .input-field {
         border: 1px solid var(--border-soft);
         border-radius: 0.6rem;
@@ -140,11 +161,12 @@
 
     .event-banner {
         position: relative; overflow: hidden; color: white;
-        height: 9rem;
-        background: linear-gradient(135deg, var(--maroon-800) 0%, var(--maroon-700) 100%);
+        height: 11rem;
+        background: linear-gradient(135deg, var(--maroon-800) 0%, var(--maroon-900) 100%);
     }
     .event-banner img {
-        position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover;
+        position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain;
+        background-color: rgba(0,0,0,0.15);
         transition: transform 0.3s ease;
     }
     .event-card-new:hover .event-banner img { transform: scale(1.04); }
@@ -364,6 +386,20 @@
         </div>
 
         <!-- Events Grid -->
+        <div class="panel-card mb-4 overflow-hidden">
+            <div class="table-header-bar">
+                <div class="flex items-center gap-3">
+                    <div class="table-header-icon">
+                        <i class="fas fa-calendar-days text-[#7a2a2a] text-[10px] sm:text-xs"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-sm font-medium text-[#2c2420]">All Events</h2>
+                        <p class="text-[10px] sm:text-xs text-[#8b7e76]">Showing <span class="font-bold text-[#2c2420]">{{ $events->firstItem() ?? 0 }} - {{ $events->lastItem() ?? 0 }}</span> of <span class="font-bold text-[#2c2420]">{{ $events->total() }}</span></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         @if($events->isEmpty())
             <div class="glass-card p-6 sm:p-8 text-center">
                 <div class="empty-state-icon mb-3">
@@ -481,7 +517,7 @@
                                     @csrf
                                     @method('DELETE')
                                     <button type="submit"
-                                            class="action-btn-soft bg-[#fdf2f2] text-[#b91c1c] hover:bg-[#fce4e4] text-center w-full">
+                                            class="action-btn-soft bg-[#fdf2f2] text-[#b91c1c] hover:bg-[#fce4e4] text-center w-full col-span-2">
                                         <i class="fas fa-trash-can-alt mr-1.5 text-[9px]"></i> Delete
                                     </button>
                                 </form>

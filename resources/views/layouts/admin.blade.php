@@ -1148,6 +1148,10 @@
                     <i class="fas fa-calendar-days"></i>
                     <span>Events</span>
                 </a>
+                <a href="{{ route('admin.announcements.index') }}" class="sidebar-link {{ request()->routeIs('admin.announcements.*') && !request()->routeIs('admin.announcements.create') ? 'active' : '' }}">
+                    <i class="fas fa-bullhorn"></i>
+                    <span>Announcements</span>
+                </a>
                 <a href="{{ route('admin.feedback.index') }}" class="sidebar-link {{ request()->routeIs('admin.feedback.*') ? 'active' : '' }}">
                     <i class="fas fa-message"></i>
                     <span>Feedback</span>
@@ -1167,6 +1171,18 @@
                 <a href="{{ route('admin.events.create') }}" class="sidebar-link {{ request()->routeIs('admin.events.create') ? 'active' : '' }}">
                     <i class="fas fa-calendar-plus"></i>
                     <span>Create Event</span>
+                </a>
+                <a href="{{ route('admin.faqs.create') }}" class="sidebar-link {{ request()->routeIs('admin.faqs.create') ? 'active' : '' }}">
+                    <i class="fas fa-circle-question"></i>
+                    <span>Create FAQ</span>
+                </a>
+                <a href="{{ route('admin.resources.create') }}" class="sidebar-link {{ request()->routeIs('admin.resources.create') ? 'active' : '' }}">
+                    <i class="fas fa-folder-plus"></i>
+                    <span>Create Resource   </span>
+                </a>
+                <a href="{{ route('admin.announcements.create') }}" class="sidebar-link {{ request()->routeIs('admin.announcements.create') ? 'active' : '' }}">
+                    <i class="fas fa-bullhorn"></i>
+                    <span>Create Announcement</span>
                 </a>
             </div>
         </div>

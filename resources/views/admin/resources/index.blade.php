@@ -288,8 +288,11 @@
                         </div>
                         <div>
                             <h2 class="text-sm font-medium text-[#2c2420]">Resource Library</h2>
-                            <p class="text-[10px] sm:text-xs text-[#8b7e76]">Total resources: <span class="font-bold text-[#2c2420]">{{ $resources->total() }}</span></p>
+                            <p class="text-[10px] sm:text-xs text-[#8b7e76]">Showing <span class="font-bold text-[#2c2420]">{{ $resources->firstItem() ?? 0 }} - {{ $resources->lastItem() ?? 0 }}</span> of <span class="font-bold text-[#2c2420]">{{ $resources->total() }}</span></p>
                         </div>
+                    </div>
+                    <div class="flex items-center gap-2">
+
                     </div>
                 </div>
 
