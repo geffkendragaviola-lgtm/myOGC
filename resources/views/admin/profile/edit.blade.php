@@ -240,7 +240,7 @@
                                     </div>
                                     <div class="flex-1">
                                         <button type="submit" class="secondary-btn rounded-lg">
-                                            <i class="fas fa-upload mr-1.5 text-[9px] sm:text-xs"></i> Upload Photo
+                                            <i class="fas fa-upload mr-1.5 text-[9px] sm:text-xs"></i> Save Photo
                                         </button>
                                         @error('profile_picture') <p class="error-text">{{ $message }}</p> @enderror
                                     </div>

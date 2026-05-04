@@ -292,9 +292,15 @@
 
                                     <td class="px-3 sm:px-4 py-2.5 sm:py-3">
                                         <div class="flex items-center gap-2 sm:gap-2.5">
-                                            <div class="w-8 h-8 rounded-md bg-[#fdf2f2] flex items-center justify-center shadow-inner">
-                                                <i class="fas fa-user-graduate text-[#7a2a2a] text-[10px] sm:text-xs"></i>
-                                            </div>
+                                            @if($appointment->student && $appointment->student->profile_picture)
+                                                <div class="w-8 h-8 rounded-md overflow-hidden shadow-inner flex-shrink-0 bg-[#faf8f5]">
+                                                    <img src="{{ asset('storage/' . $appointment->student->profile_picture) }}" alt="PFP" class="w-full h-full object-cover">
+                                                </div>
+                                            @else
+                                                <div class="w-8 h-8 rounded-md bg-[#fdf2f2] flex items-center justify-center shadow-inner flex-shrink-0">
+                                                    <i class="fas fa-user-graduate text-[#7a2a2a] text-[10px] sm:text-xs"></i>
+                                                </div>
+                                            @endif
                                             <div class="min-w-0">
                                                 <p class="text-xs sm:text-sm font-medium text-[#2c2420] truncate">{{ $appointment->student->user->first_name ?? 'N/A' }} {{ $appointment->student->user->last_name ?? '' }}</p>
                                                 <p class="text-[10px] sm:text-[11px] text-[#8b7e76] truncate">{{ $appointment->student->student_id ?? 'No ID' }}</p>
@@ -304,9 +310,15 @@
 
                                     <td class="px-3 sm:px-4 py-2.5 sm:py-3">
                                         <div class="flex items-center gap-2 sm:gap-2.5">
-                                            <div class="w-8 h-8 rounded-md bg-[#f5f0eb] flex items-center justify-center shadow-inner">
-                                                <i class="fas fa-user-doctor text-[#8b7e76] text-[10px] sm:text-xs"></i>
-                                            </div>
+                                            @if($appointment->counselor && $appointment->counselor->user && $appointment->counselor->user->profile_picture)
+                                                <div class="w-8 h-8 rounded-md overflow-hidden shadow-inner flex-shrink-0 bg-[#faf8f5]">
+                                                    <img src="{{ asset('storage/' . $appointment->counselor->user->profile_picture) }}" alt="PFP" class="w-full h-full object-cover">
+                                                </div>
+                                            @else
+                                                <div class="w-8 h-8 rounded-md bg-[#f5f0eb] flex items-center justify-center shadow-inner flex-shrink-0">
+                                                    <i class="fas fa-user-doctor text-[#8b7e76] text-[10px] sm:text-xs"></i>
+                                                </div>
+                                            @endif
                                             <div class="min-w-0">
                                                 <p class="text-xs sm:text-sm font-medium text-[#2c2420] truncate">{{ $appointment->counselor->user->first_name ?? 'N/A' }} {{ $appointment->counselor->user->last_name ?? '' }}</p>
                                                 <p class="text-[10px] sm:text-[11px] text-[#8b7e76] truncate">{{ $appointment->counselor->college->name ?? '' }}</p>

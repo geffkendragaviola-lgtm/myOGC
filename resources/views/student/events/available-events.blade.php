@@ -1106,12 +1106,12 @@
                                     <span>{{ $event->time_range }}</span>
                                 </div>
                                 <div class="event-detail">
-                                    <i class="far fa-location-dot"></i>
+                                    <i class="fas fa-location-dot"></i>
                                     <span class="line-clamp-1">{{ $event->location }}</span>
                                 </div>
                                 @if($event->max_attendees)
                                     <div class="event-detail">
-                                        <i class="far fa-users"></i>
+                                        <i class="fas fa-users"></i>
                                         <span>{{ $event->registered_count }}/{{ $event->max_attendees }} registered</span>
                                     </div>
                                 @endif

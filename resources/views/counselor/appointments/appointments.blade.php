@@ -634,9 +634,15 @@
                                             @php
                                                 $isHighRisk = $appointment->is_appointment_high_risk;
                                             @endphp
-                                            <div class="avatar-badge {{ $isHighRisk ? 'ring-2 ring-red-500' : '' }}">
-                                                <i class="fas fa-user-graduate text-[9px] sm:text-xs"></i>
-                                            </div>
+                                            @if($appointment->student && $appointment->student->profile_picture)
+                                                <div class="avatar-badge {{ $isHighRisk ? 'ring-2 ring-red-500' : '' }} overflow-hidden p-0">
+                                                    <img src="{{ asset('storage/' . $appointment->student->profile_picture) }}" alt="PFP" class="w-full h-full object-cover">
+                                                </div>
+                                            @else
+                                                <div class="avatar-badge {{ $isHighRisk ? 'ring-2 ring-red-500' : '' }}">
+                                                    <i class="fas fa-user-graduate text-[9px] sm:text-xs"></i>
+                                                </div>
+                                            @endif
                                             <div class="min-w-0">
                                                 <div class="text-xs sm:text-sm font-semibold text-[#2c2420] truncate max-w-[140px] sm:max-w-[180px]">
                                                     {{ $appointment->student->user->first_name }} {{ $appointment->student->user->last_name }}

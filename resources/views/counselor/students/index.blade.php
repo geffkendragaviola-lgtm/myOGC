@@ -193,7 +193,7 @@
                                                ($student->student_status == 'returnee' ? 'bg-[#fffbeb] text-[#b45309] border border-[#f59e0b]/30' : 
                                                'bg-[#f5f0eb] text-[#6b5e57] border border-[#e5e0db]/70')) }}">
                                             <i class="fas {{ $student->student_status == 'new' ? 'fa-star' : ($student->student_status == 'transferee' ? 'fa-arrow-right-arrow-left' : ($student->student_status == 'returnee' ? 'fa-undo' : 'fa-user')) }} mr-1 text-[9px] sm:text-[10px]"></i>
-                                            {{ ucfirst($student->student_status ?? 'new') }}@if($student->is_high_risk) <span class="inline-flex items-center ml-1.5"><i class="fas fa-flag mr-1 text-[9px] sm:text-[10px]"></i>Flagged</span>@endif
+                                            {{ ucfirst($student->student_status ?? 'new') }}
                                         </span>
                                     </div>
                                 </td>

@@ -198,22 +198,38 @@ class EventRegistrationController extends Controller
 
         return redirect()->back()->with('success', 'Successfully re-registered for the event!');
     }
-    public function myRegistrations()
+    public function myRegistrations(Request $request)
 {
     $student = Auth::user()->student;
 
     if (!$student) {
         return view('student.events.my-registrations', [
             'registrations' => collect(),
-            'student' => null
+            'student' => null,
+            'stats' => ['all' => 0, 'registered' => 0, 'attended' => 0, 'cancelled' => 0],
+            'status' => 'all'
         ]);
     }
 
-    $registrations = EventRegistration::with(['event', 'event.user', 'event.colleges'])
-        ->where('student_id', $student->id)
-        ->orderBy('registered_at', 'desc')
-        ->get();
+    $status = $request->query('status', 'all');
 
-    return view('student.events.my-registrations', compact('registrations', 'student'));
+    $query = EventRegistration::with(['event', 'event.user', 'event.colleges'])
+        ->where('student_id', $student->id)
+        ->orderBy('registered_at', 'desc');
+        
+    if ($status !== 'all') {
+        $query->where('status', $status);
+    }
+
+    $registrations = $query->paginate(9)->withQueryString();
+    
+    $stats = [
+        'all' => EventRegistration::where('student_id', $student->id)->count(),
+        'registered' => EventRegistration::where('student_id', $student->id)->where('status', 'registered')->count(),
+        'attended' => EventRegistration::where('student_id', $student->id)->where('status', 'attended')->count(),
+        'cancelled' => EventRegistration::where('student_id', $student->id)->where('status', 'cancelled')->count(),
+    ];
+
+    return view('student.events.my-registrations', compact('registrations', 'student', 'stats', 'status'));
 }
 }

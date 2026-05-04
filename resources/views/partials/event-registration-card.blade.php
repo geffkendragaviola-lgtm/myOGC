@@ -113,17 +113,36 @@
 
                 <!-- Cancellation Info for Optional Events -->
                 @if(!$isRequiredEvent && $event->is_upcoming && $registration->status === 'registered')
-                    <div class="bg-[#fffbeb] border border-[#fde68a] rounded-lg p-2.5">
-                        <div class="flex items-center">
-                            <i class="fas fa-circle-info text-[#d97706] text-[10px] mr-1.5"></i>
-                            <span class="text-[#92400e] font-medium text-[11px]">Cancellation Policy</span>
+                    <div class="bg-[#fffbeb] border border-[#fde68a] rounded-xl p-3">
+                        <div class="flex items-start gap-2.5">
+                            <div class="h-7 w-7 rounded-lg bg-white/70 border border-[#fde68a] text-[#d97706] flex items-center justify-center flex-shrink-0">
+                                <i class="fas fa-shield-halved text-[11px]"></i>
+                            </div>
+                            <div class="min-w-0 flex-1">
+                                <div class="flex items-center justify-between gap-2">
+                                    <span class="text-[#92400e] font-semibold text-[11px]">Cancellation Policy</span>
+                                    @if($event->isCancellationAllowed())
+                                        <span class="inline-flex items-center gap-1 rounded-full bg-white/80 border border-[#fde68a] px-2 py-0.5 text-[10px] font-semibold text-[#92400e]">
+                                            <i class="fas fa-clock text-[9px]"></i>
+                                            <span>{{ $event->getCancellationCutoffTime() }}</span>
+                                        </span>
+                                    @endif
+                                </div>
+                                <p class="text-[#b45309] text-[10px] mt-1 leading-relaxed">
+                                    You can cancel your registration up to 24 hours before the event starts.
+                                </p>
+                                <div class="mt-2 grid grid-cols-1 gap-1.5 text-[10px] text-[#92400e]">
+                                    <div class="flex items-center gap-1.5">
+                                        <span class="h-1.5 w-1.5 rounded-full bg-[#d97706]"></span>
+                                        <span>Late cancellations may be denied.</span>
+                                    </div>
+                                    <div class="flex items-center gap-1.5">
+                                        <span class="h-1.5 w-1.5 rounded-full bg-[#d97706]"></span>
+                                        <span>Check the cutoff time before cancelling.</span>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                        <p class="text-[#b45309] text-[10px] mt-1 leading-relaxed">
-                            You can cancel your registration up to 24 hours before the event starts.
-                            @if($event->isCancellationAllowed())
-                                <br><strong>Cancellation cutoff: {{ $event->getCancellationCutoffTime() }}</strong>
-                            @endif
-                        </p>
                     </div>
                 @endif
             </div>
