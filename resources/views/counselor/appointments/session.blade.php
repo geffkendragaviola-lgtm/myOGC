@@ -902,7 +902,10 @@
             updateFollowupSubmitState();
 
             // Refresh calendar availability & slots in case override affects enabled dates/slots
-            if (!enabled && dateHidden && dateHidden.value) {
+            if (typeof window.followupLoadMonthAvail === 'function') {
+                window.followupLoadMonthAvail();
+            }
+            if (dateHidden && dateHidden.value) {
                 loadFollowupSlots(dateHidden.value);
             }
         }
@@ -1141,6 +1144,8 @@
                 }
             }
 
+            window.followupLoadMonthAvail = loadMonthAvail;
+
             async function loadMonthAvail() {
                 availMap = new Map();
                 renderCal();
@@ -1161,7 +1166,7 @@
                 if (id !== reqId) return;
                 const hasAny = [...availMap.values()].some(v=>v);
                 if (hasAny) {
-                    calStatus.innerHTML = '';
+                    setStatus('Available dates are highlighted. Select a date to continue.');
                 } else {
                     setStatus('No available dates this month.', 'error');
                 }

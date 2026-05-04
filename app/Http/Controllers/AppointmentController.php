@@ -85,7 +85,7 @@ class AppointmentController extends Controller
 
             $appointments = $query->orderBy('appointment_date', 'desc')
                 ->orderBy('start_time', 'desc')
-                ->get();
+                ->paginate(10);
         } else {
             // Counselor/admin view logic here
             $appointments = Appointment::with(['student.user', 'counselor.user', 'referredCounselor.user', 'sessionNotes'])

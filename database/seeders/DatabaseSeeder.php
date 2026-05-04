@@ -14,6 +14,7 @@ class DatabaseSeeder extends Seeder
             CollegeSeeder::class,
             AdminSeeder::class,
             CounselorSeeder::class,
+            CounselorAvailabilitySeeder::class,
                StudentSeeder::class,
             AnnouncementSeeder::class,
           ServiceSeeder::class,

@@ -207,6 +207,17 @@
     }
     .action-btn.info:hover { background: rgba(59,130,246,0.14); }
 
+    /* Table Header Bar */
+    .table-header-bar {
+        display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap;
+        gap: 0.6rem; padding: 0.75rem 1.25rem; border-bottom: 1px solid #e5e0db;
+        background: rgba(250,248,245,0.4);
+    }
+    .table-header-icon {
+        width: 2rem; height: 2rem; border-radius: 0.6rem; display: flex; align-items: center; justify-content: center;
+        background: rgba(254,249,231,0.7); color: var(--maroon-700); flex-shrink: 0;
+    }
+
     /* Table */
     .table-wrapper { overflow-x: auto; -webkit-overflow-scrolling: touch; }
     .appointments-table { width: 100%; min-width: 800px; border-collapse: separate; border-spacing: 0; }
@@ -520,6 +531,17 @@
                     </a>
                 </div>
             @else
+                <div class="table-header-bar">
+                    <div class="flex items-center gap-2.5">
+                        <div class="table-header-icon">
+                            <i class="fas fa-list-ol"></i>
+                        </div>
+                        <div>
+                            <h2 class="text-sm font-semibold text-[#2c2420]">Appointment Schedule</h2>
+                            <p class="text-[10px] sm:text-xs text-[#8b7e76] mt-0.5">Manage your appointments and follow-ups</p>
+                        </div>
+                    </div>
+                </div>
                 <div class="table-wrapper">
                     <table class="appointments-table">
                         <thead>
@@ -682,6 +704,11 @@
                             @endforeach
                         </tbody>
                     </table>
+                </div>
+
+                <!-- Pagination -->
+                <div class="px-4 sm:px-5 py-3 sm:py-3.5 border-t border-[#e5e0db]/60 bg-[#faf8f5]/40">
+                    {{ $appointments->appends(request()->query())->links('vendor.pagination.counselor-resources') }}
                 </div>
             @endif
         </div>

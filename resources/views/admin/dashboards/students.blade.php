@@ -218,12 +218,12 @@
                                     <div class="flex flex-col gap-1.5 items-start">
                                         @if($student->calculated_high_risk)
                                             @if(in_array('assessment', $student->high_risk_reasons))
-                                            <span class="inline-flex items-center px-2 py-0.5 sm:px-2.5 sm:py-1 text-[10px] sm:text-xs font-semibold rounded-full bg-[#fff7ed] text-[#9a3412] border border-[#fed7aa]">
+                                            <span class="inline-flex items-center px-2 py-0.5 sm:px-2.5 sm:py-1 text-[10px] sm:text-xs font-semibold rounded-full bg-[#fef2f2] text-[#b91c1c] border border-[#ef4444]/30">
                                                 <i class="fas fa-notes-medical mr-1 text-[9px] sm:text-[10px]"></i> High Risk Assessment
                                             </span>
                                             @endif
                                             @if(in_array('flagged', $student->high_risk_reasons))
-                                            <span class="inline-flex items-center px-2 py-0.5 sm:px-2.5 sm:py-1 text-[10px] sm:text-xs font-semibold rounded-full bg-[#fef3c7] text-[#92400e] border border-[#fde68a]">
+                                            <span class="inline-flex items-center px-2 py-0.5 sm:px-2.5 sm:py-1 text-[10px] sm:text-xs font-semibold rounded-full bg-[#fef2f2] text-[#b91c1c] border border-[#ef4444]/30">
                                                 <i class="fas fa-flag mr-1 text-[9px] sm:text-[10px]"></i> Flagged by the Counselor
                                             </span>
                                             @endif

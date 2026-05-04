@@ -194,33 +194,52 @@
     .panel-subtitle { font-size: 0.68rem; color: var(--text-muted); margin-top: 0.1rem; }
 
     /* Event Card Specific Styles */
-    .event-image {
-        position: relative; height: 10rem; overflow: hidden;
-        background: linear-gradient(135deg, var(--maroon-800) 0%, var(--maroon-700) 100%);
+    .event-card-new { transition: all 0.22s ease; background: rgba(255, 255, 255, 0.95); border: 1px solid var(--border-soft); border-radius: 0.75rem; overflow: hidden; position: relative; }
+    .event-card-new:hover { transform: translateY(-2px); box-shadow: 0 8px 18px rgba(44,36,32,0.06); }
+    .event-card-new::before { content: ""; position: absolute; inset: 0; pointer-events: none; background: radial-gradient(circle at top right, rgba(212,175,55,0.06), transparent 30%); }
+
+    .event-banner {
+        position: relative; overflow: hidden; color: white;
+        height: 11rem;
+        background: linear-gradient(135deg, var(--maroon-800) 0%, var(--maroon-900) 100%);
     }
-    .event-image img {
-        width: 100%; height: 100%; object-fit: cover;
+    .event-banner img {
+        position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain;
+        background-color: rgba(0,0,0,0.15);
         transition: transform 0.3s ease;
     }
-    .event-card:hover .event-image img { transform: scale(1.03); }
-    .event-overlay {
+    .event-card-new:hover .event-banner img { transform: scale(1.04); }
+    .event-banner-overlay {
         position: absolute; inset: 0;
-        background: linear-gradient(to top, rgba(44,36,32,0.7) 0%, transparent 60%);
+        background: linear-gradient(to top, rgba(44,20,20,0.82) 0%, rgba(44,20,20,0.25) 60%, transparent 100%);
     }
-    .event-content {
-        position: absolute; bottom: 0; left: 0; right: 0;
-        padding: 0.75rem 1rem; color: white;
+    .event-banner-content {
+        position: absolute; bottom: 0; left: 0; right: 0; padding: 0.65rem 0.85rem;
     }
-    .event-badge {
-        display: inline-flex; align-items: center; gap: 0.3rem;
-        padding: 0.15rem 0.5rem; border-radius: 999px;
-        font-size: 0.65rem; font-weight: 700; text-transform: capitalize;
+    .event-banner-top {
+        position: absolute; top: 0.5rem; right: 0.5rem;
     }
-    .event-badge.type { background: rgba(212,175,55,0.9); color: var(--maroon-900); }
-    .event-badge.status { background: rgba(255,255,255,0.2); color: white; backdrop-filter: blur(4px); }
-    .event-badge.status.active { background: rgba(122,42,42,0.9); }
-    .event-badge.status.cancelled { background: rgba(249,115,22,0.9); }
-    .event-badge.status.attended { background: rgba(16,185,129,0.9); }
+    .event-type-pill {
+        display: inline-flex; align-items: center; border-radius: 999px; background: rgba(255,255,255,0.18);
+        border: 1px solid rgba(255,255,255,0.12); backdrop-filter: blur(6px);
+        font-size: 9px; padding: 0.2rem 0.5rem; font-weight: 600; text-transform: capitalize; color: white;
+    }
+    .status-badge { font-size: 0.65rem; padding: 0.2rem 0.5rem; border-radius: 9999px; font-weight: 700; backdrop-filter: blur(4px); }
+    .status-active { background-color: rgba(209, 250, 229, 0.95); color: #059669; }
+    .status-inactive { background-color: rgba(254, 226, 226, 0.95); color: #b91c1c; }
+    .status-attended { background-color: rgba(16, 185, 129, 0.95); color: white; }
+    .status-cancelled { background-color: rgba(249, 115, 22, 0.95); color: white; }
+    .status-registered { background-color: rgba(209, 250, 229, 0.95); color: #059669; }
+
+    .event-meta-row { display: flex; align-items: center; gap: 0.5rem; color: var(--text-secondary); font-size: 0.8rem; }
+    .event-meta-icon { width: 1.5rem; height: 1.5rem; border-radius: 0.45rem; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; }
+
+    .action-btn-soft {
+        display: inline-flex; align-items: center; justify-content: center; border-radius: 0.6rem;
+        padding: 0.45rem 0.55rem; font-size: 0.7rem; font-weight: 600; transition: all 0.15s ease;
+    }
+    .action-btn-soft:hover { transform: translateY(-1px); }
+
     .event-badge.completed {
         position: absolute; top: 0.5rem; left: 0.5rem;
         background: rgba(16,185,129,0.95); color: white;
@@ -542,22 +561,35 @@
                 @else
                     <div class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-5 sm:gap-6">
                         @foreach($registrations->where('status', 'cancelled') as $registration)
-                            <div class="event-card" style="border-left: 3px solid #f97316; opacity: 0.95;">
-                                <!-- Event Image Header -->
-                                <div class="event-image">
-                                    <img src="{{ $registration->event->image_url }}"
-                                         alt="{{ $registration->event->title }}"
-                                         onerror="this.parentElement.style.background='linear-gradient(135deg, var(--maroon-800) 0%, var(--maroon-700) 100%)'">
+                            <div class="event-card-new flex flex-col h-full" style="border-top: 3px solid #f97316; opacity: 0.95;">
+                                <!-- Event Header -->
+                                <div class="event-banner flex-shrink-0">
+                                    @if($registration->event->image_url)
+                                        <img src="{{ $registration->event->image_url }}" alt="{{ $registration->event->title }}"
+                                             onerror="this.style.display='none'">
+                                    @endif
+                                    <div class="event-banner-overlay"></div>
 
-                                    <div class="event-overlay"></div>
+                                    <!-- Status badge top-right -->
+                                    <div class="event-banner-top">
+                                        <span class="status-badge status-cancelled">
+                                            Cancelled
+                                        </span>
+                                    </div>
 
-                                    <!-- Content Overlay -->
-                                    <div class="event-content">
-                                        <div class="flex flex-wrap gap-1.5 mb-2">
-                                            <span class="event-badge type">{{ $registration->event->type }}</span>
-                                            <span class="event-badge status cancelled">Cancelled</span>
+                                    <!-- Title + type bottom -->
+                                    <div class="event-banner-content">
+                                        <div class="flex flex-wrap gap-1 mb-1.5">
+                                            <span class="event-type-pill">{{ $registration->event->type }}</span>
                                         </div>
-                                        <h3 class="text-base font-bold text-white line-clamp-2">{{ $registration->event->title }}</h3>
+                                        <h3 class="text-sm sm:text-base font-semibold leading-tight line-clamp-2">{{ $registration->event->title }}</h3>
+                                        <p class="text-[10px] sm:text-xs text-white/80 mt-0.5 truncate">
+                                            @if($registration->event->for_all_colleges)
+                                                <i class="fas fa-globe mr-1"></i> All Colleges
+                                            @else
+                                                <i class="fas fa-building-columns mr-1"></i> {{ $registration->event->colleges->count() }} college(s)
+                                            @endif
+                                        </p>
                                     </div>
 
                                     <!-- Cancelled Overlay -->
@@ -566,107 +598,73 @@
                                     </div>
                                 </div>
 
-                                <!-- Event Details -->
-                                <div class="p-4">
-                                    <!-- Date and Time -->
-                                    <div class="space-y-1.5 mb-3">
-                                        <div class="event-detail">
-                                            <i class="fas fa-calendar-days" style="color:#c9a227"></i>
-                                            <span>{{ $registration->event->date_range }}</span>
+                                <!-- Card Body -->
+                                <div class="p-3.5 flex-1 flex flex-col">
+                                    <div class="space-y-2 mb-3">
+                                        <div class="event-meta-row">
+                                            <div class="event-meta-icon bg-[#fef9e7] text-[10px] sm:text-xs text-[#c9a227]"><i class="fas fa-calendar-days"></i></div>
+                                            <span class="text-xs sm:text-sm font-medium">{{ $registration->event->date_range }}</span>
                                         </div>
-                                        <div class="event-detail">
-                                            <i class="fas fa-clock"></i>
-                                            <span>{{ $registration->event->time_range }}</span>
+                                        <div class="event-meta-row">
+                                            <div class="event-meta-icon bg-[#eff6ff] text-[10px] sm:text-xs text-sky-600"><i class="fas fa-clock"></i></div>
+                                            <span class="text-[11px] sm:text-xs">{{ $registration->event->time_range }}</span>
                                         </div>
-                                        <div class="event-detail">
-                                            <i class="far fa-location-dot"></i>
-                                            <span class="line-clamp-1">{{ $registration->event->location }}</span>
+                                        <div class="event-meta-row">
+                                            <div class="event-meta-icon bg-[#fdf2f2] text-[10px] sm:text-xs text-[#b91c1c]"><i class="fas fa-location-dot"></i></div>
+                                            <span class="text-[11px] sm:text-xs truncate" title="{{ $registration->event->location }}">{{ $registration->event->location }}</span>
                                         </div>
-                                        <div class="event-detail">
-                                            <i class="fas fa-calendar-days-times" style="color:#f97316"></i>
-                                            <span>Cancelled: {{ $registration->cancelled_at ? $registration->cancelled_at->format('M j, Y g:i A') : 'N/A' }}</span>
+                                        <div class="event-meta-row">
+                                            <div class="event-meta-icon bg-[#fff7ed] text-[10px] sm:text-xs text-[#ea580c]"><i class="fas fa-calendar-xmark"></i></div>
+                                            <span class="text-[11px] sm:text-xs">Cancelled: {{ $registration->cancelled_at ? $registration->cancelled_at->format('M j, Y') : 'N/A' }}</span>
                                         </div>
                                     </div>
 
-                                    <!-- Description -->
-                                    <p class="text-[#6b5e57] text-[0.8rem] mb-3 line-clamp-2 leading-relaxed">
+                                    <p class="text-[11px] sm:text-xs text-[#6b5e57] line-clamp-2 leading-relaxed mb-3 flex-1">
                                         {{ Str::limit($registration->event->description, 120) }}
                                     </p>
 
                                     <!-- Re-registration Option -->
                                     @if($registration->event->is_registration_open && $registration->event->hasAvailableSlots())
-                                        <div class="re-register-box">
+                                        <div class="re-register-box mb-3">
                                             <div class="info-title">
                                                 <i class="fas fa-redo-alt text-[9px]"></i>
                                                 <span>Re-registration Available</span>
                                             </div>
-                                            <p class="info-desc mb-3">
+                                            <p class="info-desc mb-2 text-[10px]">
                                                 This event still has available slots. You can register again if you'd like to attend.
                                             </p>
                                             <form action="{{ route('student.events.re-register', $registration->event) }}" method="POST">
                                                 @csrf
-                                                <button type="submit"
-                                                        class="action-btn reregister w-full">
-                                                    <i class="fas fa-redo-alt text-[9px]"></i>
-                                                    <span>Re-register for Event</span>
+                                                <button type="submit" class="action-btn-soft bg-[#7a2a2a] text-white hover:bg-[#5c1a1a] border-none w-full">
+                                                    <i class="fas fa-redo-alt mr-1.5"></i> Re-register
                                                 </button>
                                             </form>
-                                        </div>
-                                    @else
-                                        <div class="re-register-box unavailable">
-                                            <div class="info-title unavailable">
-                                                <i class="fas fa-circle-info text-[9px]"></i>
-                                                <span>Re-registration not available</span>
-                                            </div>
-                                            <p class="info-desc">
-                                                @if(!$registration->event->is_registration_open)
-                                                    Event registration is closed.
-                                                @elseif(!$registration->event->hasAvailableSlots())
-                                                    Event is full.
-                                                @else
-                                                    Cannot re-register for this event.
-                                                @endif
-                                            </p>
                                         </div>
                                     @endif
 
                                     <!-- Action Buttons -->
-                                    <div class="flex flex-wrap gap-2 btn-row-mobile">
-                                        <button onclick="toggleDetails('cancelled-details-{{ $registration->id }}')"
-                                                class="action-btn details flex-1 min-w-[100px]">
-                                            <i class="fas fa-circle-info text-[9px]"></i>
-                                            <span class="hidden sm:inline">Details</span>
+                                    <div class="mt-auto pt-3 border-t border-[#e5e0db] flex justify-between gap-2">
+                                        <button onclick="toggleDetails('cancelled-details-{{ $registration->id }}')" class="action-btn-soft bg-[#faf8f5] text-[#6b5e57] border border-[#e5e0db] w-full">
+                                            <i class="fas fa-circle-info mr-1.5"></i> Details
                                         </button>
                                     </div>
 
                                     <!-- Expandable Details -->
-                                    <div id="cancelled-details-{{ $registration->id }}" class="hidden expand-details">
-                                        <div class="space-y-2.5">
-                                            <!-- Full Description -->
+                                    <div id="cancelled-details-{{ $registration->id }}" class="hidden mt-3 pt-3 border-t border-dashed border-[#e5e0db]">
+                                        <div class="space-y-3">
                                             <div>
-                                                <p class="text-[0.75rem] font-semibold text-[#6b5e57] mb-1">Description:</p>
-                                                <p class="text-[#6b5e57] text-[0.8rem] leading-relaxed">{{ $registration->event->description }}</p>
+                                                <p class="text-[11px] font-semibold text-[#6b5e57] uppercase tracking-wider mb-1">Description</p>
+                                                <p class="text-[11px] sm:text-xs text-[#2c2420] leading-relaxed">{{ $registration->event->description }}</p>
                                             </div>
-
-                                            <!-- Registration Timeline -->
-                                            <div class="space-y-1.5 text-[0.75rem]">
+                                            <div class="space-y-1 text-[11px] sm:text-xs">
                                                 <div class="flex justify-between">
-                                                    <span class="text-[#6b5e57]">Originally Registered:</span>
-                                                    <span class="text-[#6b5e57]">{{ $registration->registered_at->format('M j, Y g:i A') }}</span>
+                                                    <span class="text-[#8b7e76]">Originally Registered:</span>
+                                                    <span class="text-[#2c2420] font-medium">{{ $registration->registered_at->format('M j, Y g:i A') }}</span>
                                                 </div>
                                                 <div class="flex justify-between">
-                                                    <span class="text-[#6b5e57]">Cancelled On:</span>
-                                                    <span class="text-[#6b5e57]">{{ $registration->cancelled_at ? $registration->cancelled_at->format('M j, Y g:i A') : 'N/A' }}</span>
+                                                    <span class="text-[#8b7e76]">Cancelled On:</span>
+                                                    <span class="text-[#b91c1c] font-medium">{{ $registration->cancelled_at ? $registration->cancelled_at->format('M j, Y g:i A') : 'N/A' }}</span>
                                                 </div>
-                                            </div>
-
-                                            <!-- Event Status -->
-                                            <div class="flex justify-between items-center text-[0.75rem]">
-                                                <span class="text-[#6b5e57]">Event Status:</span>
-                                                <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full {{ $registration->event->is_upcoming ? 'bg-[#fef3c7] text-[#92400e] border border-[#f59e0b]/30' : 'bg-[#f3f4f6] text-[#6b7280] border border-[#d1d5db]' }} text-[0.65rem]">
-                                                    <i class="fas fa-{{ $registration->event->is_upcoming ? 'clock' : 'history' }} text-[8px]"></i>
-                                                    {{ $registration->event->is_upcoming ? 'Upcoming' : 'Past' }}
-                                                </span>
                                             </div>
                                         </div>
                                     </div>
@@ -696,22 +694,35 @@
                 @else
                     <div class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-5 sm:gap-6">
                         @foreach($registrations->where('status', 'attended') as $registration)
-                            <div class="event-card" style="border-left: 3px solid #10b981;">
-                                <!-- Event Image Header -->
-                                <div class="event-image">
-                                    <img src="{{ $registration->event->image_url }}"
-                                         alt="{{ $registration->event->title }}"
-                                         onerror="this.parentElement.style.background='linear-gradient(135deg, var(--maroon-800) 0%, var(--maroon-700) 100%)'">
+                            <div class="event-card-new flex flex-col h-full" style="border-top: 3px solid #10b981;">
+                                <!-- Event Header -->
+                                <div class="event-banner flex-shrink-0">
+                                    @if($registration->event->image_url)
+                                        <img src="{{ $registration->event->image_url }}" alt="{{ $registration->event->title }}"
+                                             onerror="this.style.display='none'">
+                                    @endif
+                                    <div class="event-banner-overlay"></div>
 
-                                    <div class="event-overlay"></div>
+                                    <!-- Status badge top-right -->
+                                    <div class="event-banner-top">
+                                        <span class="status-badge status-attended">
+                                            Attended
+                                        </span>
+                                    </div>
 
-                                    <!-- Content Overlay -->
-                                    <div class="event-content">
-                                        <div class="flex flex-wrap gap-1.5 mb-2">
-                                            <span class="event-badge type">{{ $registration->event->type }}</span>
-                                            <span class="event-badge status attended">Attended</span>
+                                    <!-- Title + type bottom -->
+                                    <div class="event-banner-content">
+                                        <div class="flex flex-wrap gap-1 mb-1.5">
+                                            <span class="event-type-pill">{{ $registration->event->type }}</span>
                                         </div>
-                                        <h3 class="text-base font-bold text-white line-clamp-2">{{ $registration->event->title }}</h3>
+                                        <h3 class="text-sm sm:text-base font-semibold leading-tight line-clamp-2">{{ $registration->event->title }}</h3>
+                                        <p class="text-[10px] sm:text-xs text-white/80 mt-0.5 truncate">
+                                            @if($registration->event->for_all_colleges)
+                                                <i class="fas fa-globe mr-1"></i> All Colleges
+                                            @else
+                                                <i class="fas fa-building-columns mr-1"></i> {{ $registration->event->colleges->count() }} college(s)
+                                            @endif
+                                        </p>
                                     </div>
 
                                     <!-- Completed Badge -->
@@ -720,46 +731,48 @@
                                     </span>
                                 </div>
 
-                                <!-- Event Details -->
-                                <div class="p-4">
-                                    <!-- Date and Time -->
-                                    <div class="space-y-1.5 mb-3">
-                                        <div class="event-detail">
-                                            <i class="fas fa-calendar-days" style="color:#c9a227"></i>
-                                            <span>{{ $registration->event->date_range }}</span>
+                                <!-- Card Body -->
+                                <div class="p-3.5 flex-1 flex flex-col">
+                                    <div class="space-y-2 mb-3">
+                                        <div class="event-meta-row">
+                                            <div class="event-meta-icon bg-[#fef9e7] text-[10px] sm:text-xs text-[#c9a227]"><i class="fas fa-calendar-days"></i></div>
+                                            <span class="text-xs sm:text-sm font-medium">{{ $registration->event->date_range }}</span>
                                         </div>
-                                        <div class="event-detail">
-                                            <i class="fas fa-clock"></i>
-                                            <span>{{ $registration->event->time_range }}</span>
+                                        <div class="event-meta-row">
+                                            <div class="event-meta-icon bg-[#eff6ff] text-[10px] sm:text-xs text-sky-600"><i class="fas fa-clock"></i></div>
+                                            <span class="text-[11px] sm:text-xs">{{ $registration->event->time_range }}</span>
                                         </div>
-                                        <div class="event-detail">
-                                            <i class="far fa-location-dot"></i>
-                                            <span class="line-clamp-1">{{ $registration->event->location }}</span>
+                                        <div class="event-meta-row">
+                                            <div class="event-meta-icon bg-[#fdf2f2] text-[10px] sm:text-xs text-[#b91c1c]"><i class="fas fa-location-dot"></i></div>
+                                            <span class="text-[11px] sm:text-xs truncate" title="{{ $registration->event->location }}">{{ $registration->event->location }}</span>
+                                        </div>
+                                        <div class="event-meta-row">
+                                            <div class="event-meta-icon bg-[#f0fdf4] text-[10px] sm:text-xs text-[#16a34a]"><i class="fas fa-circle-check"></i></div>
+                                            <span class="text-[11px] sm:text-xs">Attended: {{ $registration->updated_at->format('M j, Y') }}</span>
                                         </div>
                                     </div>
 
-                                    <p class="text-[#6b5e57] text-[0.8rem] mb-3 line-clamp-2 leading-relaxed">
+                                    <p class="text-[11px] sm:text-xs text-[#6b5e57] line-clamp-2 leading-relaxed mb-3 flex-1">
                                         {{ Str::limit($registration->event->description, 120) }}
                                     </p>
 
-                                    <div class="flex flex-wrap gap-2 btn-row-mobile">
-                                        <button onclick="toggleDetails('attended-details-{{ $registration->id }}')"
-                                                class="action-btn details flex-1 min-w-[100px]">
-                                            <i class="fas fa-circle-info text-[9px]"></i>
-                                            <span class="hidden sm:inline">Details</span>
+                                    <!-- Action Buttons -->
+                                    <div class="mt-auto pt-3 border-t border-[#e5e0db] flex justify-between gap-2">
+                                        <button onclick="toggleDetails('attended-details-{{ $registration->id }}')" class="action-btn-soft bg-[#faf8f5] text-[#6b5e57] border border-[#e5e0db] w-full">
+                                            <i class="fas fa-circle-info mr-1.5"></i> Details
                                         </button>
                                     </div>
 
                                     <!-- Expandable Details -->
-                                    <div id="attended-details-{{ $registration->id }}" class="hidden expand-details">
-                                        <div class="space-y-2.5">
+                                    <div id="attended-details-{{ $registration->id }}" class="hidden mt-3 pt-3 border-t border-dashed border-[#e5e0db]">
+                                        <div class="space-y-3">
                                             <div>
-                                                <p class="text-[0.75rem] font-semibold text-[#6b5e57] mb-1">Description:</p>
-                                                <p class="text-[#6b5e57] text-[0.8rem] leading-relaxed">{{ $registration->event->description }}</p>
+                                                <p class="text-[11px] font-semibold text-[#6b5e57] uppercase tracking-wider mb-1">Description</p>
+                                                <p class="text-[11px] sm:text-xs text-[#2c2420] leading-relaxed">{{ $registration->event->description }}</p>
                                             </div>
-                                            <div class="flex justify-between text-[0.75rem]">
-                                                <span class="text-[#6b5e57]">Attended on:</span>
-                                                <span class="text-[#6b5e57]">{{ $registration->updated_at->format('M j, Y') }}</span>
+                                            <div class="flex justify-between text-[11px] sm:text-xs">
+                                                <span class="text-[#8b7e76]">Attended On:</span>
+                                                <span class="text-[#10b981] font-medium">{{ $registration->updated_at->format('M j, Y g:i A') }}</span>
                                             </div>
                                         </div>
                                     </div>

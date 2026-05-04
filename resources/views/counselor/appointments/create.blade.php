@@ -916,9 +916,7 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 function toggleCreateOverride(enabled) {
-    if (enabled) {
-        openCreateOverrideModal();
-    } else {
+    if (!enabled) {
         closeCreateOverrideModal();
         clearCreateManualOverride();
     }
