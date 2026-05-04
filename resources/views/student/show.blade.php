@@ -294,10 +294,11 @@
                             <span>Back to Student List</span>
                         </a>
                         @elseif(Auth::check() && Auth::user()->role === 'counselor')
-                        <button onclick="window.print()" class="btn-primary no-print">
-                            <i class="fas fa-print"></i>
-                            <span>Print</span>
-                        </button>
+                        <a href="{{ route('counselor.appointments.create', ['student_id' => $student->id]) }}" 
+                           class="primary-btn px-4 py-2 text-xs sm:text-sm whitespace-nowrap no-print" style="background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); box-shadow: none;">
+                            <i class="fas fa-plus mr-1.5 text-[9px] sm:text-xs"></i>
+                            <span>Book New</span>
+                        </a>
                         @else
                         <a href="{{ route('appointments.create') }}" class="btn-primary">
                             <i class="fas fa-plus"></i>
@@ -332,37 +333,55 @@
             $hasSelfHarmRisk = !$student->high_risk_overridden && count(array_intersect($riskResponses, $stressResponses)) > 0;
             $isHighRisk = $student->is_high_risk || $hasSelfHarmRisk;
         @endphp
-        <div class="info-card mb-6 sm:mb-8 {{ $isHighRisk ? 'risk-card-danger' : 'risk-card-safe' }}">
-            <div class="info-card-header" style="{{ $isHighRisk ? 'background:rgba(254,242,242,0.6);color:#991b1b;' : '' }}">
-                <div class="info-card-header-icon" style="{{ $isHighRisk ? 'background:rgba(239,68,68,0.1);color:#dc2626;' : 'background:rgba(16,185,129,0.1);color:#059669;' }}">
-                    <i class="fas fa-{{ $isHighRisk ? 'exclamation-triangle' : 'shield-halved' }}"></i>
-                </div>
-                High-Risk Status
-                @if(in_array(Auth::user()->role, ['counselor', 'admin']))
-                <button type="button" onclick="toggleHighRiskModal()" class="btn ml-auto no-print" style="padding:0.3rem 0.7rem;font-size:0.72rem;">
-                    <i class="fas fa-edit"></i> {{ $student->is_high_risk ? 'Update Flag' : 'Flag Student' }}
-                </button>
-                @endif
-            </div>
-            <div class="info-card-body">
-                @if($isHighRisk)
-                    <div class="flex flex-col gap-3">
-                        @if($hasSelfHarmRisk)
-                        <div style="padding:0.75rem;background:#fff7ed;border:1px solid #fed7aa;border-radius:0.5rem;">
-                            <p style="margin:0 0 0.2rem;font-size:0.8rem;font-weight:700;color:#9a3412;"><i class="fas fa-notes-medical mr-1"></i>Assessment-Based Risk</p>
-                            <p style="margin:0;font-size:0.78rem;color:#7c2d12;">Student indicated self-harm or suicidal thoughts in their needs assessment.</p>
+        <div class="panel-card mb-5 sm:mb-6" style="{{ $isHighRisk ? 'border:1px solid rgba(220,38,38,0.3); background:rgba(254,242,242,0.95);' : 'border:1px solid rgba(16,185,129,0.3); background:rgba(236,253,245,0.95);' }}">
+            <div class="panel-topline" style="{{ $isHighRisk ? 'background:linear-gradient(90deg, #dc2626 0%, #ef4444 100%);' : 'background:linear-gradient(90deg, #10b981 0%, #34d399 100%);' }}"></div>
+            <div class="p-3 sm:p-4">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                    <div class="flex items-center gap-2.5">
+                        <div class="panel-icon w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0" style="{{ $isHighRisk ? 'background:rgba(220,38,38,0.1);color:#dc2626;' : 'background:rgba(16,185,129,0.1);color:#059669;' }}">
+                            <i class="fas fa-{{ $isHighRisk ? 'exclamation-triangle' : 'shield-halved' }} text-sm"></i>
                         </div>
-                        @endif
-                        @if($student->is_high_risk)
-                        <div style="padding:0.75rem;background:#fef3c7;border:1px solid #fde68a;border-radius:0.5rem;">
-                            <p style="margin:0 0 0.2rem;font-size:0.8rem;font-weight:700;color:#92400e;"><i class="fas fa-flag mr-1"></i>Counselor Flagged</p>
-                            @if($student->high_risk_notes)<p style="margin:0.2rem 0;color:#78350f;font-size:0.78rem;"><strong>Notes:</strong> {{ $student->high_risk_notes }}</p>@endif
-                            <p style="margin:0.2rem 0 0;font-size:0.7rem;color:#a16207;">By {{ $student->flaggedBy->first_name ?? 'Unknown' }} {{ $student->flaggedBy->last_name ?? '' }} · {{ $student->high_risk_flagged_at?->format('M j, Y g:i A') }}</p>
+                        <div>
+                            <h3 class="text-sm font-semibold" style="{{ $isHighRisk ? 'color:#991b1b;' : 'color:#065f46;' }}">High-Risk Status</h3>
+                            <p class="text-[11px] mt-0.5" style="{{ $isHighRisk ? 'color:#b91c1c;' : 'color:#047857;' }}">
+                                {{ $isHighRisk ? 'This student requires immediate attention.' : 'Not currently flagged as high-risk.' }}
+                            </p>
                         </div>
-                        @endif
                     </div>
-                @else
-                    <p style="margin:0;color:var(--text-secondary);font-size:0.82rem;"><i class="fas fa-check-circle" style="color:#059669;margin-right:0.4rem;"></i>This student is not currently flagged as high-risk.</p>
+                    @if(in_array(Auth::user()->role, ['counselor', 'admin']))
+                    <button type="button" onclick="toggleHighRiskModal()" class="secondary-btn text-[11px] px-3 py-1.5 flex-shrink-0" style="{{ $isHighRisk ? 'border-color:rgba(220,38,38,0.2);color:#dc2626;hover:background:rgba(220,38,38,0.05);' : '' }}">
+                        <i class="fas fa-flag text-[10px]"></i>
+                        <span>{{ $student->is_high_risk ? 'Update Flag' : 'Flag Student' }}</span>
+                    </button>
+                    @endif
+                </div>
+
+                @if($isHighRisk)
+                <div class="mt-3 flex flex-col gap-2">
+                    @if($hasSelfHarmRisk)
+                    <div class="p-2.5 sm:p-3 rounded-md bg-white border border-red-100 flex items-start gap-2.5">
+                        <i class="fas fa-notes-medical mt-0.5 text-red-500 text-xs"></i>
+                        <div>
+                            <h4 class="text-xs font-semibold text-red-800">Assessment-Based Risk</h4>
+                            <p class="text-[11px] text-red-600 mt-0.5 leading-snug">Student indicated self-harm or suicidal thoughts in their needs assessment.</p>
+                        </div>
+                    </div>
+                    @endif
+                    @if($student->is_high_risk)
+                    <div class="p-2.5 sm:p-3 rounded-md bg-white border border-orange-100 flex items-start gap-2.5">
+                        <i class="fas fa-user-shield mt-0.5 text-orange-500 text-xs"></i>
+                        <div>
+                            <h4 class="text-xs font-semibold text-orange-800">Counselor Flagged</h4>
+                            @if($student->high_risk_notes)
+                                <p class="text-[11px] text-orange-700 mt-0.5 leading-snug"><span class="font-medium">Notes:</span> {{ $student->high_risk_notes }}</p>
+                            @endif
+                            <p class="text-[9px] text-orange-600 mt-1.5 opacity-80">
+                                By {{ $student->flaggedBy->first_name ?? 'Unknown' }} {{ $student->flaggedBy->last_name ?? '' }} &middot; {{ $student->high_risk_flagged_at?->format('M j, Y g:i A') }}
+                            </p>
+                        </div>
+                    </div>
+                    @endif
+                </div>
                 @endif
             </div>
         </div>

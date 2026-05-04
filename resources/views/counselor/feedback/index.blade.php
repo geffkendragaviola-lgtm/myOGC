@@ -32,7 +32,7 @@
 
                     <div class="summary-card">
                         <div class="relative h-full flex flex-col sm:flex-row items-center justify-between gap-3 p-4">
-                            <div class="flex items-center gap-3 text-center sm:text-left">
+                            <div class="flex items-center gap-3 text-left">
                                 <div class="summary-icon flex-shrink-0">
                                     <i class="fas fa-file-export text-sm"></i>
                                 </div>
@@ -42,7 +42,7 @@
                                     <p class="summary-subtext hidden sm:block">Download the current feedback list.</p>
                                 </div>
                             </div>
-                            <a href="{{ route('counselor.feedback.export', request()->query()) }}" class="inline-flex items-center justify-center px-4 py-2 sm:py-2.5 rounded-lg bg-white/10 hover:bg-white/20 text-white font-medium transition-all text-xs sm:text-sm border border-white/20 backdrop-blur-sm shadow-sm">
+                            <a href="{{ route('counselor.feedback.export', request()->query()) }}" class="primary-btn px-4 py-2 sm:py-2.5 text-xs sm:text-sm whitespace-nowrap" style="background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); box-shadow: none;">
                                 <i class="fas fa-file-export mr-1.5 text-[9px] sm:text-xs"></i> Export
                             </a>
                         </div>

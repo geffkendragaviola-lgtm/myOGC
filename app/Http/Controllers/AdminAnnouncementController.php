@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Announcement;
 use App\Models\College;
+use App\Notifications\AnnouncementPostedNotification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
@@ -86,6 +87,13 @@ class AdminAnnouncementController extends Controller
 
         if (!$request->for_all_colleges && $request->has('colleges')) {
             $announcement->colleges()->sync($request->colleges);
+        }
+
+        if ($announcement->status === 'active') {
+            $announcement->targetedStudentUsersQuery()
+                ->each(function ($user) use ($announcement) {
+                    $user->notify(new AnnouncementPostedNotification($announcement));
+                });
         }
 
         return redirect()->route('admin.announcements.index')

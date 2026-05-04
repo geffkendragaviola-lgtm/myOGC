@@ -168,7 +168,7 @@
 
                 <div class="summary-card">
                     <div class="relative h-full flex flex-col sm:flex-row items-center justify-between gap-3 p-4">
-                        <div class="flex items-center gap-3 text-center sm:text-left">
+                        <div class="flex items-center gap-3 text-left">
                             <div class="summary-icon flex-shrink-0">
                                 <i class="fas fa-arrow-left text-sm"></i>
                             </div>

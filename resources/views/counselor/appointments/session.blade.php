@@ -675,25 +675,25 @@
     </div>
 
     <!-- Follow-up Modal -->
-    <div id="followupModal" class="modal-backdrop hidden" onclick="handleFollowupBackdropClick(event)">
-        <div class="modal-card" onclick="event.stopPropagation();" style="max-width:52rem; max-height:80vh; overflow-y:auto;">
+    <div id="followupModal" class="modal-backdrop hidden" onclick="handleFollowupBackdropClick(event)" style="background: rgba(15, 10, 8, 0.4); backdrop-filter: blur(4px);">
+        <div class="modal-card bg-white" onclick="event.stopPropagation();" style="max-width:56rem; max-height:90vh; overflow-y:auto; border-radius:1rem; box-shadow:0 25px 50px -12px rgba(0,0,0,0.25);">
 
             {{-- Modal Header --}}
-            <div class="modal-header" style="background:linear-gradient(135deg,var(--maroon-800) 0%,var(--maroon-700) 100%);border-radius:0.75rem 0.75rem 0 0;padding:1.1rem 1.5rem;">
-                <div class="flex items-center gap-3">
-                    <div style="width:2.25rem;height:2.25rem;border-radius:0.6rem;background:rgba(255,255,255,0.12);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
-                        <i class="fas fa-calendar-plus text-sm" style="color:#fef9e7;"></i>
+            <div class="modal-header relative overflow-hidden" style="background:linear-gradient(135deg,var(--maroon-800) 0%,var(--maroon-700) 100%);border-radius:1rem 1rem 0 0;padding:1.5rem;">
+                <div class="absolute top-0 right-0 w-64 h-64 bg-white opacity-5 rounded-full blur-3xl -mr-20 -mt-20 pointer-events-none"></div>
+                <div class="flex items-center gap-4 relative z-10">
+                    <div style="width:3rem;height:3rem;border-radius:0.75rem;background:rgba(255,255,255,0.15);display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:inset 0 2px 4px rgba(255,255,255,0.1);">
+                        <i class="fas fa-calendar-plus text-xl" style="color:#fef9e7;"></i>
                     </div>
                     <div>
-                        <h3 style="margin:0;font-size:0.95rem;font-weight:600;color:#fef9e7;">Book Follow-up Appointment</h3>
-                        <p style="margin:0;font-size:0.7rem;color:rgba(254,249,231,0.7);">
+                        <h3 style="margin:0;font-size:1.1rem;font-weight:700;color:#fef9e7;letter-spacing:0.02em;">Book Follow-up Appointment</h3>
+                        <p style="margin:0.2rem 0 0;font-size:0.75rem;color:rgba(254,249,231,0.8);font-medium;">
                             {{ $appointment->student->user->first_name }} {{ $appointment->student->user->last_name }}
                             &mdash; {{ $appointment->student->student_id }}
                         </p>
                     </div>
                 </div>
-                <button type="button" onclick="closeFollowupModal()" class="modal-close" title="Close"
-                        style="color:rgba(254,249,231,0.7);">
+                <button type="button" onclick="closeFollowupModal()" class="absolute top-4 right-4 flex items-center justify-center w-8 h-8 rounded-full bg-black/10 text-white/70 hover:bg-black/20 hover:text-white transition-all z-10" title="Close">
                     <i class="fas fa-xmark"></i>
                 </button>
             </div>
@@ -709,12 +709,14 @@
                         <div class="space-y-4">
 
                             {{-- Type & Category --}}
-                            <div style="background:rgba(250,248,245,0.7);border:1px solid var(--border-soft);border-radius:0.65rem;padding:1rem;">
-                                <p style="font-size:0.65rem;font-weight:700;text-transform:uppercase;letter-spacing:0.12em;color:var(--text-muted);margin:0 0 0.75rem;">Appointment Details</p>
+                            <div style="background:#ffffff;border:1px solid var(--border-soft);border-radius:0.75rem;padding:1.25rem;box-shadow:0 2px 10px rgba(0,0,0,0.02);">
+                                <h4 class="text-xs font-bold text-[#8b7e76] uppercase tracking-wider mb-4 flex items-center gap-2">
+                                    <i class="fas fa-info-circle text-[#d4af37]"></i> Appointment Details
+                                </h4>
                                 <div class="space-y-3">
                                     <div>
                                         <label for="followup_booking_type" class="field-label">Type of Booking <span class="text-[#b91c1c]">*</span></label>
-                                        <select name="booking_type" id="followup_booking_type" class="select-field text-xs sm:text-sm" required>
+                                        <select name="booking_type" id="followup_booking_type" class="select-field text-xs sm:text-sm bg-[#faf8f5]" required>
                                             <option value="">Choose a type</option>
                                             <option value="Counseling" {{ old('booking_type') === 'Counseling' ? 'selected' : '' }}>Counseling</option>
                                             <option value="Consultation" {{ old('booking_type') === 'Consultation' ? 'selected' : '' }}>Consultation</option>
@@ -723,7 +725,7 @@
                                     </div>
                                     <div>
                                         <label for="followup_booking_category" class="field-label">Booking Category <span class="text-[#b91c1c]">*</span></label>
-                                        <select name="booking_category" id="followup_booking_category" class="select-field text-xs sm:text-sm" required>
+                                        <select name="booking_category" id="followup_booking_category" class="select-field text-xs sm:text-sm bg-[#faf8f5]" required>
                                            
                                             <option value="walk-in" {{ old('booking_category') === 'walk-in' ? 'selected' : '' }}>Walk-in</option>
                                             <option value="referred" {{ old('booking_category') === 'referred' ? 'selected' : '' }}>Referred</option>
@@ -734,7 +736,7 @@
                                     <div id="followupReferredByWrap" class="{{ old('booking_category') === 'referred' ? '' : 'hidden' }}">
                                         <label for="followup_referred_by" class="field-label">Referred by</label>
                                         <input type="text" name="referred_by" id="followup_referred_by" value="{{ old('referred_by') }}"
-                                               class="input-field text-xs sm:text-sm" maxlength="255"
+                                               class="input-field text-xs sm:text-sm bg-[#faf8f5]" maxlength="255"
                                                placeholder="e.g. Teacher, Parent, Friend">
                                         @error('referred_by')<p class="error-text">{{ $message }}</p>@enderror
                                     </div>
@@ -742,18 +744,20 @@
                             </div>
 
                             {{-- Concern --}}
-                            <div style="background:rgba(250,248,245,0.7);border:1px solid var(--border-soft);border-radius:0.65rem;padding:1rem;">
-                                <p style="font-size:0.65rem;font-weight:700;text-transform:uppercase;letter-spacing:0.12em;color:var(--text-muted);margin:0 0 0.75rem;">Concern / Agenda</p>
-                                <textarea name="concern" id="followup_concern" rows="4"
-                                          class="textarea-field" required
-                                          style="min-height:90px;">{{ old('concern', 'Follow-up session') }}</textarea>
+                            <div style="background:#ffffff;border:1px solid var(--border-soft);border-radius:0.75rem;padding:1.25rem;box-shadow:0 2px 10px rgba(0,0,0,0.02);">
+                                <h4 class="text-xs font-bold text-[#8b7e76] uppercase tracking-wider mb-4 flex items-center gap-2">
+                                    <i class="fas fa-align-left text-[#d4af37]"></i> Concern / Agenda
+                                </h4>
+                                <textarea name="concern" id="followup_concern" rows="3"
+                                          class="textarea-field bg-[#faf8f5]" required
+                                          style="min-height:70px;">{{ old('concern', 'Follow-up session') }}</textarea>
                             </div>
 
                             {{-- Time Slots --}}
-                            <div id="fuSlotWrap" style="background:#ffffff;border:1px solid var(--border-soft);border-radius:0.75rem;padding:1.25rem;box-shadow:0 2px 8px rgba(0,0,0,0.02);">
-                                <p style="font-size:0.65rem;font-weight:700;text-transform:uppercase;letter-spacing:0.12em;color:var(--maroon-700);margin:0 0 0.85rem;display:flex;align-items:center;gap:0.4rem;">
-                                    <i class="fas fa-clock"></i> Available Time Slots
-                                </p>
+                            <div id="fuSlotWrap" style="background:#ffffff;border:1px solid var(--border-soft);border-radius:0.75rem;padding:1.25rem;box-shadow:0 2px 10px rgba(0,0,0,0.02);">
+                                <h4 class="text-xs font-bold text-[#8b7e76] uppercase tracking-wider mb-4 flex items-center gap-2">
+                                    <i class="fas fa-clock text-[#d4af37]"></i> Available Time Slots
+                                </h4>
                                 <div id="followup_time_slots" class="grid grid-cols-2 gap-2 max-h-48 overflow-y-auto p-1">
                                     <div class="col-span-full flex flex-col items-center justify-center text-[#8b7e76] text-xs py-6 border-2 border-dashed border-[#e5e0db] rounded-xl bg-[#faf8f5]">
                                         <i class="fas fa-calendar-day mb-2 text-lg text-[#d4af37]"></i>
@@ -763,17 +767,6 @@
                                 <input type="hidden" name="start_time" id="followup_selected_time">
                                 @error('start_time')<p class="error-text mt-2">{{ $message }}</p>@enderror
                             </div>
-
-                            {{-- Override Availability --}}
-                            <label style="display:flex;align-items:center;gap:0.6rem;cursor:pointer;padding:0.65rem 0.85rem;border:1px solid #fca5a5;border-radius:0.6rem;background:rgba(255,241,242,0.5);">
-                                <input type="checkbox" name="override_availability" id="fuOverrideCheck" value="1"
-                                       onchange="toggleFollowupOverride(this.checked)"
-                                       style="width:1rem;height:1rem;accent-color:#dc2626;cursor:pointer;">
-                                <span style="font-size:0.78rem;color:#991b1b;font-weight:600;display:flex;align-items:center;gap:0.4rem;">
-                                    <i class="fas fa-bolt text-[10px]"></i>
-                                    Override Availability — book outside set hours / daily limit
-                                </span>
-                            </label>
 
                             {{-- Auto-approve --}}
                             <label style="display:flex;align-items:center;gap:0.6rem;cursor:pointer;padding:0.65rem 0.85rem;border:1px solid var(--border-soft);border-radius:0.6rem;background:rgba(254,249,231,0.4);">
@@ -786,10 +779,28 @@
                         {{-- Right column: calendar --}}
                         <div id="fuCalendarWrap">
                             <div style="background:#ffffff;border:1px solid var(--border-soft);border-radius:0.75rem;padding:1.25rem;box-shadow:0 2px 8px rgba(0,0,0,0.02);height:100%;display:flex;flex-direction:column;">
-                                <p style="font-size:0.65rem;font-weight:700;text-transform:uppercase;letter-spacing:0.12em;color:var(--maroon-700);margin:0 0 0.85rem;display:flex;align-items:center;gap:0.4rem;">
-                                    <i class="fas fa-calendar-alt"></i> Select Date <span style="color:#b91c1c;">*</span>
-                                </p>
-                                <div class="calendar-card flex-1" style="border:none;padding:0;background:transparent;display:flex;flex-direction:column;">
+                                <label style="display:flex;align-items:center;gap:0.6rem;cursor:pointer;padding:0.65rem 0.85rem;border:1px solid var(--border-soft);border-radius:0.6rem;background:rgba(254,249,231,0.4);margin-bottom:1rem;">
+                                    <input type="checkbox" name="override_availability" id="fuOverrideCheck" value="1"
+                                           onchange="toggleFollowupOverride(this.checked)"
+                                           style="width:1rem;height:1rem;accent-color:var(--maroon-700);cursor:pointer;">
+                                    <span style="font-size:0.78rem;color:var(--text-secondary);font-weight:600;display:flex;align-items:center;gap:0.4rem;">
+                                        <i class="fas fa-bolt text-[10px] text-[#d4af37]"></i>
+                                        Override Availability — book outside set hours / daily limit
+                                    </span>
+                                </label>
+                                <h4 class="text-xs font-bold text-[#8b7e76] uppercase tracking-wider mb-4 flex items-center gap-2">
+                                    <i class="fas fa-calendar-alt text-[#d4af37]"></i> Select Date <span style="color:#b91c1c;">*</span>
+                                </h4>
+                                <div class="calendar-card flex-1" style="border:none;padding:0;background:transparent;display:flex;flex-direction:column;position:relative;">
+                                    
+                                    {{-- Loading Overlay for Dates --}}
+                                    <div id="fuCalLoadingOverlay" class="hidden absolute inset-0 z-10 bg-white/80 backdrop-blur-[2px] flex flex-col items-center justify-center rounded-xl" style="margin-top: 3.5rem;">
+                                        <div class="bg-white px-4 py-3 rounded-xl shadow-sm border border-[#e5e0db]/80 flex items-center gap-3">
+                                            <i class="fas fa-circle-notch fa-spin text-lg text-[#7a2a2a]"></i>
+                                            <span class="text-xs font-bold text-[#5c1a1a] tracking-wide ">Loading Dates...</span>
+                                        </div>
+                                    </div>
+
                                     <div class="calendar-nav mb-3 bg-[#faf8f5] p-2 rounded-lg border border-[#e5e0db]">
                                         <button type="button" id="fuCalPrev" class="calendar-nav-btn shadow-sm">‹</button>
                                         <h3 id="fuCalMonthLabel" class="text-sm font-bold text-[#2c2420] tracking-wide"></h3>
@@ -806,10 +817,8 @@
                                     </div>
                                     <div id="fuCalGrid" class="calendar-grid"></div>
                                     
-                                    <div class="mt-auto pt-4">
-                                        <div id="fuCalStatus">
-                                            <!-- Status container -->
-                                        </div>
+                                    <div class="mt-auto pt-4 empty:hidden" id="fuCalStatus">
+                                        <!-- Status container -->
                                     </div>
                                 </div>
                                 <input type="hidden" name="appointment_date" id="followup_appointment_date" required>
@@ -821,13 +830,13 @@
                 </div>
 
                 {{-- Footer --}}
-                <div class="modal-footer">
-                    <button type="button" onclick="closeFollowupModal()" class="secondary-btn px-5 py-2.5 text-xs sm:text-sm">
+                <div class="modal-footer" style="padding:1.25rem 1.5rem;background:#faf8f5;border-top:1px solid var(--border-soft);border-radius:0 0 1rem 1rem;">
+                    <button type="button" onclick="closeFollowupModal()" class="secondary-btn px-6 py-2.5 text-xs sm:text-sm font-semibold tracking-wide">
                         Cancel
                     </button>
                     <button type="submit" id="followup_submit_btn"
-                            class="primary-btn px-5 py-2.5 text-xs sm:text-sm disabled:opacity-50 disabled:cursor-not-allowed">
-                        <i class="fas fa-calendar-check mr-1.5 text-[9px] sm:text-xs"></i> Book Follow-up
+                            class="primary-btn px-6 py-2.5 text-xs sm:text-sm font-semibold tracking-wide disabled:opacity-50 disabled:cursor-not-allowed">
+                        <i class="fas fa-calendar-check mr-1.5 text-[10px] sm:text-xs"></i> Book Follow-up
                     </button>
                 </div>
             </form>
@@ -1057,17 +1066,21 @@
                 return a && b && a.getFullYear()===b.getFullYear() && a.getMonth()===b.getMonth() && a.getDate()===b.getDate();
             }
             function setStatus(msg, tone='') {
+                const overlay = document.getElementById('fuCalLoadingOverlay');
+                if (msg === 'Checking available dates...') {
+                    if (overlay) overlay.classList.remove('hidden');
+                    calStatus.innerHTML = '';
+                    return;
+                } else {
+                    if (overlay) overlay.classList.add('hidden');
+                }
+                
                 let icon = '';
                 let colorClass = 'text-[#6b5e57]';
                 let bgClass = 'bg-[#f5f0eb]/50 border border-[#e5e0db]';
                 let animateClass = '';
                 
-                if (msg === 'Checking available dates...') {
-                    icon = '<i class="fas fa-circle-notch fa-spin text-base"></i>';
-                    colorClass = 'text-[#b48600]';
-                    bgClass = 'bg-[#fef9e7] border border-[#d4af37]/40 shadow-[0_2px_10px_rgba(212,175,55,0.15)]';
-                    animateClass = 'animate-pulse';
-                } else if (tone === 'success' || msg.includes('Selected:')) {
+                if (tone === 'success' || msg.includes('Selected:')) {
                     icon = '<i class="fas fa-check-circle text-base"></i>';
                     colorClass = 'text-[#065f46]';
                     bgClass = 'bg-[#f0fdf4] border border-[#10b981]/40 shadow-[0_2px_10px_rgba(16,185,129,0.15)]';
@@ -1147,7 +1160,11 @@
                 }
                 if (id !== reqId) return;
                 const hasAny = [...availMap.values()].some(v=>v);
-                setStatus(hasAny ? 'Available dates are highlighted. Select a date to continue.' : 'No available dates this month.', hasAny ? '' : 'error');
+                if (hasAny) {
+                    calStatus.innerHTML = '';
+                } else {
+                    setStatus('No available dates this month.', 'error');
+                }
                 if (selectedDate && !availMap.get(fmt(selectedDate))) {
                     selectedDate = null; dateHidden.value = '';
                 }

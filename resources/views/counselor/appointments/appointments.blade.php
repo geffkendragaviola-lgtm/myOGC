@@ -929,83 +929,120 @@
         </div>
 
         <!-- Referral Modal -->
-        <div id="referralModal" class="modal-backdrop hidden">
-            <div class="modal-card modal-card-md">
-                <div class="modal-header">
-                    <div class="flex items-center gap-2">
-                        <div class="modal-header-icon"><i class="fas fa-share-square"></i></div>
-                        <h3 class="modal-title">Refer Appointment</h3>
+        <div id="referralModal" class="modal-backdrop hidden" onclick="closeReferralModal()" style="background: rgba(15, 10, 8, 0.4); backdrop-filter: blur(4px);">
+            <div class="modal-card bg-white" onclick="event.stopPropagation();" style="max-width:56rem; max-height:90vh; overflow-y:auto; border-radius:1rem; box-shadow:0 25px 50px -12px rgba(0,0,0,0.25);">
+
+                {{-- Modal Header --}}
+                <div class="modal-header relative overflow-hidden" style="background:linear-gradient(135deg,var(--maroon-800) 0%,var(--maroon-700) 100%);border-radius:1rem 1rem 0 0;padding:1.5rem;">
+                    <div class="absolute top-0 right-0 w-64 h-64 bg-white opacity-5 rounded-full blur-3xl -mr-20 -mt-20 pointer-events-none"></div>
+                    <div class="flex items-center gap-4 relative z-10">
+                        <div style="width:3rem;height:3rem;border-radius:0.75rem;background:rgba(255,255,255,0.15);display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:inset 0 2px 4px rgba(255,255,255,0.1);">
+                            <i class="fas fa-share-square text-xl" style="color:#fef9e7;"></i>
+                        </div>
+                        <div>
+                            <h3 style="margin:0;font-size:1.1rem;font-weight:700;color:#fef9e7;letter-spacing:0.02em;">Refer Appointment</h3>
+                            <p style="margin:0.2rem 0 0;font-size:0.75rem;color:rgba(254,249,231,0.8);font-medium;">Transfer this session to another counselor</p>
+                        </div>
                     </div>
-                    <button onclick="closeReferralModal()" class="modal-close" title="Close">
+                    <button type="button" onclick="closeReferralModal()" class="absolute top-4 right-4 flex items-center justify-center w-8 h-8 rounded-full bg-black/10 text-white/70 hover:bg-black/20 hover:text-white transition-all z-10" title="Close">
                         <i class="fas fa-xmark"></i>
                     </button>
                 </div>
+
                 <form id="referralForm" method="POST" class="flex flex-col flex-1 min-h-0">
                     @csrf
                     @method('PATCH')
-                    <div class="modal-body">
-                        <div class="p-4 sm:p-5 space-y-4">
-                            <div>
-                                <label for="referralCounselorSelect" class="field-label">Select Counselor</label>
-                                <select id="referralCounselorSelect" name="referred_to_counselor_id"
-                                        class="select-field text-xs sm:text-sm"
-                                        required>
-                                    <option value="">Loading counselors...</option>
-                                </select>
-                                <p class="text-[10px] text-[#8b7e76] mt-1">Choose a counselor from any college.</p>
-                            </div>
-
-                            <div>
-                                <label class="field-label">Select Date</label>
-                                <div class="border border-[#e5e0db] rounded-xl bg-white p-4 shadow-sm">
-                                    <div class="calendar-nav">
-                                        <button type="button" id="referralCalendarPrev" class="calendar-nav-btn">‹</button>
-                                        <h3 id="referralCalendarMonthLabel" class="text-sm font-semibold text-[#2c2420]"></h3>
-                                        <button type="button" id="referralCalendarNext" class="calendar-nav-btn">›</button>
-                                    </div>
-                                    <div class="calendar-grid mb-2">
-                                        <span class="calendar-day-header">Sun</span>
-                                        <span class="calendar-day-header">Mon</span>
-                                        <span class="calendar-day-header">Tue</span>
-                                        <span class="calendar-day-header">Wed</span>
-                                        <span class="calendar-day-header">Thu</span>
-                                        <span class="calendar-day-header">Fri</span>
-                                        <span class="calendar-day-header">Sat</span>
-                                    </div>
-                                    <div id="referralCalendarGrid" class="calendar-grid"></div>
-                                    <p id="referralCalendarStatus" class="mt-3 text-[10px] sm:text-xs text-[#8b7e76]">
-                                        Select a counselor to load available dates.
-                                    </p>
+                    
+                    <div class="modal-body" style="padding:1.5rem;">
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
+                            
+                            {{-- Left Column: Details --}}
+                            <div class="space-y-4">
+                                {{-- Counselor Selection --}}
+                                <div style="background:#ffffff;border:1px solid var(--border-soft);border-radius:0.75rem;padding:1.25rem;box-shadow:0 2px 10px rgba(0,0,0,0.02);">
+                                    <h4 class="text-xs font-bold text-[#8b7e76] uppercase tracking-wider mb-4 flex items-center gap-2">
+                                        <i class="fas fa-user-md text-[#d4af37]"></i> Select Counselor
+                                    </h4>
+                                    <select id="referralCounselorSelect" name="referred_to_counselor_id" class="select-field text-xs sm:text-sm bg-[#faf8f5]" required>
+                                        <option value="">Loading counselors...</option>
+                                    </select>
+                                    <p class="text-[10px] text-[#8b7e76] mt-2"><i class="fas fa-info-circle mr-1"></i> Choose a counselor to load their schedule.</p>
                                 </div>
-                                <input type="hidden" name="appointment_date" id="referralDateSelect" required>
-                            </div>
 
-                            <div>
-                                <label class="field-label">Available Time Slots</label>
-                                <div id="referralTimeSlots" class="grid grid-cols-2 md:grid-cols-3 gap-2 sm:gap-3">
-                                    <div class="text-[#8b7e76] text-center p-4 border-2 border-dashed border-[#e5e0db] rounded-lg text-xs">
-                                        Select a date to see available time slots
-                                    </div>
-                                </div>
-                                <input type="hidden" name="start_time" id="referralSelectedTime" required>
-                            </div>
-
-                            <div>
-                                <label for="referral_reason" class="field-label">Reason (optional)</label>
-                                <div class="border border-[#e5e0db] rounded-xl bg-white p-4 shadow-sm">
+                                {{-- Reason --}}
+                                <div style="background:#ffffff;border:1px solid var(--border-soft);border-radius:0.75rem;padding:1.25rem;box-shadow:0 2px 10px rgba(0,0,0,0.02);">
+                                    <h4 class="text-xs font-bold text-[#8b7e76] uppercase tracking-wider mb-4 flex items-center gap-2">
+                                        <i class="fas fa-align-left text-[#d4af37]"></i> Reason (Optional)
+                                    </h4>
                                     <textarea id="referral_reason" name="referral_reason" rows="3"
-                                              class="textarea-field"
-                                              placeholder="Explain the reason for referring the student..."></textarea>
+                                              class="textarea-field bg-[#faf8f5]"
+                                              placeholder="Explain the reason for referring the student..." style="min-height:70px;"></textarea>
+                                </div>
+                            </div>
+
+                            {{-- Right Column: Calendar & Slots --}}
+                            <div class="space-y-4">
+                                {{-- Time Slots --}}
+                                <div style="background:#ffffff;border:1px solid var(--border-soft);border-radius:0.75rem;padding:1.25rem;box-shadow:0 2px 10px rgba(0,0,0,0.02);">
+                                    <h4 class="text-xs font-bold text-[#8b7e76] uppercase tracking-wider mb-4 flex items-center gap-2">
+                                        <i class="fas fa-clock text-[#d4af37]"></i> Available Time Slots
+                                    </h4>
+                                    <div id="referralTimeSlots" class="grid grid-cols-2 gap-2 max-h-48 overflow-y-auto p-1">
+                                        <div class="col-span-full flex flex-col items-center justify-center text-[#8b7e76] text-xs py-6 border-2 border-dashed border-[#e5e0db] rounded-xl bg-[#faf8f5]">
+                                            <i class="fas fa-calendar-day mb-2 text-lg text-[#d4af37]"></i>
+                                            Select a date to see available time slots
+                                        </div>
+                                    </div>
+                                    <input type="hidden" name="start_time" id="referralSelectedTime" required>
+                                </div>
+
+                                {{-- Calendar --}}
+                                <div style="background:#ffffff;border:1px solid var(--border-soft);border-radius:0.75rem;padding:1.25rem;box-shadow:0 2px 8px rgba(0,0,0,0.02);height:100%;display:flex;flex-direction:column;">
+                                    <h4 class="text-xs font-bold text-[#8b7e76] uppercase tracking-wider mb-4 flex items-center gap-2">
+                                        <i class="fas fa-calendar-alt text-[#d4af37]"></i> Select Date <span style="color:#b91c1c;">*</span>
+                                    </h4>
+                                    <div class="calendar-card flex-1" style="border:none;padding:0;background:transparent;display:flex;flex-direction:column;position:relative;">
+                                        
+                                        <div class="calendar-nav mb-3 bg-[#faf8f5] p-2 rounded-lg border border-[#e5e0db]">
+                                            <button type="button" id="referralCalendarPrev" class="calendar-nav-btn shadow-sm">‹</button>
+                                            <h3 id="referralCalendarMonthLabel" class="text-sm font-bold text-[#2c2420] tracking-wide"></h3>
+                                            <button type="button" id="referralCalendarNext" class="calendar-nav-btn shadow-sm">›</button>
+                                        </div>
+                                        <div class="calendar-grid mb-2">
+                                            <span class="calendar-day-header text-[9px] font-bold text-[#a89f97]">Sun</span>
+                                            <span class="calendar-day-header text-[9px] font-bold text-[#a89f97]">Mon</span>
+                                            <span class="calendar-day-header text-[9px] font-bold text-[#a89f97]">Tue</span>
+                                            <span class="calendar-day-header text-[9px] font-bold text-[#a89f97]">Wed</span>
+                                            <span class="calendar-day-header text-[9px] font-bold text-[#a89f97]">Thu</span>
+                                            <span class="calendar-day-header text-[9px] font-bold text-[#a89f97]">Fri</span>
+                                            <span class="calendar-day-header text-[9px] font-bold text-[#a89f97]">Sat</span>
+                                        </div>
+                                        <div id="referralCalendarGrid" class="calendar-grid"></div>
+                                        
+                                        <div class="mt-auto pt-4 empty:hidden" id="referralCalendarStatus">
+                                            <p class="text-[10px] text-[#8b7e76] text-center"><i class="fas fa-info-circle mr-1"></i>Select a counselor to load dates.</p>
+                                        </div>
+                                        
+                                        <div id="referralCalendarLoading" class="absolute inset-0 z-10 bg-white/80 backdrop-blur-[2px] flex flex-col items-center justify-center transition-opacity duration-200 hidden">
+                                            <div class="bg-white px-4 py-3 rounded-xl shadow-sm border border-[#e5e0db]/80 flex items-center gap-3">
+                                                <i class="fas fa-circle-notch fa-spin text-lg text-[#7a2a2a]"></i>
+                                                <span class="text-xs font-bold text-[#5c1a1a] tracking-wide ">Loading Dates...</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <input type="hidden" name="appointment_date" id="referralDateSelect" required>
                                 </div>
                             </div>
                         </div>
                     </div>
-                    <div class="modal-footer">
-                        <button type="button" onclick="closeReferralModal()" class="secondary-btn px-4 py-2 text-xs sm:text-sm">
+
+                    {{-- Footer --}}
+                    <div class="modal-footer" style="padding:1.25rem 1.5rem;background:#faf8f5;border-top:1px solid var(--border-soft);border-radius:0 0 1rem 1rem;">
+                        <button type="button" onclick="closeReferralModal()" class="secondary-btn px-6 py-2.5 text-xs sm:text-sm font-semibold tracking-wide">
                             Cancel
                         </button>
-                        <button type="submit" class="primary-btn px-4 py-2 text-xs sm:text-sm">
-                            Send Referral Request
+                        <button type="submit" class="primary-btn px-6 py-2.5 text-xs sm:text-sm font-semibold tracking-wide">
+                            <i class="fas fa-share-square mr-1.5 text-[10px] sm:text-xs"></i> Send Referral Request
                         </button>
                     </div>
                 </form>
@@ -1013,81 +1050,118 @@
         </div>
 
         <!-- Reschedule Modal -->
-        <div id="rescheduleModal" class="modal-backdrop hidden">
-            <div class="modal-card modal-card-md">
-                <div class="modal-header">
-                    <div class="flex items-center gap-2">
-                        <div class="modal-header-icon"><i class="fas fa-calendar-alt"></i></div>
-                        <h3 class="modal-title">Reschedule Appointment</h3>
+        <div id="rescheduleModal" class="modal-backdrop hidden" onclick="closeRescheduleModal()" style="background: rgba(15, 10, 8, 0.4); backdrop-filter: blur(4px);">
+            <div class="modal-card bg-white" onclick="event.stopPropagation();" style="max-width:56rem; max-height:90vh; overflow-y:auto; border-radius:1rem; box-shadow:0 25px 50px -12px rgba(0,0,0,0.25);">
+
+                {{-- Modal Header --}}
+                <div class="modal-header relative overflow-hidden" style="background:linear-gradient(135deg,var(--maroon-800) 0%,var(--maroon-700) 100%);border-radius:1rem 1rem 0 0;padding:1.5rem;">
+                    <div class="absolute top-0 right-0 w-64 h-64 bg-white opacity-5 rounded-full blur-3xl -mr-20 -mt-20 pointer-events-none"></div>
+                    <div class="flex items-center gap-4 relative z-10">
+                        <div style="width:3rem;height:3rem;border-radius:0.75rem;background:rgba(255,255,255,0.15);display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:inset 0 2px 4px rgba(255,255,255,0.1);">
+                            <i class="fas fa-calendar-alt text-xl" style="color:#fef9e7;"></i>
+                        </div>
+                        <div>
+                            <h3 style="margin:0;font-size:1.1rem;font-weight:700;color:#fef9e7;letter-spacing:0.02em;">Reschedule Appointment</h3>
+                            <p style="margin:0.2rem 0 0;font-size:0.75rem;color:rgba(254,249,231,0.8);font-medium;">Select a new date and time for this session</p>
+                        </div>
                     </div>
-                    <button onclick="closeRescheduleModal()" class="modal-close" title="Close">
+                    <button type="button" onclick="closeRescheduleModal()" class="absolute top-4 right-4 flex items-center justify-center w-8 h-8 rounded-full bg-black/10 text-white/70 hover:bg-black/20 hover:text-white transition-all z-10" title="Close">
                         <i class="fas fa-xmark"></i>
                     </button>
                 </div>
+
                 <form id="rescheduleForm" method="POST" class="flex flex-col flex-1 min-h-0">
                     @csrf
                     @method('PATCH')
-                    <div class="modal-body">
-                        <div class="p-4 sm:p-5 space-y-4">
 
-                            {{-- Override Availability Toggle --}}
-                            <label id="rescheduleOverrideToggle" style="display:flex;align-items:center;gap:0.6rem;cursor:pointer;padding:0.65rem 0.85rem;border:1px solid #fca5a5;border-radius:0.6rem;background:rgba(255,241,242,0.5);">
-                                <input type="checkbox" name="override_availability" id="rescheduleOverrideCheck" value="1"
-                                       onchange="toggleRescheduleOverride(this.checked)"
-                                       style="width:1rem;height:1rem;accent-color:#dc2626;cursor:pointer;">
-                                <span style="font-size:0.78rem;color:#991b1b;font-weight:600;display:flex;align-items:center;gap:0.4rem;">
-                                    <i class="fas fa-bolt text-[10px]"></i>
-                                    Override Availability — book outside set hours / daily limit
-                                </span>
-                            </label>
+                    <div class="modal-body" style="padding:1.5rem;">
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
+                            
+                            {{-- Left Column: Details --}}
+                            <div class="space-y-4">
+                                {{-- Reason --}}
+                                <div style="background:#ffffff;border:1px solid var(--border-soft);border-radius:0.75rem;padding:1.25rem;box-shadow:0 2px 10px rgba(0,0,0,0.02);">
+                                    <h4 class="text-xs font-bold text-[#8b7e76] uppercase tracking-wider mb-4 flex items-center gap-2">
+                                        <i class="fas fa-align-left text-[#d4af37]"></i> Reason (Optional)
+                                    </h4>
+                                    <textarea id="reschedule_reason" name="reason" rows="3" class="textarea-field bg-[#faf8f5]" placeholder="Explain the reason for rescheduling..." style="min-height:70px;"></textarea>
+                                </div>
+                                
+                                {{-- Time Slots --}}
+                                <div id="rescheduleSlotWrap" style="background:#ffffff;border:1px solid var(--border-soft);border-radius:0.75rem;padding:1.25rem;box-shadow:0 2px 10px rgba(0,0,0,0.02);">
+                                    <h4 class="text-xs font-bold text-[#8b7e76] uppercase tracking-wider mb-4 flex items-center gap-2">
+                                        <i class="fas fa-clock text-[#d4af37]"></i> Available Time Slots
+                                    </h4>
+                                    <div id="rescheduleTimeSlots" class="grid grid-cols-2 gap-2 max-h-48 overflow-y-auto p-1">
+                                        <div class="col-span-full flex flex-col items-center justify-center text-[#8b7e76] text-xs py-6 border-2 border-dashed border-[#e5e0db] rounded-xl bg-[#faf8f5]">
+                                            <i class="fas fa-calendar-day mb-2 text-lg text-[#d4af37]"></i>
+                                            Select a date to see available time slots
+                                        </div>
+                                    </div>
+                                    <input type="hidden" name="start_time" id="rescheduleSelectedTime" required>
+                                </div>
+                            </div>
 
-                            <div id="rescheduleCalendarWrap">
-                                <label class="field-label">Select Date</label>
-                                <div class="border border-[#e5e0db] rounded-xl bg-white p-4 shadow-sm">
-                                    <div class="calendar-nav">
-                                        <button type="button" id="rescheduleCalendarPrev" class="calendar-nav-btn">‹</button>
-                                        <h3 id="rescheduleCalendarMonthLabel" class="text-sm font-semibold text-[#2c2420]"></h3>
-                                        <button type="button" id="rescheduleCalendarNext" class="calendar-nav-btn">›</button>
+                            {{-- Right Column: Calendar --}}
+                            <div id="rescheduleCalendarWrap" class="space-y-4">
+                                <div style="background:#ffffff;border:1px solid var(--border-soft);border-radius:0.75rem;padding:1.25rem;box-shadow:0 2px 8px rgba(0,0,0,0.02);height:100%;display:flex;flex-direction:column;">
+                                    
+                                    {{-- Override Availability Toggle --}}
+                                    <label id="rescheduleOverrideToggle" style="display:flex;align-items:center;gap:0.6rem;cursor:pointer;padding:0.65rem 0.85rem;border:1px solid var(--border-soft);border-radius:0.6rem;background:rgba(254,249,231,0.4);margin-bottom:1rem;">
+                                        <input type="checkbox" name="override_availability" id="rescheduleOverrideCheck" value="1"
+                                               onchange="toggleRescheduleOverride(this.checked)"
+                                               style="width:1rem;height:1rem;accent-color:var(--maroon-700);cursor:pointer;">
+                                        <span style="font-size:0.78rem;color:var(--text-secondary);font-weight:600;display:flex;align-items:center;gap:0.4rem;">
+                                            <i class="fas fa-bolt text-[10px] text-[#d4af37]"></i>
+                                            Override Availability — book outside set hours
+                                        </span>
+                                    </label>
+                                    
+                                    <h4 class="text-xs font-bold text-[#8b7e76] uppercase tracking-wider mb-4 flex items-center gap-2">
+                                        <i class="fas fa-calendar-alt text-[#d4af37]"></i> Select Date <span style="color:#b91c1c;">*</span>
+                                    </h4>
+                                    
+                                    <div class="calendar-card flex-1" style="border:none;padding:0;background:transparent;display:flex;flex-direction:column;position:relative;">
+                                        <div class="calendar-nav mb-3 bg-[#faf8f5] p-2 rounded-lg border border-[#e5e0db]">
+                                            <button type="button" id="rescheduleCalendarPrev" class="calendar-nav-btn shadow-sm">‹</button>
+                                            <h3 id="rescheduleCalendarMonthLabel" class="text-sm font-bold text-[#2c2420] tracking-wide"></h3>
+                                            <button type="button" id="rescheduleCalendarNext" class="calendar-nav-btn shadow-sm">›</button>
+                                        </div>
+                                        <div class="calendar-grid mb-2">
+                                            <span class="calendar-day-header text-[9px] font-bold text-[#a89f97]">Sun</span>
+                                            <span class="calendar-day-header text-[9px] font-bold text-[#a89f97]">Mon</span>
+                                            <span class="calendar-day-header text-[9px] font-bold text-[#a89f97]">Tue</span>
+                                            <span class="calendar-day-header text-[9px] font-bold text-[#a89f97]">Wed</span>
+                                            <span class="calendar-day-header text-[9px] font-bold text-[#a89f97]">Thu</span>
+                                            <span class="calendar-day-header text-[9px] font-bold text-[#a89f97]">Fri</span>
+                                            <span class="calendar-day-header text-[9px] font-bold text-[#a89f97]">Sat</span>
+                                        </div>
+                                        <div id="rescheduleCalendarGrid" class="calendar-grid"></div>
+                                        
+                                        <div class="mt-auto pt-4 empty:hidden" id="rescheduleCalendarStatus">
+                                            <p class="text-[10px] text-[#8b7e76] text-center"><i class="fas fa-info-circle mr-1"></i>Select a date.</p>
+                                        </div>
+                                        
+                                        <div id="rescheduleCalendarLoading" class="absolute inset-0 z-10 bg-white/80 backdrop-blur-[2px] flex flex-col items-center justify-center transition-opacity duration-200 hidden">
+                                            <div class="bg-white px-4 py-3 rounded-xl shadow-sm border border-[#e5e0db]/80 flex items-center gap-3">
+                                                <i class="fas fa-circle-notch fa-spin text-lg text-[#7a2a2a]"></i>
+                                                <span class="text-xs font-bold text-[#5c1a1a] tracking-wide ">Loading Dates...</span>
+                                            </div>
+                                        </div>
                                     </div>
-                                    <div class="calendar-grid mb-2">
-                                        <span class="calendar-day-header">Sun</span>
-                                        <span class="calendar-day-header">Mon</span>
-                                        <span class="calendar-day-header">Tue</span>
-                                        <span class="calendar-day-header">Wed</span>
-                                        <span class="calendar-day-header">Thu</span>
-                                        <span class="calendar-day-header">Fri</span>
-                                        <span class="calendar-day-header">Sat</span>
-                                    </div>
-                                    <div id="rescheduleCalendarGrid" class="calendar-grid"></div>
-                                    <p id="rescheduleCalendarStatus" class="mt-3 text-[10px] sm:text-xs text-[#8b7e76]">
-                                        Select a counselor to load available dates.
-                                    </p>
-                                </div>
-                                <input type="hidden" name="appointment_date" id="rescheduleDateSelect" required>
-                            </div>
-                            <div id="rescheduleSlotWrap">
-                                <label class="field-label">Available Time Slots</label>
-                                <div id="rescheduleTimeSlots" class="grid grid-cols-2 md:grid-cols-3 gap-2 sm:gap-3">
-                                    <div class="text-[#8b7e76] text-center p-4 border-2 border-dashed border-[#e5e0db] rounded-lg text-xs">
-                                        Select a date to see available time slots
-                                    </div>
-                                </div>
-                                <input type="hidden" name="start_time" id="rescheduleSelectedTime" required>
-                            </div>
-                            <div>
-                                <label for="reschedule_reason" class="field-label">Reason (optional)</label>
-                                <div class="border border-[#e5e0db] rounded-xl bg-white p-4 shadow-sm">
-                                    <textarea id="reschedule_reason" name="reason" rows="3" class="textarea-field" placeholder="Explain the reason for rescheduling..."></textarea>
+                                    <input type="hidden" name="appointment_date" id="rescheduleDateSelect" required>
                                 </div>
                             </div>
                         </div>
                     </div>
-                    <div class="modal-footer">
-                        <button type="button" onclick="closeRescheduleModal()" class="secondary-btn px-4 py-2 text-xs sm:text-sm">
+
+                    {{-- Footer --}}
+                    <div class="modal-footer" style="padding:1.25rem 1.5rem;background:#faf8f5;border-top:1px solid var(--border-soft);border-radius:0 0 1rem 1rem;">
+                        <button type="button" onclick="closeRescheduleModal()" class="secondary-btn px-6 py-2.5 text-xs sm:text-sm font-semibold tracking-wide">
                             Cancel
                         </button>
-                        <button type="submit" class="primary-btn px-4 py-2 text-xs sm:text-sm">
-                            Save Changes
+                        <button type="submit" class="primary-btn px-6 py-2.5 text-xs sm:text-sm font-semibold tracking-wide">
+                            <i class="fas fa-calendar-alt mr-1.5 text-[10px] sm:text-xs"></i> Save Changes
                         </button>
                     </div>
                 </form>
@@ -1230,21 +1304,42 @@
                     a.getDate() === b.getDate();
             }
 
-            function setReferralCalendarStatus(message, tone = 'muted') {
-                const calendarStatus = document.getElementById('referralCalendarStatus');
-                if (!calendarStatus) {
-                    return;
+            function setReferralCalendarStatus(msg, tone = 'muted') {
+                const calStatus = document.getElementById('referralCalendarStatus');
+                if (!calStatus) return;
+                
+                let icon = '';
+                let colorClass = 'text-[#6b5e57]';
+                let bgClass = 'bg-[#f5f0eb]/50 border border-[#e5e0db]';
+                let animateClass = '';
+                
+                if (msg === 'Checking available dates...') {
+                    icon = '<i class="fas fa-circle-notch fa-spin text-base"></i>';
+                    colorClass = 'text-[#b48600]';
+                    bgClass = 'bg-[#fef9e7] border border-[#d4af37]/40 shadow-[0_2px_10px_rgba(212,175,55,0.15)]';
+                    animateClass = 'animate-pulse';
+                } else if (tone === 'success' || msg.includes('Selected:')) {
+                    icon = '<i class="fas fa-check-circle text-base"></i>';
+                    colorClass = 'text-[#065f46]';
+                    bgClass = 'bg-[#f0fdf4] border border-[#10b981]/40 shadow-[0_2px_10px_rgba(16,185,129,0.15)]';
+                } else if (tone === 'error' || msg.includes('No available')) {
+                    icon = '<i class="fas fa-exclamation-circle text-base"></i>';
+                    colorClass = 'text-[#b91c1c]';
+                    bgClass = 'bg-[#fef2f2] border border-[#ef4444]/40 shadow-[0_2px_10px_rgba(239,68,68,0.15)]';
+                } else if (msg.includes('Available dates')) {
+                    icon = '<i class="fas fa-info-circle text-base"></i>';
+                    colorClass = 'text-[#0369a1]';
+                    bgClass = 'bg-[#f0f9ff] border border-[#0ea5e9]/40 shadow-[0_2px_10px_rgba(14,165,233,0.15)]';
                 }
-                calendarStatus.textContent = message;
-                calendarStatus.classList.remove('text-gray-500', 'text-green-600', 'text-red-600');
-                if (tone === 'success') {
-                    calendarStatus.classList.add('text-green-600');
-                } else if (tone === 'error') {
-                    calendarStatus.classList.add('text-red-600');
-                } else {
-                    calendarStatus.classList.add('text-gray-500');
-                }
+                
+                calStatus.innerHTML = `
+                    <div class="flex items-center justify-center gap-2.5 px-4 py-3 rounded-xl ${bgClass} ${colorClass} ${animateClass} font-semibold transition-all duration-300 transform w-full">
+                        ${icon}
+                        <span class="text-xs sm:text-sm tracking-wide">${msg}</span>
+                    </div>
+                `;
             }
+
 
             function renderReferralCalendar() {
                 const calendarGrid = document.getElementById('referralCalendarGrid');
@@ -1310,6 +1405,7 @@
             }
 
             async function loadReferralMonthAvailability() {
+                const referralCalendarLoading = document.getElementById('referralCalendarLoading');
                 referralAvailabilityByDate = new Map();
                 renderReferralCalendar();
 
@@ -1320,10 +1416,14 @@
 
                 const requestId = ++referralAvailabilityRequestId;
                 setReferralCalendarStatus('Checking available dates...');
+                if (referralCalendarLoading) referralCalendarLoading.classList.remove('hidden');
                 const monthValue = `${referralCurrentMonth.getFullYear()}-${String(referralCurrentMonth.getMonth() + 1).padStart(2, '0')}`;
 
                 try {
                     const response = await fetch(`/appointments/available-dates?counselor_id=${referralCounselorId}&month=${monthValue}&allow_today=1`);
+                    if (!response.ok) {
+                        throw new Error('Failed to load available dates');
+                    }
                     const data = await response.json();
                     if (requestId !== referralAvailabilityRequestId) {
                         return;
@@ -1336,11 +1436,17 @@
                     if (requestId !== referralAvailabilityRequestId) {
                         return;
                     }
+                    setReferralCalendarStatus('Unable to load available dates. Please try again.', 'error');
+                    if (referralCalendarLoading) referralCalendarLoading.classList.add('hidden');
+                    renderReferralCalendar();
+                    return;
                 }
 
                 if (requestId !== referralAvailabilityRequestId) {
                     return;
                 }
+
+                if (referralCalendarLoading) referralCalendarLoading.classList.add('hidden');
 
                 const hasAnyAvailability = Array.from(referralAvailabilityByDate.values()).some(value => value);
                 if (!hasAnyAvailability) {
@@ -1531,21 +1637,42 @@
                     a.getDate() === b.getDate();
             }
 
-            function setRescheduleCalendarStatus(message, tone = 'muted') {
-                const calendarStatus = document.getElementById('rescheduleCalendarStatus');
-                if (!calendarStatus) {
-                    return;
+            function setRescheduleCalendarStatus(msg, tone = 'muted') {
+                const calStatus = document.getElementById('rescheduleCalendarStatus');
+                if (!calStatus) return;
+                
+                let icon = '';
+                let colorClass = 'text-[#6b5e57]';
+                let bgClass = 'bg-[#f5f0eb]/50 border border-[#e5e0db]';
+                let animateClass = '';
+                
+                if (msg === 'Checking available dates...') {
+                    icon = '<i class="fas fa-circle-notch fa-spin text-base"></i>';
+                    colorClass = 'text-[#b48600]';
+                    bgClass = 'bg-[#fef9e7] border border-[#d4af37]/40 shadow-[0_2px_10px_rgba(212,175,55,0.15)]';
+                    animateClass = 'animate-pulse';
+                } else if (tone === 'success' || msg.includes('Selected:')) {
+                    icon = '<i class="fas fa-check-circle text-base"></i>';
+                    colorClass = 'text-[#065f46]';
+                    bgClass = 'bg-[#f0fdf4] border border-[#10b981]/40 shadow-[0_2px_10px_rgba(16,185,129,0.15)]';
+                } else if (tone === 'error' || msg.includes('No available')) {
+                    icon = '<i class="fas fa-exclamation-circle text-base"></i>';
+                    colorClass = 'text-[#b91c1c]';
+                    bgClass = 'bg-[#fef2f2] border border-[#ef4444]/40 shadow-[0_2px_10px_rgba(239,68,68,0.15)]';
+                } else if (msg.includes('Available dates')) {
+                    icon = '<i class="fas fa-info-circle text-base"></i>';
+                    colorClass = 'text-[#0369a1]';
+                    bgClass = 'bg-[#f0f9ff] border border-[#0ea5e9]/40 shadow-[0_2px_10px_rgba(14,165,233,0.15)]';
                 }
-                calendarStatus.textContent = message;
-                calendarStatus.classList.remove('text-gray-500', 'text-green-600', 'text-red-600');
-                if (tone === 'success') {
-                    calendarStatus.classList.add('text-green-600');
-                } else if (tone === 'error') {
-                    calendarStatus.classList.add('text-red-600');
-                } else {
-                    calendarStatus.classList.add('text-gray-500');
-                }
+                
+                calStatus.innerHTML = `
+                    <div class="flex items-center justify-center gap-2.5 px-4 py-3 rounded-xl ${bgClass} ${colorClass} ${animateClass} font-semibold transition-all duration-300 transform w-full">
+                        ${icon}
+                        <span class="text-xs sm:text-sm tracking-wide">${msg}</span>
+                    </div>
+                `;
             }
+
 
             function renderRescheduleCalendar() {
                 const calendarGrid = document.getElementById('rescheduleCalendarGrid');
@@ -1613,6 +1740,7 @@
             }
 
             async function loadRescheduleMonthAvailability() {
+                const rescheduleCalendarLoading = document.getElementById('rescheduleCalendarLoading');
                 rescheduleAvailabilityByDate = new Map();
                 renderRescheduleCalendar();
 
@@ -1626,10 +1754,14 @@
 
                 const requestId = ++rescheduleAvailabilityRequestId;
                 setRescheduleCalendarStatus('Checking available dates...');
+                if (rescheduleCalendarLoading) rescheduleCalendarLoading.classList.remove('hidden');
                 const monthValue = `${rescheduleCurrentMonth.getFullYear()}-${String(rescheduleCurrentMonth.getMonth() + 1).padStart(2, '0')}`;
 
                 try {
                     const response = await fetch(`/appointments/available-dates?counselor_id=${rescheduleCounselorId}&month=${monthValue}&allow_today=1&override_availability=${isOverride ? 1 : 0}`);
+                    if (!response.ok) {
+                        throw new Error('Failed to load available dates');
+                    }
                     const data = await response.json();
                     if (requestId !== rescheduleAvailabilityRequestId) {
                         return;
@@ -1642,11 +1774,17 @@
                     if (requestId !== rescheduleAvailabilityRequestId) {
                         return;
                     }
+                    setRescheduleCalendarStatus('Unable to load available dates. Please try again.', 'error');
+                    if (rescheduleCalendarLoading) rescheduleCalendarLoading.classList.add('hidden');
+                    renderRescheduleCalendar();
+                    return;
                 }
 
                 if (requestId !== rescheduleAvailabilityRequestId) {
                     return;
                 }
+
+                if (rescheduleCalendarLoading) rescheduleCalendarLoading.classList.add('hidden');
 
                 const hasAnyAvailability = Array.from(rescheduleAvailabilityByDate.values()).some(value => value);
                 if (!hasAnyAvailability) {
@@ -2128,6 +2266,29 @@
                 row.style.outline = '2px solid #c9a227';
                 row.style.boxShadow = '0 0 0 4px rgba(201,162,39,0.2)';
                 setTimeout(() => { row.style.outline = ''; row.style.boxShadow = ''; }, 3000);
+            })();
+        </script>
+
+        <script>
+            (function() {
+                const params = new URLSearchParams(window.location.search);
+                const id = params.get('open');
+                if (!id) return;
+
+                const row = document.getElementById('appointment-' + id);
+                if (row) {
+                    row.style.scrollMarginTop = '5rem';
+                    row.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                }
+
+                if (typeof showAppointmentDetails === 'function') {
+                    showAppointmentDetails(id);
+                }
+
+                params.delete('open');
+                const nextQuery = params.toString();
+                const nextUrl = window.location.pathname + (nextQuery ? ('?' + nextQuery) : '') + window.location.hash;
+                window.history.replaceState({}, '', nextUrl);
             })();
         </script>
     </div>

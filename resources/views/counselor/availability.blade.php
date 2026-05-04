@@ -226,7 +226,7 @@
                             </div>
                         </div>
                         <div class="flex items-center gap-2">
-                            <a href="{{ route('counselor.appointments') }}" class="inline-flex items-center justify-center gap-1.5 px-4 py-2 text-xs sm:text-sm rounded-lg font-medium border border-white/20 bg-white/10 hover:bg-white/20 transition-all text-white shadow-sm whitespace-nowrap">
+                            <a href="{{ route('counselor.appointments') }}" class="primary-btn px-4 py-2 text-xs sm:text-sm whitespace-nowrap" style="background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); box-shadow: none;">
                                 <i class="fas fa-calendar-check text-[10px]"></i> View Appointments
                             </a>
                         </div>

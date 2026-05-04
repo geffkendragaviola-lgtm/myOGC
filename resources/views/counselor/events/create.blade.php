@@ -218,7 +218,7 @@
                         </div>
                         <div class="flex items-center gap-2">
                             <a href="{{ route('counselor.events.index') }}"
-                               class="back-btn px-3 py-2 whitespace-nowrap text-xs sm:text-sm rounded-lg">
+                               class="primary-btn px-3 py-2 whitespace-nowrap text-xs sm:text-sm rounded-lg" style="background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); box-shadow: none;">
                                 <i class="fas fa-arrow-left mr-1.5 text-[9px] sm:text-xs"></i> Back
                             </a>
                         </div>

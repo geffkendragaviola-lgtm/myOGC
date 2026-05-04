@@ -299,7 +299,7 @@
 
                 <div class="summary-card">
                     <div class="relative h-full flex flex-col sm:flex-row items-center justify-between gap-3 p-4">
-                        <div class="flex items-center gap-3 text-center sm:text-left">
+                        <div class="flex items-center gap-3 text-left">
                             <div class="summary-icon flex-shrink-0">
                                 <i class="fas fa-plus text-sm"></i>
                             </div>
@@ -309,7 +309,7 @@
                                 <p class="summary-subtext hidden sm:block">Publish a new message to students.</p>
                             </div>
                         </div>
-                        <a href="{{ route('counselor.announcements.create') }}" class="primary-btn px-5 py-2.5 text-xs sm:text-sm rounded-lg">
+                        <a href="{{ route('counselor.announcements.create') }}" class="primary-btn px-5 py-2.5 text-xs sm:text-sm rounded-lg" style="background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); box-shadow: none;">
                             <i class="fas fa-plus mr-1.5 text-[9px] sm:text-xs"></i>
                             <span>Create Announcement</span>
                         </a>
@@ -410,7 +410,7 @@
         </div>
 
         <!-- Announcements Grid -->
-        <div class="panel-card mb-6 sm:mb-8 overflow-hidden">
+        <div class="panel-card overflow-hidden relative mb-6 sm:mb-8">
             <div class="panel-header">
                 <div class="flex items-center gap-3">
                     <div class="panel-icon">
@@ -418,7 +418,11 @@
                     </div>
                     <div>
                         <h2 class="text-sm font-medium text-[#2c2420]">Announcements List</h2>
-                        <p class="text-[10px] sm:text-xs text-[#8b7e76]">Showing <span class="font-bold text-[#2c2420]">{{ $announcements->firstItem() ?? 0 }} - {{ $announcements->lastItem() ?? 0 }}</span> of <span class="font-bold text-[#2c2420]">{{ $announcements->total() }}</span></p>
+                        @if(method_exists($announcements, 'total') && $announcements->total() > 0)
+                            <p class="text-[10px] sm:text-xs text-[#8b7e76]">Showing <span class="font-bold text-[#2c2420]">{{ $announcements->firstItem() ?? 0 }} - {{ $announcements->lastItem() ?? 0 }}</span> of <span class="font-bold text-[#2c2420]">{{ $announcements->total() }}</span></p>
+                        @elseif(count($announcements) > 0)
+                            <p class="text-[10px] sm:text-xs text-[#8b7e76]">Showing <span class="font-bold text-[#2c2420]">{{ count($announcements) }}</span> announcements</p>
+                        @endif
                     </div>
                 </div>
             </div>
@@ -573,11 +577,13 @@
             </div>
 
             <!-- Pagination -->
+            @if(method_exists($announcements, 'links'))
             <div class="mt-5 sm:mt-6 glass-card overflow-hidden">
                 <div class="px-4 sm:px-5 py-3 sm:py-3.5 border-t border-[#e5e0db]/60 bg-[#faf8f5]/40">
                     {{ $announcements->appends(request()->query())->links('vendor.pagination.counselor-resources') }}
                 </div>
             </div>
+            @endif
         @endif
     </div>
 </div>

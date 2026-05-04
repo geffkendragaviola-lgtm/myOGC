@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -56,6 +57,29 @@ class Announcement extends Model
     public function colleges(): BelongsToMany
     {
         return $this->belongsToMany(College::class, 'announcement_college');
+    }
+
+    public function targetedStudentUsersQuery(): Builder
+    {
+        $collegeIds = $this->for_all_colleges
+            ? null
+            : $this->colleges()->pluck('colleges.id')->all();
+
+        $yearLevels = is_array($this->year_levels) && !empty($this->year_levels)
+            ? $this->year_levels
+            : null;
+
+        return User::query()
+            ->where('role', 'student')
+            ->whereHas('student', function ($q) use ($collegeIds, $yearLevels) {
+                if (is_array($collegeIds) && !empty($collegeIds)) {
+                    $q->whereIn('college_id', $collegeIds);
+                }
+
+                if (is_array($yearLevels) && !empty($yearLevels)) {
+                    $q->whereIn('year_level', $yearLevels);
+                }
+            });
     }
 
     /**

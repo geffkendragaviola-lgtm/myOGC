@@ -241,7 +241,7 @@
 
                 <div class="summary-card">
                     <div class="relative h-full flex flex-col sm:flex-row items-center justify-between gap-3 p-4">
-                        <div class="flex items-center gap-3 text-center sm:text-left">
+                        <div class="flex items-center gap-3 text-left">
                             <div class="summary-icon flex-shrink-0">
                                 <i class="fas fa-plus text-sm"></i>
                             </div>
@@ -252,7 +252,7 @@
                             </div>
                         </div>
                         <a href="{{ route('counselor.events.create') }}"
-                           class="primary-btn px-5 py-2.5 whitespace-nowrap text-xs sm:text-sm rounded-lg">
+                           class="primary-btn px-5 py-2.5 whitespace-nowrap text-xs sm:text-sm rounded-lg" style="background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); box-shadow: none;">
                             <i class="fas fa-plus mr-1.5 text-[9px] sm:text-xs"></i> Create New Event
                         </a>
                     </div>
@@ -381,10 +381,10 @@
         </div>
 
         <!-- Events Grid -->
-        <div class="panel-card mb-6 sm:mb-8 overflow-hidden">
-            <div class="table-header-bar">
+        <div class="panel-card overflow-hidden relative mb-6 sm:mb-8">
+            <div class="panel-header">
                 <div class="flex items-center gap-3">
-                    <div class="table-header-icon">
+                    <div class="panel-icon">
                         <i class="fas fa-calendar-days text-[#7a2a2a] text-[10px] sm:text-xs"></i>
                     </div>
                     <div>

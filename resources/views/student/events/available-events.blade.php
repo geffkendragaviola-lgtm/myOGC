@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -757,14 +757,14 @@
 
     /* Event Card Specific Styles */
     .event-image {
-        position: relative; height: 10rem; overflow: hidden;
+        position: relative; height: 18rem; overflow: hidden;
         background: linear-gradient(135deg, var(--maroon-800) 0%, var(--maroon-700) 100%);
     }
     .event-image img {
         width: 100%; height: 100%; object-fit: cover;
         transition: transform 0.3s ease;
     }
-    .event-card:hover .event-image img { transform: scale(1.03); }
+    .event-card:hover .event-image img { transform: scale(1.08); }
     .event-overlay {
         position: absolute; inset: 0;
         background: linear-gradient(to top, rgba(44,36,32,0.7) 0%, transparent 60%);
@@ -866,63 +866,124 @@
             $student = Auth::user()->student;
 
             if ($student) {
-                $events = \App\Models\Event::with(['user', 'colleges', 'registrations' => function($query) use ($student) {
-                        $query->where('student_id', $student->id);
+                // Base query for getting event types
+                $baseQuery = \App\Models\Event::upcoming()
+                    ->active()
+                    ->forCollege($student->college_id)
+                    ->forYearLevel($student->year_level);
+                
+                $eventTypes = (clone $baseQuery)->pluck('type')->unique()->sort();
+
+                // Main query with relations
+                $query = \App\Models\Event::with(['user', 'colleges', 'registrations' => function($q) use ($student) {
+                        $q->where('student_id', $student->id);
                     }])
                     ->upcoming()
                     ->active()
                     ->forCollege($student->college_id)
-                    ->forYearLevel($student->year_level)
-                    ->orderBy('is_pinned', 'desc')
+                    ->forYearLevel($student->year_level);
+
+                // Search
+                if (request('search')) {
+                    $query->whereRaw('LOWER(title) LIKE ?', ['%' . strtolower(request('search')) . '%']);
+                }
+
+                // Type
+                if (request('type')) {
+                    $query->where('type', request('type'));
+                }
+
+                // Status
+                if (request('status')) {
+                    switch (request('status')) {
+                        case 'required':
+                            $query->where('is_required', true);
+                            break;
+                        case 'optional':
+                            $query->where('is_required', false);
+                            break;
+                        case 'registered':
+                            $query->whereHas('registrations', function($q) use ($student) {
+                                $q->where('student_id', $student->id)->whereIn('status', ['registered', 'attended']);
+                            });
+                            break;
+                        case 'available':
+                            $query->where('is_required', false)
+                                  ->whereDoesntHave('registrations', function($q) use ($student) {
+                                      $q->where('student_id', $student->id)->whereIn('status', ['registered', 'attended']);
+                                  });
+                            break;
+                    }
+                }
+
+                $events = $query->orderBy('is_pinned', 'desc')
                     ->orderBy('event_start_date')
                     ->orderBy('start_time')
-                    ->get();
+                    ->paginate(12);
 
-                // Get unique event types for filter
-                $eventTypes = $events->pluck('type')->unique()->sort();
             } else {
                 $events = collect();
                 $eventTypes = collect();
             }
         @endphp
 <!-- Filters Section -->
-<div class="panel-card mb-5 sm:mb-6">
+<form method="GET" action="{{ route('student.events.available') }}" id="filterForm" class="panel-card mb-5 sm:mb-6">
     <div class="panel-topline"></div>
 
     <div class="p-4 sm:p-5">
         <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
             <div class="filters-scroll w-full">
                 <div class="flex flex-wrap gap-3">
+                    
+                    <div class="min-w-[200px] flex-grow md:flex-grow-0">
+                        <label class="field-label">Search</label>
+                        <div class="relative">
+                            <input type="text" name="search" value="{{ request('search') }}" placeholder="Search events..." class="select-field w-full" style="padding-left: 2.75rem !important;">
+                            <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                        </div>
+                    </div>
+
                     <div class="min-w-[140px]">
                         <label class="field-label">Event Type</label>
-                        <select id="typeFilter" class="select-field">
+                        <select name="type" id="typeFilter" class="select-field" onchange="this.form.submit()">
                             <option value="">All Event Types</option>
                             @foreach($eventTypes as $type)
-                                <option value="{{ $type }}">{{ ucfirst($type) }}</option>
+                                <option value="{{ $type }}" {{ request('type') == $type ? 'selected' : '' }}>{{ ucfirst($type) }}</option>
                             @endforeach
                         </select>
                     </div>
 
                     <div class="min-w-[160px]">
                         <label class="field-label">Status</label>
-                        <select id="statusFilter" class="select-field">
+                        <select name="status" id="statusFilter" class="select-field" onchange="this.form.submit()">
                             <option value="">All Events</option>
-                            <option value="required">Required Events</option>
-                            <option value="optional">Optional Events</option>
-                            <option value="registered">My Registrations</option>
-                            <option value="available">Available to Register</option>
+                            <option value="required" {{ request('status') == 'required' ? 'selected' : '' }}>Required Events</option>
+                            <option value="optional" {{ request('status') == 'optional' ? 'selected' : '' }}>Optional Events</option>
+                            <option value="registered" {{ request('status') == 'registered' ? 'selected' : '' }}>My Registrations</option>
+                            <option value="available" {{ request('status') == 'available' ? 'selected' : '' }}>Available to Register</option>
                         </select>
                     </div>
+                    
+                    @if(request()->anyFilled(['search', 'type', 'status']))
+                        <div class="flex items-end">
+                            <a href="{{ route('student.events.available') }}" 
+                               class="secondary-btn h-[41px] px-4 flex items-center gap-2 text-red-600 hover:text-red-700 hover:bg-red-50 border-red-100 hover:border-red-200 transition-all duration-200 shadow-sm"
+                               title="Clear all filters">
+                                <i class="fas fa-rotate-left text-[10px]"></i>
+                                <span>Reset</span>
+                            </a>
+                        </div>
+                    @endif
                 </div>
             </div>
 
-            <div class="text-[0.75rem] text-[#6b5e57] flex items-center gap-1.5">
-                <i class="fas fa-search text-[#8b7e76]"></i>
-                <span><strong style="color:var(--text-primary)">{{ $events->count() }}</strong> events found</span>
+            <div class="text-[0.75rem] text-[#6b5e57] flex items-center gap-1.5 whitespace-nowrap mt-2 md:mt-0">
+                <i class="fas fa-layer-group text-[#8b7e76]"></i>
+                <span><strong style="color:var(--text-primary)">{{ $student ? $events->total() : 0 }}</strong> events found</span>
             </div>
         </div>
     </div>
-</div>
+</form>
 
         @if(!$student)
             <!-- Student Profile Not Complete -->
@@ -976,11 +1037,24 @@
                         $isRequiredAutoRegister = $isRequiredEvent && !$isRegistered;
                     @endphp
 
-                    <div class="event-card"
+                    <div class="event-card group cursor-pointer flex flex-col h-full"
                          data-type="{{ $event->type }}"
                          data-required="{{ $isRequiredEvent ? 'true' : 'false' }}"
                          data-registered="{{ $isRegistered ? 'true' : 'false' }}"
-                         data-available="{{ $canRegister ? 'true' : 'false' }}">
+                         data-available="{{ $canRegister ? 'true' : 'false' }}"
+                         onclick="openEventModal({
+                            title: {{ json_encode($event->title) }},
+                            type: {{ json_encode(ucfirst($event->type)) }},
+                            dateRange: {{ json_encode(\Carbon\Carbon::parse($event->event_start_date)->format('M d, Y') . ' - ' . \Carbon\Carbon::parse($event->event_end_date)->format('M d, Y')) }},
+                            timeRange: {{ json_encode($event->time_range) }},
+                            location: {{ json_encode($event->location) }},
+                            description: {{ json_encode($event->description) }},
+                            imageUrl: {{ json_encode($event->image_url) }},
+                            maxAttendees: {{ json_encode($event->max_attendees) }},
+                            registeredCount: {{ $event->registered_count ?? 0 }},
+                            isRequired: {{ json_encode($isRequiredEvent) }},
+                            isRegistered: {{ json_encode($isRegistered) }}
+                        })">
 
                         <!-- Event Image Header -->
                         <div class="event-image">
@@ -1024,7 +1098,7 @@
                         </div>
 
                         <!-- Event Details -->
-                        <div class="p-4">
+                        <div class="p-4 flex flex-col flex-grow">
                             <!-- Date and Time -->
                             <div class="space-y-1.5 mb-3">
                                 <div class="event-detail">
@@ -1069,6 +1143,7 @@
                                 </div>
                             @endif
 
+                            <div class="mt-auto">
                             <!-- Action Buttons -->
                             <div class="flex flex-wrap gap-2 btn-row-mobile">
                                 @if($status === 'attended')
@@ -1083,7 +1158,7 @@
                                             <span class="hidden sm:inline">Auto Registered</span>
                                         </button>
                                     @else
-                                        <form action="{{ route('student.events.cancel', $event) }}" method="POST" class="flex-1 min-w-[100px]">
+                                        <form action="{{ route('student.events.cancel', $event) }}" method="POST" class="flex-1 min-w-[100px]" onclick="event.stopPropagation()">
                                             @csrf
                                             <button type="submit"
                                                     class="action-btn cancel w-full"
@@ -1099,7 +1174,7 @@
                                         <span class="hidden sm:inline">Required</span>
                                     </span>
                                 @elseif($hasAvailableSlots)
-                                    <form action="{{ route('student.events.register', $event) }}" method="POST" class="flex-1 min-w-[100px]">
+                                    <form action="{{ route('student.events.register', $event) }}" method="POST" class="flex-1 min-w-[100px]" onclick="event.stopPropagation()">
                                         @csrf
                                         <button type="submit"
                                                 class="action-btn register w-full"
@@ -1115,24 +1190,7 @@
                                     </button>
                                 @endif
 
-                                <!-- View Details Button -->
-                                                                <button onclick="openEventModal({
-                                            title: `{{ addslashes($event->title) }}`,
-                                            type: `{{ addslashes($event->event_type) }}`,
-                                            dateRange: `{{ \Carbon\Carbon::parse($event->event_start_date)->format('M d, Y') }} - {{ \Carbon\Carbon::parse($event->event_end_date)->format('M d, Y') }}`,
-                                            timeRange: `{{ addslashes($event->time_range) }}`,
-                                            location: `{{ addslashes($event->location) }}`,
-                                            description: `{{ addslashes($event->description) }}`,
-                                            imageUrl: `{{ $event->image_path ? asset('storage/' . $event->image_path) : '' }}`,
-                                            maxAttendees: {{ $event->max_attendees ?? 'null' }},
-                                            registeredCount: {{ $event->registered_count ?? 0 }},
-                                            isRequired: {{ $isRequiredEvent ? 'true' : 'false' }},
-                                            isRegistered: {{ $isRegistered ? 'true' : 'false' }}
-                                        })"
-                                        class="action-btn details flex-1 min-w-[100px]">
-                                    <i class="fas fa-circle-info text-[9px]"></i>
-                                    <span class="hidden sm:inline">Details</span>
-                                </button>
+                                
                             </div>
 
                             <!-- Event Status and Created Info -->
@@ -1155,52 +1213,119 @@
                                     </div>
                                 </div>
                             </div>
+                            </div> <!-- /mt-auto -->
 
-                            <!-- Expandable Details -->
-                            <div id="details-{{ $event->id }}" class="hidden expand-details">
-                                <div class="space-y-2.5">
-                                    <!-- Full Description -->
-                                    <div>
-                                        <p class="text-[0.75rem] font-semibold text-[#6b5e57] mb-1">Description:</p>
-                                        <p class="text-[#6b5e57] text-[0.8rem] leading-relaxed">{{ $event->description }}</p>
-                                    </div>
-
-                                    <!-- Capacity Info -->
-                                    <div class="flex items-center justify-between text-[0.75rem]">
-                                        <span class="text-[#6b5e57]">Capacity:</span>
-                                        <span class="text-[#6b5e57]">
-                                            @if($event->max_attendees)
-                                                {{ $event->registered_count }}/{{ $event->max_attendees }} registered
-                                                ({{ $event->available_slots }} available)
-                                            @else
-                                                Unlimited capacity
-                                            @endif
-                                        </span>
-                                    </div>
-
-                                    <!-- Event Requirements Information -->
-                                    @if($isRequiredEvent)
-                                        <div class="info-box">
-                                            <div class="flex items-center mb-1">
-                                                <i class="fas fa-circle-info"></i>
-                                                <span class="font-semibold">Required Event</span>
-                                            </div>
-                                            <p class="text-[0.7rem]">
-                                                This event is required for your college. Attendance is mandatory.
-                                            </p>
-                                        </div>
-                                    @endif
-                                </div>
                             </div>
-                        </div>
                     </div>
                 @endforeach
             </div>
+            
+            @if($events instanceof \Illuminate\Pagination\LengthAwarePaginator && $events->hasPages())
+                <div class="mt-8 flex justify-center">
+                    <div class="glass-card px-6 py-3 rounded-full inline-flex">
+                        {{ $events->appends(request()->query())->links('pagination::tailwind') }}
+                    </div>
+                </div>
+            @endif
         @endif
     </div>
 </div>
 
-</div></main>﻿    <footer style="background:linear-gradient(to right,#5b0f0f,#7b1717,#8f1d1d);color:white;" class="py-4 mt-auto">
+</div></main>﻿<!-- Event Details Modal -->
+    <div id="eventModal"
+         class="fixed inset-0 z-[2000] hidden items-center justify-center p-4 sm:p-6 opacity-0 transition-opacity duration-300"
+         style="background:rgba(47,37,34,0.65);backdrop-filter:blur(6px);">
+        <div id="eventModalContent" class="relative w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-[24px] shadow-2xl scale-95 translate-y-4 transition-all duration-300"
+             style="background:linear-gradient(180deg,#fffdfa,#faf4ed);border:1px solid var(--border-soft);">
+
+            <!-- Modal image header -->
+            <div class="relative overflow-hidden rounded-t-[24px] bg-black group">
+                <img id="modalImage" src="" alt="" class="w-full h-auto max-h-[60vh] object-cover block opacity-90 transition-opacity duration-500 group-hover:opacity-100">
+                <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent pointer-events-none"></div>
+
+                <!-- Close button -->
+                <button onclick="closeEventModal()"
+                        class="absolute top-4 right-4 w-9 h-9 rounded-full flex items-center justify-center text-white transition hover:bg-black/50 hover:scale-105"
+                        style="background:rgba(0,0,0,0.35);backdrop-filter:blur(6px);">
+                    <i class="fas fa-xmark text-sm"></i>
+                </button>
+
+                <!-- Type badge -->
+                <div class="absolute top-4 left-4">
+                    <span id="modalType" class="badge-soft badge-maroon capitalize text-xs shadow-lg"></span>
+                </div>
+
+                <!-- Required badge -->
+                <div id="modalRequiredBadge" class="absolute top-4 left-4 mt-8 hidden">
+                    <span class="badge-soft badge-red text-xs shadow-lg"><i class="fas fa-star mr-1"></i> Required</span>
+                </div>
+
+                <div class="absolute bottom-0 left-0 p-6 sm:p-8 w-full">
+                    <h2 id="modalTitle" class="text-3xl sm:text-4xl font-extrabold text-white mb-2 leading-tight drop-shadow-md"></h2>
+                </div>
+            </div>
+
+            <!-- Modal body -->
+            <div class="p-6 sm:p-8">
+                <!-- Meta row -->
+                <div class="flex flex-wrap gap-5 mb-6 text-sm" style="color:var(--text-secondary);">
+                    <div class="flex items-center gap-2 bg-white/60 px-3 py-1.5 rounded-lg border border-[#e8ddd2]">
+                        <i class="fas fa-calendar-days text-[var(--accent-gold)]"></i>
+                        <span id="modalDate" class="font-medium text-[var(--text-dark)]"></span>
+                    </div>
+                    <div class="flex items-center gap-2 bg-white/60 px-3 py-1.5 rounded-lg border border-[#e8ddd2]">
+                        <i class="fas fa-clock text-[var(--accent-gold)]"></i>
+                        <span id="modalTime" class="font-medium text-[var(--text-dark)]"></span>
+                    </div>
+                    <div class="flex items-center gap-2 bg-white/60 px-3 py-1.5 rounded-lg border border-[#e8ddd2]">
+                        <i class="fas fa-location-dot text-[var(--primary-red)]"></i>
+                        <span id="modalLocation" class="font-medium text-[var(--text-dark)]"></span>
+                    </div>
+                    <div id="modalSlotsWrap" class="flex items-center gap-2 bg-white/60 px-3 py-1.5 rounded-lg border border-[#e8ddd2]">
+                        <i class="fas fa-users" style="color:var(--text-muted)"></i>
+                        <span id="modalSlots" class="font-medium text-[var(--text-dark)]"></span>
+                    </div>
+                </div>
+
+                <!-- Divider -->
+                <hr style="border-color:var(--border-soft);margin-bottom:1.5rem;">
+
+                <!-- Description -->
+                <div class="prose prose-sm max-w-none text-[#5c504a] leading-relaxed">
+                    <p id="modalDescription" class="whitespace-pre-wrap"></p>
+                </div>
+
+                <!-- Required note -->
+                <div id="modalRequiredNote" class="hidden mt-6 p-4 rounded-2xl text-sm border flex items-start gap-3" style="background:#fff5f5;border-color:#fecdd3;color:#9f1239;">
+                    <i class="fas fa-circle-exclamation mt-0.5 text-lg"></i>
+                    <div>
+                        <strong>Mandatory Event</strong>
+                        <p class="mt-0.5 opacity-90">This event is required for your college. Your attendance is expected.</p>
+                    </div>
+                </div>
+
+                <!-- Registered note -->
+                <div id="modalRegisteredNote" class="hidden mt-6 p-4 rounded-2xl text-sm border flex items-start gap-3"
+                     style="background:#eefaf2;border-color:#bfe5c8;color:#166534;">
+                    <i class="fas fa-circle-check mt-0.5 text-lg"></i>
+                    <div>
+                        <strong>You're Registered!</strong>
+                        <p class="mt-0.5 opacity-90">Your spot is secured. Check your email or notifications for updates.</p>
+                    </div>
+                </div>
+
+                <!-- Close action -->
+                <div class="mt-8 flex justify-end pt-5 border-t border-[#e8ddd2]">
+                    <button onclick="closeEventModal()"
+                            class="btn-secondary px-8 py-2.5 rounded-[14px] text-sm font-bold shadow-sm hover:shadow-md transition-all">
+                        Close Details
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer style="background:linear-gradient(to right,#5b0f0f,#7b1717,#8f1d1d);color:white;" class="py-4 mt-auto">
         <div class="container mx-auto px-6 text-center">
             <p class="text-[#f3e8df]">&copy; {{ date('Y') }} Office of Guidance and Counseling. All rights reserved.</p>
             <p class="text-sm text-[#e5caa9] mt-2">Committed to student support, wellness, and accessible guidance services</p>
@@ -1270,53 +1395,7 @@
         
     
 
-    document.addEventListener('DOMContentLoaded', function() {
-        const typeFilter = document.getElementById('typeFilter');
-        const statusFilter = document.getElementById('statusFilter');
-        const eventsGrid = document.getElementById('eventsGrid');
-        const eventCards = eventsGrid ? Array.from(eventsGrid.getElementsByClassName('event-card')) : [];
 
-        function filterEvents() {
-            const selectedType = typeFilter.value;
-            const selectedStatus = statusFilter.value;
-
-            eventCards.forEach(card => {
-                let show = true;
-
-                if (selectedType && card.dataset.type !== selectedType) {
-                    show = false;
-                }
-
-                if (selectedStatus) {
-                    switch (selectedStatus) {
-                        case 'required':
-                            if (card.dataset.required !== 'true') show = false;
-                            break;
-                        case 'optional':
-                            if (card.dataset.required === 'true') show = false;
-                            break;
-                        case 'registered':
-                            if (card.dataset.registered !== 'true') show = false;
-                            break;
-                        case 'available':
-                            if (card.dataset.available !== 'true') show = false;
-                            break;
-                    }
-                }
-
-                card.style.display = show ? 'block' : 'none';
-            });
-
-            const visibleCount = eventCards.filter(card => card.style.display !== 'none').length;
-            const countElement = document.querySelector('.text-[0.75rem].text-[#6b5e57] strong');
-            if (countElement) {
-                countElement.textContent = visibleCount;
-            }
-        }
-
-        if (typeFilter) typeFilter.addEventListener('change', filterEvents);
-        if (statusFilter) statusFilter.addEventListener('change', filterEvents);
-    });
 
         // FAQ Toggle
         function toggleFaq(id) {

@@ -289,35 +289,37 @@
                                     $tIsHighRisk = $appointment->student->is_high_risk
                                         || (!$appointment->student->high_risk_overridden && count(array_intersect($tRisk, $tStress)) > 0);
                                 @endphp
-                                <div class="appt-card {{ $appointment->status }} {{ $tIsHighRisk ? 'border-l-2 border-red-500' : '' }}">
-                                    <div class="flex justify-between items-start mb-2">
-                                        <div>
-                                            <h3 class="appt-student truncate">
-                                                {{ $appointment->student->user->first_name }} {{ $appointment->student->user->last_name }}
-                                                @if($tIsHighRisk)
-                                                    <span class="ml-1 inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-full text-[9px] font-semibold bg-red-100 text-red-700 border border-red-200">
-                                                        <i class="fas fa-exclamation-triangle" style="font-size:8px;"></i> High-risk
-                                                    </span>
-                                                @endif
-                                            </h3>
-                                            <p class="appt-id">
-                                                <i class="fas fa-id-card mr-1 text-[9px]"></i>{{ $appointment->student->student_id }}
-                                            </p>
+                                <a href="{{ route('counselor.appointments') }}?highlight={{ $appointment->id }}&open={{ $appointment->id }}" class="block">
+                                    <div class="appt-card {{ $appointment->status }} {{ $tIsHighRisk ? 'border-l-2 border-red-500' : '' }}">
+                                        <div class="flex justify-between items-start mb-2">
+                                            <div>
+                                                <h3 class="appt-student truncate">
+                                                    {{ $appointment->student->user->first_name }} {{ $appointment->student->user->last_name }}
+                                                    @if($tIsHighRisk)
+                                                        <span class="ml-1 inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-full text-[9px] font-semibold bg-red-100 text-red-700 border border-red-200">
+                                                            <i class="fas fa-exclamation-triangle" style="font-size:8px;"></i> High-risk
+                                                        </span>
+                                                    @endif
+                                                </h3>
+                                                <p class="appt-id">
+                                                    <i class="fas fa-id-card mr-1 text-[9px]"></i>{{ $appointment->student->student_id }}
+                                                </p>
+                                            </div>
+                                            <span class="appt-status {{ $appointment->status }}">
+                                                {{ ucfirst($appointment->status) }}
+                                            </span>
                                         </div>
-                                        <span class="appt-status {{ $appointment->status }}">
-                                            {{ ucfirst($appointment->status) }}
-                                        </span>
+                                        <p class="appt-time">
+                                            <i class="fas fa-clock text-[#7a2a2a] mr-1.5 text-[9px]"></i>
+                                            {{ \Carbon\Carbon::parse($appointment->start_time)->format('g:i A') }} -
+                                            {{ \Carbon\Carbon::parse($appointment->end_time)->format('g:i A') }}
+                                        </p>
+                                        <p class="appt-concern truncate">
+                                            <i class="fas fa-comment text-[#a89f97] mr-1.5 text-[9px]"></i>
+                                            {{ $appointment->concern }}
+                                        </p>
                                     </div>
-                                    <p class="appt-time">
-                                        <i class="fas fa-clock text-[#7a2a2a] mr-1.5 text-[9px]"></i>
-                                        {{ \Carbon\Carbon::parse($appointment->start_time)->format('g:i A') }} -
-                                        {{ \Carbon\Carbon::parse($appointment->end_time)->format('g:i A') }}
-                                    </p>
-                                    <p class="appt-concern truncate">
-                                        <i class="fas fa-comment text-[#a89f97] mr-1.5 text-[9px]"></i>
-                                        {{ $appointment->concern }}
-                                    </p>
-                                </div>
+                                </a>
                             @endforeach
                         </div>
                     @endif
@@ -376,34 +378,36 @@
                                         $uIsHighRisk = $appointment->student->is_high_risk
                                             || (!$appointment->student->high_risk_overridden && count(array_intersect($uRisk, $uStress)) > 0);
                                     @endphp
-                                    <div class="upcoming-card {{ $uIsHighRisk ? 'border-l-2 border-red-400' : '' }}">
-                                        <div class="flex items-center gap-3 sm:gap-4">
-                                            <div class="upcoming-date">
-                                                <p class="upcoming-date-day">
-                                                    {{ \Carbon\Carbon::parse($appointment->appointment_date)->format('M j') }}
-                                                </p>
-                                                <p class="upcoming-date-time">
-                                                    {{ \Carbon\Carbon::parse($appointment->start_time)->format('g:i A') }}
-                                                </p>
+                                    <a href="{{ route('counselor.appointments') }}?highlight={{ $appointment->id }}&open={{ $appointment->id }}" class="block">
+                                        <div class="upcoming-card {{ $uIsHighRisk ? 'border-l-2 border-red-400' : '' }}">
+                                            <div class="flex items-center gap-3 sm:gap-4">
+                                                <div class="upcoming-date">
+                                                    <p class="upcoming-date-day">
+                                                        {{ \Carbon\Carbon::parse($appointment->appointment_date)->format('M j') }}
+                                                    </p>
+                                                    <p class="upcoming-date-time">
+                                                        {{ \Carbon\Carbon::parse($appointment->start_time)->format('g:i A') }}
+                                                    </p>
+                                                </div>
+                                                <div>
+                                                    <p class="upcoming-student truncate max-w-[120px] sm:max-w-[160px]">
+                                                        {{ $appointment->student->user->first_name }} {{ $appointment->student->user->last_name }}
+                                                    </p>
+                                                    <p class="upcoming-college">
+                                                        <i class="fas fa-building-columns mr-1 text-[9px]"></i>{{ $appointment->student->college->name ?? 'N/A' }}
+                                                    </p>
+                                                    @if($uIsHighRisk)
+                                                        <span class="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-full text-[9px] font-semibold bg-red-100 text-red-700 border border-red-200 mt-1">
+                                                            <i class="fas fa-exclamation-triangle" style="font-size:8px;"></i> High-risk
+                                                        </span>
+                                                    @endif
+                                                </div>
                                             </div>
-                                            <div>
-                                                <p class="upcoming-student truncate max-w-[120px] sm:max-w-[160px]">
-                                                    {{ $appointment->student->user->first_name }} {{ $appointment->student->user->last_name }}
-                                                </p>
-                                                <p class="upcoming-college">
-                                                    <i class="fas fa-building-columns mr-1 text-[9px]"></i>{{ $appointment->student->college->name ?? 'N/A' }}
-                                                </p>
-                                                @if($uIsHighRisk)
-                                                    <span class="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-full text-[9px] font-semibold bg-red-100 text-red-700 border border-red-200 mt-1">
-                                                        <i class="fas fa-exclamation-triangle" style="font-size:8px;"></i> High-risk
-                                                    </span>
-                                                @endif
-                                            </div>
+                                            <span class="appt-status {{ $appointment->status }}">
+                                                {{ ucfirst($appointment->status) }}
+                                            </span>
                                         </div>
-                                        <span class="appt-status {{ $appointment->status }}">
-                                            {{ ucfirst($appointment->status) }}
-                                        </span>
-                                    </div>
+                                    </a>
                                 @endforeach
                             </div>
                         @endif

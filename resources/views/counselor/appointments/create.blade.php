@@ -213,6 +213,39 @@
 
 <div class="min-h-screen book-shell">
     <div class="book-glow one"></div>
+
+<div id="createManualOverrideModal" class="fixed inset-0 z-[2000] hidden" aria-hidden="true">
+    <div class="absolute inset-0 bg-black/40" onclick="closeCreateOverrideModal()"></div>
+    <div class="relative mx-auto w-[min(560px,92vw)] mt-24 sm:mt-28">
+        <div class="glass-card p-5 sm:p-6">
+            <div class="flex items-start justify-between gap-4">
+                <div>
+                    <h3 class="text-sm font-bold text-[#2c2420] uppercase tracking-wide">Override Availability</h3>
+                    <p class="text-xs text-[var(--text-muted)] mt-1">Set date and time manually (optional). Calendar selection will not be overwritten unless you apply.</p>
+                </div>
+                <button type="button" class="secondary-btn px-3 py-2 text-xs" onclick="closeCreateOverrideModal()">Close</button>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-5">
+                <div>
+                    <label class="field-label">Date</label>
+                    <input type="date" name="manual_date" id="createManualDate" class="input-field text-xs sm:text-sm bg-white">
+                </div>
+                <div>
+                    <label class="field-label">Time</label>
+                    <input type="time" name="manual_time" id="createManualTime" class="input-field text-xs sm:text-sm bg-white">
+                </div>
+            </div>
+
+            <div class="flex flex-col sm:flex-row gap-3 justify-end mt-6">
+                <button type="button" class="secondary-btn px-5 py-2.5 text-sm" onclick="clearCreateManualOverride()">Clear</button>
+                <button type="button" class="primary-btn px-5 py-2.5 text-sm" onclick="applyCreateManualOverride()">
+                    <i class="fas fa-check mr-2"></i>Apply
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
     <div class="book-glow two"></div>
 
     <div class="relative max-w-7xl mx-auto px-4 sm:px-6 py-5 md:py-8">
@@ -282,7 +315,7 @@
                     <div class="panel-card">
                         <div class="panel-topline"></div>
                         <div class="p-4 sm:p-5 md:p-6">
-                            <h2 class="text-sm font-bold text-[#2c2420] uppercase tracking-wide mb-5 flex items-center gap-2.5">
+                            <h2 class="text-sm font-bold text-[#2c2420] uppercase tracking-wide mb-4 flex items-center gap-2.5">
                                 <div class="w-8 h-8 rounded-lg bg-[rgba(212,175,55,0.15)] text-[var(--gold-500)] flex items-center justify-center">
                                     <i class="fas fa-user-graduate"></i>
                                 </div>
@@ -324,7 +357,7 @@
                     <div class="panel-card">
                         <div class="panel-topline"></div>
                         <div class="p-4 sm:p-5 md:p-6">
-                            <h2 class="text-sm font-bold text-[#2c2420] uppercase tracking-wide mb-5 flex items-center gap-2.5">
+                            <h2 class="text-sm font-bold text-[#2c2420] uppercase tracking-wide mb-4 flex items-center gap-2.5">
                                 <div class="w-8 h-8 rounded-lg bg-[rgba(212,175,55,0.15)] text-[var(--gold-500)] flex items-center justify-center">
                                     <i class="fas fa-clipboard-list"></i>
                                 </div>
@@ -386,7 +419,19 @@
                     <div class="panel-card sticky top-6">
                         <div class="panel-topline"></div>
                         <div class="p-4 sm:p-5 md:p-6">
-                            <h2 class="text-sm font-bold text-[#2c2420] uppercase tracking-wide mb-5 flex items-center gap-2.5">
+                            <div class="rounded-xl border p-4 sm:p-5 mb-5 transition-all duration-200" style="border-color: rgba(212,175,55,0.4); background: rgba(254,249,231,0.4);" onmouseover="this.style.background='rgba(254,249,231,0.8)';" onmouseout="this.style.background='rgba(254,249,231,0.4)';">
+                                <label class="flex items-center gap-3 cursor-pointer select-none">
+                                    <input type="checkbox" name="override_availability" id="createOverrideCheck" value="1"
+                                           onchange="toggleCreateOverride(this.checked)"
+                                           style="width:1.25rem;height:1.25rem;accent-color:var(--gold-500);cursor:pointer;">
+                                    <span class="text-sm font-bold uppercase tracking-wide" style="color:var(--text-primary);">
+                                        <i class="fas fa-bolt mr-1.5 text-[var(--gold-500)]"></i> Override Availability
+                                    </span>
+                                </label>
+                                <p class="text-xs text-[var(--text-muted)] mt-1 ml-8">Book outside set hours or daily limit.</p>
+                            </div>
+
+                            <h2 class="text-sm font-bold text-[#2c2420] uppercase tracking-wide mb-4 flex items-center gap-2.5">
                                 <div class="w-8 h-8 rounded-lg bg-[rgba(212,175,55,0.15)] text-[var(--gold-500)] flex items-center justify-center">
                                     <i class="fas fa-calendar-alt"></i>
                                 </div>
@@ -400,7 +445,7 @@
                                     <div id="calendarLoading" class="absolute inset-0 z-10 bg-white/80 backdrop-blur-[2px] flex flex-col items-center justify-center transition-opacity duration-200 hidden">
                                         <div class="bg-white px-4 py-3 rounded-xl shadow-sm border border-[#e5e0db]/80 flex items-center gap-3">
                                             <i class="fas fa-circle-notch fa-spin text-lg text-[#7a2a2a]"></i>
-                                            <span class="text-xs font-bold text-[#5c1a1a] tracking-wide uppercase">Checking Dates...</span>
+                                            <span class="text-xs font-bold text-[#5c1a1a] tracking-wide ">Loading Dates...</span>
                                         </div>
                                     </div>
 
@@ -427,7 +472,7 @@
                                 @enderror
                             </div>
 
-                            <div class="mt-6" id="createSlotWrap">
+                            <div class="mt-5" id="createSlotWrap">
                                 <label class="field-label">Available Time Slots</label>
                                 <div id="timeSlots" class="grid grid-cols-2 gap-2 sm:gap-3">
                                     <div class="col-span-2 text-[#8b7e76] text-center p-4 border-2 border-dashed border-[#e5e0db] rounded-lg text-xs">
@@ -449,7 +494,7 @@
             <div class="panel-card mt-5 lg:mt-6">
                 <div class="panel-topline"></div>
                 <div class="p-4 sm:p-5 md:p-6">
-                    <h2 class="text-sm font-bold text-[#2c2420] uppercase tracking-wide mb-5 flex items-center gap-2.5">
+                    <h2 class="text-sm font-bold text-[#2c2420] uppercase tracking-wide mb-4 flex items-center gap-2.5">
                         <div class="w-8 h-8 rounded-lg bg-[rgba(212,175,55,0.15)] text-[var(--gold-500)] flex items-center justify-center">
                             <i class="fas fa-sliders-h"></i>
                         </div>
@@ -475,37 +520,6 @@
                                 <textarea name="high_risk_notes" rows="2" class="textarea-field w-full mt-2"
                                           placeholder="Briefly describe the reason..."
                                           style="border-color:rgba(220,38,38,0.3); background: white;">{{ old('high_risk_notes') }}</textarea>
-                            </div>
-                        </div>
-
-                        <!-- Override Availability -->
-                        <div class="h-full rounded-xl border p-4 sm:p-5 transition-all duration-200" style="border-color: rgba(212,175,55,0.4); background: rgba(254,249,231,0.4);" onmouseover="this.style.background='rgba(254,249,231,0.8)';" onmouseout="this.style.background='rgba(254,249,231,0.4)';">
-                            <label class="flex items-center gap-3 cursor-pointer select-none">
-                                <input type="checkbox" name="override_availability" id="createOverrideCheck" value="1"
-                                       onchange="toggleCreateOverride(this.checked)"
-                                       style="width:1.25rem;height:1.25rem;accent-color:var(--gold-500);cursor:pointer;">
-                                <span class="text-sm font-bold uppercase tracking-wide" style="color:var(--text-primary);">
-                                    <i class="fas fa-bolt mr-1.5 text-[var(--gold-500)]"></i> Override Availability
-                                </span>
-                            </label>
-                            <p class="text-xs text-[var(--text-muted)] mt-1 ml-8">Book outside set hours or daily limit.</p>
-                            
-                            <div id="createManualTimeWrap" class="mt-4 pt-4 border-t border-[rgba(212,175,55,0.2)] hidden">
-                                <div class="grid grid-cols-2 gap-4">
-                                    <div>
-                                        <label class="field-label">Date</label>
-                                        <input type="date" name="manual_date" id="createManualDate" class="input-field text-xs sm:text-sm bg-white mt-2"
-                                               onchange="document.getElementById('dateSelect').value = this.value; document.getElementById('selectedTime').value = document.getElementById('createManualTime').value;">
-                                    </div>
-                                    <div>
-                                        <label class="field-label">Time</label>
-                                        <input type="time" name="manual_time" id="createManualTime" class="input-field text-xs sm:text-sm bg-white mt-2"
-                                               onchange="document.getElementById('selectedTime').value = this.value;">
-                                    </div>
-                                </div>
-                                <p class="text-xs text-[var(--gold-500)] font-medium mt-3 flex items-center gap-1.5">
-                                    <i class="fas fa-info-circle"></i> Manual input overwrites calendar selection.
-                                </p>
                             </div>
                         </div>
                     </div>
@@ -902,26 +916,57 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 function toggleCreateOverride(enabled) {
-    const calendarSection = document.querySelector('#createSlotWrap').previousElementSibling; // calendar card
-    const slotWrap  = document.getElementById('createSlotWrap');
-    const manualWrap = document.getElementById('createManualTimeWrap');
+    if (enabled) {
+        openCreateOverrideModal();
+    } else {
+        closeCreateOverrideModal();
+        clearCreateManualOverride();
+    }
+}
+
+function openCreateOverrideModal() {
+    const modal = document.getElementById('createManualOverrideModal');
+    if (!modal) return;
+    modal.classList.remove('hidden');
+    modal.setAttribute('aria-hidden', 'false');
+}
+
+function closeCreateOverrideModal() {
+    const modal = document.getElementById('createManualOverrideModal');
+    if (!modal) return;
+    modal.classList.add('hidden');
+    modal.setAttribute('aria-hidden', 'true');
+}
+
+function clearCreateManualOverride() {
+    const manualDate = document.getElementById('createManualDate');
+    const manualTime = document.getElementById('createManualTime');
+    if (manualDate) manualDate.value = '';
+    if (manualTime) manualTime.value = '';
+}
+
+function applyCreateManualOverride() {
+    const manualDate = document.getElementById('createManualDate');
+    const manualTime = document.getElementById('createManualTime');
     const dateSelect = document.getElementById('dateSelect');
     const selectedTime = document.getElementById('selectedTime');
+    const overrideCheck = document.getElementById('createOverrideCheck');
 
-    if (enabled) {
-        manualWrap.classList.remove('hidden');
-    } else {
-        manualWrap.classList.add('hidden');
-        document.getElementById('createManualDate').value = '';
-        document.getElementById('createManualTime').value = '';
-        dateSelect.value = '';
-        selectedTime.value = '';
+    const d = manualDate?.value;
+    const t = manualTime?.value;
+
+    if (!d || !t) {
+        alert('Please provide both date and time, or click Clear to cancel manual override.');
+        return;
     }
 
-    // Re-evaluate calendar + slots based on override mode
-    loadMonthAvailability();
-    renderCalendar();
-    loadAvailableSlots();
+    dateSelect.value = d;
+    selectedTime.value = t;
+
+    closeCreateOverrideModal();
+
+    // Let the existing change listener refresh availability and slots
+    overrideCheck?.dispatchEvent(new Event('change'));
 }
 </script>
 @endsection

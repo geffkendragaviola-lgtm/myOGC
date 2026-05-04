@@ -322,10 +322,11 @@
                                     <span>Google Calendar</span>
                                 </a>
                             @else
-                                <a href="{{ route('profile.edit') }}"
-                                   class="primary-btn px-4 py-2 text-xs sm:text-sm whitespace-nowrap" style="background: rgba(255,255,255,0.9); border: 1px solid rgba(212,175,55,0.4); color: #7a2a2a; box-shadow: none;">
+                                <a href="https://calendar.google.com/calendar/u/0/r"
+                                   target="_blank" rel="noopener"
+                                   class="primary-btn px-4 py-2 text-xs sm:text-sm whitespace-nowrap" style="background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); box-shadow: none;">
                                     <i class="fas fa-link mr-1.5 text-[9px] sm:text-xs"></i>
-                                    <span>Add Calendar ID</span>
+                                    <span>Google Calendar</span>
                                 </a>
                             @endif
                         </div>

@@ -347,7 +347,7 @@
 
             <div class="summary-card no-print">
                 <div class="relative h-full flex flex-col sm:flex-row items-center justify-between gap-3 p-4">
-                    <div class="flex items-center gap-3 text-center sm:text-left">
+                    <div class="flex items-center gap-3 text-left">
                         <div class="summary-icon flex-shrink-0">
                             <i class="fas fa-print text-sm"></i>
                         </div>
@@ -357,7 +357,7 @@
                             <p class="summary-subtext hidden sm:block">Generate a printable version of this analytics data.</p>
                         </div>
                     </div>
-                    <button onclick="exportWord()" class="primary-btn px-5 py-2.5 whitespace-nowrap text-xs sm:text-sm rounded-lg">
+                    <button onclick="exportWord()" class="primary-btn px-5 py-2.5 whitespace-nowrap text-xs sm:text-sm rounded-lg" style="background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); box-shadow: none;">
                         <i class="fas fa-file-word mr-1.5 text-[9px] sm:text-xs"></i> Export Word
                     </button>
                 </div>

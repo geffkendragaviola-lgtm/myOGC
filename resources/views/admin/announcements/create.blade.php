@@ -170,7 +170,7 @@
 
     .alert-error { border-radius: 0.6rem; padding: 0.65rem 0.85rem; border-width: 1px; margin-bottom: 1rem; }
 
-    .form-action-primary, .form-action-secondary {
+    .form-action-primary, .form-action-secondary, .back-btn {
         border-radius: 0.6rem; font-weight: 600; transition: all 0.2s ease;
         display: inline-flex; align-items: center; justify-content: center; font-size: 0.8rem;
         padding: 0.55rem 0.85rem; white-space: nowrap;
@@ -180,8 +180,8 @@
         box-shadow: 0 4px 10px rgba(92,26,26,0.15);
     }
     .form-action-primary:hover { transform: translateY(-1px); box-shadow: 0 6px 14px rgba(92,26,26,0.2); }
-    .form-action-secondary { background: #f5f0eb; color: var(--text-secondary); border: 1px solid var(--border-soft); }
-    .form-action-secondary:hover { background: #e5e0db; }
+    .form-action-secondary, .back-btn { background: #f5f0eb; color: var(--text-secondary); border: 1px solid var(--border-soft); }
+    .form-action-secondary:hover, .back-btn:hover { background: #e5e0db; }
 
     .modal-backdrop {
         position: fixed; inset: 0; background: rgba(44,36,32,0.6);
@@ -231,7 +231,7 @@
         .panel-header, .section-header { padding: 0.75rem 1rem; }
         .input-field, .select-field { padding: 0.5rem 0.7rem; font-size: 0.85rem; }
         .textarea-field { padding: 0.6rem 0.7rem; }
-        .form-action-primary, .form-action-secondary { width: 100%; justify-content: center; }
+        .form-action-primary, .form-action-secondary, .back-btn { width: 100%; justify-content: center; }
         .upload-zone { min-height: 9rem; padding: 1.25rem; }
         .image-preview-card img { height: 10rem; }
         .college-grid { max-height: 10rem; }
@@ -267,14 +267,22 @@
                 </div>
 
                 <div class="summary-card">
-                    <div class="relative h-full flex flex-col sm:flex-row items-center gap-3 p-4">
-                        <div class="summary-icon flex-shrink-0">
-                            <i class="fas fa-wand-magic-sparkles text-sm"></i>
+                    <div class="relative h-full flex items-center justify-between gap-3 p-4">
+                        <div class="flex items-center gap-3">
+                            <div class="summary-icon flex-shrink-0">
+                                <i class="fas fa-wand-magic-sparkles text-sm"></i>
+                            </div>
+                            <div class="text-center sm:text-left min-w-0">
+                                <p class="summary-label">Publishing Flow</p>
+                                <p class="summary-value">Draft your message</p>
+                                <p class="summary-subtext">Configure content, audience targeting, and active dates.</p>
+                            </div>
                         </div>
-                        <div class="text-center sm:text-left min-w-0">
-                            <p class="summary-label">Publishing Flow</p>
-                            <p class="summary-value">Draft your message</p>
-                            <p class="summary-subtext">Configure content, audience targeting, and active dates.</p>
+                        <div class="flex items-center gap-2">
+                            <a href="{{ route('admin.announcements.index') }}"
+                               class="back-btn px-3 py-2 whitespace-nowrap text-xs sm:text-sm rounded-lg">
+                                <i class="fas fa-arrow-left mr-1.5 text-[9px] sm:text-xs"></i> Back
+                            </a>
                         </div>
                     </div>
                 </div>
