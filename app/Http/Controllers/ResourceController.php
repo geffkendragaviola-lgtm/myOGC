@@ -44,7 +44,11 @@ class ResourceController extends Controller
             $query->where('is_pinned', false);
         }
 
-        $resources = $query->ordered()->paginate(10)->appends($request->query());
+        $resources = $query
+            ->orderBy('is_pinned', 'desc')
+            ->orderBy('updated_at', 'desc')
+            ->paginate(8)
+            ->appends($request->query());
         $categories = Resource::getCategories();
 
         return view('counselor.resources.index', compact(

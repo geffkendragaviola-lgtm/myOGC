@@ -1045,7 +1045,7 @@
                          onclick="openEventModal({
                             title: {{ json_encode($event->title) }},
                             type: {{ json_encode(ucfirst($event->type)) }},
-                            dateRange: {{ json_encode(\Carbon\Carbon::parse($event->event_start_date)->format('M d, Y') . ' - ' . \Carbon\Carbon::parse($event->event_end_date)->format('M d, Y')) }},
+                            dateRange: {{ json_encode($event->date_range) }},
                             timeRange: {{ json_encode($event->time_range) }},
                             location: {{ json_encode($event->location) }},
                             description: {{ json_encode($event->description) }},
@@ -1093,7 +1093,11 @@
 
                             <!-- Date Badge -->
                             <span class="event-badge date">
-                                {{ \Carbon\Carbon::parse($event->event_start_date)->format('M d') }} - {{ \Carbon\Carbon::parse($event->event_end_date)->format('M d') }}
+                                @if(\Carbon\Carbon::parse($event->event_start_date)->isSameDay(\Carbon\Carbon::parse($event->event_end_date)))
+                                    {{ \Carbon\Carbon::parse($event->event_start_date)->format('M d') }}
+                                @else
+                                    {{ \Carbon\Carbon::parse($event->event_start_date)->format('M d') }} - {{ \Carbon\Carbon::parse($event->event_end_date)->format('M d') }}
+                                @endif
                             </span>
                         </div>
 

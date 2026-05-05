@@ -265,7 +265,7 @@
                                 <label for="student_email" class="field-label">Email Address</label>
                                 <input type="email" id="student_email" value="{{ Auth::user()->email }}" disabled
                                        class="input-field">
-                                <p class="helper-text mt-1">Your email address cannot be changed directly.</p>
+                               
                             </div>
                         </div>
                     </div>

@@ -70,7 +70,7 @@
             z-index: 1001; border: 1px solid var(--border-soft);
         }
         /* Resource page specific */
-        .resources-shell { position: relative; overflow: hidden; background: var(--bg-warm); min-height: 100vh; }
+        .resources-shell { position: relative; overflow: hidden; background: var(--bg-warm); min-height: 100vh; display:flex; flex-direction:column; }
         .resources-glow { position: absolute; border-radius: 50%; filter: blur(80px); pointer-events: none; opacity: 0.2; }
         .resources-glow.one { top: -40px; left: -50px; width: 240px; height: 240px; background: var(--gold-400); }
         .resources-glow.two { bottom: -50px; right: -70px; width: 280px; height: 280px; background: var(--maroon-800); }
@@ -117,7 +117,7 @@
         }
     </style>
 </head>
-<body>
+<body class="min-h-screen flex flex-col">
 <div class="resources-shell">
     <div class="resources-glow one"></div>
     <div class="resources-glow two"></div>
@@ -228,6 +228,7 @@
         </div>
     </nav>
 
+    <main class="flex-grow">
     <div class="relative max-w-7xl mx-auto px-4 sm:px-6 py-5 md:py-8">
         <div class="mb-5 sm:mb-6">
             <div class="hero-card">
@@ -307,7 +308,9 @@
         @endif
     </div>
 
-    <footer style="background:linear-gradient(to right,#5b0f0f,#7b1717,#8f1d1d);color:white;" class="py-4 mt-4">
+    </main>
+
+    <footer style="background:linear-gradient(to right,#5b0f0f,#7b1717,#8f1d1d);color:white;" class="py-4 mt-auto">
         <div class="container mx-auto px-6 text-center">
             <p style="color:#f3e8df;">&copy; {{ date('Y') }} Office of Guidance and Counseling. All rights reserved.</p>
             <p class="text-sm mt-2" style="color:#e5caa9;">Committed to student support, wellness, and accessible guidance services</p>
