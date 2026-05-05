@@ -142,6 +142,31 @@ class RegisteredUserController extends Controller
     }
 
     /**
+     * Check uniqueness of registration fields asynchronously.
+     */
+    public function checkUnique(Request $request)
+    {
+        $field = $request->input('field');
+        $value = $request->input('value');
+
+        if (in_array($field, ['phone_number', 'father_phone_number', 'mother_phone_number', 'guardian_phone_number'])) {
+            $existsInUsers = User::where('phone_number', $value)->exists();
+            $existsInFamily = StudentFamilyData::where('father_phone_number', $value)
+                ->orWhere('mother_phone_number', $value)
+                ->orWhere('guardian_phone_number', $value)
+                ->exists();
+            return response()->json(['unique' => !($existsInUsers || $existsInFamily)]);
+        }
+
+        if ($field === 'student_id') {
+            $exists = Student::where('student_id', $value)->exists();
+            return response()->json(['unique' => !$exists]);
+        }
+
+        return response()->json(['unique' => true]);
+    }
+
+    /**
      * Handle an incoming registration request.
      *
      * @throws \Illuminate\Validation\ValidationException
@@ -157,21 +182,33 @@ class RegisteredUserController extends Controller
 
         $request->merge(['email' => $verifiedEmail]);
 
+        $globalPhoneRule = function ($attribute, $value, $fail) {
+            $existsInUsers = \App\Models\User::where('phone_number', $value)->exists();
+            $existsInFamily = \App\Models\StudentFamilyData::where('father_phone_number', $value)
+                ->orWhere('mother_phone_number', $value)
+                ->orWhere('guardian_phone_number', $value)
+                ->exists();
+            if ($existsInUsers || $existsInFamily) {
+                $fail('This phone number is already registered in the system.');
+            }
+        };
+
         $rules = [
             'first_name' => ['required', 'string', 'max:100'],
             'middle_name' => ['nullable', 'string', 'max:100'],
             'last_name' => ['required', 'string', 'max:100'],
-            'birthdate' => ['nullable', 'date'],
-            'sex' => ['nullable', 'string', 'in:male,female,other'],
+            'birthdate' => ['required', 'date', 'before:today'],
+            'age' => ['required', 'integer', 'min:10', 'max:100'],
+            'sex' => ['required', 'string', 'in:male,female,other'],
             'birthplace' => ['nullable', 'string', 'max:255'],
             'religion' => ['nullable', 'string', 'max:100'],
-            'civil_status' => ['nullable', 'string', 'in:single,married,not legally married,divorced,widowed,separated,others'],
+            'civil_status' => ['required', 'string', 'in:single,married,not legally married,divorced,widowed,separated,others'],
             'civil_status_other' => ['nullable', 'string', 'max:255'],
             'number_of_children' => ['nullable', 'integer', 'min:0'],
             'citizenship' => ['nullable', 'string', 'max:50'],
-            'address' => ['nullable', 'string', 'max:500'],
+            'address' => ['required', 'string', 'max:500'],
             'region_of_residence' => ['nullable', 'string', 'in:National Capital Region (NCR) – Metro Manila,Region I – Ilocos Region,Region II – Cagayan Valley,Region III – Central Luzon,Region IV-A – CALABARZON,Region IV-B – MIMAROPA,Region V – Bicol Region,Cordillera Administrative Region (CAR),Region VI – Western Visayas,Region VII – Central Visayas,Region VIII – Eastern Visayas,Region IX – Zamboanga Peninsula,Region X – Northern Mindanao,Region XI – Davao Region,Region XII – SOCCSKSARGEN,Region XIII – Caraga,Bangsamoro Autonomous Region in Muslim Mindanao (BARMM).'],
-            'phone_number' => ['required', 'string', 'regex:/^09\d{9}$/', 'unique:users,phone_number'],
+            'phone_number' => ['required', 'string', 'regex:/^09\d{9}$/', $globalPhoneRule],
             'email' => [
                 'required',
                 'string',
@@ -188,13 +225,13 @@ class RegisteredUserController extends Controller
         // Add role-specific rules conditionally
         if ($request->role === 'student') {
             // School Data
-            $rules['student_id'] = ['required', 'string', 'max:50', 'unique:students'];
+            $rules['student_id'] = ['required', 'string', 'max:50', 'unique:students', 'regex:/^20\d{2}-\d{4}$/'];
             $rules['year_level'] = ['required', 'string', 'max:50'];
             $rules['initial_interview_completed'] = ['exclude_unless:year_level,1st Year,2nd Year', 'required', 'in:yes,no'];
             $rules['course'] = ['required', 'string', 'max:100'];
             $rules['college_id'] = ['required', 'exists:colleges,id'];
             $rules['msu_sase_score'] = ['nullable', 'numeric', 'min:0', 'max:180'];
-            $rules['academic_year'] = ['nullable', 'string', 'max:20'];
+            $rules['academic_year'] = ['required', 'string', 'max:20', 'regex:/^20\d{2}-20\d{2}$/'];
             $rules['student_status'] = ['required', 'string', 'in:new,transferee,returnee,shiftee'];
             $rules['profile_picture'] = ['nullable', 'image', 'max:10240'];
 
@@ -213,15 +250,15 @@ class RegisteredUserController extends Controller
             // Family Data
             $rules['father_name'] = ['required', 'string', 'max:100'];
             $rules['father_occupation'] = ['required', 'string', 'max:100'];
-            $rules['father_phone_number'] = ['required', 'string', 'max:20'];
+            $rules['father_phone_number'] = ['required', 'string', 'regex:/^09\d{9}$/', $globalPhoneRule];
             $rules['mother_name'] = ['required', 'string', 'max:100'];
             $rules['mother_occupation'] = ['required', 'string', 'max:100'];
-            $rules['mother_phone_number'] = ['required', 'string', 'max:20'];
+            $rules['mother_phone_number'] = ['required', 'string', 'regex:/^09\d{9}$/', $globalPhoneRule];
             $rules['parents_marital_status'] = ['required', 'string', 'in:married,not legally married,separated,both parents remarried,one parent remarried'];
             $rules['family_monthly_income'] = ['required', 'string', 'in:below 3k,3001-5000,5001-8000,8001-10000,10001-15000,15001-20000,20001 above'];
             $rules['guardian_name'] = ['nullable', 'string', 'max:100'];
             $rules['guardian_occupation'] = ['nullable', 'string', 'max:100'];
-            $rules['guardian_phone_number'] = ['nullable', 'string', 'max:20'];
+            $rules['guardian_phone_number'] = ['nullable', 'string', 'regex:/^09\d{9}$/', $globalPhoneRule];
             $rules['guardian_relationship'] = ['nullable', 'string', 'max:50'];
             $rules['ordinal_position'] = ['required', 'string', 'in:only child,eldest,middle,youngest'];
             $rules['number_of_siblings'] = ['required', 'integer', 'min:0'];
@@ -335,6 +372,41 @@ class RegisteredUserController extends Controller
                     $validator->errors()->add('easy_discussion_other', 'Please specify who you can discuss problems with.');
                 }
             }
+
+            $normalizePhone = function ($value) {
+                $value = is_string($value) ? trim($value) : '';
+                return $value;
+            };
+
+            $studentPhone = $normalizePhone($request->input('phone_number'));
+            $fatherPhone = $normalizePhone($request->input('father_phone_number'));
+            $motherPhone = $normalizePhone($request->input('mother_phone_number'));
+            $guardianPhone = $normalizePhone($request->input('guardian_phone_number'));
+
+            if ($fatherPhone !== '' && $motherPhone !== '' && $fatherPhone === $motherPhone) {
+                $validator->errors()->add('mother_phone_number', 'Mother phone number must be different from father phone number.');
+            }
+
+            if ($guardianPhone !== '') {
+                if ($fatherPhone !== '' && $guardianPhone === $fatherPhone) {
+                    $validator->errors()->add('guardian_phone_number', 'Guardian phone number must be different from father phone number.');
+                }
+                if ($motherPhone !== '' && $guardianPhone === $motherPhone) {
+                    $validator->errors()->add('guardian_phone_number', 'Guardian phone number must be different from mother phone number.');
+                }
+            }
+
+            if ($studentPhone !== '') {
+                if ($fatherPhone !== '' && $studentPhone === $fatherPhone) {
+                    $validator->errors()->add('father_phone_number', 'Father phone number must be different from your phone number.');
+                }
+                if ($motherPhone !== '' && $studentPhone === $motherPhone) {
+                    $validator->errors()->add('mother_phone_number', 'Mother phone number must be different from your phone number.');
+                }
+                if ($guardianPhone !== '' && $studentPhone === $guardianPhone) {
+                    $validator->errors()->add('guardian_phone_number', 'Guardian phone number must be different from your phone number.');
+                }
+            }
         });
         $validator->validate();
 
@@ -417,9 +489,12 @@ class RegisteredUserController extends Controller
             $civilStatus = $request->civil_status === 'others'
                 ? trim(strip_tags((string) $request->civil_status_other))
                 : $request->civil_status;
-            $easyDiscussionTarget = $request->easy_discussion_target === 'others'
-                ? trim(strip_tags((string) $request->easy_discussion_other))
-                : $request->easy_discussion_target;
+            $easyDiscussionTarget = $request->easy_discussion_target;
+            $easyDiscussionOther = null;
+            if ($request->easy_discussion_target === 'others') {
+                $easyDiscussionTarget = 'others';
+                $easyDiscussionOther = trim(strip_tags((string) $request->easy_discussion_other));
+            }
 
             // Step 1: Create User
             $user = User::create([
@@ -569,6 +644,7 @@ class RegisteredUserController extends Controller
                         'personal_social_needs' => $personalSocialNeeds ? json_encode($personalSocialNeeds) : null,
                         'stress_responses' => $stressResponses ? json_encode($stressResponses) : null,
                         'easy_discussion_target' => $easyDiscussionTarget ?: null,
+                        'easy_discussion_other' => $easyDiscussionOther ?: null,
                         'counseling_perceptions' => $request->counseling_perceptions ? json_encode($request->counseling_perceptions) : null,
                     ]);
                     break;

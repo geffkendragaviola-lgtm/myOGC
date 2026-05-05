@@ -449,6 +449,12 @@
                     </div>
 
                     <div class="md:col-span-2">
+                        <label for="specialization" class="field-label">Specialization</label>
+                        <input type="text" id="specialization" name="specialization" value="{{ old('specialization') }}"
+                               class="input-field" placeholder="e.g., Career counseling, Mental health, Academic advising">
+                    </div>
+
+                    <div class="md:col-span-2">
                         <label for="counselor_college_id" class="field-label">College *</label>
                         <select id="counselor_college_id" name="counselor_college_id" class="select-field">
                             <option value="">Select College</option>

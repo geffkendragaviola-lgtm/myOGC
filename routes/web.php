@@ -65,6 +65,8 @@ Route::post('register/email/send', [RegisteredUserController::class, 'sendEmailV
     ->name('register.email.send');
 Route::post('register/email/verify', [RegisteredUserController::class, 'verifyEmailCode'])
     ->name('register.email.verify');
+Route::post('register/check-unique', [RegisteredUserController::class, 'checkUnique'])
+    ->name('register.check-unique');
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');

@@ -49,6 +49,9 @@ body{font-family:'Inter',sans-serif}
 .btn-next,.btn-submit{border:none;background:#820000;color:#ffffff;box-shadow:0 14px 28px rgba(130,0,0,0.16)}
 .btn-next:hover,.btn-submit:hover{transform:translateY(-1px);box-shadow:0 18px 34px rgba(130,0,0,0.22)}
 .alert-error{background:#fff1f2;border:1px solid #fecdd3;color:#820000;border-radius:14px;padding:14px 16px;font-size:14px;margin-bottom:16px}
+.auth-input.is-invalid,.auth-select.is-invalid,.auth-textarea.is-invalid{border-color:#F00000;background:#fff5f5}
+.invalid-feedback{color:#F00000;font-size:12px;margin-top:4px;display:none;font-weight:600}
+.is-invalid ~ .invalid-feedback{display:block}
 .hidden{display:none!important}
 .login-row{margin-top:22px;text-align:center;font-size:14px;color:#64748b}
 .login-row a{color:#820000;text-decoration:none;font-weight:700}
@@ -193,11 +196,13 @@ body{font-family:'Inter',sans-serif}
                             </div>
                             <div class="field-wrap">
                                 <label class="field-label">Birthdate</label>
-                                <input class="auth-input" type="date" name="birthdate" id="birthdate" value="{{ old('birthdate') }}" />
+                                <input class="auth-input" type="date" name="birthdate" id="birthdate" value="{{ old('birthdate') }}" required />
+                                <x-input-error :messages="$errors->get('birthdate')" class="mt-1" />
                             </div>
                             <div class="field-wrap">
                                 <label class="field-label">Age (auto)</label>
-                                <input class="auth-input" type="number" name="age" id="age" value="{{ old('age') }}" readonly placeholder="Auto-calculated" />
+                                <input class="auth-input" type="number" name="age" id="age" value="{{ old('age') }}" readonly placeholder="Auto-calculated" required min="10" />
+                                <x-input-error :messages="$errors->get('age')" class="mt-1" />
                             </div>
                             <div class="field-wrap">
                                 <label class="field-label">Sex</label>
@@ -244,7 +249,7 @@ body{font-family:'Inter',sans-serif}
                             </div>
                             <div class="field-wrap span2">
                                 <label class="field-label">Address in Iligan City *</label>
-                                <textarea class="auth-textarea" name="address" placeholder="House No., Street, Barangay, Iligan City">{{ old('address') }}</textarea>
+                                <textarea class="auth-textarea" name="address" required placeholder="House No., Street, Barangay, Iligan City">{{ old('address') }}</textarea>
                             </div>
                             <div class="field-wrap">
                                 <label class="field-label">Phone Number *</label>
@@ -272,7 +277,8 @@ body{font-family:'Inter',sans-serif}
                         <div class="field-grid">
                             <div class="field-wrap">
                                 <label class="field-label">Student ID *</label>
-                                <input class="auth-input" type="text" name="student_id" value="{{ old('student_id') }}" required placeholder="e.g. 2024-XXXXX" />
+                                <input class="auth-input" type="text" name="student_id" value="{{ old('student_id') }}" required placeholder="e.g. 2024-XXXX" pattern="^20\d{2}-\d{4}$" title="Format: 20XX-XXXX" />
+                                <div class="invalid-feedback">Required format: 20XX-XXXX</div>
                                 <x-input-error :messages="$errors->get('student_id')" class="mt-1" />
                             </div>
                             <div class="field-wrap">
@@ -313,8 +319,9 @@ body{font-family:'Inter',sans-serif}
                                 <input class="auth-input" type="number" step="0.01" name="msu_sase_score" value="{{ old('msu_sase_score') }}" placeholder="e.g. 85.50" />
                             </div>
                             <div class="field-wrap">
-                                <label class="field-label">Academic Year</label>
-                                <input class="auth-input" type="text" name="academic_year" value="{{ old('academic_year') }}" placeholder="e.g. 2024-2025" />
+                                <label class="field-label">Academic Year *</label>
+                                <input class="auth-input" type="text" name="academic_year" value="{{ old('academic_year') }}" required placeholder="e.g. 2024-2025" pattern="^20\d{2}-20\d{2}$" title="Format: 20XX-20XX" />
+                                <div class="invalid-feedback">Required format: 20XX-20XX</div>
                             </div>
                             <div class="field-wrap">
                                 <label class="field-label">Student Status *</label>
@@ -440,7 +447,8 @@ body{font-family:'Inter',sans-serif}
                             </div>
                             <div class="field-wrap">
                                 <label class="field-label">Father's Phone Number *</label>
-                                <input class="auth-input" type="text" name="father_phone_number" value="{{ old('father_phone_number') }}" required placeholder="09XXXXXXXXX" />
+                                <input class="auth-input" type="text" name="father_phone_number" id="father_phone_number" value="{{ old('father_phone_number') }}" required placeholder="09XXXXXXXXX" inputmode="numeric" maxlength="11" minlength="11" pattern="^09\d{9}$" />
+                                <x-input-error :messages="$errors->get('father_phone_number')" class="mt-1" />
                             </div>
                             <div class="field-wrap">
                                 <label class="field-label">Mother's Name *</label>
@@ -454,7 +462,8 @@ body{font-family:'Inter',sans-serif}
                             </div>
                             <div class="field-wrap">
                                 <label class="field-label">Mother's Phone Number *</label>
-                                <input class="auth-input" type="text" name="mother_phone_number" value="{{ old('mother_phone_number') }}" required placeholder="09XXXXXXXXX" />
+                                <input class="auth-input" type="text" name="mother_phone_number" id="mother_phone_number" value="{{ old('mother_phone_number') }}" required placeholder="09XXXXXXXXX" inputmode="numeric" maxlength="11" minlength="11" pattern="^09\d{9}$" />
+                                <x-input-error :messages="$errors->get('mother_phone_number')" class="mt-1" />
                             </div>
                             <div class="field-wrap">
                                 <label class="field-label">Parents' Marital Status *</label>
@@ -484,7 +493,8 @@ body{font-family:'Inter',sans-serif}
                             </div>
                             <div class="field-wrap">
                                 <label class="field-label">Guardian Phone Number</label>
-                                <input class="auth-input" type="text" name="guardian_phone_number" value="{{ old('guardian_phone_number') }}" placeholder="09XXXXXXXXX" />
+                                <input class="auth-input" type="text" name="guardian_phone_number" id="guardian_phone_number" value="{{ old('guardian_phone_number') }}" placeholder="09XXXXXXXXX" inputmode="numeric" maxlength="11" minlength="11" pattern="^09\d{9}$" />
+                                <x-input-error :messages="$errors->get('guardian_phone_number')" class="mt-1" />
                             </div>
                             <div class="field-wrap">
                                 <label class="field-label">Relationship with Guardian</label>
@@ -922,12 +932,249 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     document.querySelectorAll('.step-next').forEach(btn => {
-        btn.addEventListener('click', () => { if (current < panels.length - 1) goTo(current + 1); });
+        btn.addEventListener('click', () => {
+            const currentPanel = panels[current];
+            const inputs = currentPanel.querySelectorAll('input, select, textarea');
+            let isValid = true;
+            let firstInvalid = null;
+
+            const normalizePhone = (value) => (value || '').toString().replace(/\D+/g, '').slice(0, 11);
+
+            function invalidate(el, message) {
+                if (!el) return;
+                el.setCustomValidity(message);
+                el.classList.add('is-invalid');
+                if (!firstInvalid) firstInvalid = el;
+                isValid = false;
+            }
+
+            function clearInvalid(el) {
+                if (!el) return;
+                el.setCustomValidity('');
+                if (el.checkValidity()) {
+                    el.classList.remove('is-invalid');
+                }
+            }
+
+            function validateBasicInfoStep() {
+                const bd = document.getElementById('birthdate');
+                const age = document.getElementById('age');
+
+                clearInvalid(bd);
+                clearInvalid(age);
+
+                if (bd && bd.value) {
+                    const bdDate = new Date(bd.value);
+                    const today = new Date();
+                    today.setHours(0, 0, 0, 0);
+                    bdDate.setHours(0, 0, 0, 0);
+
+                    if (isNaN(bdDate.getTime()) || bdDate >= today) {
+                        invalidate(bd, 'The birthdate field must be a date before today.');
+                    }
+                }
+
+                if (age) {
+                    const ageVal = parseInt(age.value, 10);
+                    if (!Number.isFinite(ageVal) || ageVal < 10) {
+                        invalidate(age, 'The age field must be at least 10.');
+                    }
+                }
+            }
+
+            function validateFamilyDataStep() {
+                const studentPhoneEl = document.getElementById('phone_number');
+                const fatherEl = document.getElementById('father_phone_number');
+                const motherEl = document.getElementById('mother_phone_number');
+                const guardianEl = document.getElementById('guardian_phone_number');
+
+                [fatherEl, motherEl, guardianEl].forEach(clearInvalid);
+
+                const studentPhone = normalizePhone(studentPhoneEl ? studentPhoneEl.value : '');
+                const fatherPhone = normalizePhone(fatherEl ? fatherEl.value : '');
+                const motherPhone = normalizePhone(motherEl ? motherEl.value : '');
+                const guardianPhone = normalizePhone(guardianEl ? guardianEl.value : '');
+
+                if (fatherPhone && motherPhone && fatherPhone === motherPhone) {
+                    invalidate(motherEl, 'Mother phone number must be different from father phone number.');
+                }
+
+                if (studentPhone) {
+                    if (fatherPhone && studentPhone === fatherPhone) {
+                        invalidate(fatherEl, 'Father phone number must be different from your phone number.');
+                    }
+                    if (motherPhone && studentPhone === motherPhone) {
+                        invalidate(motherEl, 'Mother phone number must be different from your phone number.');
+                    }
+                    if (guardianPhone && studentPhone === guardianPhone) {
+                        invalidate(guardianEl, 'Guardian phone number must be different from your phone number.');
+                    }
+                }
+
+                if (guardianPhone) {
+                    if (fatherPhone && guardianPhone === fatherPhone) {
+                        invalidate(guardianEl, 'Guardian phone number must be different from father phone number.');
+                    }
+                    if (motherPhone && guardianPhone === motherPhone) {
+                        invalidate(guardianEl, 'Guardian phone number must be different from mother phone number.');
+                    }
+                }
+            }
+            
+            for (let input of inputs) {
+                if (!input.checkValidity()) {
+                    input.classList.add('is-invalid');
+                    isValid = false;
+                    if (!firstInvalid) {
+                        firstInvalid = input;
+                    }
+                } else {
+                    input.classList.remove('is-invalid');
+                }
+            }
+
+            if (isValid && current === 0) {
+                validateBasicInfoStep();
+            }
+            if (isValid && current === 3) {
+                validateFamilyDataStep();
+            }
+            
+            if (isValid && current < panels.length - 1) {
+                let checks = [];
+                if (current === 0) { 
+                    const el = document.getElementById('phone_number');
+                    if (el && el.value) checks.push(el);
+                } else if (current === 1) { 
+                    const el = document.querySelector('input[name="student_id"]');
+                    if (el && el.value) checks.push(el);
+                } else if (current === 3) { 
+                    ['father_phone_number', 'mother_phone_number', 'guardian_phone_number'].forEach(id => {
+                        const el = document.getElementById(id);
+                        if (el && el.value) checks.push(el);
+                    });
+                }
+
+                if (checks.length > 0) {
+                    const btn = currentPanel.querySelector('.step-next');
+                    const originalText = btn.innerHTML;
+                    btn.innerHTML = 'Checking...';
+                    btn.disabled = true;
+
+                    const csrfToken = document.querySelector('input[name="_token"]').value;
+                    const promises = checks.map(el => 
+                        fetch("{{ route('register.check-unique') }}", {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRF-TOKEN': csrfToken
+                            },
+                            body: JSON.stringify({ field: el.name, value: el.value })
+                        }).then(res => {
+                            if (!res.ok) throw new Error('Network response was not ok');
+                            return res.json();
+                        }).then(data => ({ unique: data.unique, el: el }))
+                    );
+
+                    Promise.all(promises).then(results => {
+                        btn.innerHTML = originalText;
+                        btn.disabled = false;
+                        
+                        let hasError = false;
+                        let firstErrEl = null;
+                        results.forEach(res => {
+                            if (!res.unique) {
+                                res.el.classList.add('is-invalid');
+                                res.el.setCustomValidity('This ' + (res.el.name.includes('phone') ? 'phone number' : 'ID') + ' is already registered.');
+                                if (!hasError) {
+                                    hasError = true;
+                                    firstErrEl = res.el;
+                                }
+                            } else {
+                                res.el.setCustomValidity('');
+                            }
+                        });
+
+                        if (hasError) {
+                            firstErrEl.reportValidity();
+                            firstErrEl.focus();
+                        } else {
+                            goTo(current + 1);
+                        }
+                    }).catch(err => {
+                        btn.innerHTML = originalText;
+                        btn.disabled = false;
+                        console.error('Validation error:', err);
+                        alert('Could not verify uniqueness. Please check your connection or try again.');
+                        // goTo(current + 1); // Do not fallback so we can see the error
+                    });
+                } else {
+                    goTo(current + 1);
+                }
+            } else if (firstInvalid) {
+                firstInvalid.reportValidity();
+                firstInvalid.focus();
+            }
+        });
+    });
+
+    document.querySelectorAll('.auth-input, .auth-select, .auth-textarea').forEach(input => {
+        input.addEventListener('input', function() {
+            // For phone and ID fields checked asynchronously, we need to clear the custom uniqueness error
+            if (this.validationMessage.includes('registered')) {
+                this.setCustomValidity('');
+            }
+            if (this.checkValidity()) {
+                this.classList.remove('is-invalid');
+            }
+        });
+        input.addEventListener('change', function() {
+            if (this.validationMessage.includes('registered')) {
+                this.setCustomValidity('');
+            }
+            if (this.checkValidity()) {
+                this.classList.remove('is-invalid');
+            }
+        });
     });
     document.querySelectorAll('.step-back').forEach(btn => {
         btn.addEventListener('click', () => { if (current > 0) goTo(current - 1); });
     });
     buildPills();
+
+    // Check for server-side errors and go to the corresponding step
+    const firstError = document.querySelector('.text-red-600');
+    if (firstError) {
+        const errorPanel = firstError.closest('.step-panel');
+        if (errorPanel) {
+            const index = panels.indexOf(errorPanel);
+            if (index !== -1 && index !== current) {
+                goTo(index);
+            }
+        }
+    }
+
+    // Handle form submit to catch any hidden invalid fields
+    const regForm = document.getElementById('regForm');
+    if (regForm) {
+        regForm.addEventListener('submit', function(e) {
+            if (!this.checkValidity()) {
+                e.preventDefault();
+                const invalidInputs = this.querySelectorAll(':invalid');
+                if (invalidInputs.length > 0) {
+                    const firstInvalid = invalidInputs[0];
+                    const errorPanel = firstInvalid.closest('.step-panel');
+                    if (errorPanel) {
+                        const index = panels.indexOf(errorPanel);
+                        if (index !== -1 && index !== current) {
+                            goTo(index);
+                        }
+                    }
+                    setTimeout(() => { firstInvalid.reportValidity(); }, 100);
+                }
+            }
+        });
+    }
 
     // Birthdate -> Age
     const bdInput = document.getElementById('birthdate');
@@ -940,26 +1187,53 @@ document.addEventListener('DOMContentLoaded', function () {
             const m = today.getMonth() - bd.getMonth();
             if (m < 0 || (m === 0 && today.getDate() < bd.getDate())) age--;
             ageInput.value = isNaN(age) ? '' : age;
+
+            const todayDate = new Date();
+            todayDate.setHours(0, 0, 0, 0);
+            bd.setHours(0, 0, 0, 0);
+            if (!this.value || isNaN(bd.getTime()) || bd >= todayDate) {
+                this.setCustomValidity('The birthdate field must be a date before today.');
+            } else {
+                this.setCustomValidity('');
+            }
+
+            const ageVal = parseInt(ageInput.value, 10);
+            if (!Number.isFinite(ageVal) || ageVal < 10) {
+                ageInput.setCustomValidity('The age field must be at least 10.');
+            } else {
+                ageInput.setCustomValidity('');
+            }
         });
     }
 
-    // Phone number validation
-    const phoneInput = document.getElementById('phone_number');
-    if (phoneInput) {
-        phoneInput.addEventListener('input', function () {
-            const cleaned = this.value.replace(/\D+/g, '').slice(0, 11);
-            if (this.value !== cleaned) this.value = cleaned;
-            if (cleaned.length === 0) this.setCustomValidity('');
-            else if (!/^09\d{9}$/.test(cleaned)) this.setCustomValidity('Phone number must be 11 digits and start with 09');
-            else this.setCustomValidity('');
-        });
+    // Phone number validation helper
+    function setupPhoneValidation(id) {
+        const phoneInput = document.getElementById(id);
+        if (phoneInput) {
+            phoneInput.addEventListener('input', function () {
+                const cleaned = this.value.replace(/\D+/g, '').slice(0, 11);
+                if (this.value !== cleaned) this.value = cleaned;
+                if (cleaned.length === 0) this.setCustomValidity('');
+                else if (!/^09\d{9}$/.test(cleaned)) this.setCustomValidity('Phone number must be 11 digits and start with 09');
+                else this.setCustomValidity('');
+            });
+        }
     }
+    setupPhoneValidation('phone_number');
+    setupPhoneValidation('father_phone_number');
+    setupPhoneValidation('mother_phone_number');
+    setupPhoneValidation('guardian_phone_number');
 
     // Civil status other
     const csSelect = document.getElementById('civil_status');
     const csOther = document.getElementById('civil_status_other_container');
     if (csSelect && csOther) {
-        csSelect.addEventListener('change', function () { csOther.classList.toggle('hidden', this.value !== 'others'); });
+        csSelect.addEventListener('change', function () {
+            const isOthers = this.value === 'others';
+            csOther.classList.toggle('hidden', !isOthers);
+            const input = csOther.querySelector('input');
+            if (input) input.required = isOthers;
+        });
     }
 
     // Year level -> initial interview
@@ -990,14 +1264,24 @@ document.addEventListener('DOMContentLoaded', function () {
     const ccSelect = document.getElementById('course_choice_by');
     const ccOther = document.getElementById('course_choice_other_container');
     if (ccSelect && ccOther) {
-        ccSelect.addEventListener('change', function () { ccOther.classList.toggle('hidden', this.value !== 'others'); });
+        ccSelect.addEventListener('change', function () {
+            const isOthers = this.value === 'others';
+            ccOther.classList.toggle('hidden', !isOthers);
+            const input = ccOther.querySelector('input');
+            if (input) input.required = isOthers;
+        });
     }
 
     // Easy discussion other
     document.querySelectorAll('.easy-discussion-radio').forEach(r => {
         r.addEventListener('change', function () {
             const c = document.getElementById('easy_discussion_other_container');
-            if (c) c.classList.toggle('hidden', this.value !== 'others');
+            if (c) {
+                const isOthers = this.value === 'others';
+                c.classList.toggle('hidden', !isOthers);
+                const input = c.querySelector('input');
+                if (input) input.required = isOthers;
+            }
         });
     });
 
@@ -1016,7 +1300,11 @@ document.addEventListener('DOMContentLoaded', function () {
             cb.addEventListener('change', function () {
                 const anyOther = Array.from(document.querySelectorAll('.' + cbClass)).some(c => c.value === otherValue && c.checked);
                 const container = document.getElementById(containerId);
-                if (container) container.classList.toggle('hidden', !anyOther);
+                if (container) {
+                    container.classList.toggle('hidden', !anyOther);
+                    const input = container.querySelector('input');
+                    if (input) input.required = anyOther;
+                }
             });
         });
     }

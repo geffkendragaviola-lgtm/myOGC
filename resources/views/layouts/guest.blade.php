@@ -407,9 +407,6 @@
                     <label class="auth-remember">
                         <input type="checkbox" name="remember"> Remember me
                     </label>
-                    @if (Route::has('password.request'))
-                        <a class="auth-forgot" href="{{ route('password.request') }}">Forgot password?</a>
-                    @endif
                 </div>
                 <button type="submit" class="auth-submit">
                     <i class="fas fa-sign-in-alt"></i> Sign In
@@ -439,7 +436,7 @@
             if (e.key === 'Escape') closeLoginModal();
         });
 
-        @if($errors->any())
+        @if($errors->has('email') || $errors->has('password'))
             openLoginModal();
         @endif
     </script>

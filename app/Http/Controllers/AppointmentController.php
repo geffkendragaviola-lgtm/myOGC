@@ -269,6 +269,10 @@ public function create()
         ->whereNotIn('status', ['cancelled', 'rejected', 'no_show'])
         ->exists();
 
+    $hasActiveAppointment = Appointment::where('student_id', $student->id)
+        ->whereIn('status', ['pending', 'approved', 'rescheduled', 'reschedule_requested', 'reschedule_rejected'])
+        ->exists();
+
     // Pre-load referred counselors server-side so the button renders instantly
     $referredCounselors = Counselor::with('user', 'college')
         ->whereHas('receivedReferrals', function ($q) use ($student) {
@@ -284,7 +288,8 @@ public function create()
 
     return view('appointments.create', compact(
         'counselors', 'student', 'allowAllCounselors',
-        'hasInitialInterviewAppointment', 'referredCounselors', 'hasReferredCounselors'
+        'hasInitialInterviewAppointment', 'referredCounselors', 'hasReferredCounselors',
+        'hasActiveAppointment'
     ));
 }
 
@@ -722,16 +727,15 @@ public function getAvailableSlots(Request $request)
     if (!$isCounselorRequest && $requestUser && $requestUser->role === 'student') {
         $student = Student::where('user_id', $requestUser->id)->first();
         if ($student) {
-            $sameDayActive = Appointment::where('student_id', $student->id)
-                ->where('appointment_date', $request->date)
+            $hasActive = Appointment::where('student_id', $student->id)
                 ->whereIn('status', ['pending', 'approved', 'rescheduled', 'reschedule_requested', 'reschedule_rejected'])
                 ->exists();
 
-            if ($sameDayActive) {
+            if ($hasActive) {
                 return response()->json([
                     'available_slots' => [],
                     'booked_slots' => [],
-                    'message' => 'You already have an appointment on this date that has not been completed yet.',
+                    'message' => 'You already have an appointment that has not been completed yet. You can only book again once it is completed.',
                 ]);
             }
         }
@@ -1079,14 +1083,13 @@ public function store(Request $request)
     }
 
     // Prevent double-booking: student cannot book on a day where they already have
-    // a pending or approved appointment that hasn't been completed yet.
-    $sameDayActiveAppointment = Appointment::where('student_id', $student->id)
-        ->where('appointment_date', $request->appointment_date)
+    // a pending/approved appointment that hasn't been completed yet.
+    $activeAppointment = Appointment::where('student_id', $student->id)
         ->whereIn('status', ['pending', 'approved', 'rescheduled', 'reschedule_requested', 'reschedule_rejected'])
         ->exists();
 
-    if ($sameDayActiveAppointment) {
-        return redirect()->back()->with('error', 'You already have an appointment on this date that has not been completed yet. Please choose a different date.');
+    if ($activeAppointment) {
+        return redirect()->back()->with('error', 'You already have an appointment that has not been completed yet. You can only book again once it is completed.');
     }
 
     if ($request->booking_type === 'Initial Interview') {

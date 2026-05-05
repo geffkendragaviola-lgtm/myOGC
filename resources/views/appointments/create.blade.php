@@ -277,6 +277,55 @@
         font-size: 0.75rem; color: var(--maroon-700); font-weight: 500;
     }
 
+    .error-alert {
+        border: 1px solid rgba(153, 27, 27, 0.22);
+        background: linear-gradient(135deg, rgba(254, 249, 231, 0.7) 0%, rgba(255, 255, 255, 0.97) 55%);
+        padding: 1rem;
+    }
+    .error-alert::before {
+        content: "";
+        position: absolute;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        width: 4px;
+        border-radius: 999px;
+        background: linear-gradient(180deg, #991b1b, #dc2626);
+    }
+    .error-alert-inner {
+        position: relative;
+        display: flex;
+        align-items: flex-start;
+        gap: 0.9rem;
+    }
+    .error-alert-icon {
+        width: 2.6rem;
+        height: 2.6rem;
+        min-width: 2.6rem;
+        border-radius: 0.85rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(220, 38, 38, 0.12);
+        color: #991b1b;
+        border: 1px solid rgba(220, 38, 38, 0.22);
+        margin-top: 0.1rem;
+    }
+    .error-alert-title {
+        font-size: 0.78rem;
+        font-weight: 800;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        color: var(--maroon-900);
+        margin-bottom: 0.25rem;
+    }
+    .error-alert-message {
+        font-size: 0.82rem;
+        line-height: 1.6;
+        color: var(--text-secondary);
+    }
+    .error-alert-actions { margin-top: 0.75rem; }
+
     /* Alert notifications */
     .alert-stack {
         position: fixed;
@@ -639,6 +688,27 @@
         </div>
 
         <div class="form-card">
+            @if($hasActiveAppointment ?? false)
+                <div class="glass-card error-alert mb-5">
+                    <div class="error-alert-inner">
+                        <div class="error-alert-icon">
+                            <i class="fas fa-circle-exclamation"></i>
+                        </div>
+                        <div>
+                            <div class="error-alert-title">Booking temporarily disabled</div>
+                            <div class="error-alert-message">
+                                You already have an appointment that has not been completed yet. You can only book again once it is completed.
+                            </div>
+                            <div class="error-alert-actions">
+                                <a href="{{ route('appointments.index') }}" class="btn-primary">
+                                    <i class="fas fa-list"></i>
+                                    <span>View My Appointments</span>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            @endif
             <form id="appointmentForm" action="{{ route('appointments.store') }}" method="POST">
                 @csrf
 
@@ -847,7 +917,7 @@
                     <a href="{{ route('appointments.index') }}" class="secondary-btn px-5 py-2.5 text-xs sm:text-sm">
                         <i class="fas fa-arrow-left mr-1"></i> Cancel
                     </a>
-                    <button type="button" id="openConsentModal" class="primary-btn px-6 py-2.5 text-xs sm:text-sm">
+                    <button type="button" id="openConsentModal" class="primary-btn px-6 py-2.5 text-xs sm:text-sm" @if($hasActiveAppointment ?? false) disabled aria-disabled="true" @endif>
                         <i class="fas fa-calendar-check mr-1.5"></i> Book Appointment
                     </button>
                 </div>
@@ -1063,6 +1133,11 @@ document.addEventListener('DOMContentLoaded', function() {
     toggleReferredBy();
 
     function showSystemAlert(message, type = 'warning', title = '') {
+        if (typeof window.showLayoutAlert === 'function') {
+            window.showLayoutAlert(message, type, title);
+            return;
+        }
+
         if (!alertStack) return;
 
         const config = {

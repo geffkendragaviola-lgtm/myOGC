@@ -16,6 +16,7 @@ class StudentNeedsAssessment extends Model
         'personal_social_needs',
         'stress_responses',
         'easy_discussion_target',
+        'easy_discussion_other',
         'counseling_perceptions',
     ];
 
