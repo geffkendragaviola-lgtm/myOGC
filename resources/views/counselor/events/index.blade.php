@@ -149,11 +149,51 @@
     }
     .input-field:focus { border-color: var(--maroon-700); box-shadow: 0 0 0 3px rgba(92,26,26,0.08); }
 
-    .stats-card { transition: all 0.2s ease; }
-    .stats-card:hover { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(44,36,32,0.06); }
-    .stats-icon { width: 2rem; height: 2rem; border-radius: 0.6rem; }
-    .mini-progress { width: 100%; background: #f5f0eb; border-radius: 999px; height: 0.3rem; overflow: hidden; }
-    .mini-progress > div { height: 100%; border-radius: 999px; }
+    .stat-card {
+        position: relative;
+        overflow: hidden;
+        border-radius: 0.75rem;
+        border: 1px solid rgba(229, 224, 219, 0.8);
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(8px);
+        padding: 0.85rem !important;
+        box-shadow: 0 2px 8px rgba(44, 36, 32, 0.04);
+        transition: all 0.2s ease;
+        display: block !important;
+    }
+    .stat-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 14px rgba(44, 36, 32, 0.06);
+    }
+    .stat-card-pattern {
+        position: absolute;
+        inset: 0;
+        background: radial-gradient(circle at top right, rgba(212, 175, 55, 0.06), transparent 30%);
+        pointer-events: none;
+    }
+    .stat-icon {
+        width: 2rem;
+        height: 2rem;
+        border-radius: 0.5rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s ease;
+    }
+    .stat-label {
+        font-size: 0.6rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        color: #8b7e76;
+        margin-bottom: 0.15rem;
+    }
+    .stat-value {
+        font-size: 1.1rem;
+        line-height: 1;
+        font-weight: 700;
+        color: #2c2420;
+    }
 
     .event-card-new { transition: all 0.22s ease; }
     .event-card-new:hover { transform: translateY(-2px); box-shadow: 0 8px 18px rgba(44,36,32,0.06); }
@@ -207,7 +247,7 @@
 
     @media (max-width: 639px) {
         .panel-header { padding: 0.75rem 1rem; }
-        .stats-icon { width: 1.75rem; height: 1.75rem; }
+        .stat-icon { width: 1.75rem; height: 1.75rem; }
     }
 </style>
 
@@ -261,69 +301,61 @@
         </div>
 
         <!-- Stats Cards Row -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-6 sm:mb-8">
+        @php $evCount = method_exists($events, 'total') ? $events->total() : $events->count(); @endphp
+        <div class="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 mb-6 sm:mb-8">
             <!-- Total Events -->
-            <div class="stats-card p-3.5">
-                <div class="flex items-center justify-between">
+            <div class="stat-card group">
+                <div class="stat-card-pattern"></div>
+                <div class="relative flex items-center gap-2.5 sm:gap-3">
+                    <div class="stat-icon bg-[#eff6ff] text-sky-600 group-hover:bg-[#dbeafe]">
+                        <i class="fas fa-calendar text-sm sm:text-base"></i>
+                    </div>
                     <div>
-                        <p class="text-[9px] sm:text-[10px] font-semibold text-[#8b7e76] uppercase tracking-[0.16em]">Total Events</p>
-                        <p class="text-xl sm:text-2xl font-semibold text-[#2c2420] mt-1.5">{{ method_exists($events, 'total') ? $events->total() : $events->count() }}</p>
+                        <p class="stat-label">Total</p>
+                        <p class="stat-value">{{ $evCount }}</p>
                     </div>
-                    <div class="stats-icon bg-[#eff6ff]">
-                        <i class="fas fa-calendar text-sky-600 text-sm sm:text-base"></i>
-                    </div>
-                </div>
-                <div class="mt-3 mini-progress">
-                    <div class="bg-gradient-to-r from-sky-500 to-sky-600" style="width: 100%"></div>
                 </div>
             </div>
 
             <!-- Active Events -->
-            <div class="stats-card p-3.5">
-                <div class="flex items-center justify-between">
+            <div class="stat-card group">
+                <div class="stat-card-pattern"></div>
+                <div class="relative flex items-center gap-2.5 sm:gap-3">
+                    <div class="stat-icon bg-[#ecfdf5] text-[#059669] group-hover:bg-[#d1fae5]">
+                        <i class="fas fa-circle-play text-sm sm:text-base"></i>
+                    </div>
                     <div>
-                        <p class="text-[9px] sm:text-[10px] font-semibold text-[#8b7e76] uppercase tracking-[0.16em]">Active Events</p>
-                        <p class="text-xl sm:text-2xl font-semibold text-[#2c2420] mt-1.5">{{ collect($events->items() ?? $events)->where('is_active', true)->count() }}</p>
+                        <p class="stat-label">Active</p>
+                        <p class="stat-value">{{ collect($events->items() ?? $events)->where('is_active', true)->count() }}</p>
                     </div>
-                    <div class="stats-icon bg-[#ecfdf5]">
-                        <i class="fas fa-circle-play text-emerald-600 text-sm sm:text-base"></i>
-                    </div>
-                </div>
-                <div class="mt-3 mini-progress">
-                    @php $evCount = method_exists($events, 'total') ? $events->total() : $events->count(); @endphp
-                    <div class="bg-gradient-to-r from-emerald-500 to-emerald-600" style="width: {{ $evCount > 0 ? (collect($events->items() ?? $events)->where('is_active', true)->count() / $evCount) * 100 : 0 }}%"></div>
                 </div>
             </div>
 
             <!-- Upcoming Events -->
-            <div class="stats-card p-3.5">
-                <div class="flex items-center justify-between">
+            <div class="stat-card group">
+                <div class="stat-card-pattern"></div>
+                <div class="relative flex items-center gap-2.5 sm:gap-3">
+                    <div class="stat-icon bg-[#fffbeb] text-[#b45309] group-hover:bg-[#fef3d1]">
+                        <i class="fas fa-clock text-sm sm:text-base"></i>
+                    </div>
                     <div>
-                        <p class="text-[9px] sm:text-[10px] font-semibold text-[#8b7e76] uppercase tracking-[0.16em]">Upcoming Events</p>
-                        <p class="text-xl sm:text-2xl font-semibold text-[#2c2420] mt-1.5">{{ collect($events->items() ?? $events)->filter(function($e) { return \Carbon\Carbon::parse($e->event_start_date)->gte(now()->startOfDay()); })->count() }}</p>
+                        <p class="stat-label">Upcoming</p>
+                        <p class="stat-value">{{ collect($events->items() ?? $events)->filter(function($e) { return \Carbon\Carbon::parse($e->event_start_date)->gte(now()->startOfDay()); })->count() }}</p>
                     </div>
-                    <div class="stats-icon bg-[#fffbeb]">
-                        <i class="fas fa-clock text-amber-600 text-sm sm:text-base"></i>
-                    </div>
-                </div>
-                <div class="mt-3 mini-progress">
-                    <div class="bg-gradient-to-r from-amber-500 to-amber-600" style="width: {{ $evCount > 0 ? (collect($events->items() ?? $events)->filter(function($e) { return \Carbon\Carbon::parse($e->event_start_date)->gte(now()->startOfDay()); })->count() / $evCount) * 100 : 0 }}%"></div>
                 </div>
             </div>
 
             <!-- Required Events -->
-            <div class="stats-card p-3.5">
-                <div class="flex items-center justify-between">
+            <div class="stat-card group">
+                <div class="stat-card-pattern"></div>
+                <div class="relative flex items-center gap-2.5 sm:gap-3">
+                    <div class="stat-icon bg-[#fdf2f2] text-[#7a2a2a] group-hover:bg-[#fce4e4]">
+                        <i class="fas fa-circle-exclamation text-sm sm:text-base"></i>
+                    </div>
                     <div>
-                        <p class="text-[9px] sm:text-[10px] font-semibold text-[#8b7e76] uppercase tracking-[0.16em]">Required Events</p>
-                        <p class="text-xl sm:text-2xl font-semibold text-[#2c2420] mt-1.5">{{ collect($events->items() ?? $events)->where('is_required', true)->count() }}</p>
+                        <p class="stat-label">Required</p>
+                        <p class="stat-value">{{ collect($events->items() ?? $events)->where('is_required', true)->count() }}</p>
                     </div>
-                    <div class="stats-icon bg-[#fdf2f2]">
-                        <i class="fas fa-circle-exclamation text-[#b91c1c] text-sm sm:text-base"></i>
-                    </div>
-                </div>
-                <div class="mt-3 mini-progress">
-                    <div class="bg-gradient-to-r from-[#b91c1c] to-[#9a1c1c]" style="width: {{ $evCount > 0 ? (collect($events->items() ?? $events)->where('is_required', true)->count() / $evCount) * 100 : 0 }}%"></div>
                 </div>
             </div>
         </div>

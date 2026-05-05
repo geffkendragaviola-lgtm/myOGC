@@ -63,8 +63,10 @@
         content: ""; position: absolute; inset: 0; opacity: 0.15;
         background: radial-gradient(circle at top right, var(--gold-400), transparent 40%); pointer-events: none;
     }
-    .summary-avatar {
-        width: 2.75rem; height: 2.75rem; border-radius: 0.75rem; display: flex; align-items: center; justify-content: center; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.1); color: #fef9e7; flex-shrink: 0; font-weight: 700;
+    .summary-icon {
+        width: 2.5rem; height: 2.5rem; border-radius: 0.75rem; display: flex;
+        align-items: center; justify-content: center; background: rgba(255,255,255,0.1);
+        border: 1px solid rgba(255,255,255,0.1); color: #fef9e7; flex-shrink: 0;
     }
     .summary-label { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.2em; color: rgba(255,255,255,0.7); }
     .summary-value { font-size: 1.15rem; line-height: 1.25; font-weight: 800; margin-top: 0.35rem; }
@@ -140,14 +142,11 @@
         <div class="mb-6 sm:mb-8">
             <div class="grid grid-cols-1 xl:grid-cols-[1fr_auto] gap-4 items-stretch">
                 <div class="hero-card">
-                    <div class="relative p-4 sm:p-5 flex flex-col sm:flex-row items-start gap-3 sm:gap-4">
+                    <div class="relative p-4 sm:p-5 flex items-start gap-3">
                         <div class="hero-icon">
                             <i class="fas fa-pen-to-square text-base sm:text-lg"></i>
                         </div>
                         <div class="min-w-0">
-                            <a href="{{ route('counselor.resources.index') }}" class="inline-flex items-center text-[#7a2a2a] hover:text-[#5c1a1a] mb-3 sm:mb-4 font-medium text-xs sm:text-sm">
-                                <i class="fas fa-arrow-left mr-1.5"></i> Back to Resources
-                            </a>
                             <div class="hero-badge">
                                 <span class="hero-badge-dot"></span>
                                 Resource Editor
@@ -160,18 +159,22 @@
                     </div>
                 </div>
 
-                <div class="summary-card min-w-[240px] sm:min-w-[280px]">
-                    <div class="relative h-full flex flex-col justify-center p-4 sm:p-5">
-                        <div class="flex items-center gap-3 sm:gap-4">
-                            <div class="summary-avatar flex-shrink-0">
-                                <i class="{{ $resource->icon }} text-lg"></i>
+                <div class="summary-card">
+                    <div class="relative h-full flex flex-col sm:flex-row items-center justify-between gap-3 p-4">
+                        <div class="flex items-center gap-3 text-left">
+                            <div class="summary-icon flex-shrink-0">
+                                <i class="fas fa-arrow-left text-sm"></i>
                             </div>
                             <div class="min-w-0">
-                                <div class="summary-label">Resource Profile</div>
-                                <div class="summary-value truncate" title="{{ $resource->title }}">{{ $resource->title }}</div>
-                                <div class="summary-subtext">{{ Str::title(str_replace('_', ' ', $resource->category)) }}</div>
+                                <p class="summary-label">Navigation</p>
+                                <p class="summary-value">Back to Resources</p>
+                                <p class="summary-subtext hidden sm:block">Return to the resource library anytime.</p>
                             </div>
                         </div>
+                        <a href="{{ route('counselor.resources.index') }}"
+                           class="secondary-btn px-3 py-2 text-xs sm:text-sm rounded-lg">
+                            <i class="fas fa-arrow-left mr-1.5 text-[9px] sm:text-xs"></i> Back
+                        </a>
                     </div>
                 </div>
             </div>

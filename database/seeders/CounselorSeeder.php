@@ -13,6 +13,8 @@ class CounselorSeeder extends Seeder
      */
     public function run(): void
     {
+        $userIds = [];
+
         // Insert users with complete information
         $users = [
             [
@@ -177,6 +179,7 @@ class CounselorSeeder extends Seeder
                 'college_id' => $colleges['College of Arts and Social Sciences']->id,
                 'position' => 'Guidance Counselor III',
                 'credentials' => 'RGC, RPm, LPT',
+                'specialization' => 'Mental health counseling',
                 'is_head' => true,
                 'google_calendar_id' => 'jullianephilip.ouano@g.msuiit.edu.ph',
                 'created_at' => now(),
@@ -187,6 +190,7 @@ class CounselorSeeder extends Seeder
                 'college_id' => $colleges['College of Engineering']->id,
                 'position' => 'Guidance Counselor III',
                 'credentials' => 'RPm',
+                'specialization' => 'Academic advising',
                 'is_head' => false,
                 'google_calendar_id' => 'lindylou.gaviola@g.msuiit.edu.ph',
                 'created_at' => now(),
@@ -197,6 +201,7 @@ class CounselorSeeder extends Seeder
                 'college_id' => $colleges['College of Engineering Technology']->id,
                 'position' => 'Guidance Counselor III',
                 'credentials' => 'RGC',
+                'specialization' => 'Career counseling',
                 'is_head' => false,
                 'google_calendar_id' => 'saquin@g.msuiit.edu.ph',
                 'created_at' => now(),
@@ -207,6 +212,7 @@ class CounselorSeeder extends Seeder
                 'college_id' => $colleges['College of Economics, Business and Accountancy']->id,
                 'position' => 'Guidance Counselor III',
                 'credentials' => 'RGC, LPT',
+                'specialization' => 'Personal and social counseling',
                 'is_head' => false,
                 'google_calendar_id' => 'dumarpa@g.msuiit.edu.ph',
                 'created_at' => now(),
@@ -217,6 +223,7 @@ class CounselorSeeder extends Seeder
                 'college_id' => $colleges['College of Education']->id,
                 'position' => 'Guidance Services Associate I',
                 'credentials' => 'MAEd',
+                'specialization' => 'Student development',
                 'is_head' => false,
                 'google_calendar_id' => 'evardone@g.msuiit.edu.ph',
                 'created_at' => now(),
@@ -227,6 +234,7 @@ class CounselorSeeder extends Seeder
                 'college_id' => $colleges['College of Science and Mathematics']->id,
                 'position' => 'Guidance Services Associate I',
                 'credentials' => 'RPm',
+                'specialization' => 'Behavioral counseling',
                 'is_head' => false,
                 'google_calendar_id' => 'bagalanon@g.msuiit.edu.ph',
                 'created_at' => now(),
@@ -238,6 +246,7 @@ class CounselorSeeder extends Seeder
                 'college_id' => $colleges['College of Computer Studies']->id,
                 'position' => 'Guidance Counselor III',
                 'credentials' => 'RGC, LPT',
+                'specialization' => 'Academic advising',
                 'is_head' => false,
                 'google_calendar_id' => 'geffkendra.gaviola@g.msuiit.edu.ph',
                 'created_at' => now(),
@@ -249,6 +258,7 @@ class CounselorSeeder extends Seeder
                 'college_id' => $colleges['College of Health Sciences']->id,
                 'position' => 'Guidance Counselor III',
                 'credentials' => 'RGC, LPT',
+                'specialization' => 'Wellness counseling',
                 'is_head' => false,
                 'google_calendar_id' => 'geffkendra.gaviola@g.msuiit.edu.ph',
                 'created_at' => now(),

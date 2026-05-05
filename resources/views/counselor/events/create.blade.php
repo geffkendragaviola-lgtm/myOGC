@@ -161,6 +161,15 @@
     }
     .form-action-secondary:hover, .back-btn:hover { background: #f5f0eb; }
 
+    .secondary-btn {
+        border-radius: 0.6rem; font-weight: 600; transition: all 0.2s ease;
+        display: inline-flex; align-items: center; justify-content: center; white-space: nowrap;
+        padding: 0.55rem 0.85rem;
+        background: #ffffff; color: var(--text-secondary); border: 1px solid var(--border-soft);
+        box-shadow: 0 2px 6px rgba(44,36,32,0.03);
+    }
+    .secondary-btn:hover { background: #f5f0eb; }
+
     .info-grid-label {
         display: block; font-size: 0.6rem; font-weight: 600; text-transform: uppercase;
         letter-spacing: 0.12em; color: var(--text-muted); margin-bottom: 0.25rem;
@@ -206,22 +215,21 @@
                 </div>
 
                 <div class="summary-card">
-                    <div class="relative h-full flex items-center justify-between gap-3 p-4">
-                        <div class="flex items-center gap-3">
-                            <div class="summary-icon">
-                                <i class="fas fa-calendar-days text-sm"></i>
+                    <div class="relative h-full flex flex-col sm:flex-row items-center justify-between gap-3 p-4">
+                        <div class="flex items-center gap-3 text-left">
+                            <div class="summary-icon flex-shrink-0">
+                                <i class="fas fa-arrow-left text-sm"></i>
                             </div>
-                            <div>
-                                <p class="summary-label">Event Management</p>
-                                <p class="summary-value">Draft Event</p>
+                            <div class="min-w-0">
+                                <p class="summary-label">Navigation</p>
+                                <p class="summary-value">Back to Events</p>
+                                <p class="summary-subtext hidden sm:block">Return to your events list anytime.</p>
                             </div>
                         </div>
-                        <div class="flex items-center gap-2">
-                            <a href="{{ route('counselor.events.index') }}"
-                               class="primary-btn px-3 py-2 whitespace-nowrap text-xs sm:text-sm rounded-lg" style="background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); box-shadow: none;">
-                                <i class="fas fa-arrow-left mr-1.5 text-[9px] sm:text-xs"></i> Back
-                            </a>
-                        </div>
+                        <a href="{{ route('counselor.events.index') }}"
+                           class="secondary-btn px-3 py-2 text-xs sm:text-sm rounded-lg">
+                            <i class="fas fa-arrow-left mr-1.5 text-[9px] sm:text-xs"></i> Back
+                        </a>
                     </div>
                 </div>
             </div>

@@ -186,6 +186,15 @@
     .form-action-secondary { background: #f5f0eb; color: var(--text-secondary); border: 1px solid var(--border-soft); }
     .form-action-secondary:hover { background: #e5e0db; }
 
+    .secondary-btn {
+        border-radius: 0.6rem; font-weight: 600; transition: all 0.2s ease;
+        display: inline-flex; align-items: center; justify-content: center; white-space: nowrap;
+        padding: 0.55rem 0.85rem;
+        background: #ffffff; color: var(--text-secondary); border: 1px solid var(--border-soft);
+        box-shadow: 0 2px 6px rgba(44,36,32,0.03);
+    }
+    .secondary-btn:hover { background: #f5f0eb; }
+
     .modal-backdrop {
         position: fixed; inset: 0; background: rgba(44,36,32,0.6);
         align-items: center; justify-content: center;
@@ -272,15 +281,21 @@
                 </div>
 
                 <div class="summary-card">
-                    <div class="relative h-full flex flex-col sm:flex-row items-center gap-3 p-4">
-                        <div class="summary-icon flex-shrink-0">
-                            <i class="fas fa-wand-magic-sparkles text-sm"></i>
+                    <div class="relative h-full flex flex-col sm:flex-row items-center justify-between gap-3 p-4">
+                        <div class="flex items-center gap-3 text-left">
+                            <div class="summary-icon flex-shrink-0">
+                                <i class="fas fa-arrow-left text-sm"></i>
+                            </div>
+                            <div class="min-w-0">
+                                <p class="summary-label">Navigation</p>
+                                <p class="summary-value">Back to Announcements</p>
+                                <p class="summary-subtext hidden sm:block">Return to your announcements list anytime.</p>
+                            </div>
                         </div>
-                        <div class="text-center sm:text-left min-w-0">
-                            <p class="summary-label">Publishing Flow</p>
-                            <p class="summary-value">Draft your message</p>
-                            <p class="summary-subtext">Configure content, audience targeting, and active dates.</p>
-                        </div>
+                        <a href="{{ route('counselor.announcements.index') }}"
+                           class="secondary-btn px-3 py-2 text-xs sm:text-sm rounded-lg">
+                            <i class="fas fa-arrow-left mr-1.5 text-[9px] sm:text-xs"></i> Back
+                        </a>
                     </div>
                 </div>
             </div>

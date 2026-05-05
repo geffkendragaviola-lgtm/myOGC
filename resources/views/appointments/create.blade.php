@@ -772,6 +772,7 @@
                             <div class="field-wrap">
                                 <label class="field-label"><i class="fas fa-door-open field-icon"></i> How did you come in?</label>
                                 <select name="booking_category" id="bookingCategory" class="select-field" required>
+                                    <option value="online" {{ old('booking_category') === 'online' ? 'selected' : '' }}>Online Booking</option>
                                     <option value="walk-in" {{ old('booking_category') === 'walk-in' ? 'selected' : '' }}>Walk-in</option>
                                     <option value="referred" {{ old('booking_category') === 'referred' ? 'selected' : '' }}>Referred</option>
                                     <option value="called-in" {{ old('booking_category') === 'called-in' ? 'selected' : '' }}>Called-in</option>

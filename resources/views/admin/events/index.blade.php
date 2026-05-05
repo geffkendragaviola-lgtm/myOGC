@@ -148,11 +148,51 @@
     }
     .input-field:focus { border-color: var(--maroon-700); box-shadow: 0 0 0 3px rgba(92,26,26,0.08); }
 
-    .stats-card { transition: all 0.2s ease; }
-    .stats-card:hover { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(44,36,32,0.06); }
-    .stats-icon { width: 2rem; height: 2rem; border-radius: 0.6rem; }
-    .mini-progress { width: 100%; background: #f5f0eb; border-radius: 999px; height: 0.3rem; overflow: hidden; }
-    .mini-progress > div { height: 100%; border-radius: 999px; }
+    .stat-card {
+        position: relative;
+        overflow: hidden;
+        border-radius: 0.75rem;
+        border: 1px solid rgba(229, 224, 219, 0.8);
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(8px);
+        padding: 0.85rem !important;
+        box-shadow: 0 2px 8px rgba(44, 36, 32, 0.04);
+        transition: all 0.2s ease;
+        display: block !important;
+    }
+    .stat-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 14px rgba(44, 36, 32, 0.06);
+    }
+    .stat-card-pattern {
+        position: absolute;
+        inset: 0;
+        background: radial-gradient(circle at top right, rgba(212, 175, 55, 0.06), transparent 30%);
+        pointer-events: none;
+    }
+    .stat-icon {
+        width: 2rem;
+        height: 2rem;
+        border-radius: 0.5rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s ease;
+    }
+    .stat-label {
+        font-size: 0.6rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        color: #8b7e76;
+        margin-bottom: 0.15rem;
+    }
+    .stat-value {
+        font-size: 1.1rem;
+        line-height: 1;
+        font-weight: 700;
+        color: #2c2420;
+    }
 
     .flash-success, .flash-error { border-radius: 0.6rem; padding: 0.65rem 0.85rem; border-width: 1px; }
 
@@ -208,7 +248,7 @@
 
     @media (max-width: 639px) {
         .panel-header { padding: 0.75rem 1rem; }
-        .stats-icon { width: 1.75rem; height: 1.75rem; }
+        .stat-icon { width: 1.75rem; height: 1.75rem; }
     }
 </style>
 
@@ -262,68 +302,60 @@
         </div>
 
         <!-- Stats Cards Row -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-5 sm:mb-6">
+        <div class="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 mb-5 sm:mb-6">
             <!-- Total Events -->
-            <div class="stats-card p-3.5">
-                <div class="flex items-center justify-between">
+            <div class="stat-card group">
+                <div class="stat-card-pattern"></div>
+                <div class="relative flex items-center gap-2.5 sm:gap-3">
+                    <div class="stat-icon bg-[#eff6ff] text-sky-600 group-hover:bg-[#dbeafe]">
+                        <i class="fas fa-calendar text-sm sm:text-base"></i>
+                    </div>
                     <div>
-                        <p class="text-[9px] sm:text-[10px] font-semibold text-[#8b7e76] uppercase tracking-[0.16em]">Total Events</p>
-                        <p class="text-xl sm:text-2xl font-semibold text-[#2c2420] mt-1.5">{{ $events->total() }}</p>
+                        <p class="stat-label">Total</p>
+                        <p class="stat-value">{{ $events->total() }}</p>
                     </div>
-                    <div class="stats-icon bg-[#eff6ff]">
-                        <i class="fas fa-calendar text-sky-600 text-sm sm:text-base"></i>
-                    </div>
-                </div>
-                <div class="mt-3 mini-progress">
-                    <div class="bg-gradient-to-r from-sky-500 to-sky-600" style="width: 100%"></div>
                 </div>
             </div>
 
             <!-- Active Events -->
-            <div class="stats-card p-3.5">
-                <div class="flex items-center justify-between">
+            <div class="stat-card group">
+                <div class="stat-card-pattern"></div>
+                <div class="relative flex items-center gap-2.5 sm:gap-3">
+                    <div class="stat-icon bg-[#ecfdf5] text-[#059669] group-hover:bg-[#d1fae5]">
+                        <i class="fas fa-circle-play text-sm sm:text-base"></i>
+                    </div>
                     <div>
-                        <p class="text-[9px] sm:text-[10px] font-semibold text-[#8b7e76] uppercase tracking-[0.16em]">Active Events</p>
-                        <p class="text-xl sm:text-2xl font-semibold text-[#2c2420] mt-1.5">{{ $events->where('is_active', true)->count() }}</p>
+                        <p class="stat-label">Active</p>
+                        <p class="stat-value">{{ $events->where('is_active', true)->count() }}</p>
                     </div>
-                    <div class="stats-icon bg-[#ecfdf5]">
-                        <i class="fas fa-circle-play text-emerald-600 text-sm sm:text-base"></i>
-                    </div>
-                </div>
-                <div class="mt-3 mini-progress">
-                    <div class="bg-gradient-to-r from-emerald-500 to-emerald-600" style="width: {{ $events->total() > 0 ? ($events->where('is_active', true)->count() / $events->total()) * 100 : 0 }}%"></div>
                 </div>
             </div>
 
             <!-- Total Registrations -->
-            <div class="stats-card p-3.5">
-                <div class="flex items-center justify-between">
+            <div class="stat-card group">
+                <div class="stat-card-pattern"></div>
+                <div class="relative flex items-center gap-2.5 sm:gap-3">
+                    <div class="stat-icon bg-[#fffbeb] text-[#b45309] group-hover:bg-[#fef3d1]">
+                        <i class="fas fa-users text-sm sm:text-base"></i>
+                    </div>
                     <div>
-                        <p class="text-[9px] sm:text-[10px] font-semibold text-[#8b7e76] uppercase tracking-[0.16em]">Total Registrations</p>
-                        <p class="text-xl sm:text-2xl font-semibold text-[#2c2420] mt-1.5">{{ $totalRegistrations ?? 0 }}</p>
+                        <p class="stat-label">Registrations</p>
+                        <p class="stat-value">{{ $totalRegistrations ?? 0 }}</p>
                     </div>
-                    <div class="stats-icon bg-[#fffbeb]">
-                        <i class="fas fa-users text-amber-600 text-sm sm:text-base"></i>
-                    </div>
-                </div>
-                <div class="mt-3 mini-progress">
-                    <div class="bg-gradient-to-r from-amber-500 to-amber-600" style="width: {{ min(100, ($totalRegistrations ?? 0) / 10) }}%"></div>
                 </div>
             </div>
 
             <!-- Active Counselors -->
-            <div class="stats-card p-3.5">
-                <div class="flex items-center justify-between">
+            <div class="stat-card group">
+                <div class="stat-card-pattern"></div>
+                <div class="relative flex items-center gap-2.5 sm:gap-3">
+                    <div class="stat-icon bg-[#fdf2f2] text-[#7a2a2a] group-hover:bg-[#fce4e4]">
+                        <i class="fas fa-user-doctor text-sm sm:text-base"></i>
+                    </div>
                     <div>
-                        <p class="text-[9px] sm:text-[10px] font-semibold text-[#8b7e76] uppercase tracking-[0.16em]">Active Counselors</p>
-                        <p class="text-xl sm:text-2xl font-semibold text-[#2c2420] mt-1.5">{{ $counselors->count() }}</p>
+                        <p class="stat-label">Counselors</p>
+                        <p class="stat-value">{{ $counselors->count() }}</p>
                     </div>
-                    <div class="stats-icon bg-[#fdf2f2]">
-                        <i class="fas fa-user-doctor text-[#7a2a2a] text-sm sm:text-base"></i>
-                    </div>
-                </div>
-                <div class="mt-3 mini-progress">
-                    <div class="bg-gradient-to-r from-[#7a2a2a] to-[#9a2a3a]" style="width: {{ min(100, ($counselors->count() / 20) * 100) }}%"></div>
                 </div>
             </div>
         </div>
