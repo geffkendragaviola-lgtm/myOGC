@@ -802,6 +802,7 @@
                                     <div class="text-xs text-[#6b5e57] mt-0.5 font-mono">${student.student_id ?? ''}</div>
                                     <div class="text-xs text-[#8b7e76] mt-0.5">${student.college?.name ?? ''}</div>
                                     <div class="text-xs text-[#8b7e76]">${student.course ?? ''} ${student.year_level ? '· Yr ' + student.year_level : ''}</div>
+                                    <div class="text-xs text-[#8b7e76] mt-0.5"><i class="fas fa-phone-alt mr-1"></i>${student.user?.phone_number ?? 'No phone'}</div>
                                 </div>
 
                                 <!-- Counselor -->

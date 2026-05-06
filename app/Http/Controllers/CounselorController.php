@@ -223,6 +223,48 @@ public function appointmentSessionsDashboard(Request $request)
         $query->where('status', $request->input('status'));
     }
 
+    if ($request->filled('referred_by') && in_array($request->input('referred_by'), ['yes', 'no'], true)) {
+        $query->whereHas('sessionNotes', function ($q) use ($request) {
+            if ($request->input('referred_by') === 'yes') {
+                $q->whereNotNull('referred_by_source')
+                    ->where('referred_by_source', '!=', '');
+                return;
+            }
+
+            $q->where(function ($q) {
+                $q->whereNull('referred_by_source')
+                    ->orWhere('referred_by_source', '=', '');
+            });
+        });
+    }
+
+    if ($request->filled('referred_out') && in_array($request->input('referred_out'), ['yes', 'no'], true)) {
+        $query->whereHas('sessionNotes', function ($q) use ($request) {
+            if ($request->input('referred_out') === 'yes') {
+                $q->whereNotNull('referred_to_destination')
+                    ->where('referred_to_destination', '!=', '');
+                return;
+            }
+
+            $q->where(function ($q) {
+                $q->whereNull('referred_to_destination')
+                    ->orWhere('referred_to_destination', '=', '');
+            });
+        });
+    }
+
+    if ($request->filled('appointment_type') && $request->input('appointment_type') !== 'all') {
+        $query->whereHas('sessionNotes', function ($q) use ($request) {
+            $q->where('appointment_type', $request->input('appointment_type'));
+        });
+    }
+
+    if ($request->filled('root_cause') && $request->input('root_cause') !== 'all') {
+        $query->whereHas('sessionNotes', function ($q) use ($request) {
+            $q->whereJsonContains('root_causes', $request->input('root_cause'));
+        });
+    }
+
     if ($request->filled('date_range')) {
         $now = Carbon::now();
         switch ($request->input('date_range')) {

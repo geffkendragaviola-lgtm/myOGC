@@ -218,7 +218,7 @@
         <div class="relative overflow-hidden rounded-xl border border-[#e5e0db]/80 bg-white/95 backdrop-blur-sm shadow-sm mb-6 sm:mb-8">
             <div class="absolute inset-x-0 top-0 h-0.5 bg-gradient-to-r from-[#5c1a1a] via-[#d4af37] to-[#5c1a1a]"></div>
             <div class="p-3 sm:p-4">
-                <form method="GET" action="{{ route('counselor.appointment-sessions.dashboard') }}" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
+                <form method="GET" action="{{ route('counselor.appointment-sessions.dashboard') }}" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-7 gap-3 sm:gap-4">
                     <!-- Search -->
                     <div>
                         <label for="search" class="filter-label">Search</label>
@@ -230,18 +230,6 @@
                                 class="filter-input"
                                 style="padding-left: 2.25rem !important;">
                         </div>
-                    </div>
-
-                    <!-- Status -->
-                    <div>
-                        <label for="status" class="filter-label">Status</label>
-                        <select id="status" name="status" class="filter-input bg-white">
-                            <option value="all"      {{ request('status', 'all') === 'all'      ? 'selected' : '' }}>All Statuses</option>
-                            <option value="pending"  {{ request('status') === 'pending'   ? 'selected' : '' }}>Pending</option>
-                            <option value="approved" {{ request('status') === 'approved'  ? 'selected' : '' }}>Approved</option>
-                            <option value="completed"{{ request('status') === 'completed' ? 'selected' : '' }}>Completed</option>
-                            <option value="referred" {{ request('status') === 'referred'  ? 'selected' : '' }}>Referred</option>
-                        </select>
                     </div>
 
                     <!-- Date Range -->
@@ -257,9 +245,51 @@
                         </select>
                     </div>
 
+                    <!-- Source of Referral (Referred) -->
+                    <div>
+                        <label for="referred_by" class="filter-label">Source of Referral</label>
+                        <select id="referred_by" name="referred_by" class="filter-input bg-white">
+                            <option value=""     {{ request('referred_by') === null || request('referred_by') === '' ? 'selected' : '' }}>All</option>
+                            <option value="yes"  {{ request('referred_by') === 'yes' ? 'selected' : '' }}>Referred</option>
+                            <option value="no"   {{ request('referred_by') === 'no'  ? 'selected' : '' }}>Not Referred</option>
+                        </select>
+                    </div>
+
+                    <!-- Referred Out -->
+                    <div>
+                        <label for="referred_out" class="filter-label">Referred Out</label>
+                        <select id="referred_out" name="referred_out" class="filter-input bg-white">
+                            <option value=""     {{ request('referred_out') === null || request('referred_out') === '' ? 'selected' : '' }}>All</option>
+                            <option value="yes"  {{ request('referred_out') === 'yes' ? 'selected' : '' }}>Yes</option>
+                            <option value="no"   {{ request('referred_out') === 'no'  ? 'selected' : '' }}>No</option>
+                        </select>
+                    </div>
+
+                    <!-- Type of Appointment -->
+                    <div>
+                        <label for="appointment_type" class="filter-label">Type of Appointment</label>
+                        <select id="appointment_type" name="appointment_type" class="filter-input bg-white">
+                            <option value="all"               {{ request('appointment_type', 'all') === 'all' ? 'selected' : '' }}>All</option>
+                            <option value="intake_session"    {{ request('appointment_type') === 'intake_session' ? 'selected' : '' }}>Intake Session</option>
+                            <option value="follow_up_session" {{ request('appointment_type') === 'follow_up_session' ? 'selected' : '' }}>Follow-up Session</option>
+                            <option value="case_closed"       {{ request('appointment_type') === 'case_closed' ? 'selected' : '' }}>Case Closure / Closed</option>
+                        </select>
+                    </div>
+
+                    <!-- Root Causes -->
+                    <div>
+                        <label for="root_cause" class="filter-label">Root Causes</label>
+                        <select id="root_cause" name="root_cause" class="filter-input bg-white">
+                            <option value="all"                           {{ request('root_cause', 'all') === 'all' ? 'selected' : '' }}>All</option>
+                            <option value="personal_social"               {{ request('root_cause') === 'personal_social' ? 'selected' : '' }}>Personal Social</option>
+                            <option value="career_occupational_vocational" {{ request('root_cause') === 'career_occupational_vocational' ? 'selected' : '' }}>Career Occupational/Vocational</option>
+                            <option value="academic_educational"          {{ request('root_cause') === 'academic_educational' ? 'selected' : '' }}>Academic Educational</option>
+                        </select>
+                    </div>
+
                     <!-- Buttons -->
                     <div class="flex items-end gap-2 sm:gap-3">
-                        <button type="submit" class="flex-1 inline-flex items-center justify-center gap-2 px-3 sm:px-4 py-2 sm:py-2.5 rounded-lg bg-gradient-to-r from-[#5c1a1a] to-[#7a2a2a] text-white font-medium shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 text-xs sm:text-sm">
+                        <button type="submit" class="flex-1 sm:flex-none inline-flex items-center justify-center gap-2 px-3 sm:px-6 py-2 sm:py-2.5 rounded-lg bg-gradient-to-r from-[#5c1a1a] to-[#7a2a2a] text-white font-medium shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 text-xs sm:text-sm">
                             <i class="fas fa-search text-[10px] sm:text-xs"></i>
                             <span>Apply</span>
                         </button>

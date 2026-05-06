@@ -388,6 +388,7 @@
                                 <div class="text-sm font-semibold text-[#2c2420] truncate">{{ $appointment->student->user->full_name }}</div>
                                 <div class="text-[10px] text-[#8b7e76] font-mono">{{ $appointment->student->student_id }}</div>
                                 <div class="text-[10px] text-[#8b7e76]">{{ $appointment->student->college->name ?? 'N/A' }} · {{ $appointment->student->year_level }}</div>
+                                <div class="text-[10px] text-[#8b7e76]"><i class="fas fa-phone-alt text-[8px] mr-1"></i>{{ $appointment->student->user->phone_number ?? 'No phone' }}</div>
                             </div>
                         </div>
 

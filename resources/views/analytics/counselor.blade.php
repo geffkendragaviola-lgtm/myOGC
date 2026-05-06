@@ -21,7 +21,9 @@
     display: flex;
     align-items: center;
     gap: 1rem;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
+    height: 100%;
+    min-height: 86px;
 }
 .stat-icon {
     width: 3rem; height: 3rem;
@@ -501,7 +503,7 @@
             </div>
 
             {{-- Rate & insight cards --}}
-            <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4 mb-6">
+            <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-7 gap-4 mb-6">
                 <div class="stat-card" style="flex-direction:column;align-items:flex-start;gap:0.5rem;">
                     <div style="display:flex;align-items:center;gap:0.75rem;width:100%;">
                         <div class="stat-icon" style="background:#ecfdf5;color:#2d7a4f;border:1px solid #d1fae5;"><i class="fas fa-chart-pie"></i></div>
@@ -522,15 +524,6 @@
                 </div>
                 <div class="stat-card" style="flex-direction:column;align-items:flex-start;gap:0.5rem;">
                     <div style="display:flex;align-items:center;gap:0.75rem;width:100%;">
-                        <div class="stat-icon" style="background:#f5e6e8;color:#5c1a1a;border:1px solid #e5d0d3;"><i class="fas fa-share-nodes"></i></div>
-                        <div><div class="stat-value" style="color:#5c1a1a;font-weight:600;">{{ number_format($ca['referralCount']) }}</div><div class="stat-label">Referrals</div></div>
-                    </div>
-                    <div style="width:100%;height:5px;border-radius:999px;background:#e5e0db;overflow:hidden;">
-                        <div style="height:100%;border-radius:999px;width:{{ $ca['totalAppointments'] > 0 ? round(($ca['referralCount']/$ca['totalAppointments'])*100) : 0 }}%;background:#7a2a2a;transition:width 0.6s;"></div>
-                    </div>
-                </div>
-                <div class="stat-card" style="flex-direction:column;align-items:flex-start;gap:0.5rem;">
-                    <div style="display:flex;align-items:center;gap:0.75rem;width:100%;">
                         <div class="stat-icon" style="background:#eff6ff;color:#1e40af;border:1px solid #bfdbfe;"><i class="fas fa-users"></i></div>
                         <div><div class="stat-value" style="color:#1e40af;font-weight:600;">{{ $bookedPct }}%</div><div class="stat-label">Booked / Enrolled</div></div>
                     </div>
@@ -545,6 +538,28 @@
                     </div>
                     <div style="width:100%;height:5px;border-radius:999px;background:#e5e0db;overflow:hidden;">
                         <div style="height:100%;border-radius:999px;width:{{ min($completedPct,100) }}%;background:#c9a227;transition:width 0.6s;"></div>
+                    </div>
+                </div>
+
+                <div class="stat-card" style="flex-direction:column;align-items:flex-start;gap:0.5rem;">
+                    <div style="display:flex;align-items:center;gap:0.75rem;width:100%;">
+                        <div class="stat-icon" style="background:#f3e8ff;color:#6b21a8;border:1px solid #e9d5ff;"><i class="fas fa-user-tag"></i></div>
+                        <div><div class="stat-value" style="color:#6b21a8;font-weight:600;">{{ number_format($ca['referredByCount'] ?? 0) }}</div><div class="stat-label">Source of Referral</div></div>
+                    </div>
+                    <div style="width:100%;height:5px;border-radius:999px;background:#e5e0db;overflow:hidden;">
+                        @php $rbPct = ($ca['totalAppointments'] ?? 0) > 0 ? round((($ca['referredByCount'] ?? 0)/$ca['totalAppointments'])*100) : 0; @endphp
+                        <div style="height:100%;border-radius:999px;width:{{ $rbPct }}%;background:#6b21a8;transition:width 0.6s;"></div>
+                    </div>
+                </div>
+
+                <div class="stat-card" style="flex-direction:column;align-items:flex-start;gap:0.5rem;">
+                    <div style="display:flex;align-items:center;gap:0.75rem;width:100%;">
+                        <div class="stat-icon" style="background:#eff6ff;color:#1e40af;border:1px solid #bfdbfe;"><i class="fas fa-arrow-up-right-from-square"></i></div>
+                        <div><div class="stat-value" style="color:#1e40af;font-weight:600;">{{ number_format($ca['referredToCount'] ?? 0) }}</div><div class="stat-label">Referred Out</div></div>
+                    </div>
+                    <div style="width:100%;height:5px;border-radius:999px;background:#e5e0db;overflow:hidden;">
+                        @php $rtPct = ($ca['totalAppointments'] ?? 0) > 0 ? round((($ca['referredToCount'] ?? 0)/$ca['totalAppointments'])*100) : 0; @endphp
+                        <div style="height:100%;border-radius:999px;width:{{ $rtPct }}%;background:#1e40af;transition:width 0.6s;"></div>
                     </div>
                 </div>
                 <div class="stat-card" style="flex-direction:column;align-items:flex-start;gap:0.5rem;">
@@ -862,6 +877,8 @@
                 'statusData'   => array_values(array_filter($ca['statusData'], fn($s) => $s['count'] > 0)),
                 'bookingData'  => $ca['bookingTypeData'],
                 'categoryData' => $ca['bookingCategoryData'],
+                'referredByData' => $ca['referredByData'] ?? [],
+                'referredToData' => $ca['referredToData'] ?? [],
             ];
         }, $collegeAnalytics));
     @endphp
@@ -1049,6 +1066,9 @@ function exportWord() {
     
     // Check if we have an active pane to pull stats from
     if (activePane) {
+        const activeCollegeId = (activePane.id || '').replace('college_', '');
+        const activeCollegeData = collegeData.find(d => String(d.id) === String(activeCollegeId));
+
         let statsTable = activePane.querySelector('.print-stat-table');
         if (statsTable) {
             let clone = statsTable.cloneNode(true);
@@ -1063,6 +1083,34 @@ function exportWord() {
             }
             
             htmlContent += clone.outerHTML;
+        }
+
+        if (activeCollegeData) {
+            const referredByEntries = Object.entries(activeCollegeData.referredByData || {});
+            if (referredByEntries.length > 0) {
+                const total = Math.max(1, referredByEntries.reduce((sum, [, c]) => sum + Number(c || 0), 0));
+                htmlContent += `<h2>Source of Referral (Referred)</h2>`;
+                htmlContent += `<table><tr><th>Source</th><th>Total</th><th>%</th></tr>`;
+                referredByEntries.forEach(([src, cnt]) => {
+                    const c = Number(cnt || 0);
+                    const pct = Math.round(((c / total) * 100) * 10) / 10;
+                    htmlContent += `<tr><td>${src}</td><td>${c.toLocaleString()}</td><td>${pct}%</td></tr>`;
+                });
+                htmlContent += `</table>`;
+            }
+
+            const referredToEntries = Object.entries(activeCollegeData.referredToData || {});
+            if (referredToEntries.length > 0) {
+                const total = Math.max(1, referredToEntries.reduce((sum, [, c]) => sum + Number(c || 0), 0));
+                htmlContent += `<h2>Referred Out (External Destination)</h2>`;
+                htmlContent += `<table><tr><th>Destination</th><th>Total</th><th>%</th></tr>`;
+                referredToEntries.forEach(([dest, cnt]) => {
+                    const c = Number(cnt || 0);
+                    const pct = Math.round(((c / total) * 100) * 10) / 10;
+                    htmlContent += `<tr><td>${dest}</td><td>${c.toLocaleString()}</td><td>${pct}%</td></tr>`;
+                });
+                htmlContent += `</table>`;
+            }
         }
         
         // Add text summaries for charts based on the active pane

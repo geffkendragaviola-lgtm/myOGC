@@ -679,6 +679,7 @@
                                                 <div class="text-[10px] sm:text-xs text-[#8b7e76]">
                                                     {{ $appointment->student->user->sex ?? 'Not provided' }} • Yr {{ $appointment->student->year_level }}
                                                 </div>
+                                                <div class="text-[10px] sm:text-xs text-[#8b7e76]"><i class="fas fa-phone-alt text-[8px] mr-1"></i>{{ $appointment->student->user->phone_number ?? 'No phone' }}</div>
                                             </div>
                                         </div>
                                     </td>
@@ -2040,6 +2041,7 @@
                                 <div style="flex:1;min-width:0;">
                                     <div style="font-size:0.95rem;font-weight:700;color:#2c2420;">${s.user.first_name} ${s.user.last_name}</div>
                                     <div style="font-size:0.72rem;color:var(--text-secondary);margin-top:0.1rem;">${s.student_id} &nbsp;·&nbsp; ${s.college?.name || 'N/A'} &nbsp;·&nbsp; ${s.year_level}</div>
+                                    <div style="font-size:0.7rem;color:var(--text-muted);margin-top:0.15rem;"><i class="fas fa-phone-alt" style="font-size:0.6rem;margin-right:0.25rem;"></i>${s.user.phone_number || 'No phone'}</div>
                                 </div>
                                 <div style="display:flex;flex-direction:column;align-items:flex-end;gap:0.35rem;">
                                     ${chip(statusLabel, sc)}

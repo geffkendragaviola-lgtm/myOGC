@@ -57,14 +57,18 @@ class AnalyticsController extends Controller
         $referredInRate   = $totalStudents > 0 ? round(($referredInStudents  / $totalStudents) * 100, 1) : 0;
         $referredOutRate  = $totalStudents > 0 ? round(($referredOutStudents / $totalStudents) * 100, 1) : 0;
 
-        // External referred_by breakdown
-        $referredByData = (clone $base)
-            ->whereNotNull('referred_by')
-            ->select('referred_by', DB::raw('count(*) as total'))
-            ->groupBy('referred_by')
+        // Source of Referral (Referred) — from session notes
+        $referredByData = SessionNote::whereHas('appointment', function ($q) use ($base) {
+                $q->whereIn('id', (clone $base)->select('id'));
+            })
+            ->whereNotNull('referred_by_source')
+            ->where('referred_by_source', '!=', '')
+            ->select('referred_by_source', DB::raw('count(*) as total'))
+            ->groupBy('referred_by_source')
             ->orderByDesc('total')
-            ->pluck('total', 'referred_by')
+            ->pluck('total', 'referred_by_source')
             ->toArray();
+        $referredByCount = array_sum($referredByData);
 
         // Referred To (external destination from session notes)
         $referredToData = SessionNote::whereHas('appointment', function ($q) use ($base) {
@@ -229,6 +233,7 @@ class AnalyticsController extends Controller
             'referredInRate',
             'referredOutRate',
             'referredByData',
+            'referredByCount',
             'referredToData',
             'referredToCount'
         ));
@@ -361,14 +366,18 @@ class AnalyticsController extends Controller
                 $referredInRate   = $studentsBooked > 0 ? round(($referredInStudents  / $studentsBooked) * 100, 1) : 0;
                 $referredOutRate  = $studentsBooked > 0 ? round(($referredOutStudents / $studentsBooked) * 100, 1) : 0;
 
-                // External referred_by breakdown
-                $referredByData = (clone $base)
-                    ->whereNotNull('referred_by')
-                    ->select('referred_by', DB::raw('count(*) as total'))
-                    ->groupBy('referred_by')
+                // Source of Referral (Referred) — from session notes
+                $referredByData = SessionNote::whereHas('appointment', function ($q) use ($base) {
+                        $q->whereIn('id', (clone $base)->select('id'));
+                    })
+                    ->whereNotNull('referred_by_source')
+                    ->where('referred_by_source', '!=', '')
+                    ->select('referred_by_source', DB::raw('count(*) as total'))
+                    ->groupBy('referred_by_source')
                     ->orderByDesc('total')
-                    ->pluck('total', 'referred_by')
+                    ->pluck('total', 'referred_by_source')
                     ->toArray();
+                $referredByCount = array_sum($referredByData);
 
                 // Referred To (external destination from session notes)
                 $referredToData = SessionNote::whereHas('appointment', function ($q) use ($base) {
@@ -384,12 +393,24 @@ class AnalyticsController extends Controller
                 $referredToCount = array_sum($referredToData);
 
                 // Peak day of week
-                $peakDayRaw = (clone $base)
-                    ->select(DB::raw("TO_CHAR(appointment_date, 'Day') as day_name"), DB::raw('count(*) as total'))
-                    ->groupBy(DB::raw("TO_CHAR(appointment_date, 'Day')"))
+                $peakDowRaw = (clone $base)
+                    ->whereIn('status', ['completed', 'approved', 'rescheduled'])
+                    ->select(DB::raw('EXTRACT(DOW FROM appointment_date)::int as dow'), DB::raw('count(*) as total'))
+                    ->groupBy(DB::raw('EXTRACT(DOW FROM appointment_date)::int'))
                     ->orderByDesc('total')
+                    ->orderBy('dow')
                     ->first();
-                $peakDay = $peakDayRaw ? trim($peakDayRaw->day_name) : null;
+
+                $dowToDay = [
+                    0 => 'Sunday',
+                    1 => 'Monday',
+                    2 => 'Tuesday',
+                    3 => 'Wednesday',
+                    4 => 'Thursday',
+                    5 => 'Friday',
+                    6 => 'Saturday',
+                ];
+                $peakDay = $peakDowRaw ? ($dowToDay[$peakDowRaw->dow] ?? null) : null;
 
                 $collegeAnalytics[] = [
                     'college'              => $college,
@@ -414,6 +435,7 @@ class AnalyticsController extends Controller
                     'referredInRate'       => $referredInRate,
                     'referredOutRate'      => $referredOutRate,
                     'referredByData'       => $referredByData,
+                    'referredByCount'      => $referredByCount,
                     'referredToData'       => $referredToData,
                     'referredToCount'      => $referredToCount,
                 ];

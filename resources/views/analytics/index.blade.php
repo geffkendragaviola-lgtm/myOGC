@@ -21,7 +21,9 @@
     display: flex;
     align-items: center;
     gap: 1rem;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
+    height: 100%;
+    min-height: 86px;
 }
 .stat-icon {
     width: 3rem; height: 3rem;
@@ -475,7 +477,7 @@
     </div>
 
     {{-- Rate & insight cards --}}
-    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
+    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
         <div class="stat-card" style="flex-direction:column;align-items:flex-start;gap:0.5rem;">
             <div style="display:flex;align-items:center;gap:0.75rem;width:100%;">
                 <div class="stat-icon" style="background:#ecfdf5;color:#2d7a4f;border:1px solid #d1fae5;"><i class="fas fa-chart-pie"></i></div>
@@ -502,18 +504,6 @@
         </div>
         <div class="stat-card" style="flex-direction:column;align-items:flex-start;gap:0.5rem;">
             <div style="display:flex;align-items:center;gap:0.75rem;width:100%;">
-                <div class="stat-icon" style="background:#f5e6e8;color:#5c1a1a;border:1px solid #e5d0d3;"><i class="fas fa-share-nodes"></i></div>
-                <div>
-                    <div class="stat-value" style="color:#5c1a1a;font-weight:600;">{{ number_format($referralCount) }}</div>
-                    <div class="stat-label">Referrals</div>
-                </div>
-            </div>
-            <div style="width:100%;height:5px;border-radius:999px;background:#e5e0db;overflow:hidden;">
-                <div style="height:100%;border-radius:999px;width:{{ $totalAppointments > 0 ? round(($referralCount/$totalAppointments)*100) : 0 }}%;background:#7a2a2a;transition:width 0.6s;"></div>
-            </div>
-        </div>
-        <div class="stat-card" style="flex-direction:column;align-items:flex-start;gap:0.5rem;">
-            <div style="display:flex;align-items:center;gap:0.75rem;width:100%;">
                 <div class="stat-icon" style="background:#fef9e7;color:#c9a227;border:1px solid #f5e6b8;"><i class="fas fa-star"></i></div>
                 <div>
                     <div class="stat-value" style="color:#c9a227;font-weight:600;">{{ $avgSatisfaction !== null ? $avgSatisfaction.'/5' : 'N/A' }}</div>
@@ -535,6 +525,34 @@
             </div>
             <div style="width:100%;height:5px;border-radius:999px;background:#e5e0db;overflow:hidden;">
                 <div style="height:100%;border-radius:999px;width:60%;background:#7a2a2a;transition:width 0.6s;"></div>
+            </div>
+        </div>
+
+        <div class="stat-card" style="flex-direction:column;align-items:flex-start;gap:0.5rem;">
+            <div style="display:flex;align-items:center;gap:0.75rem;width:100%;">
+                <div class="stat-icon" style="background:#f3e8ff;color:#6b21a8;border:1px solid #e9d5ff;"><i class="fas fa-user-tag"></i></div>
+                <div>
+                    <div class="stat-value" style="color:#6b21a8;font-weight:600;">{{ number_format($referredByCount ?? 0) }}</div>
+                    <div class="stat-label">Source of Referral</div>
+                </div>
+            </div>
+            <div style="width:100%;height:5px;border-radius:999px;background:#e5e0db;overflow:hidden;">
+                @php $rbPct = $totalAppointments > 0 ? round((($referredByCount ?? 0)/$totalAppointments)*100) : 0; @endphp
+                <div style="height:100%;border-radius:999px;width:{{ $rbPct }}%;background:#6b21a8;transition:width 0.6s;"></div>
+            </div>
+        </div>
+
+        <div class="stat-card" style="flex-direction:column;align-items:flex-start;gap:0.5rem;">
+            <div style="display:flex;align-items:center;gap:0.75rem;width:100%;">
+                <div class="stat-icon" style="background:#eff6ff;color:#1e40af;border:1px solid #bfdbfe;"><i class="fas fa-arrow-up-right-from-square"></i></div>
+                <div>
+                    <div class="stat-value" style="color:#1e40af;font-weight:600;">{{ number_format($referredToCount ?? 0) }}</div>
+                    <div class="stat-label">Referred Out</div>
+                </div>
+            </div>
+            <div style="width:100%;height:5px;border-radius:999px;background:#e5e0db;overflow:hidden;">
+                @php $rtPct = $totalAppointments > 0 ? round((($referredToCount ?? 0)/$totalAppointments)*100) : 0; @endphp
+                <div style="height:100%;border-radius:999px;width:{{ $rtPct }}%;background:#1e40af;transition:width 0.6s;"></div>
             </div>
         </div>
     </div>
@@ -933,6 +951,36 @@ function exportWord() {
             <tr><td>Inbound Referral (received)</td><td>{{ number_format($referredInStudents) }}</td><td>{{ $referredInRate }}%</td></tr>
             <tr><td>Outbound Referral (sent)</td><td>{{ number_format($referredOutStudents) }}</td><td>{{ $referredOutRate }}%</td></tr>
         </table>
+
+        @if(!empty($referredByData))
+        <h2>Source of Referral (Referred)</h2>
+        <table>
+            <tr><th>Source</th><th>Total</th><th>%</th></tr>
+            @php $rbTotal = max(1, array_sum($referredByData)); @endphp
+            @foreach($referredByData as $source => $count)
+                <tr>
+                    <td>{{ $source }}</td>
+                    <td>{{ number_format($count) }}</td>
+                    <td>{{ round(($count / $rbTotal) * 100, 1) }}%</td>
+                </tr>
+            @endforeach
+        </table>
+        @endif
+
+        @if(!empty($referredToData))
+        <h2>Referred Out (External Destination)</h2>
+        <table>
+            <tr><th>Destination</th><th>Total</th><th>%</th></tr>
+            @php $rtTotal = max(1, array_sum($referredToData)); @endphp
+            @foreach($referredToData as $destination => $count)
+                <tr>
+                    <td>{{ $destination }}</td>
+                    <td>{{ number_format($count) }}</td>
+                    <td>{{ round(($count / $rtTotal) * 100, 1) }}%</td>
+                </tr>
+            @endforeach
+        </table>
+        @endif
         
         <h2>Feedback Details</h2>
         <p style="margin-top: 15px; font-size: 10pt; line-height: 1.5; color: #444444;">
