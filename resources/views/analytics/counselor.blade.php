@@ -306,6 +306,60 @@
     box-shadow: 0 4px 10px rgba(92,26,26,0.15);
 }
 .primary-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 14px rgba(92,26,26,0.2); }
+
+/* Keep the rate/insight metric cards visually aligned without changing the rest of the page. */
+.metric-stat-grid { align-items: stretch; }
+.metric-stat-card {
+    min-height: 126px;
+    padding: 1rem 1.1rem !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: stretch !important;
+    justify-content: space-between !important;
+    gap: 0.7rem !important;
+}
+.metric-stat-main {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    width: 100%;
+}
+.metric-stat-main .stat-icon { flex: 0 0 3rem; }
+.metric-stat-value {
+    min-width: 0;
+    text-align: right;
+    white-space: nowrap;
+    font-size: 1.55rem;
+    font-weight: 700;
+    line-height: 1;
+    letter-spacing: -0.02em;
+}
+.metric-stat-value.busy-day {
+    white-space: normal;
+    font-size: 1.1rem;
+    line-height: 1.12;
+}
+.metric-stat-label {
+    min-height: 2.1rem;
+    display: flex;
+    align-items: flex-start;
+    line-height: 1.28;
+    margin-top: 0 !important;
+}
+.metric-progress {
+    width: 100%;
+    height: 5px;
+    border-radius: 999px;
+    background: #e5e0db;
+    overflow: hidden;
+    margin-top: auto;
+}
+@media (max-width: 420px) {
+    .metric-stat-card { padding: 0.85rem !important; }
+    .metric-stat-value { font-size: 1.35rem; }
+}
+
 </style>
 <div class="min-h-screen admin-shell">
     <div class="admin-glow one"></div>
@@ -503,71 +557,78 @@
             </div>
 
             {{-- Rate & insight cards --}}
-            <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-7 gap-4 mb-6">
-                <div class="stat-card" style="flex-direction:column;align-items:flex-start;gap:0.5rem;">
-                    <div style="display:flex;align-items:center;gap:0.75rem;width:100%;">
+            <div class="metric-stat-grid grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 2xl:grid-cols-7 gap-4 mb-6">
+                <div class="stat-card metric-stat-card">
+                    <div class="metric-stat-main">
                         <div class="stat-icon" style="background:#ecfdf5;color:#2d7a4f;border:1px solid #d1fae5;"><i class="fas fa-chart-pie"></i></div>
-                        <div><div class="stat-value" style="color:#2d7a4f;font-weight:600;">{{ $completionRate }}%</div><div class="stat-label">Completion Rate</div></div>
+                        <div class="metric-stat-value" style="color:#2d7a4f;">{{ $completionRate }}%</div>
                     </div>
-                    <div style="width:100%;height:5px;border-radius:999px;background:#e5e0db;overflow:hidden;">
+                    <div class="stat-label metric-stat-label">Completion Rate</div>
+                    <div class="metric-progress">
                         <div style="height:100%;border-radius:999px;width:{{ $completionRate }}%;background:#2d7a4f;transition:width 0.6s;"></div>
                     </div>
                 </div>
-                <div class="stat-card" style="flex-direction:column;align-items:flex-start;gap:0.5rem;">
-                    <div style="display:flex;align-items:center;gap:0.75rem;width:100%;">
+                <div class="stat-card metric-stat-card">
+                    <div class="metric-stat-main">
                         <div class="stat-icon" style="background:#fee2e2;color:#b91c1c;border:1px solid #fecaca;"><i class="fas fa-user-xmark"></i></div>
-                        <div><div class="stat-value" style="color:#b91c1c;font-weight:600;">{{ $noShowRate }}%</div><div class="stat-label">No-Show Rate</div></div>
+                        <div class="metric-stat-value" style="color:#b91c1c;">{{ $noShowRate }}%</div>
                     </div>
-                    <div style="width:100%;height:5px;border-radius:999px;background:#e5e0db;overflow:hidden;">
+                    <div class="stat-label metric-stat-label">No-Show Rate</div>
+                    <div class="metric-progress">
                         <div style="height:100%;border-radius:999px;width:{{ $noShowRate }}%;background:#dc2626;transition:width 0.6s;"></div>
                     </div>
                 </div>
-                <div class="stat-card" style="flex-direction:column;align-items:flex-start;gap:0.5rem;">
-                    <div style="display:flex;align-items:center;gap:0.75rem;width:100%;">
+                <div class="stat-card metric-stat-card">
+                    <div class="metric-stat-main">
                         <div class="stat-icon" style="background:#eff6ff;color:#1e40af;border:1px solid #bfdbfe;"><i class="fas fa-users"></i></div>
-                        <div><div class="stat-value" style="color:#1e40af;font-weight:600;">{{ $bookedPct }}%</div><div class="stat-label">Booked / Enrolled</div></div>
+                        <div class="metric-stat-value" style="color:#1e40af;">{{ $bookedPct }}%</div>
                     </div>
-                    <div style="width:100%;height:5px;border-radius:999px;background:#e5e0db;overflow:hidden;">
+                    <div class="stat-label metric-stat-label">Booked / Enrolled</div>
+                    <div class="metric-progress">
                         <div style="height:100%;border-radius:999px;width:{{ min($bookedPct,100) }}%;background:#1e40af;transition:width 0.6s;"></div>
                     </div>
                 </div>
-                <div class="stat-card" style="flex-direction:column;align-items:flex-start;gap:0.5rem;">
-                    <div style="display:flex;align-items:center;gap:0.75rem;width:100%;">
+                <div class="stat-card metric-stat-card">
+                    <div class="metric-stat-main">
                         <div class="stat-icon" style="background:#fef9e7;color:#c9a227;border:1px solid #f5e6b8;"><i class="fas fa-circle-check"></i></div>
-                        <div><div class="stat-value" style="color:#c9a227;font-weight:600;">{{ $completedPct }}%</div><div class="stat-label">Completed / Enrolled</div></div>
+                        <div class="metric-stat-value" style="color:#c9a227;">{{ $completedPct }}%</div>
                     </div>
-                    <div style="width:100%;height:5px;border-radius:999px;background:#e5e0db;overflow:hidden;">
+                    <div class="stat-label metric-stat-label">Completed / Enrolled</div>
+                    <div class="metric-progress">
                         <div style="height:100%;border-radius:999px;width:{{ min($completedPct,100) }}%;background:#c9a227;transition:width 0.6s;"></div>
                     </div>
                 </div>
 
-                <div class="stat-card" style="flex-direction:column;align-items:flex-start;gap:0.5rem;">
-                    <div style="display:flex;align-items:center;gap:0.75rem;width:100%;">
+                <div class="stat-card metric-stat-card">
+                    <div class="metric-stat-main">
                         <div class="stat-icon" style="background:#f3e8ff;color:#6b21a8;border:1px solid #e9d5ff;"><i class="fas fa-user-tag"></i></div>
-                        <div><div class="stat-value" style="color:#6b21a8;font-weight:600;">{{ number_format($ca['referredByCount'] ?? 0) }}</div><div class="stat-label">Source of Referral</div></div>
+                        <div class="metric-stat-value" style="color:#6b21a8;">{{ number_format($ca['referredByCount'] ?? 0) }}</div>
                     </div>
-                    <div style="width:100%;height:5px;border-radius:999px;background:#e5e0db;overflow:hidden;">
+                    <div class="stat-label metric-stat-label">Source of Referral</div>
+                    <div class="metric-progress">
                         @php $rbPct = ($ca['totalAppointments'] ?? 0) > 0 ? round((($ca['referredByCount'] ?? 0)/$ca['totalAppointments'])*100) : 0; @endphp
                         <div style="height:100%;border-radius:999px;width:{{ $rbPct }}%;background:#6b21a8;transition:width 0.6s;"></div>
                     </div>
                 </div>
 
-                <div class="stat-card" style="flex-direction:column;align-items:flex-start;gap:0.5rem;">
-                    <div style="display:flex;align-items:center;gap:0.75rem;width:100%;">
+                <div class="stat-card metric-stat-card">
+                    <div class="metric-stat-main">
                         <div class="stat-icon" style="background:#eff6ff;color:#1e40af;border:1px solid #bfdbfe;"><i class="fas fa-arrow-up-right-from-square"></i></div>
-                        <div><div class="stat-value" style="color:#1e40af;font-weight:600;">{{ number_format($ca['referredToCount'] ?? 0) }}</div><div class="stat-label">Referred Out</div></div>
+                        <div class="metric-stat-value" style="color:#1e40af;">{{ number_format($ca['referredToCount'] ?? 0) }}</div>
                     </div>
-                    <div style="width:100%;height:5px;border-radius:999px;background:#e5e0db;overflow:hidden;">
+                    <div class="stat-label metric-stat-label">Referred Out</div>
+                    <div class="metric-progress">
                         @php $rtPct = ($ca['totalAppointments'] ?? 0) > 0 ? round((($ca['referredToCount'] ?? 0)/$ca['totalAppointments'])*100) : 0; @endphp
                         <div style="height:100%;border-radius:999px;width:{{ $rtPct }}%;background:#1e40af;transition:width 0.6s;"></div>
                     </div>
                 </div>
-                <div class="stat-card" style="flex-direction:column;align-items:flex-start;gap:0.5rem;">
-                    <div style="display:flex;align-items:center;gap:0.75rem;width:100%;">
+                <div class="stat-card metric-stat-card">
+                    <div class="metric-stat-main">
                         <div class="stat-icon" style="background:#f3e8ff;color:#6b21a8;border:1px solid #e9d5ff;"><i class="fas fa-calendar-day"></i></div>
-                        <div><div class="stat-value" style="color:#6b21a8;font-weight:600;font-size:1.1rem;margin-top:0.4rem;">{{ $ca['peakDay'] ?? 'N/A' }}</div><div class="stat-label">Busiest Day</div></div>
+                        <div class="metric-stat-value busy-day" style="color:#6b21a8;">{{ $ca['peakDay'] ?? 'N/A' }}</div>
                     </div>
-                    <div style="width:100%;height:5px;border-radius:999px;background:#e5e0db;overflow:hidden;">
+                    <div class="stat-label metric-stat-label">Busiest Day</div>
+                    <div class="metric-progress">
                         <div style="height:100%;border-radius:999px;width:100%;background:#6b21a8;transition:width 0.6s;"></div>
                     </div>
                 </div>
