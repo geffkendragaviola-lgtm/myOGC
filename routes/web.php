@@ -245,8 +245,8 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/events/{event}/cancel', [EventRegistrationController::class, 'cancelRegistration'])->name('student.events.cancel');
 });
 
-// Admin routes - REMOVED role:admin middleware
-Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () {
+// Admin routes
+Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('dashboard');
 
     // User Management

@@ -10,6 +10,33 @@ use App\Models\Event;
 class StudentController extends Controller
 {
     /**
+     * Display the authenticated student's own profile.
+     */
+    public function myProfile()
+    {
+        $student = Auth::user()->student;
+
+        if (!$student) {
+            abort(404, 'Student profile not found.');
+        }
+
+        $student->load([
+            'user',
+            'college',
+            'personalData',
+            'familyData',
+            'academicData',
+            'learningResources',
+            'psychosocialData',
+            'needsAssessment',
+            'appointments',
+            'events',
+        ]);
+
+        return view('student.show', compact('student'));
+    }
+
+    /**
      * Display the specified student's details.
      */
     public function show($id)
