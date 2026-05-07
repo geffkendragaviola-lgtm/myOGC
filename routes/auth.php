@@ -31,6 +31,28 @@ Route::middleware('guest')->group(function () {
         ->name('login');
 
     Route::post('login', [AuthenticatedSessionController::class, 'store']);
+
+    Route::get('forgot-password', function() {
+        return redirect()->route('login');
+    })->name('password.request');
+
+    Route::post('forgot-password', function(\Illuminate\Http\Request $request) {
+        $request->validate(['email' => ['required', 'email']]);
+
+        $status = \Illuminate\Support\Facades\Password::sendResetLink(
+            $request->only('email')
+        );
+
+        return $status == \Illuminate\Support\Facades\Password::RESET_LINK_SENT
+            ? redirect()->route('login')->with('forgot_status', __($status))
+            : back()->withInput($request->only('email'))->withErrors(['forgot_email' => __($status)]);
+    })->name('password.email');
+
+    Route::get('reset-password/{token}', [NewPasswordController::class, 'create'])
+        ->name('password.reset');
+
+    Route::post('reset-password', [NewPasswordController::class, 'store'])
+        ->name('password.store');
 });
 
 Route::middleware('auth')->group(function () {

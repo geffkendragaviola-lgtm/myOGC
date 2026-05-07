@@ -368,54 +368,107 @@
     <!-- Page content (login/register form) -->
     {{ $slot }}
 
-    <!-- Login Modal -->
+    <!-- Auth Modal (Login + Forgot Password) -->
     <div class="auth-overlay" id="authOverlay">
         <div class="auth-modal" id="authModal">
-            <button class="auth-modal-close" onclick="closeLoginModal()" title="Close"><i class="fas fa-xmark"></i></button>
+            <button type="button" class="auth-modal-close" onclick="closeLoginModal()" title="Close"><i class="fas fa-xmark"></i></button>
 
-            <div class="auth-modal-logo">
-                <img src="{{ asset('images/msu-iit-logo.png') }}" alt="MSU-IIT" onerror="this.style.display='none'">
-                <div class="auth-modal-logo-text">
-                    <strong>MSU-IIT OGC</strong>
-                    <span>Guidance & Counseling</span>
+            <!-- LOGIN PANEL -->
+            <div id="loginPanel">
+                <div class="auth-modal-logo">
+                    <img src="{{ asset('images/msu-iit-logo.png') }}" alt="MSU-IIT" onerror="this.style.display='none'">
+                    <div class="auth-modal-logo-text">
+                        <strong>MSU-IIT OGC</strong>
+                        <span>Guidance & Counseling</span>
+                    </div>
+                </div>
+
+                <h2>Welcome back</h2>
+                <p class="auth-modal-sub">Sign in to your student portal account.</p>
+
+                <form method="POST" action="{{ route('login') }}">
+                    @csrf
+                    <div class="auth-field">
+                        <label for="modal_email">Email Address</label>
+                        <div class="auth-input-wrap">
+                            <i class="fas fa-envelope auth-input-icon"></i>
+                            <input id="modal_email" class="auth-input" type="email" name="email"
+                                value="{{ old('email') }}" required autofocus autocomplete="username"
+                                placeholder="username@g.msuiit.edu.ph" />
+                        </div>
+                    </div>
+                    <div class="auth-field">
+                        <label for="modal_password">Password</label>
+                        <div class="auth-input-wrap">
+                            <i class="fas fa-lock auth-input-icon"></i>
+                            <input id="modal_password" class="auth-input" type="password" name="password"
+                                required autocomplete="current-password" placeholder="Enter your password" />
+                        </div>
+                    </div>
+                    <div class="auth-options">
+                        <label class="auth-remember">
+                            <input type="checkbox" name="remember"> Remember me
+                        </label>
+                        <a href="#" class="auth-forgot" onclick="showForgotPanel(event)">Forgot password?</a>
+                    </div>
+                    <button type="submit" class="auth-submit">
+                        <i class="fas fa-sign-in-alt"></i> Sign In
+                    </button>
+                </form>
+
+                <div class="auth-divider">or</div>
+                <div class="auth-register-link">
+                    Don't have an account? <a href="{{ route('register') }}">Register here</a>
                 </div>
             </div>
 
-            <h2>Welcome back</h2>
-            <p class="auth-modal-sub">Sign in to your student portal account.</p>
-
-            <form method="POST" action="{{ route('login') }}">
-                @csrf
-                <div class="auth-field">
-                    <label for="modal_email">Email Address</label>
-                    <div class="auth-input-wrap">
-                        <i class="fas fa-envelope auth-input-icon"></i>
-                        <input id="modal_email" class="auth-input" type="email" name="email"
-                            value="{{ old('email') }}" required autofocus autocomplete="username"
-                            placeholder="username@g.msuiit.edu.ph" />
+            <!-- FORGOT PASSWORD PANEL -->
+            <div id="forgotPanel" style="display:none;">
+                <div class="auth-modal-logo">
+                    <img src="{{ asset('images/msu-iit-logo.png') }}" alt="MSU-IIT" onerror="this.style.display='none'">
+                    <div class="auth-modal-logo-text">
+                        <strong>MSU-IIT OGC</strong>
+                        <span>Guidance & Counseling</span>
                     </div>
                 </div>
-                <div class="auth-field">
-                    <label for="modal_password">Password</label>
-                    <div class="auth-input-wrap">
-                        <i class="fas fa-lock auth-input-icon"></i>
-                        <input id="modal_password" class="auth-input" type="password" name="password"
-                            required autocomplete="current-password" placeholder="Enter your password" />
-                    </div>
-                </div>
-                <div class="auth-options">
-                    <label class="auth-remember">
-                        <input type="checkbox" name="remember"> Remember me
-                    </label>
-                </div>
-                <button type="submit" class="auth-submit">
-                    <i class="fas fa-sign-in-alt"></i> Sign In
-                </button>
-            </form>
 
-            <div class="auth-divider">or</div>
-            <div class="auth-register-link">
-                Don't have an account? <a href="{{ route('register') }}">Register here</a>
+                <div style="width:48px;height:48px;border-radius:14px;background:linear-gradient(135deg,#820000,#F8650C);display:flex;align-items:center;justify-content:center;margin-bottom:20px;">
+                    <i class="fas fa-lock" style="color:#fff;font-size:20px;"></i>
+                </div>
+
+                <h2>Forgot password?</h2>
+                <p class="auth-modal-sub">No problem. Enter your MSU-IIT email and we'll send you a password reset link.</p>
+
+                @if(session('forgot_status'))
+                    <div style="background:#effaf3;border:1px solid #bfe5c8;color:#166534;border-radius:10px;padding:12px 16px;font-size:14px;margin-bottom:20px;">
+                        <i class="fas fa-circle-check"></i> {{ session('forgot_status') }}
+                    </div>
+                @endif
+
+                <form method="POST" action="{{ route('password.email') }}">
+                    @csrf
+                    <div class="auth-field">
+                        <label for="forgot_email">MSU-IIT Email Address</label>
+                        <div class="auth-input-wrap">
+                            <i class="fas fa-envelope auth-input-icon"></i>
+                            <input id="forgot_email" class="auth-input" type="email" name="email"
+                                value="{{ old('email') }}" required
+                                placeholder="username@g.msuiit.edu.ph" />
+                        </div>
+                        @error('forgot_email')
+                            <p style="color:#dc2626;font-size:13px;margin-top:6px;">{{ $message }}</p>
+                        @enderror
+                    </div>
+                    <button type="submit" class="auth-submit">
+                        <i class="fas fa-paper-plane"></i> Send Reset Link
+                    </button>
+                </form>
+
+                <div style="text-align:center;margin-top:18px;font-size:14px;">
+                    <a href="#" onclick="showLoginPanel(event)" style="color:#820000;font-weight:700;text-decoration:none;display:inline-flex;align-items:center;gap:6px;">
+                        <i class="fas fa-arrow-left"></i> Back to Login
+                    </a>
+                </div>
             </div>
         </div>
     </div>
@@ -429,6 +482,16 @@
             document.getElementById('authOverlay').classList.remove('active');
             document.body.style.overflow = '';
         }
+        function showForgotPanel(e) {
+            e.preventDefault();
+            document.getElementById('loginPanel').style.display = 'none';
+            document.getElementById('forgotPanel').style.display = 'block';
+        }
+        function showLoginPanel(e) {
+            e.preventDefault();
+            document.getElementById('forgotPanel').style.display = 'none';
+            document.getElementById('loginPanel').style.display = 'block';
+        }
         document.getElementById('authOverlay').addEventListener('click', function(e) {
             if (e.target === this) closeLoginModal();
         });
@@ -438,6 +501,12 @@
 
         @if($errors->has('email') || $errors->has('password'))
             openLoginModal();
+        @endif
+
+        @if($errors->has('forgot_email') || session('forgot_status'))
+            openLoginModal();
+            document.getElementById('loginPanel').style.display = 'none';
+            document.getElementById('forgotPanel').style.display = 'block';
         @endif
     </script>
 
