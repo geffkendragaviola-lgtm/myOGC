@@ -554,3 +554,283 @@ Actual Result: CounselorAnnouncementController::store() dispatches AnnouncementP
 Status: Pass
 Remarks / Corrective Action: None.
 
+
+================================================================================
+MODULE I: ANNOUNCEMENTS
+================================================================================
+
+Test ID: I-01
+Feature / Function: Counselor Creates an Announcement
+Test Scenario: Log in as a counselor, navigate to announcements, and create a new announcement with a title, content, target college, year level, and date range.
+Expected Result: Announcement is saved, targeted students are notified, and the announcement appears in the counselor's announcement list.
+Actual Result: CounselorAnnouncementController::store() validates and creates the announcement. College targeting is handled via the announcement-college pivot table. Year level targeting is stored as a JSON array. AnnouncementPostedNotification is dispatched to targeted students when the announcement is active.
+Status: Pass
+Remarks / Corrective Action: None.
+
+--------------------------------------------------------------------------------
+
+Test ID: I-02
+Feature / Function: Counselor Edits an Announcement
+Test Scenario: Log in as a counselor, open an existing announcement, update the content, and save.
+Expected Result: Announcement is updated. Only the owner counselor can edit it.
+Actual Result: CounselorAnnouncementController::update() checks $announcement->user_id !== Auth::id() and calls abort(403) if the user is not the owner. Updates are applied and college targeting is re-synced.
+Status: Pass
+Remarks / Corrective Action: None.
+
+--------------------------------------------------------------------------------
+
+Test ID: I-03
+Feature / Function: Counselor Deletes an Announcement
+Test Scenario: Log in as a counselor and delete one of their announcements.
+Expected Result: Announcement is removed from the list. Only the owner can delete it.
+Actual Result: CounselorAnnouncementController::destroy() verifies ownership before deleting. Associated image is deleted from storage if present.
+Status: Pass
+Remarks / Corrective Action: None.
+
+--------------------------------------------------------------------------------
+
+Test ID: I-04
+Feature / Function: Counselor Pins an Announcement
+Test Scenario: Log in as a counselor and pin an announcement.
+Expected Result: Announcement is_pinned is toggled. Pinned announcements appear at the top of the list.
+Actual Result: CounselorAnnouncementController::togglePin() returns a JSON response with the updated is_pinned state. The index query uses orderBy('is_pinned', 'desc').
+Status: Pass
+Remarks / Corrective Action: None.
+
+--------------------------------------------------------------------------------
+
+Test ID: I-05
+Feature / Function: Counselor Marks Announcement as Complete
+Test Scenario: Log in as a counselor and mark an announcement as completed.
+Expected Result: Announcement is_active is set to false and end_date is set to the current timestamp.
+Actual Result: CounselorAnnouncementController::complete() sets is_active to false and end_date to now(). Ownership is verified before the action.
+Status: Pass
+Remarks / Corrective Action: None.
+
+--------------------------------------------------------------------------------
+
+Test ID: I-06
+Feature / Function: Admin Creates and Manages Announcements
+Test Scenario: Log in as an admin and create, edit, toggle status, pin, and delete an announcement.
+Expected Result: All announcement management actions work for the admin role with system-wide reach.
+Actual Result: AdminAnnouncementController handles admin announcements with the same feature set as the counselor controller, including image removal. Routes are defined under the admin prefix.
+Status: Pass
+Remarks / Corrective Action: None.
+
+--------------------------------------------------------------------------------
+
+Test ID: I-07
+Feature / Function: Announcement Image Upload and Removal
+Test Scenario: Upload an image when creating an announcement, then remove it via the remove image action.
+Expected Result: Image is stored in the announcements folder. Removal deletes the file from storage and clears the image field.
+Actual Result: CounselorAnnouncementController::store() stores the image path using store('announcements', 'public'). The removeImage() method checks Storage::disk('public')->exists() before deleting and then sets image to null.
+Status: Pass
+Remarks / Corrective Action: None.
+
+================================================================================
+MODULE J: FEEDBACK MODULE
+================================================================================
+
+Test ID: J-01
+Feature / Function: Student Submits Feedback
+Test Scenario: Log in as a student, navigate to /feedback, fill out the CSM form (service availed, SQD ratings, CC fields, comments), and submit.
+Expected Result: Feedback is saved with all CSM fields, satisfaction_rating is derived from sqd0, and a success message is shown.
+Actual Result: FeedbackController::store() validates all SQD keys (sqd0-sqd9 and sub-dimensions), CC fields, service_availed, and target_counselor_id. Feedback is created with all fields. satisfaction_rating is set from sqd0 for backward compatibility.
+Status: Pass
+Remarks / Corrective Action: None.
+
+--------------------------------------------------------------------------------
+
+Test ID: J-02
+Feature / Function: Student Submits Anonymous Feedback
+Test Scenario: Log in as a student, check the "anonymous" option on the feedback form, and submit.
+Expected Result: Feedback is saved with is_anonymous set to true. The student's name is displayed as "Anonymous" in the counselor/admin view.
+Actual Result: FeedbackController::store() sets is_anonymous from the request. FeedbackController::export() displays "Anonymous" for is_anonymous feedback entries.
+Status: Pass
+Remarks / Corrective Action: None.
+
+--------------------------------------------------------------------------------
+
+Test ID: J-03
+Feature / Function: Counselor Views Feedback
+Test Scenario: Log in as a counselor and navigate to the feedback list.
+Expected Result: Counselor sees feedback targeted to them. Head counselors see all feedback. Non-head counselors see only feedback directed to their counselor ID or unidentified feedback.
+Actual Result: FeedbackController::index() checks is_head on the counselor's assignments. Non-head counselors are filtered to see only feedback where target_counselor_id is null or matches their counselor IDs.
+Status: Pass
+Remarks / Corrective Action: None.
+
+--------------------------------------------------------------------------------
+
+Test ID: J-04
+Feature / Function: Admin Views All Feedback
+Test Scenario: Log in as an admin and navigate to the feedback list.
+Expected Result: Admin sees all feedback from all students with full statistics (total, average rating, rating distribution, anonymous count).
+Actual Result: FeedbackController::index() detects admin role via Admin::where('user_id', $userId)->exists() and skips the counselor-specific filter. Statistics are computed from the full dataset.
+Status: Pass
+Remarks / Corrective Action: None.
+
+--------------------------------------------------------------------------------
+
+Test ID: J-05
+Feature / Function: Feedback Search and Filter
+Test Scenario: Log in as a counselor or admin, use the search bar and filters (rating, service type, date range) on the feedback list.
+Expected Result: Feedback list is filtered correctly based on the selected criteria.
+Actual Result: FeedbackController::index() supports search by student name, service, and comments; rating filter; service type filter; date range filter (today, week, month); and anonymous filter.
+Status: Pass
+Remarks / Corrective Action: None.
+
+--------------------------------------------------------------------------------
+
+Test ID: J-06
+Feature / Function: Feedback Export to CSV
+Test Scenario: Log in as a counselor or admin and export the feedback list.
+Expected Result: System generates and downloads a CSV file with feedback data. Anonymous entries show "Anonymous" for the student name.
+Actual Result: FeedbackController::export() streams a CSV response with UTF-8 BOM. Columns include student name, service availed, satisfaction rating, rating label, comments, anonymous flag, and submitted date.
+Status: Pass
+Remarks / Corrective Action: None.
+
+
+================================================================================
+MODULE K: EVENT MANAGEMENT
+================================================================================
+
+Test ID: K-01
+Feature / Function: Counselor Creates an Event
+Test Scenario: Log in as a counselor, navigate to event management, and create a new event with title, description, type, date range, time, location, max attendees, and college/year level targeting.
+Expected Result: Event is saved, assigned counselors are synced to their Google Calendars, and required students are auto-registered if the event is marked as required.
+Actual Result: EventController::store() validates via EventRequest, creates the event, syncs college targeting, auto-registers required students via $event->registerRequiredStudents(), and syncs assigned counselors' Google Calendars. Schedule conflict notifications are dispatched.
+Status: Pass
+Remarks / Corrective Action: None.
+
+--------------------------------------------------------------------------------
+
+Test ID: K-02
+Feature / Function: Counselor Edits an Event
+Test Scenario: Log in as a counselor, edit an existing event, change the date and assigned counselors, and save.
+Expected Result: Event is updated, removed counselors have their calendar entries deleted, new counselors receive calendar entries, and existing counselors receive update notifications.
+Actual Result: EventController::update() handles differential counselor sync: removedIds get calendar entries deleted, addedCounselorIds get new entries, keptCounselorIds get update notifications. The event creator's own calendar is also re-synced.
+Status: Pass
+Remarks / Corrective Action: None.
+
+--------------------------------------------------------------------------------
+
+Test ID: K-03
+Feature / Function: Counselor Deletes an Event
+Test Scenario: Log in as a counselor and delete one of their events.
+Expected Result: Event is deleted, all assigned counselors' Google Calendar entries are removed, and the event image is deleted from storage.
+Actual Result: EventController::destroy() verifies ownership, removes calendar entries for all assigned counselors, deletes the event creator's calendar entry, deletes the image from storage, and then deletes the event record.
+Status: Pass
+Remarks / Corrective Action: None.
+
+--------------------------------------------------------------------------------
+
+Test ID: K-04
+Feature / Function: Student Registers for an Event
+Test Scenario: Log in as a student, browse available events, and register for an event.
+Expected Result: EventRegistration record is created with status "registered." If the event is full, registration is blocked.
+Actual Result: EventController::register() checks isAvailableForStudent(), hasAvailableSlots(), and existing registration status before creating the EventRegistration record. Required events block manual registration with an info message.
+Status: Pass
+Remarks / Corrective Action: None.
+
+--------------------------------------------------------------------------------
+
+Test ID: K-05
+Feature / Function: Student Cancels Event Registration
+Test Scenario: Log in as a student and cancel a registration for a non-required event before the 24-hour cutoff.
+Expected Result: Registration status changes to "cancelled." Cancellation is blocked for required events and after the cutoff time.
+Actual Result: EventController::cancel() checks isRequiredForStudent() and isCancellationAllowed(). Required events cannot be cancelled. After the cutoff, the error message includes the cutoff time.
+Status: Pass
+Remarks / Corrective Action: None.
+
+--------------------------------------------------------------------------------
+
+Test ID: K-06
+Feature / Function: Counselor Views and Manages Event Registrations
+Test Scenario: Log in as a counselor, open an event, view the registrations list, update a registration status, and re-register a cancelled student.
+Expected Result: Registration list shows all registrants with status. Counselor can update status (registered, attended, cancelled) and re-register cancelled students.
+Actual Result: EventController::showRegistrations() returns the registrations view with stats. updateRegistrationStatus() and reRegisterStudent() handle status overrides with counsellor_override, override_by, and override_at fields logged.
+Status: Pass
+Remarks / Corrective Action: None.
+
+--------------------------------------------------------------------------------
+
+Test ID: K-07
+Feature / Function: Event Registration Export
+Test Scenario: Log in as a counselor and export the registrations for an event.
+Expected Result: System generates and downloads a CSV file with full student details and registration status.
+Actual Result: EventController::exportRegistrations() streams a CSV with student ID, name, age, sex, phone, email, college, year level, registration date, and status. Ownership is verified before export.
+Status: Pass
+Remarks / Corrective Action: None.
+
+--------------------------------------------------------------------------------
+
+Test ID: K-08
+Feature / Function: Event Toggle Active Status and Pin
+Test Scenario: Log in as a counselor and toggle an event's active status and pin status.
+Expected Result: is_active and is_pinned fields are toggled. Auto-registration runs when a required event is activated.
+Actual Result: EventController::toggleStatus() toggles is_active and calls registerRequiredStudents() if the event is active and required. togglePin() returns a JSON response with the updated is_pinned state.
+Status: Pass
+Remarks / Corrective Action: None.
+
+--------------------------------------------------------------------------------
+
+Test ID: K-09
+Feature / Function: Admin Event Management
+Test Scenario: Log in as an admin and create, edit, toggle status, pin, and delete an event.
+Expected Result: All event management actions work for the admin role.
+Actual Result: Admin event routes (admin.events.*) map to AdminController methods: createEvent, storeEvent, editEvent, updateEvent, deleteEvent, toggleEventStatus, toggleEventPin. Routes are defined and accessible.
+Status: Pass
+Remarks / Corrective Action: None.
+
+================================================================================
+MODULE L: ADMINISTRATIVE LOGS
+================================================================================
+
+Test ID: L-01
+Feature / Function: Admin Dashboard - System Statistics
+Test Scenario: Log in as an admin and view the dashboard.
+Expected Result: Dashboard displays total users, students, counselors, admins, events, appointment statistics, completion rate, no-show rate, average satisfaction rating, and follow-up count.
+Actual Result: AdminController::dashboard() computes all statistics and passes them to the view. Appointments by college (top 5), recent events, and recent users are also included.
+Status: Pass
+Remarks / Corrective Action: None.
+
+--------------------------------------------------------------------------------
+
+Test ID: L-02
+Feature / Function: Admin User Management - View, Create, Edit, Delete Users
+Test Scenario: Log in as an admin, navigate to user management, and perform create, edit, and delete operations on a user.
+Expected Result: Users can be created, updated, and deleted. Changes are reflected in the database.
+Actual Result: Routes admin.users, admin.users.create, admin.users.store, admin.users.edit, admin.users.update, and admin.users.delete are all defined and map to AdminController methods.
+Status: Pass
+Remarks / Corrective Action: None.
+
+--------------------------------------------------------------------------------
+
+Test ID: L-03
+Feature / Function: Admin Appointment Sessions Dashboard
+Test Scenario: Log in as an admin and navigate to the appointment sessions dashboard.
+Expected Result: Dashboard displays all session notes across all counselors with filter and search options.
+Actual Result: Route admin.appointment-sessions.dashboard maps to AdminController::appointmentSessionsDashboard(). Route admin.appointments.session-notes maps to AdminController::viewAppointmentSessionNotes().
+Status: Pass
+Remarks / Corrective Action: None.
+
+--------------------------------------------------------------------------------
+
+Test ID: L-04
+Feature / Function: Admin Analytics - System-Wide Reports
+Test Scenario: Log in as an admin, navigate to analytics, and apply filters (college, year, date range).
+Expected Result: Analytics page displays appointment statistics, monthly trends, per-college breakdown, booking type distribution, referral in/out stats, and average satisfaction.
+Actual Result: AnalyticsController::index() computes all metrics with college and date range filters. Monthly data is computed for all 12 months. Referral in/out counts, rates, sources, and destinations are all included.
+Status: Pass
+Remarks / Corrective Action: None.
+
+--------------------------------------------------------------------------------
+
+Test ID: L-05
+Feature / Function: Audit Trail / Activity Log
+Test Scenario: Perform key actions (login, appointment creation, status change, user deletion) and check if an audit log records these events.
+Expected Result: System maintains a log of significant user actions with timestamps and actor information.
+Actual Result: No audit logging system exists in the codebase. There is no activity_log or audit_log table, no ActivityLog model, and no logging middleware. Key actions are not recorded beyond standard Laravel application logs. Some controllers use Log::info() for debugging purposes only.
+Status: Fail
+Remarks / Corrective Action: An audit trail is not implemented. This is a non-blocking gap for participant evaluation but is recommended for a system handling sensitive student counseling data. Consider implementing a lightweight activity log to record critical actions such as login/logout, appointment status changes, high-risk flag toggles, and user management operations.
+
