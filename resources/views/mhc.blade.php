@@ -391,9 +391,16 @@
     }
 
     .faq-active .faq-answer {
-        max-height: 500px;
+        max-height: none;
         padding: 1.35rem 1.4rem 1.45rem;
         border-top: 1px solid var(--border-soft);
+        overflow: visible;
+    }
+
+    .faq-answer p {
+        margin: 0;
+        white-space: normal;
+        overflow-wrap: anywhere;
     }
 
     .profile-dropdown-content {
@@ -847,10 +854,19 @@
                             $firstResource = $resources->first();
                         @endphp
 
+                        @php
+                            $categoryImages = [
+                                'youtube'  => 'https://images.unsplash.com/photo-1611162616305-c69b3fa7fbe0?auto=format&fit=crop&w=500&q=80',
+                                'ebooks'   => 'https://images.unsplash.com/photo-1512820790803-83ca734da794?auto=format&fit=crop&w=500&q=80',
+                                'private'  => 'https://images.unsplash.com/photo-1574717024653-61fd2cf4d44d?auto=format&fit=crop&w=500&q=80',
+                                'ogc'      => 'https://images.unsplash.com/photo-1497032628192-86f99bcd76bc?auto=format&fit=crop&w=500&q=80',
+                            ];
+                            $cardImage = $categoryImages[$key] ?? null;
+                        @endphp
                         <div class="mhc-card group h-full">
                             <div class="relative h-52 overflow-hidden">
-                                @if($firstResource && $firstResource->image_url)
-                                    <img src="{{ $firstResource->image_url }}"
+                                @if($cardImage)
+                                    <img src="{{ $cardImage }}"
                                          alt="{{ $name }}"
                                          class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110">
                                 @else
@@ -1144,7 +1160,7 @@
             faqItem.classList.toggle('faq-active');
 
             if (faqItem.classList.contains('faq-active')) {
-                answer.style.maxHeight = answer.scrollHeight + "px";
+                answer.style.maxHeight = null;
                 icon.style.transform = 'rotate(180deg)';
             } else {
                 answer.style.maxHeight = null;

@@ -687,7 +687,7 @@
             </div>
         </div>
 
-        <div class="form-card">
+        
             @if($hasActiveAppointment ?? false)
                 <div class="glass-card error-alert mb-5">
                     <div class="error-alert-inner">
@@ -708,7 +708,8 @@
                         </div>
                     </div>
                 </div>
-            @endif
+            @else
+        <div class="form-card">
             <form id="appointmentForm" action="{{ route('appointments.store') }}" method="POST">
                 @csrf
 
@@ -923,6 +924,7 @@
                     </button>
                 </div>
             </form>
+        @endif
         </div>
     </div>
 </div>
